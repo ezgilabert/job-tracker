@@ -4,7 +4,7 @@
 
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { isRefClosed, refStepIndex } from '../selectors.js';
-import { escapeHtml } from '../utils.js';
+import { escapeHtml, ensureArray } from '../utils.js';
 import { renderSteps } from './steps.js';
 
 /**
@@ -30,7 +30,7 @@ export function renderRefCard(ref, ctx = {}) {
     ? `<div class="ref-notas">${escapeHtml(ref.notas)}</div>`
     : '';
 
-  const empresas = Array.isArray(ref.empresasVinculadas) ? ref.empresasVinculadas : [];
+  const empresas = ensureArray(ref.empresasVinculadas);
   const empresasTxt = empresas.length
     ? `<div class="ref-empresas-lista">
          ${empresas.map(e => {

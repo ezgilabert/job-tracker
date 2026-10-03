@@ -53,3 +53,11 @@ export function highlightAndScroll(el, duration = 1800) {
   el.classList.add('highlighted');
   setTimeout(() => el.classList.remove('highlighted'), duration);
 }
+
+export function ensureArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+export function cloneArray(value) {
+  return Array.isArray(value) ? [...value] : [];
+}

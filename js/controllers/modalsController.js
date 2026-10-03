@@ -11,13 +11,14 @@ import { showToast } from '../ui/toast.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { PuestoCombo } from '../ui/combo.js';
 import { mountChips } from '../ui/chips.js';
+import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
 import {
   CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS,
 } from '../constants.js';
 import {
   stepIndex, progressPct,
 } from '../selectors.js';
-import { escapeHtml, todayISO } from '../utils.js';
+import { escapeHtml, todayISO, cloneArray, ensureArray } from '../utils.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -74,7 +75,7 @@ export function mountModalsController(jobsStore, refsStore) {
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
-      const history = Array.isArray(j.history) ? [...j.history] : [];
+      const history = cloneArray(j.history);
       if (nuevoEstado !== j.estado) {
         history.push({ estado: nuevoEstado, fecha: new Date().toISOString() });
       }
@@ -164,7 +165,7 @@ export function mountModalsController(jobsStore, refsStore) {
     const { id, estado } = pendingClose;
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
-      const history = Array.isArray(j.history) ? [...j.history] : [];
+      const history = cloneArray(j.history);
       history.push({ estado, fecha: new Date().toISOString(), motivo });
       return { ...j, estado, history };
     }));
@@ -210,10 +211,10 @@ export function mountModalsController(jobsStore, refsStore) {
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
-      const skipped = Array.isArray(j.skipped) ? [...j.skipped] : [];
+      const skipped = cloneArray(j.skipped);
       if (skipCurrent && !skipped.includes(j.estado)) skipped.push(j.estado);
 
-      const history = Array.isArray(j.history) ? [...j.history] : [];
+      const history = cloneArray(j.history);
       const entry = { estado: nuevoEstado, fecha: new Date().toISOString() };
       if (nota) entry.nota = nota;
       history.push(entry);
@@ -263,33 +264,7 @@ export function mountModalsController(jobsStore, refsStore) {
   );
   let refEditEmpresas = new Set();
 
-  function renderRefEditEmpresas() {
-    const container = document.getElementById('refEditEmpresasWrap');
-    const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-
-    if (empresas.length === 0) {
-      container.innerHTML = `<span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>`;
-      return;
-    }
-
-    container.innerHTML = empresas.map(emp => {
-      const sel = refEditEmpresas.has(emp);
-      return `<button type="button" class="ref-empresa-chip ${sel ? 'selected' : ''}" data-empresa="${escapeHtml(emp)}">${escapeHtml(emp)}</button>`;
-    }).join('');
-  }
-
-  document.getElementById('refEditEmpresasWrap').addEventListener('click', (e) => {
-    const chip = e.target.closest('.ref-empresa-chip');
-    if (!chip) return;
-    const emp = chip.dataset.empresa;
-    if (refEditEmpresas.has(emp)) {
-      refEditEmpresas.delete(emp);
-      chip.classList.remove('selected');
-    } else {
-      refEditEmpresas.add(emp);
-      chip.classList.add('selected');
-    }
-  });
+  mountEmpresasChips(document.getElementById('refEditEmpresasWrap'), refEditEmpresas);
 
   function openRefEdit(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -305,7 +280,12 @@ export function mountModalsController(jobsStore, refsStore) {
     refEditRelacion.setValue(r.relacion || 'Conocido');
     refEditEstado.setValue(r.estado || 'Pendiente');
     refEditEmpresas = new Set(r.empresasVinculadas || []);
-    renderRefEditEmpresas();
+    const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
+    renderEmpresasChips(
+      document.getElementById('refEditEmpresasWrap'),
+      refEditEmpresas,
+      empresas
+    );
 
     refEditModal.classList.add('open');
   }
@@ -445,7 +425,7 @@ export function mountModalsController(jobsStore, refsStore) {
 
     refsStore.update(refs => refs.map(r => {
       if (r.id !== refToJobPending) return r;
-      const vinculadas = Array.isArray(r.empresasVinculadas) ? [...r.empresasVinculadas] : [];
+      const vinculadas = cloneArray(r.empresasVinculadas);
       if (!vinculadas.includes(j.empresa)) vinculadas.push(j.empresa);
       return { ...r, empresasVinculadas: vinculadas };
     }));
@@ -459,7 +439,7 @@ export function mountModalsController(jobsStore, refsStore) {
   // Create job from referral
   // ----------------------------------------------------------
   function createJobFromRef(r) {
-    const empresas = Array.isArray(r.empresasVinculadas) ? r.empresasVinculadas : [];
+    const empresas = ensureArray(r.empresasVinculadas);
     const empresaDefault = empresas[0] || '';
 
     // If a job for that company already exists, link instead of duplicating
@@ -468,7 +448,7 @@ export function mountModalsController(jobsStore, refsStore) {
       if (existente) {
         refsStore.update(refs => refs.map(x => {
           if (x.id !== r.id) return x;
-          const vinculadas = Array.isArray(x.empresasVinculadas) ? [...x.empresasVinculadas] : [];
+          const vinculadas = cloneArray(x.empresasVinculadas);
           if (!vinculadas.includes(existente.empresa)) vinculadas.push(existente.empresa);
           return { ...x, empresasVinculadas: vinculadas };
         }));
@@ -502,7 +482,7 @@ export function mountModalsController(jobsStore, refsStore) {
 
     refsStore.update(refs => refs.map(x => {
       if (x.id !== r.id) return x;
-      const vinculadas = Array.isArray(x.empresasVinculadas) ? [...x.empresasVinculadas] : [];
+      const vinculadas = cloneArray(x.empresasVinculadas);
       if (nuevo.empresa && !vinculadas.includes(nuevo.empresa)) vinculadas.push(nuevo.empresa);
       return { ...x, empresasVinculadas: vinculadas };
     }));
@@ -569,7 +549,7 @@ export function mountModalsController(jobsStore, refsStore) {
 
     jobsStore.update(jobs => jobs.map(x => {
       if (x.id !== id) return x;
-      const history = Array.isArray(x.history) ? [...x.history] : [];
+      const history = cloneArray(x.history);
       history.push({ estado: nuevoEstado, fecha: new Date().toISOString() });
       return { ...x, estado: nuevoEstado, history };
     }));

@@ -406,6 +406,18 @@
   </div>
 </div>
 
+<!-- Confirm modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width: 420px;">
+    <h2 id="confirmTitle"></h2>
+    <p id="confirmMessage" style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.5rem;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="confirmBtnCancel">Cancelar</button>
+      <button class="btn btn-primary" id="confirmBtnConfirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toasts"></div>
 
 <script type="module" src="./js/main.js"></script>

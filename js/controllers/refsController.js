@@ -8,10 +8,12 @@
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
+import { showConfirm } from '../ui/confirmModal.js';
 import { filterRefs, refStepIndex, isRefClosed } from '../selectors.js';
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import { uid, highlightAndScroll } from '../utils.js';
+import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -109,9 +111,11 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     relacionChips?.setValue(null);
     estadoChips?.setValue('Pendiente');
     selectedEmpresas = new Set();
+    const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
     renderEmpresasChips(
       document.getElementById('refEmpresasWrap'),
-      selectedEmpresas
+      selectedEmpresas,
+      empresas
     );
 
     showToast('Referido agregado', '✓');
@@ -120,43 +124,22 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   // ----------------------------------------------------------
   // Linked companies
   // ----------------------------------------------------------
-  function renderEmpresasChips(container, selectedSet) {
-    const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-
-    if (empresas.length === 0) {
-      container.innerHTML = `<span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>`;
-      return;
-    }
-
-    container.innerHTML = empresas.map(emp => {
-      const sel = selectedSet.has(emp);
-      return `<button type="button" class="ref-empresa-chip ${sel ? 'selected' : ''}" data-empresa="${escapeAttr(emp)}">${escapeAttr(emp)}</button>`;
-    }).join('');
-  }
-
-  document.getElementById('refEmpresasWrap').addEventListener('click', (e) => {
-    const chip = e.target.closest('.ref-empresa-chip');
-    if (!chip) return;
-    const emp = chip.dataset.empresa;
-    if (selectedEmpresas.has(emp)) {
-      selectedEmpresas.delete(emp);
-      chip.classList.remove('selected');
-    } else {
-      selectedEmpresas.add(emp);
-      chip.classList.add('selected');
-    }
-  });
+  mountEmpresasChips(document.getElementById('refEmpresasWrap'), selectedEmpresas);
 
   jobsStore.subscribe(() => {
+    const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
     renderEmpresasChips(
       document.getElementById('refEmpresasWrap'),
-      selectedEmpresas
+      selectedEmpresas,
+      empresas
     );
   });
 
+  const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
   renderEmpresasChips(
     document.getElementById('refEmpresasWrap'),
-    selectedEmpresas
+    selectedEmpresas,
+    empresas
   );
 
   // ----------------------------------------------------------
@@ -215,10 +198,16 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     }
   });
 
-  function confirmDelete(id) {
+  async function confirmDelete(id) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
-    if (!confirm(`¿Borrar a ${r.nombre} de referidos?`)) return;
+    const confirmed = await showConfirm({
+      title: `¿Borrar a ${r.nombre}?`,
+      message: 'Se eliminará de tu lista de referidos.',
+      confirmText: 'Borrar',
+      danger: true,
+    });
+    if (!confirmed) return;
     refsStore.update(refs => refs.filter(x => x.id !== id));
     showToast('Referido borrado', '🗑️');
   }
@@ -250,10 +239,16 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     }
   }
 
-  function closeRef(id) {
+  async function closeRef(id) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
-    if (!confirm(`¿Marcar a ${r.nombre} como "No aplica"?`)) return;
+    const confirmed = await showConfirm({
+      title: `¿Marcar a ${r.nombre} como "No aplica"?`,
+      message: 'Este referido ya no aplica para tu búsqueda.',
+      confirmText: 'Marcar',
+      danger: true,
+    });
+    if (!confirmed) return;
     refsStore.update(refs => refs.map(x =>
       x.id === id ? { ...x, estado: 'No aplica' } : x
     ));
@@ -308,10 +303,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   function valueOf(id) {
     const el = document.getElementById(id);
     return el ? el.value.trim() : '';
-  }
-
-  function escapeAttr(str) {
-    return String(str).replace(/"/g, '&quot;');
   }
 
   return { renderRefs, initChips };

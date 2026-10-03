@@ -53,7 +53,8 @@ js/
   store.js             # persistence + migration
   constants.js         # stages, close reasons, defaults
   selectors.js         # stats, filters, sort
+  utils.js             # shared helpers (escapeHtml, ensureArray, cloneArray, etc.)
   controllers/         # jobs, referrals, modals
   templates/           # card and stats HTML
-  ui/                  # date picker, combo, chips, toast
+  ui/                  # date picker, combo, chips, toast, confirm modal, empresas chips
 ```

@@ -10,6 +10,7 @@ import { mountModalsController } from './controllers/modalsController.js';
 import { DatePicker } from './ui/datePicker.js';
 import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
+import { ensureArray } from './utils.js';
 
 // ------------------------------------------------------------
 // Theme
@@ -38,7 +39,7 @@ const jobsStore = new Store(STORAGE_KEYS.JOBS, [], {
       return data.map(j => ({
         ...j,
         contacto: j.contacto ?? '',
-        skipped: Array.isArray(j.skipped) ? j.skipped : [],
+        skipped: ensureArray(j.skipped),
         history: Array.isArray(j.history) && j.history.length
           ? j.history
           : [{ estado: j.estado, fecha: new Date().toISOString() }],
@@ -55,7 +56,7 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
       return data.map(r => ({
         ...r,
         estado: r.estado || 'Pendiente',
-        empresasVinculadas: Array.isArray(r.empresasVinculadas) ? r.empresasVinculadas : [],
+        empresasVinculadas: ensureArray(r.empresasVinculadas),
       }));
     }
     return data;
@@ -76,14 +77,11 @@ const puestoCombo = new PuestoCombo(document.getElementById('puestoCombo'), {
 const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
 const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 
-// DatePicker is not a form control; jobsController needs it to reset after submit.
-window.__fechaPicker = fechaPicker;
-
 // ------------------------------------------------------------
 // Controllers
 // ------------------------------------------------------------
 const modals = mountModalsController(jobsStore, refsStore);
-const jobsCtrl = mountJobsController(jobsStore, refsStore, modals);
+const jobsCtrl = mountJobsController(jobsStore, refsStore, modals, fechaPicker);
 const refsCtrl = mountRefsController(jobsStore, refsStore, modals);
 
 refsCtrl.initChips(refRelacionChips, refEstadoChips);

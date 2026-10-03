@@ -6,6 +6,7 @@
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
+import { showConfirm } from '../ui/confirmModal.js';
 import {
   computeStats, filterJobs, sortJobs,
   isClosed, stepIndex, progressPct,
@@ -13,18 +14,24 @@ import {
 import { WORKFLOW_STEPS, CLOSED_STATES } from '../constants.js';
 import { renderStats } from '../templates/stats.js';
 import { renderJobCard } from '../templates/jobCard.js';
-import { uid, todayISO } from '../utils.js';
+import { uid, todayISO, cloneArray } from '../utils.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
  * @param {{ onOpenEdit: (id:number)=>void, onClose: (id:number, estado:string)=>void, onAdvance: (id:number, opts:object)=>void }} modals
+ * @param {import('../ui/datePicker.js').DatePicker} fechaPicker
  */
-export function mountJobsController(jobsStore, refsStore, modals) {
+export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
   // ----------------------------------------------------------
   // Local UI state
   // ----------------------------------------------------------
   let currentFilter = 'all';
+
+  // ----------------------------------------------------------
+  // UI components
+  // ----------------------------------------------------------
+  const datePicker = fechaPicker;
 
   // ----------------------------------------------------------
   // Render
@@ -69,7 +76,7 @@ export function mountJobsController(jobsStore, refsStore, modals) {
       id: uid(),
       empresa: valueOf('empresa'),
       puesto: valueOf('puesto'),
-      fecha: window.__fechaPicker?.getValue() || '',
+      fecha: datePicker?.getValue() || '',
       estado: document.getElementById('estado').value,
       link: valueOf('link'),
       salario: valueOf('salario'),
@@ -82,7 +89,7 @@ export function mountJobsController(jobsStore, refsStore, modals) {
     jobsStore.update(jobs => [nuevo, ...jobs]);
 
     form.reset();
-    window.__fechaPicker?.setValue('');
+    datePicker?.setValue('');
     showToast('Postulación agregada', '✓');
   });
 
@@ -129,8 +136,14 @@ export function mountJobsController(jobsStore, refsStore, modals) {
     }
   });
 
-  function confirmDelete(id) {
-    if (!confirm('¿Borrar esta postulación?')) return;
+  async function confirmDelete(id) {
+    const confirmed = await showConfirm({
+      title: '¿Borrar postulación?',
+      message: 'Esta acción no se puede deshacer.',
+      confirmText: 'Borrar',
+      danger: true,
+    });
+    if (!confirmed) return;
     jobsStore.update(jobs => jobs.filter(j => j.id !== id));
     showToast('Postulación borrada', '🗑️');
   }
@@ -138,7 +151,7 @@ export function mountJobsController(jobsStore, refsStore, modals) {
   function reopenJob(id) {
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
-      const history = Array.isArray(j.history) ? [...j.history] : [];
+      const history = cloneArray(j.history);
       history.push({ estado: 'Aplicado', fecha: new Date().toISOString() });
       return { ...j, estado: 'Aplicado', history };
     }));

@@ -9,6 +9,7 @@ import {
   REF_WORKFLOW_STEPS,
   REF_CLOSED_STATES,
 } from './constants.js';
+import { ensureArray } from './utils.js';
 
 // ------------------------------------------------------------
 // Jobs
@@ -93,7 +94,7 @@ export function sortJobs(jobs) {
 }
 
 export function currentStepNote(job) {
-  const hist = Array.isArray(job.history) ? job.history : [];
+  const hist = ensureArray(job.history);
   for (let i = hist.length - 1; i >= 0; i--) {
     if (hist[i].estado === job.estado && hist[i].nota) return hist[i].nota;
   }
@@ -101,7 +102,7 @@ export function currentStepNote(job) {
 }
 
 export function lastHistoryEntry(job) {
-  const hist = Array.isArray(job.history) ? job.history : [];
+  const hist = ensureArray(job.history);
   return hist.length ? hist[hist.length - 1] : null;
 }
 

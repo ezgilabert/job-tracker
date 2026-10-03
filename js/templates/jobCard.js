@@ -7,7 +7,7 @@ import {
   isClosed, stepIndex, progressPct,
   currentStepNote, lastHistoryEntry, refsForEmpresa,
 } from '../selectors.js';
-import { escapeHtml, diasDesde, formatFecha } from '../utils.js';
+import { escapeHtml, diasDesde, formatFecha, ensureArray } from '../utils.js';
 import { renderSteps } from './steps.js';
 
 /**
@@ -60,7 +60,7 @@ export function renderJobCard(job, ctx = {}) {
   const stepsHtml = closed ? '' : renderSteps(
     WORKFLOW_STEPS,
     currentIdx,
-    Array.isArray(job.skipped) ? job.skipped : []
+    ensureArray(job.skipped)
   );
 
   const pd = currentStepNote(job);
