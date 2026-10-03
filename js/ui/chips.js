@@ -1,10 +1,9 @@
 // ============================================================
-// Chips: grupo de botones seleccionables (relación, estado, etc.)
-// Reemplaza la dupla setupChips / setChipsValue
+// Chips: selectable button group (relationship, status, etc.)
 // ============================================================
 
 /**
- * @param {HTMLElement} container  contenedor con botones .ref-chip
+ * @param {HTMLElement} container  container with .ref-chip buttons
  * @param {{ onChange?: (value:string) => void }} opts
  * @returns {{ setValue: (v:string|null) => void, getValue: () => string|null }}
  */
@@ -18,7 +17,7 @@ export function mountChips(container, { onChange = () => {} } = {}) {
     const value = chip.dataset.value;
     if (value === undefined) return;
 
-    // Permitir deseleccionar si ya está seleccionado (útil para "relación" opcional)
+    // Optional chips (e.g. relationship) can be cleared by clicking again
     if (currentValue === value && container.dataset.allowDeselect === 'true') {
       chip.classList.remove('selected');
       currentValue = null;

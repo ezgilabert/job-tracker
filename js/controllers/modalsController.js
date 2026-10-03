@@ -1,10 +1,10 @@
 // ============================================================
-// Controller: modales
-// - Editar postulación
-// - Cerrar postulación (con motivo)
-// - Editar referido
-// - Mover referido → postulación
-// - Nota al avanzar
+// Controller: modals
+// - Edit job
+// - Close job (with reason)
+// - Edit referral
+// - Move referral → job
+// - Note on advance
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -25,12 +25,12 @@ import { escapeHtml, todayISO } from '../utils.js';
  */
 export function mountModalsController(jobsStore, refsStore) {
   // ----------------------------------------------------------
-  // Editar postulación
+  // Edit job
   // ----------------------------------------------------------
   const editModal = document.getElementById('editModal');
   const editEstado = document.getElementById('editEstado');
 
-  // Poblar el <select> de estados con TODOS los estados (abiertos + cerrados)
+  // Include open + closed states so edits can also close a job
   editEstado.innerHTML = ALL_STATES
     .map(s => `<option>${escapeHtml(s)}</option>`)
     .join('');
@@ -97,7 +97,7 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Cerrar postulación con motivo
+  // Close job with reason
   // ----------------------------------------------------------
   const closeModal = document.getElementById('closeModal');
   const closeReasonsEl = document.getElementById('closeReasons');
@@ -175,7 +175,7 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Nota al avanzar
+  // Note on advance
   // ----------------------------------------------------------
   const noteModal = document.getElementById('noteModal');
   const stepNoteInput = document.getElementById('stepNoteInput');
@@ -248,7 +248,7 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Editar referido
+  // Edit referral
   // ----------------------------------------------------------
   const refEditModal = document.getElementById('refEditModal');
   let refEditingId = null;
@@ -343,7 +343,7 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Mover referido → postulaciones
+  // Move referral → jobs
   // ----------------------------------------------------------
   const refToJobModal = document.getElementById('refToJobModal');
   const refToJobLinkSection = document.getElementById('refToJobLinkSection');
@@ -456,13 +456,13 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Crear job desde referido
+  // Create job from referral
   // ----------------------------------------------------------
   function createJobFromRef(r) {
     const empresas = Array.isArray(r.empresasVinculadas) ? r.empresasVinculadas : [];
     const empresaDefault = empresas[0] || '';
 
-    // Ya existe job con esa empresa → vincular
+    // If a job for that company already exists, link instead of duplicating
     if (empresaDefault) {
       const existente = jobsStore.get().find(j => j.empresa === empresaDefault);
       if (existente) {
@@ -510,7 +510,6 @@ export function mountModalsController(jobsStore, refsStore) {
     closeRefToJob();
     showToast(`Postulación creada desde ${r.nombre}`, '✨');
 
-    // Abrir el modal de edición para completar datos
     setTimeout(() => {
       openEdit(nuevoId);
       document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: nuevoId } }));
@@ -529,10 +528,9 @@ export function mountModalsController(jobsStore, refsStore) {
     return el ? el.value.trim() : '';
   }
 
-  // Escuchar 'scroll-to-job' que disparan refsController y este mismo controller
   document.addEventListener('scroll-to-job', (e) => {
     const { jobId } = e.detail;
-    // Reset filtro para garantizar visibilidad
+    // Clear the job filter so the target card is visible
     const btn = document.querySelector('#filters button[data-filter="all"]');
     if (btn && !btn.classList.contains('active')) btn.click();
 
@@ -547,7 +545,7 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // API pública
+  // Public API
   // ----------------------------------------------------------
   return {
     onOpenEdit: openEdit,
@@ -561,7 +559,7 @@ export function mountModalsController(jobsStore, refsStore) {
     onRefToJob: openRefToJob,
   };
 
-  // Avanzar hacia atrás es directo (sin modal)
+  // Stepping backward skips the note modal
   function applyPrev(id) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;

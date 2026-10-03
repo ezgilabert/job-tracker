@@ -1,5 +1,5 @@
 // ============================================================
-// Punto de entrada: wiring de stores, controllers y UI
+// Entry point: wires stores, controllers, and UI
 // ============================================================
 
 import { Store } from './store.js';
@@ -12,7 +12,7 @@ import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
 
 // ------------------------------------------------------------
-// Tema (claro/oscuro)
+// Theme
 // ------------------------------------------------------------
 function mountTheme() {
   const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
@@ -33,7 +33,7 @@ const jobsStore = new Store(STORAGE_KEYS.JOBS, [], {
   version: STORAGE_VERSION,
   seed: () => SAMPLE_JOBS.map(j => ({ ...j })),
   migrate: (data, from, to) => {
-    // v0 (array plano) → v2
+    // v0 (flat array) → v2
     if (Array.isArray(data)) {
       return data.map(j => ({
         ...j,
@@ -63,7 +63,7 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
 });
 
 // ------------------------------------------------------------
-// UI: fecha, puesto, chips de referido
+// UI: date, role combo, referral chips
 // ------------------------------------------------------------
 const fechaPicker = new DatePicker(document.getElementById('fechaPicker'), {
   onChange: () => {},
@@ -76,9 +76,7 @@ const puestoCombo = new PuestoCombo(document.getElementById('puestoCombo'), {
 const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
 const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 
-// Exponer el datepicker al form (jobsController lo usa para resetear)
-// Es un caso de borde: el input vive en el form pero el componente no.
-// Lo dejamos en un Symbol para no contaminar window.
+// DatePicker is not a form control; jobsController needs it to reset after submit.
 window.__fechaPicker = fechaPicker;
 
 // ------------------------------------------------------------
@@ -88,10 +86,6 @@ const modals = mountModalsController(jobsStore, refsStore);
 const jobsCtrl = mountJobsController(jobsStore, refsStore, modals);
 const refsCtrl = mountRefsController(jobsStore, refsStore, modals);
 
-// Pasar los chips ya montados al refsController
 refsCtrl.initChips(refRelacionChips, refEstadoChips);
 
-// ------------------------------------------------------------
-// Tema
-// ------------------------------------------------------------
 mountTheme();

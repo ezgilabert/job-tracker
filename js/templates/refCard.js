@@ -1,5 +1,5 @@
 // ============================================================
-// Template: tarjeta de referido
+// Template: referral card
 // ============================================================
 
 import { REF_WORKFLOW_STEPS } from '../constants.js';
@@ -90,7 +90,6 @@ export function renderRefCard(ref, ctx = {}) {
   `;
 }
 
-// ------------------------------------------------------------
 function renderRefActions(ref, currentIdx) {
   const canBack = currentIdx > 0;
   const canNext = currentIdx < REF_WORKFLOW_STEPS.length - 1;

@@ -1,11 +1,11 @@
 // ============================================================
-// Store reactivo con persistencia y migración
+// Reactive store with localStorage persistence and migration
 // ============================================================
 
 export class Store {
   /**
-   * @param {string} key  clave de localStorage
-   * @param {any} initialValue  valor por defecto
+   * @param {string} key  localStorage key
+   * @param {any} initialValue  default value
    * @param {{
    *   version?: number,
    *   migrate?: (data:any, from:number, to:number)=>any,
@@ -27,10 +27,10 @@ export class Store {
       const raw = localStorage.getItem(this.key);
       if (raw) stored = JSON.parse(raw);
     } catch (e) {
-      console.warn(`[Store:${this.key}] JSON corrupto, se ignora`, e);
+      console.warn(`[Store:${this.key}] corrupt JSON, ignored`, e);
     }
 
-    // Sin datos → seed o default
+    // No stored data → seed or default
     if (stored === null) {
       const data = this.seed ? this.seed() : initialValue;
       const wrapped = { version: this.version, data };
@@ -38,7 +38,7 @@ export class Store {
       return wrapped;
     }
 
-    // Formato nuevo { version, data }
+    // Wrapped format { version, data }
     if (
       stored &&
       typeof stored === 'object' &&
@@ -53,7 +53,7 @@ export class Store {
       return stored;
     }
 
-    // Formato viejo (array plano) → migrar
+    // Legacy flat array → migrate
     const data = this.migrate ? this.migrate(stored, 0, this.version) : stored;
     const wrapped = { version: this.version, data };
     this.#persistRaw(wrapped);
@@ -64,7 +64,7 @@ export class Store {
     try {
       localStorage.setItem(this.key, JSON.stringify(obj));
     } catch (e) {
-      console.error(`[Store:${this.key}] no se pudo persistir`, e);
+      console.error(`[Store:${this.key}] persist failed`, e);
     }
   }
 
@@ -73,12 +73,12 @@ export class Store {
   }
 
   /**
-   * @param {(current:any)=>any} updater  debe devolver el nuevo estado
+   * @param {(current:any)=>any} updater  must return the next state
    */
   update(updater) {
     const next = updater(this.state.data);
     if (next === undefined) {
-      console.warn('[Store] updater devolvió undefined; ignorado');
+      console.warn('[Store] updater returned undefined; ignored');
       return;
     }
     this.state.data = next;
@@ -88,7 +88,7 @@ export class Store {
 
   subscribe(fn) {
     this.listeners.add(fn);
-    fn(this.state.data); // llamada inicial
+    fn(this.state.data); // emit current state immediately
     return () => this.listeners.delete(fn);
   }
 

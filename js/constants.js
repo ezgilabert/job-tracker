@@ -1,5 +1,5 @@
 // ============================================================
-// Constantes del dominio: workflow, estados, motivos, defaults
+// Domain constants: workflow, states, close reasons, defaults
 // ============================================================
 
 export const WORKFLOW_STEPS = [

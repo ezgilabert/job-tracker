@@ -1,5 +1,5 @@
 // ============================================================
-// Toast: notificaciones efímeras
+// Toast: short-lived notifications
 // ============================================================
 
 import { escapeHtml } from '../utils.js';
@@ -19,7 +19,7 @@ function getContainer() {
 
 /**
  * @param {string} message
- * @param {string} icon  emoji corto
+ * @param {string} icon  short emoji
  * @param {{ duration?: number }} opts
  */
 export function showToast(message, icon = '✓', opts = {}) {

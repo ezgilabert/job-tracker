@@ -1,10 +1,10 @@
 // ============================================================
-// Controller: referidos
-// - form de alta
-// - filtros + búsqueda
-// - toggle de sección
-// - event delegation sobre #refList
-// - escucha 'scroll-to-ref' disparado desde jobsController
+// Controller: referrals
+// - create form
+// - filters + search
+// - section toggle
+// - event delegation on #refList
+// - listens for 'scroll-to-ref' from jobsController
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -23,7 +23,7 @@ import { uid, highlightAndScroll } from '../utils.js';
  */
 export function mountRefsController(jobsStore, refsStore, modals) {
   // ----------------------------------------------------------
-  // Estado local del controller
+  // Local UI state
   // ----------------------------------------------------------
   let currentFilter = 'all';
   let searchTerm = '';
@@ -31,7 +31,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   let selectedEstado = 'Pendiente';
   let selectedEmpresas = new Set();
 
-  // Chips (los maneja ui/chips.js)
   let relacionChips = null;
   let estadoChips = null;
 
@@ -68,13 +67,12 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   refsStore.subscribe(renderRefs);
-  jobsStore.subscribe(renderRefs); // porque las empresas vinculadas dependen de jobs
+  jobsStore.subscribe(renderRefs); // linked companies come from jobs
 
   // ----------------------------------------------------------
-  // Chips iniciales
+  // Chips
   // ----------------------------------------------------------
-  // Se inicializan en main.js después de importar ui/chips.js.
-  // Los exponemos con un setter para no acoplar el controller al módulo de chips.
+  // Mounted in main.js; injected here so this controller stays decoupled from ui/chips.js.
   function initChips(relacion, estado) {
     relacionChips = relacion;
     estadoChips = estado;
@@ -83,7 +81,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   // ----------------------------------------------------------
-  // Form de alta
+  // Create form
   // ----------------------------------------------------------
   const refForm = document.getElementById('refForm');
   refForm.addEventListener('submit', (e) => {
@@ -107,7 +105,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     refsStore.update(refs => [nuevo, ...refs]);
 
-    // Reset
     refForm.reset();
     relacionChips?.setValue(null);
     estadoChips?.setValue('Pendiente');
@@ -121,7 +118,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // Empresas vinculadas (chips reutilizables)
+  // Linked companies
   // ----------------------------------------------------------
   function renderEmpresasChips(container, selectedSet) {
     const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
@@ -137,7 +134,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     }).join('');
   }
 
-  // Delegación sobre el wrap de empresas (una sola vez)
   document.getElementById('refEmpresasWrap').addEventListener('click', (e) => {
     const chip = e.target.closest('.ref-empresa-chip');
     if (!chip) return;
@@ -151,7 +147,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     }
   });
 
-  // Re-pintar chips de empresas cada vez que cambian los jobs
   jobsStore.subscribe(() => {
     renderEmpresasChips(
       document.getElementById('refEmpresasWrap'),
@@ -159,14 +154,13 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     );
   });
 
-  // Primer render
   renderEmpresasChips(
     document.getElementById('refEmpresasWrap'),
     selectedEmpresas
   );
 
   // ----------------------------------------------------------
-  // Búsqueda y filtros
+  // Search and filters
   // ----------------------------------------------------------
   document.getElementById('refSearch').addEventListener('input', (e) => {
     searchTerm = e.target.value;
@@ -184,7 +178,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // Toggle de sección
+  // Section toggle
   // ----------------------------------------------------------
   const refToggleBtn = document.getElementById('refToggleBtn');
   const referidosBody = document.getElementById('referidosBody');
@@ -196,7 +190,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // Delegación sobre #refList
+  // #refList delegation
   // ----------------------------------------------------------
   const refList = document.getElementById('refList');
 
@@ -249,7 +243,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     showToast(`${r.nombre}: ${nuevoEstado}`, direction === 'next' ? '→' : '←');
 
-    // Si acaba de llegar a "Referido hecho" → ofrecer mover a postulaciones
     if (nuevoEstado === 'Referido hecho'
         && prevEstado !== 'Referido hecho'
         && direction === 'next') {
@@ -279,18 +272,16 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   // ----------------------------------------------------------
-  // Escucha scroll-to-ref disparado desde jobsController
+  // scroll-to-ref (from jobsController)
   // ----------------------------------------------------------
   document.addEventListener('scroll-to-ref', (e) => {
     const { refId } = e.detail;
 
-    // Expandir la sección si está colapsada
     if (referidosBody.classList.contains('collapsed')) {
       referidosBody.classList.remove('collapsed');
       refToggleBtn.style.transform = 'rotate(0)';
     }
 
-    // Resetear filtros si el referido no está visible
     let needsRender = false;
     if (currentFilter !== 'all') {
       currentFilter = 'all';

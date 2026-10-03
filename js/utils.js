@@ -1,5 +1,5 @@
 // ============================================================
-// Utilidades puras: sin DOM, sin efectos secundarios
+// Shared helpers
 // ============================================================
 
 export function escapeHtml(str) {
@@ -45,14 +45,11 @@ export function debounce(fn, ms = 200) {
   };
 }
 
-/**
- * Pinta un elemento, lo scrollea y le aplica un highlight temporal.
- */
 export function highlightAndScroll(el, duration = 1800) {
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   el.classList.remove('highlighted');
-  void el.offsetWidth; // force reflow
+  void el.offsetWidth; // force reflow so the highlight animation restarts
   el.classList.add('highlighted');
   setTimeout(() => el.classList.remove('highlighted'), duration);
 }

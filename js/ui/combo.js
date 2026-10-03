@@ -1,5 +1,5 @@
 // ============================================================
-// PuestoCombo: input con dropdown filtrable de puestos
+// PuestoCombo: filterable role dropdown
 // ============================================================
 
 import { DEFAULT_PUESTOS, PUESTO_ICONS } from '../constants.js';
@@ -13,7 +13,7 @@ function getPuestoIcon(puesto) {
 }
 
 /**
- * @param {string[]} jobsPuestos  puestos ya usados (para etiqueta "Reciente")
+ * @param {string[]} jobsPuestos  roles already used (shown as "Reciente")
  * @param {string} query
  * @param {string} currentValue
  */
@@ -45,7 +45,7 @@ function getOptions(jobsPuestos, query) {
 
 export class PuestoCombo {
   /**
-   * @param {HTMLElement} comboEl  contenedor .combo con input + .combo-dropdown
+   * @param {HTMLElement} comboEl  .combo container with input + .combo-dropdown
    * @param {{
    *   getJobPuestos?: () => string[],
    *   onSelect?: (value:string) => void,
@@ -73,13 +73,12 @@ export class PuestoCombo {
     });
     this.input.addEventListener('keydown', (e) => this._handleKey(e));
 
-    // Cerrar al clickear afuera
     this._outsideClick = (e) => {
       if (this.open && !this.combo.contains(e.target)) this.hide();
     };
     document.addEventListener('click', this._outsideClick);
 
-    // Evitar perder foco antes del click
+    // Keep focus on the input so mousedown on an option still registers as a click
     this.dropdown.addEventListener('mousedown', (e) => e.preventDefault());
     this.dropdown.addEventListener('click', (e) => {
       const opt = e.target.closest('.combo-option');

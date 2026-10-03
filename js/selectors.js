@@ -1,6 +1,5 @@
 // ============================================================
-// Derivaciones puras del estado: stats, filtros, orden
-// Sin DOM, sin efectos, fáciles de testear
+// Pure state selectors: stats, filters, sort
 // ============================================================
 
 import {
@@ -80,10 +79,7 @@ function advanceRank(estado) {
   return -10;
 }
 
-/**
- * Ordena por "más avanzada primero"; empate resuelto por fecha/id más recientes.
- * Es un sort estable respecto al input.
- */
+/** Most advanced first; ties broken by newer date/id. */
 export function sortJobs(jobs) {
   return [...jobs].sort((a, b) => {
     const ra = advanceRank(a.estado);
@@ -96,9 +92,6 @@ export function sortJobs(jobs) {
   });
 }
 
-/**
- * Devuelve la última nota registrada para la etapa actual del job.
- */
 export function currentStepNote(job) {
   const hist = Array.isArray(job.history) ? job.history : [];
   for (let i = hist.length - 1; i >= 0; i--) {
@@ -107,16 +100,13 @@ export function currentStepNote(job) {
   return null;
 }
 
-/**
- * Última entrada del historial (para mostrar motivo de cierre, etc.)
- */
 export function lastHistoryEntry(job) {
   const hist = Array.isArray(job.history) ? job.history : [];
   return hist.length ? hist[hist.length - 1] : null;
 }
 
 // ------------------------------------------------------------
-// Referidos
+// Referrals
 // ------------------------------------------------------------
 export function isRefClosed(estado) {
   return REF_CLOSED_STATES.includes(estado);
@@ -142,18 +132,12 @@ export function filterRefs(refs, filter, searchTerm = '') {
   return out;
 }
 
-/**
- * Devuelve los referidos vinculados a una empresa.
- */
 export function refsForEmpresa(refs, empresa) {
   return refs.filter(r =>
     Array.isArray(r.empresasVinculadas) && r.empresasVinculadas.includes(empresa)
   );
 }
 
-/**
- * Lista única de empresas de los jobs, para los chips de vinculación.
- */
 export function uniqueEmpresas(jobs) {
   return [...new Set(jobs.map(j => j.empresa).filter(Boolean))];
 }

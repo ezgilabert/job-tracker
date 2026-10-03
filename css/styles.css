@@ -351,7 +351,7 @@
     font-family: inherit;
   }
 
-  /* ===== COMBO PUESTO ===== */
+  /* ===== ROLE COMBO ===== */
   .combo { position: relative; }
 
   .combo-input-wrap { position: relative; }
@@ -515,7 +515,7 @@
     font-weight: 600;
   }
 
-  /* ===== BOTONES BASE ===== */
+  /* ===== BASE BUTTONS ===== */
   .btn {
     padding: 0.75rem 1.25rem;
     border-radius: 11px;
@@ -1298,7 +1298,7 @@
   .empty h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
   .empty p { font-size: 0.9rem; }
 
-  /* DATE PICKER */
+  /* ===== DATE PICKER ===== */
   .date-picker { position: relative; }
 
   .date-trigger {
@@ -1488,7 +1488,7 @@
     border-color: var(--accent-border);
   }
 
-  /* Modal */
+  /* ===== MODAL ===== */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -1547,7 +1547,7 @@
     justify-content: flex-end;
   }
 
-  /* ===== MODAL DE CIERRE ===== */
+  /* ===== CLOSE MODAL ===== */
   .close-reason-chip {
     padding: 0.45rem 0.85rem;
     border-radius: 20px;
@@ -1574,7 +1574,7 @@
 
   #closeModal .modal h2 { color: var(--danger-2); }
 
-  /* ===== SECCIÓN REFERIDOS ===== */
+  /* ===== REFERRALS ===== */
   .referidos-section {
     margin-top: 3rem;
     padding-top: 2.5rem;
@@ -1682,7 +1682,7 @@
     box-shadow: 0 3px 10px var(--accent-glow);
   }
 
-  /* Chips de estado del referido */
+  /* Referral status chips */
   .ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
     background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
   }
@@ -1876,7 +1876,7 @@
   [data-theme="dark"] .referido[data-relacion="Recruiter"] .ref-relacion-badge { background: var(--success-soft); color: #34d399; border-color: transparent; }
   [data-theme="dark"] .referido[data-relacion="Mentor"] .ref-relacion-badge { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
 
-  /* ===== BADGE DE ESTADO DE REFERIDO ===== */
+  /* ===== REFERRAL STATUS BADGE ===== */
   .ref-estado-badge {
     display: inline-flex;
     align-items: center;
@@ -1930,7 +1930,7 @@
   [data-theme="dark"] .ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: #34d399; }
   [data-theme="dark"] .ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: #f87171; }
 
-  /* ===== REFERIDO: workflow corto ===== */
+  /* ===== REFERRAL: short workflow ===== */
   .ref-workflow {
     display: flex;
     flex-direction: column;
@@ -2109,7 +2109,7 @@
     color: white;
   }
 
-  /* ===== Chips de empresas vinculadas ===== */
+  /* ===== Linked company chips ===== */
   .ref-empresas-wrap {
     display: flex;
     flex-wrap: wrap;
@@ -2237,7 +2237,7 @@
     .ref-search { max-width: 100%; }
   }
 
-  /* ===== TAGS DE REFERIDO EN POSTULACIONES ===== */
+  /* ===== REFERRAL TAGS ON JOBS ===== */
   .job-refs {
     display: flex;
     flex-wrap: wrap;
@@ -2319,7 +2319,7 @@
     border-color: var(--accent) !important;
   }
 
-  /* ===== MODAL: MOVER REFERIDO A POSTULACIONES ===== */
+  /* ===== MODAL: MOVE REFERRAL TO JOBS ===== */
   .ref-to-job-options {
     display: flex;
     flex-direction: column;
@@ -2499,7 +2499,7 @@
     line-height: 1.4;
   }
 
-  /* Toast */
+  /* ===== TOAST ===== */
   .toast-container {
     position: fixed;
     bottom: 1.5rem;

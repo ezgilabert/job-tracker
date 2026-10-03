@@ -1,5 +1,5 @@
 // ============================================================
-// Template: tarjeta de postulación
+// Template: job card
 // ============================================================
 
 import { WORKFLOW_STEPS } from '../constants.js';
@@ -35,7 +35,6 @@ export function renderJobCard(job, ctx = {}) {
     ? `<div class="job-notas">${escapeHtml(job.notas)}</div>`
     : '';
 
-  // Referidos vinculados a esta empresa
   const refsVinculados = refsForEmpresa(referidos, job.empresa);
   const refsHtml = refsVinculados.length
     ? `<div class="job-refs">
@@ -64,7 +63,6 @@ export function renderJobCard(job, ctx = {}) {
     Array.isArray(job.skipped) ? job.skipped : []
   );
 
-  // Nota de la etapa actual (PD)
   const pd = currentStepNote(job);
   const pdHtml = (!closed && pd)
     ? `<div class="step-note">
@@ -122,7 +120,7 @@ export function renderJobCard(job, ctx = {}) {
 }
 
 // ------------------------------------------------------------
-// Bloque de acciones para job abierto
+// Open-job actions
 // ------------------------------------------------------------
 function renderOpenActions(job, currentIdx) {
   const canBack = currentIdx > 0;
@@ -168,7 +166,7 @@ function renderOpenActions(job, currentIdx) {
 }
 
 // ------------------------------------------------------------
-// Bloque de acciones para job cerrado
+// Closed-job actions
 // ------------------------------------------------------------
 function renderClosedActions(job) {
   const last = lastHistoryEntry(job);

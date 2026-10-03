@@ -1,14 +1,13 @@
 // ============================================================
-// Template: barra de pasos del workflow
-// Sirve para jobs y para referidos (mismo layout, distinta config)
+// Template: workflow step bar (jobs and referrals)
 // ============================================================
 
 import { escapeHtml } from '../utils.js';
 
 /**
  * @param {Array<{id:string, short:string}>} steps
- * @param {number} currentIdx  índice del paso actual (-1 si cerrado)
- * @param {string[]} skipped   ids de pasos marcados como "no aplica"
+ * @param {number} currentIdx  current step index (-1 if closed)
+ * @param {string[]} skipped   step ids marked as not applicable
  * @param {{ cssPrefix?: string, showSkipped?: boolean }} opts
  * @returns {string} HTML
  */

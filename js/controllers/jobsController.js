@@ -1,8 +1,8 @@
 // ============================================================
-// Controller: postulaciones
-// - form de alta
-// - filtros
-// - event delegation sobre #list (edit, delete, workflow, drag)
+// Controller: jobs
+// - create form
+// - filters
+// - event delegation on #list (edit, delete, workflow, drag)
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -22,7 +22,7 @@ import { uid, todayISO } from '../utils.js';
  */
 export function mountJobsController(jobsStore, refsStore, modals) {
   // ----------------------------------------------------------
-  // Filtro actual (estado local del controller)
+  // Local UI state
   // ----------------------------------------------------------
   let currentFilter = 'all';
 
@@ -33,11 +33,9 @@ export function mountJobsController(jobsStore, refsStore, modals) {
     const jobs = jobsStore.get();
     const refs = refsStore.get();
 
-    // Stats
     document.getElementById('stats').innerHTML =
       renderStats(computeStats(jobs));
 
-    // Filtrado + orden
     const filtered = sortJobs(filterJobs(jobs, currentFilter));
     const list = document.getElementById('list');
 
@@ -57,12 +55,11 @@ export function mountJobsController(jobsStore, refsStore, modals) {
       .join('');
   }
 
-  // Re-render automático cuando cambian los datos
   jobsStore.subscribe(renderList);
   refsStore.subscribe(renderList);
 
   // ----------------------------------------------------------
-  // Form de alta
+  // Create form
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
   form.addEventListener('submit', (e) => {
@@ -90,7 +87,7 @@ export function mountJobsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // Filtros
+  // Filters
   // ----------------------------------------------------------
   document.getElementById('filters').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-filter]');
@@ -104,7 +101,7 @@ export function mountJobsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // Event delegation sobre #list
+  // #list delegation
   // ----------------------------------------------------------
   const list = document.getElementById('list');
 
@@ -149,7 +146,6 @@ export function mountJobsController(jobsStore, refsStore, modals) {
   }
 
   function scrollToRef(refId) {
-    // Dispara un evento custom que refsController escucha
     document.dispatchEvent(new CustomEvent('scroll-to-ref', { detail: { refId } }));
   }
 
@@ -227,11 +223,9 @@ export function mountJobsController(jobsStore, refsStore, modals) {
     return el ? el.value.trim() : '';
   }
 
-  // Exponer para que modalsController pueda forzar un re-render
   return { renderList, getFilter: () => currentFilter };
 }
 
-// ------------------------------------------------------------
 function getDragAfterElement(container, y) {
   const els = [...container.querySelectorAll('.job:not(.dragging)')];
   return els.reduce((closest, child) => {

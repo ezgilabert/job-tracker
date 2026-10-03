@@ -1,9 +1,9 @@
 // ============================================================
-// DatePicker: selector de fecha custom
+// DatePicker: custom date selector
 // ============================================================
 
 /**
- * Uso:
+ * Usage:
  *   const dp = new DatePicker(document.getElementById('miPicker'), {
  *     value: '2025-01-15',
  *     onChange: (iso) => console.log(iso),
@@ -32,13 +32,11 @@ export class DatePicker {
       this.toggle();
     });
 
-    // Cerrar al clickear afuera
     this._outsideClick = (e) => {
       if (this.open && !this.container.contains(e.target)) this.close();
     };
     document.addEventListener('click', this._outsideClick);
 
-    // Delegación de eventos dentro del popover
     this.popover.addEventListener('click', (e) => this._handlePopoverClick(e));
 
     this.renderTrigger();
@@ -101,7 +99,7 @@ export class DatePicker {
     });
 
     const firstDay = new Date(year, month, 1);
-    const startWeekday = (firstDay.getDay() + 6) % 7; // lunes = 0
+    const startWeekday = (firstDay.getDay() + 6) % 7; // Monday = 0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevMonthDays = new Date(year, month, 0).getDate();
 
