@@ -14,7 +14,7 @@ import {
 import { WORKFLOW_STEPS, CLOSED_STATES } from '../constants.js';
 import { renderStats } from '../templates/stats.js';
 import { renderJobCard } from '../templates/jobCard.js';
-import { uid, todayISO, cloneArray } from '../utils.js';
+import { uid, todayISO, cloneArray, bindHourlySalaryPlaceholder } from '../utils.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -69,6 +69,11 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
   // Create form
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
+  const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
+  const updateSalaryPlaceholder = bindHourlySalaryPlaceholder(
+    document.getElementById('salario'),
+    salaryHourlyCheckbox
+  );
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -80,6 +85,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
       estado: document.getElementById('estado').value,
       link: valueOf('link'),
       salario: valueOf('salario'),
+      salarioPorHora: document.getElementById('salarioPorHora').checked,
       contacto: valueOf('contacto'),
       notas: valueOf('notas'),
       skipped: [],
@@ -89,6 +95,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
     jobsStore.update(jobs => [nuevo, ...jobs]);
 
     form.reset();
+    updateSalaryPlaceholder();
     datePicker?.setValue('');
     showToast('Postulación agregada', '✓');
   });

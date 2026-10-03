@@ -41,15 +41,18 @@ export const CLOSE_REASONS = {
 };
 
 export const DEFAULT_PUESTOS = [
+  'Software Engineer', 'Software Developer',
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
-  'Mobile Developer', 'QA Engineer', 'DevOps Engineer', 'SRE',
-  'Data Analyst', 'Data Scientist', 'Data Engineer',
-  'Machine Learning Engineer', 'AI Engineer',
-  'Product Manager', 'Product Owner', 'Project Manager',
-  'Product Designer', 'UX Designer', 'UI Designer', 'UX/UI Designer',
-  'Tech Lead', 'Engineering Manager', 'CTO',
-  'Scrum Master', 'Business Analyst', 'Solutions Architect',
+  'Web Developer', 'Mobile Developer', 'iOS Developer', 'Android Developer',
+  'Java Developer', 'JavaScript Developer', 'TypeScript Developer',
+  'Python Developer', 'Node.js Developer', 'React Developer',
+  'Angular Developer', 'Vue.js Developer', '.NET Developer',
+  'PHP Developer', 'Go Developer', 'Ruby Developer', 'C++ Developer',
+  'Embedded Software Engineer', 'Game Developer',
+  'QA Automation Engineer', 'DevOps Engineer', 'SRE',
+  'Data Engineer', 'Machine Learning Engineer', 'AI Engineer',
   'Security Engineer', 'Cloud Engineer', 'Platform Engineer',
+  'Tech Lead',
 ];
 
 export const PUESTO_ICONS = {

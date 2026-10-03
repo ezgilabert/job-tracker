@@ -13,6 +13,17 @@ export function escapeHtml(str) {
   }[c]));
 }
 
+export function bindHourlySalaryPlaceholder(input, checkbox) {
+  const update = () => {
+    input.placeholder = checkbox.checked
+      ? 'Ej: USD 20–30/h o ARS 15.000–25.000/h'
+      : 'Ej: USD 3.000–4.000/mes o ARS 2.000.000–2.500.000/mes';
+  };
+  checkbox.addEventListener('change', update);
+  update();
+  return update;
+}
+
 export function diasDesde(fecha) {
   if (!fecha) return null;
   const iso = fecha.length === 10 ? fecha + 'T00:00:00' : fecha;

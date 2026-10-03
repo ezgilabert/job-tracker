@@ -5,6 +5,8 @@
 import { DEFAULT_PUESTOS, PUESTO_ICONS } from '../constants.js';
 import { escapeHtml } from '../utils.js';
 
+const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
+
 function getPuestoIcon(puesto) {
   for (const key in PUESTO_ICONS) {
     if (puesto.toLowerCase().includes(key.toLowerCase())) return PUESTO_ICONS[key];
@@ -18,7 +20,7 @@ function getPuestoIcon(puesto) {
  * @param {string} currentValue
  */
 function getOptions(jobsPuestos, query) {
-  const usados = [...new Set(jobsPuestos.filter(Boolean))];
+  const usados = [...new Set(jobsPuestos.filter(p => p && DEVELOPER_ROLE.test(p)))];
   const todos = [...new Set([...usados, ...DEFAULT_PUESTOS])];
 
   const q = query.toLowerCase().trim();

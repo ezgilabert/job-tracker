@@ -18,7 +18,9 @@ import {
 import {
   stepIndex, progressPct,
 } from '../selectors.js';
-import { escapeHtml, todayISO, cloneArray, ensureArray } from '../utils.js';
+import {
+  escapeHtml, todayISO, cloneArray, ensureArray, bindHourlySalaryPlaceholder,
+} from '../utils.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -30,6 +32,11 @@ export function mountModalsController(jobsStore, refsStore) {
   // ----------------------------------------------------------
   const editModal = document.getElementById('editModal');
   const editEstado = document.getElementById('editEstado');
+  const editSalaryHourlyCheckbox = document.getElementById('editSalarioPorHora');
+  const updateEditSalaryPlaceholder = bindHourlySalaryPlaceholder(
+    document.getElementById('editSalario'),
+    editSalaryHourlyCheckbox
+  );
 
   // Include open + closed states so edits can also close a job
   editEstado.innerHTML = ALL_STATES
@@ -53,6 +60,8 @@ export function mountModalsController(jobsStore, refsStore) {
     editEstado.value = j.estado;
     setVal('editLink', j.link || '');
     setVal('editSalario', j.salario || '');
+    editSalaryHourlyCheckbox.checked = Boolean(j.salarioPorHora);
+    updateEditSalaryPlaceholder();
     setVal('editContacto', j.contacto || '');
     setVal('editNotas', j.notas || '');
 
@@ -87,6 +96,7 @@ export function mountModalsController(jobsStore, refsStore) {
         estado:    nuevoEstado,
         link:      valueOf('editLink'),
         salario:   valueOf('editSalario'),
+        salarioPorHora: editSalaryHourlyCheckbox.checked,
         contacto:  valueOf('editContacto'),
         notas:     valueOf('editNotas'),
         history,

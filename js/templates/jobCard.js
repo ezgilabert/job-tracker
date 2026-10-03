@@ -26,7 +26,9 @@ export function renderJobCard(job, ctx = {}) {
     ? `<span>⏱️ hace ${dias} día${dias === 1 ? '' : 's'}</span>`
     : '';
   const fechaTxt = job.fecha ? `<span>📅 ${formatFecha(job.fecha)}</span>` : '';
-  const salarioTxt = job.salario ? `<span>💰 ${escapeHtml(job.salario)}</span>` : '';
+  const salarioTxt = job.salario
+    ? `<span>💰 ${escapeHtml(job.salario)}${job.salarioPorHora ? ' · por hora' : ''}</span>`
+    : '';
   const contactoTxt = job.contacto ? `<span>👤 ${escapeHtml(job.contacto)}</span>` : '';
   const linkTxt = job.link
     ? `<a href="${escapeHtml(job.link)}" target="_blank" rel="noopener">Ver oferta ↗</a>`
