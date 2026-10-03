@@ -1,0 +1,130 @@
+// ============================================================
+// Constantes del dominio: workflow, estados, motivos, defaults
+// ============================================================
+
+export const WORKFLOW_STEPS = [
+  { id: 'Guardado',               short: 'Guardado',     icon: '🔖' },
+  { id: 'Aplicado',               short: 'Aplicado',     icon: '📤' },
+  { id: 'Contacto',               short: 'Contacto',     icon: '💬' },
+  { id: 'Entrevista RRHH',        short: 'RRHH',         icon: '👤' },
+  { id: 'Challenge técnico',      short: 'Challenge',    icon: '🧪' },
+  { id: 'Live coding',            short: 'Live coding',  icon: '⌨️' },
+  { id: 'Entrevista Técnica',     short: 'Técnica',      icon: '💻' },
+  { id: 'Entrevista con cliente', short: 'Entrev. cli.', icon: '🤝' },
+  { id: 'Charla con cliente',     short: 'Charla cli.',  icon: '☕' },
+  { id: 'Entrevista Final',       short: 'Final',        icon: '🎤' },
+  { id: 'Referencias',            short: 'Referencias',  icon: '📞' },
+  { id: 'Negociación',            short: 'Negociación',  icon: '💼' },
+  { id: 'Oferta',                 short: 'Oferta',       icon: '🎉' },
+];
+
+export const CLOSED_STATES = ['Rechazado', 'Ghosted', 'Descartado'];
+export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
+
+export const REF_WORKFLOW_STEPS = [
+  { id: 'Pendiente',       short: 'Pendiente' },
+  { id: 'Contactado',      short: 'Contactado' },
+  { id: 'Me va a referir', short: 'Va a referir' },
+  { id: 'Referido hecho',  short: 'Referido' },
+  { id: 'En proceso',      short: 'En proceso' },
+  { id: 'Contratado',      short: 'Contratado' },
+];
+
+export const REF_CLOSED_STATES = ['No aplica'];
+export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOSED_STATES];
+
+export const CLOSE_REASONS = {
+  'Oferta':     ['Acepté la oferta', 'Recibí una mejor oferta', 'Fue mi primera opción'],
+  'Rechazado':  ['No avanzó mi perfil', 'Faltó experiencia técnica', 'Eligieron a otro candidato', 'No cumplía requisitos', 'Pretensión salarial'],
+  'Ghosted':    ['Dejaron de responder', 'Nunca dieron feedback', 'Se enfrió el proceso'],
+  'Descartado': ['Me arrepentí', 'No me convenció la empresa', 'Pausé la búsqueda', 'La ubicación no servía'],
+};
+
+export const DEFAULT_PUESTOS = [
+  'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
+  'Mobile Developer', 'QA Engineer', 'DevOps Engineer', 'SRE',
+  'Data Analyst', 'Data Scientist', 'Data Engineer',
+  'Machine Learning Engineer', 'AI Engineer',
+  'Product Manager', 'Product Owner', 'Project Manager',
+  'Product Designer', 'UX Designer', 'UI Designer', 'UX/UI Designer',
+  'Tech Lead', 'Engineering Manager', 'CTO',
+  'Scrum Master', 'Business Analyst', 'Solutions Architect',
+  'Security Engineer', 'Cloud Engineer', 'Platform Engineer',
+];
+
+export const PUESTO_ICONS = {
+  'Frontend': '🎨', 'Backend': '⚙️', 'Full Stack': '🧩', 'Mobile': '📱',
+  'QA': '🧪', 'DevOps': '🚀', 'SRE': '🛠️', 'Data': '📊',
+  'Machine Learning': '🤖', 'AI': '🧠', 'Product Manager': '📋',
+  'Product Owner': '📋', 'Project Manager': '📋', 'Product Designer': '🎯',
+  'UX': '🎨', 'UI': '🎨', 'Tech Lead': '👑', 'Engineering Manager': '👔',
+  'CTO': '🏆', 'Scrum Master': '🔄', 'Business Analyst': '📈',
+  'Solutions Architect': '🏗️', 'Security': '🔒', 'Cloud': '☁️',
+  'Platform': '🧱',
+};
+
+export const STORAGE_KEYS = {
+  JOBS: 'jobTrackerV2',
+  REFS: 'jobTrackerReferidos',
+  THEME: 'jobTrackerTheme',
+};
+
+export const STORAGE_VERSION = 2;
+
+export const SAMPLE_JOBS = [
+  {
+    id: 1700000000001,
+    empresa: 'Vercel',
+    puesto: 'Frontend Developer',
+    fecha: new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10),
+    estado: 'Live coding',
+    link: 'https://vercel.com/careers',
+    salario: 'USD 5.500 - 7.000',
+    contacto: 'Sofía Ramírez (Tech Recruiter)',
+    notas: 'Segunda ronda agendada para el jueves. Me entrevista el tech lead del equipo de DX.',
+    skipped: ['Challenge técnico'],
+    history: [
+      { estado: 'Guardado',           fecha: new Date(Date.now() - 14 * 86400000).toISOString() },
+      { estado: 'Aplicado',           fecha: new Date(Date.now() - 11 * 86400000).toISOString() },
+      { estado: 'Contacto',           fecha: new Date(Date.now() - 8 * 86400000).toISOString() },
+      { estado: 'Entrevista RRHH',    fecha: new Date(Date.now() - 6 * 86400000).toISOString() },
+      { estado: 'Challenge técnico',  fecha: new Date(Date.now() - 4 * 86400000).toISOString() },
+      { estado: 'Live coding',        fecha: new Date(Date.now() - 1 * 86400000).toISOString() },
+    ],
+  },
+  {
+    id: 1700000000002,
+    empresa: 'Stripe',
+    puesto: 'Product Designer',
+    fecha: new Date(Date.now() - 12 * 86400000).toISOString().slice(0, 10),
+    estado: 'Aplicado',
+    link: '',
+    salario: 'USD 4.000 - 5.500',
+    contacto: 'Martín Acosta (Hiring Manager)',
+    notas: 'Apliqué por LinkedIn. Sin respuesta aún.',
+    skipped: [],
+    history: [
+      { estado: 'Aplicado', fecha: new Date(Date.now() - 12 * 86400000).toISOString() },
+    ],
+  },
+  {
+    id: 1700000000003,
+    empresa: 'Mercado Libre',
+    puesto: 'Backend Developer',
+    fecha: new Date(Date.now() - 20 * 86400000).toISOString().slice(0, 10),
+    estado: 'Negociación',
+    link: '',
+    salario: 'ARS 3.500.000',
+    contacto: 'Lucía Fernández (Talent Acquisition)',
+    notas: 'Me pasaron la propuesta económica. Estoy negociando el bono y días de vacaciones.',
+    skipped: ['Challenge técnico', 'Charla con cliente'],
+    history: [
+      { estado: 'Aplicado',                fecha: new Date(Date.now() - 20 * 86400000).toISOString() },
+      { estado: 'Entrevista RRHH',         fecha: new Date(Date.now() - 16 * 86400000).toISOString() },
+      { estado: 'Entrevista Técnica',      fecha: new Date(Date.now() - 10 * 86400000).toISOString() },
+      { estado: 'Entrevista con cliente',  fecha: new Date(Date.now() - 6 * 86400000).toISOString() },
+      { estado: 'Referencias',             fecha: new Date(Date.now() - 3 * 86400000).toISOString() },
+      { estado: 'Negociación',             fecha: new Date(Date.now() - 1 * 86400000).toISOString() },
+    ],
+  },
+];

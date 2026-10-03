@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Tracker · Mi búsqueda laboral</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="brand-logo">🎯</div>
+      <div>
+        <h1>Job Tracker</h1>
+        <p>Tu búsqueda laboral, organizada</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" title="Cambiar tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="form-card">
+    <h2>✨ Nueva postulación</h2>
+    <form id="jobForm">
+      <div class="field">
+        <label for="empresa">Empresa</label>
+        <input type="text" id="empresa" placeholder="Ej: Google" required>
+      </div>
+      <div class="field">
+        <label for="puesto">Puesto</label>
+        <div class="combo" id="puestoCombo">
+          <div class="combo-input-wrap">
+            <input type="text" id="puesto" placeholder="Elegí o escribí un rol" autocomplete="off" required>
+            <span class="combo-chevron">▾</span>
+          </div>
+          <div class="combo-dropdown" id="puestoDropdown"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Fecha</label>
+        <div class="date-picker" id="fechaPicker"></div>
+      </div>
+      <div class="field">
+        <label for="estado">Estado inicial</label>
+        <select id="estado">
+          <option>Guardado</option>
+          <option selected>Aplicado</option>
+          <option>Contacto</option>
+          <option>Entrevista RRHH</option>
+          <option>Challenge técnico</option>
+          <option>Live coding</option>
+          <option>Entrevista Técnica</option>
+          <option>Entrevista con cliente</option>
+          <option>Charla con cliente</option>
+          <option>Entrevista Final</option>
+          <option>Referencias</option>
+          <option>Negociación</option>
+          <option>Oferta</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="link">Link de la oferta</label>
+        <input type="url" id="link" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label for="salario">Salario</label>
+        <input type="text" id="salario" placeholder="Ej: USD 3000">
+      </div>
+      <div class="field">
+        <label for="contacto">Contacto</label>
+        <input type="text" id="contacto" placeholder="Ej: María López (Recruiter)">
+      </div>
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="notas">Notas</label>
+        <textarea id="notas" placeholder="Contacto, próxima instancia, referidos..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Agregar postulación</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="toolbar">
+    <div class="filters" id="filters">
+      <button data-filter="all" class="active">Todas</button>
+      <button data-filter="active">Activas</button>
+      <button data-filter="Guardado">Guardado</button>
+      <button data-filter="Aplicado">Aplicado</button>
+      <button data-filter="Contacto">Contacto</button>
+      <button data-filter="Entrevista RRHH">RRHH</button>
+      <button data-filter="Challenge técnico">Challenge</button>
+      <button data-filter="Live coding">Live coding</button>
+      <button data-filter="Entrevista Técnica">Técnica</button>
+      <button data-filter="Charla con cliente">Charla cliente</button>
+      <button data-filter="Referencias">Referencias</button>
+      <button data-filter="Negociación">Negociación</button>
+      <button data-filter="Oferta">Oferta</button>
+      <button data-filter="closed">Cerradas</button>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <!-- ===== SECCIÓN REFERIDOS ===== -->
+  <section class="referidos-section">
+    <div class="referidos-header">
+      <div>
+        <h2>🤝 Referidos</h2>
+        <p>Tu red de contactos que pueden recomendarte</p>
+      </div>
+      <div class="referidos-header-actions">
+        <span class="ref-counter" id="refCounter">0</span>
+        <button class="icon-btn" id="refToggleBtn" title="Mostrar/ocultar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="referidos-body" id="referidosBody">
+      <div class="form-card ref-form-card">
+        <h3>➕ Nuevo referido</h3>
+        <form id="refForm">
+          <div class="field">
+            <label for="refNombre">Nombre</label>
+            <input type="text" id="refNombre" placeholder="Ej: Ana García" required>
+          </div>
+          <div class="field">
+            <label for="refRol">Rol / Empresa</label>
+            <input type="text" id="refRol" placeholder="Ej: Tech Lead @ Google">
+          </div>
+          <div class="field">
+            <label for="refContacto">Contacto</label>
+            <input type="text" id="refContacto" placeholder="Email, teléfono, @usuario...">
+          </div>
+          <div class="field">
+            <label for="refLinkedin">LinkedIn</label>
+            <input type="url" id="refLinkedin" placeholder="https://linkedin.com/in/...">
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Relación</label>
+            <div class="ref-chips" id="refRelacionChips">
+              <button type="button" class="ref-chip" data-value="Amigo">Amigo</button>
+              <button type="button" class="ref-chip" data-value="Ex-colega">Ex-colega</button>
+              <button type="button" class="ref-chip" data-value="Familiar">Familiar</button>
+              <button type="button" class="ref-chip" data-value="Conocido">Conocido</button>
+              <button type="button" class="ref-chip" data-value="Recruiter">Recruiter</button>
+              <button type="button" class="ref-chip" data-value="Mentor">Mentor</button>
+            </div>
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Estado del referido</label>
+            <div class="ref-chips ref-estado-chips" id="refEstadoChips">
+              <button type="button" class="ref-chip selected" data-value="Pendiente">Pendiente</button>
+              <button type="button" class="ref-chip" data-value="Contactado">Contactado</button>
+              <button type="button" class="ref-chip" data-value="Me va a referir">Me va a referir</button>
+              <button type="button" class="ref-chip" data-value="Referido hecho">Referido hecho</button>
+              <button type="button" class="ref-chip" data-value="En proceso">En proceso</button>
+              <button type="button" class="ref-chip" data-value="Contratado">Contratado</button>
+              <button type="button" class="ref-chip" data-value="No aplica">No aplica</button>
+            </div>
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Empresas / postulaciones vinculadas <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:500;">(opcional)</span></label>
+            <div class="ref-empresas-wrap" id="refEmpresasWrap">
+              <span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>
+            </div>
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="refNotas">Notas</label>
+            <textarea id="refNotas" placeholder="En qué empresa está, si te puede referir, última charla..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Agregar referido</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="ref-toolbar">
+        <div class="ref-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="refSearch" placeholder="Buscar por nombre, empresa, nota...">
+        </div>
+        <div class="ref-filters" id="refFilters">
+          <button data-filter="all" class="active">Todos</button>
+          <button data-filter="Pendiente">Pendiente</button>
+          <button data-filter="Contactado">Contactado</button>
+          <button data-filter="Me va a referir">Va a referir</button>
+          <button data-filter="Referido hecho">Referido</button>
+          <button data-filter="En proceso">En proceso</button>
+          <button data-filter="Contratado">Contratado</button>
+          <button data-filter="No aplica">No aplica</button>
+        </div>
+      </div>
+
+      <div id="refList"></div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal editar postulación -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>✏️ Editar postulación</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Empresa</label>
+        <input type="text" id="editEmpresa">
+      </div>
+      <div class="field">
+        <label>Puesto</label>
+        <div class="combo" id="editPuestoCombo">
+          <div class="combo-input-wrap">
+            <input type="text" id="editPuesto" autocomplete="off">
+            <span class="combo-chevron">▾</span>
+          </div>
+          <div class="combo-dropdown" id="editPuestoDropdown"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Fecha</label>
+        <div class="date-picker" id="editFechaPicker"></div>
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <select id="editEstado"></select>
+      </div>
+      <div class="field">
+        <label>Link</label>
+        <input type="url" id="editLink">
+      </div>
+      <div class="field">
+        <label>Salario</label>
+        <input type="text" id="editSalario">
+      </div>
+      <div class="field">
+        <label>Contacto</label>
+        <input type="text" id="editContacto" placeholder="Nombre y rol">
+      </div>
+      <div class="field full">
+        <label>Notas</label>
+        <textarea id="editNotas" style="min-height:70px"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelEdit">Cancelar</button>
+      <button class="btn btn-primary" id="saveEdit">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal cierre con motivo -->
+<div class="modal-overlay" id="closeModal">
+  <div class="modal" style="max-width: 480px;">
+    <h2 id="closeModalTitle">Cerrar postulación</h2>
+    <p id="closeModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;"></p>
+    <div class="form-grid" style="grid-template-columns:1fr;">
+      <div class="field full">
+        <label>Motivo <span style="color:var(--danger);font-weight:700;">*</span></label>
+        <div id="closeReasons" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;"></div>
+        <textarea id="closeMotivo" placeholder="Contá brevemente qué pasó..." style="min-height:80px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelClose">Cancelar</button>
+      <button class="btn btn-primary" id="confirmClose" style="background:var(--danger);">Confirmar cierre</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal editar referido -->
+<div class="modal-overlay" id="refEditModal">
+  <div class="modal">
+    <h2>✏️ Editar referido</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Nombre</label>
+        <input type="text" id="refEditNombre">
+      </div>
+      <div class="field">
+        <label>Rol / Empresa</label>
+        <input type="text" id="refEditRol">
+      </div>
+      <div class="field">
+        <label>Contacto</label>
+        <input type="text" id="refEditContacto">
+      </div>
+      <div class="field">
+        <label>LinkedIn</label>
+        <input type="url" id="refEditLinkedin">
+      </div>
+      <div class="field full">
+        <label>Relación</label>
+        <div class="ref-chips" id="refEditRelacionChips">
+          <button type="button" class="ref-chip" data-value="Amigo">Amigo</button>
+          <button type="button" class="ref-chip" data-value="Ex-colega">Ex-colega</button>
+          <button type="button" class="ref-chip" data-value="Familiar">Familiar</button>
+          <button type="button" class="ref-chip" data-value="Conocido">Conocido</button>
+          <button type="button" class="ref-chip" data-value="Recruiter">Recruiter</button>
+          <button type="button" class="ref-chip" data-value="Mentor">Mentor</button>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Estado</label>
+        <div class="ref-chips ref-estado-chips" id="refEditEstadoChips">
+          <button type="button" class="ref-chip" data-value="Pendiente">Pendiente</button>
+          <button type="button" class="ref-chip" data-value="Contactado">Contactado</button>
+          <button type="button" class="ref-chip" data-value="Me va a referir">Me va a referir</button>
+          <button type="button" class="ref-chip" data-value="Referido hecho">Referido hecho</button>
+          <button type="button" class="ref-chip" data-value="En proceso">En proceso</button>
+          <button type="button" class="ref-chip" data-value="Contratado">Contratado</button>
+          <button type="button" class="ref-chip" data-value="No aplica">No aplica</button>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Empresas / postulaciones vinculadas</label>
+        <div class="ref-empresas-wrap" id="refEditEmpresasWrap">
+          <span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Notas</label>
+        <textarea id="refEditNotas" style="min-height:80px"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="refCancelEdit">Cancelar</button>
+      <button class="btn btn-primary" id="refSaveEdit">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: mover referido a postulaciones -->
+<div class="modal-overlay" id="refToJobModal">
+  <div class="modal" style="max-width: 540px;">
+    <h2 style="color:var(--accent);">🎉 ¡Referido hecho!</h2>
+    <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">
+      <strong id="refToJobName" style="color:var(--text);"></strong> ya te hizo el referido.
+      ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?
+    </p>
+
+    <div class="ref-to-job-options">
+      <button type="button" class="ref-to-job-option" data-mode="new">
+        <span class="ref-to-job-icon">✨</span>
+        <div>
+          <strong>Crear nueva postulación</strong>
+          <span>Se precarga con los datos del referido</span>
+        </div>
+      </button>
+      <button type="button" class="ref-to-job-option" data-mode="link">
+        <span class="ref-to-job-icon">🔗</span>
+        <div>
+          <strong>Vincular a una existente</strong>
+          <span>Elegí una postulación ya cargada</span>
+        </div>
+      </button>
+    </div>
+
+    <div id="refToJobLinkSection" style="display:none; margin-top:1rem;">
+      <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">
+        Postulaciones disponibles
+      </label>
+      <div class="ref-to-job-list" id="refToJobList"></div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:1.25rem;">
+      <button class="btn btn-ghost" id="refToJobSkip">Ahora no</button>
+      <button class="btn btn-primary" id="refToJobConfirm" style="display:none;">Vincular</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nota al avanzar -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal" style="max-width: 440px;">
+    <h2 style="color:var(--accent);">📝 ¿Agregar un recordatorio?</h2>
+    <p id="noteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
+    <div class="field" style="margin-bottom:1.25rem;">
+      <label for="stepNoteInput">Nota / PD (opcional)</label>
+      <textarea id="stepNoteInput" placeholder="Ej: Preparar preguntas sobre el stack, revisar el challenge..." style="min-height:90px"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="skipNote">Continuar sin nota</button>
+      <button class="btn btn-primary" id="saveNote">Guardar y avanzar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
