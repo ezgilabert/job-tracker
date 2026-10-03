@@ -251,6 +251,9 @@ export function mountModalsController(jobsStore, refsStore) {
     hideNote();
   });
 
+  // NUEVO: listener para la cruz (×)
+  document.getElementById('closeNoteModal').addEventListener('click', hideNote);
+
   noteModal.addEventListener('click', (e) => {
     if (e.target === noteModal) {
       applyAdvance({ nota: null });
