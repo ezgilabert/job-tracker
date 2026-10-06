@@ -6,6 +6,15 @@
 .config-modal {
   max-width: 620px;
   position: relative;
+  /* Ocultar la scrollbar del modal pero mantener el scroll */
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE/Edge legacy */
+}
+
+.config-modal::-webkit-scrollbar {
+  display: none;                 /* Chrome/Safari/Edge */
+  width: 0;
+  height: 0;
 }
 
 .config-modal h2 {
@@ -125,18 +134,10 @@
 }
 
 /* ===== Body ===== */
+/* Sin scroll interno: el scroll lo maneja el .modal padre */
 .config-body {
-  max-height: 55vh;
-  overflow-y: auto;
   padding-right: 0.25rem;
   margin-bottom: 1rem;
-  scrollbar-width: thin;
-}
-
-.config-body::-webkit-scrollbar { width: 6px; }
-.config-body::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 6px;
 }
 
 .config-panel { display: none; }
@@ -248,23 +249,15 @@
 }
 
 /* ===== Puestos list ===== */
+/* Sin scroll interno: la lista crece y el modal padre scrollea */
 .config-puestos-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  max-height: 220px;
-  overflow-y: auto;
   padding: 0.5rem;
   border: 1px dashed var(--border-strong);
   border-radius: 10px;
   background: var(--surface-soft);
-  scrollbar-width: thin;
-}
-
-.config-puestos-list::-webkit-scrollbar { width: 6px; }
-.config-puestos-list::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 6px;
 }
 
 .config-puesto-item {

@@ -19,7 +19,6 @@
 
   /* Config modal */
   .config-modal { padding: 1.25rem; }
-  .config-body { max-height: 50vh; }
   .config-tab { font-size: 0.75rem; padding: 0.55rem 0.5rem; }
   .config-tab span:last-child { display: none; }
   .config-checks { grid-template-columns: 1fr; }
