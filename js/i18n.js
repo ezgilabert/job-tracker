@@ -37,6 +37,7 @@ const translations = {
     'auth.orContinue': 'o continuá con',
     'auth.showPassword': 'Mostrar contraseña',
     'auth.guest': 'Continuar sin cuenta',
+    'auth.login': 'Iniciar sesión',
     'auth.logout': 'Cerrar sesión',
     'auth.account': 'Cuenta',
 
@@ -414,6 +415,7 @@ const translations = {
     'auth.orContinue': 'or continue with',
     'auth.showPassword': 'Show password',
     'auth.guest': 'Continue without an account',
+    'auth.login': 'Sign in',
     'auth.logout': 'Sign out',
     'auth.account': 'Account',
 

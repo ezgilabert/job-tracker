@@ -16,25 +16,27 @@ import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
 import { ensureArray } from './utils.js';
 import { applyI18n, setLanguage, getLanguage } from './i18n.js';
-import { requireSession, logout, getSession } from './auth/session.js';
+import { logout, getSession } from './auth/session.js';
 
 // ------------------------------------------------------------
-// Session guard: bounce to the login screen when unauthenticated.
-// The app only boots when a session exists.
+// La app ya no exige sesión para entrar: se puede usar como
+// invitado. El menú de usuario contiene Configuración, Tema,
+// y Login/Logout según corresponda.
 // ------------------------------------------------------------
-if (requireSession('./login.html')) {
-  boot();
-}
+boot();
 
 function boot() {
   // ----------------------------------------------------------
-  // Theme
+  // Theme (vive dentro del menú de usuario)
   // ----------------------------------------------------------
   function mountTheme() {
     const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
     document.documentElement.setAttribute('data-theme', saved);
 
-    document.getElementById('themeToggle').addEventListener('click', () => {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', next);
@@ -53,41 +55,58 @@ function boot() {
   }
 
   // ----------------------------------------------------------
-  // User menu: dropdown with account info + logout
+  // User menu
+  //   - Sin sesión → solo "Iniciar sesión"
+  //   - Con sesión → header (avatar + nombre + email) + "Cerrar sesión"
+  //   - Configuración y Tema viven dentro del dropdown
+  // El botón conserva siempre el ícono SVG de usuario.
   // ----------------------------------------------------------
   function mountUserMenu() {
     const menu = document.getElementById('userMenu');
     const btn = document.getElementById('userBtn');
     const logoutBtn = document.getElementById('logoutBtn');
-
-    if (!menu || !btn) return;
-
-    // ----- Fill session data into the dropdown -----
-    const session = getSession() || {};
+    const loginBtn = document.getElementById('loginBtn');
+    const configBtn = document.getElementById('configBtn');
+    const userHeader = document.getElementById('userMenuHeader');
     const nameEl = document.getElementById('userMenuName');
     const emailEl = document.getElementById('userMenuEmail');
     const avatarEl = document.getElementById('userMenuAvatar');
 
-    const displayName = session.name
-      || (session.email ? session.email.split('@')[0] : 'User');
-    const displayEmail = session.guest
-      ? 'Guest session'
-      : (session.email || '');
+    if (!menu || !btn) return;
 
-    if (nameEl) nameEl.textContent = displayName;
-    if (emailEl) emailEl.textContent = displayEmail;
-    if (avatarEl) {
-      const initials = displayName
-        .split(/\s+/)
-        .filter(Boolean)
-        .map(w => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase() || 'U';
-      avatarEl.textContent = initials;
+    function refresh() {
+      const session = getSession();
+      const logged = !!session;
+
+      if (logged) {
+        const displayName = session.name
+          || (session.email ? session.email.split('@')[0] : 'User');
+        const displayEmail = session.guest
+          ? 'Guest session'
+          : (session.email || '');
+
+        if (nameEl) nameEl.textContent = displayName;
+        if (emailEl) emailEl.textContent = displayEmail;
+        if (avatarEl) {
+          const initials = displayName
+            .split(/\s+/).filter(Boolean)
+            .map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'U';
+          avatarEl.textContent = initials;
+        }
+
+        if (userHeader) userHeader.style.display = '';
+        if (loginBtn)   loginBtn.style.display = 'none';
+        if (logoutBtn)  logoutBtn.style.display = '';
+      } else {
+        if (userHeader) userHeader.style.display = 'none';
+        if (loginBtn)   loginBtn.style.display = '';
+        if (logoutBtn)  logoutBtn.style.display = 'none';
+      }
     }
 
-    // ----- Toggle dropdown -----
+    refresh();
+
+    // Toggle dropdown
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       menu.classList.toggle('open');
@@ -107,13 +126,31 @@ function boot() {
       }
     });
 
-    // ----- Logout -----
+    // Configuración → cerrar el menú (abre un modal encima)
+    if (configBtn) {
+      configBtn.addEventListener('click', () => {
+        menu.classList.remove('open');
+      });
+    }
+
+    // Logout → limpiar sesión y refrescar (sin redirigir)
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         logout();
-        window.location.replace('./login.html');
+        menu.classList.remove('open');
+        refresh();
       });
     }
+
+    // Sign in → ir a la pantalla de login
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        window.location.href = './login.html';
+      });
+    }
+
+    // Re-render cuando cambia el idioma
+    document.addEventListener('i18n-changed', refresh);
   }
 
   // ----------------------------------------------------------

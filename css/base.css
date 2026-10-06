@@ -231,6 +231,7 @@ header {
 
 /* ============================================================
    User menu: icon-btn trigger + dropdown
+   (Config, Theme y Login/Logout viven adentro)
    ============================================================ */
 
 .user-menu {
@@ -321,7 +322,7 @@ header {
   margin-top: 0.1rem;
 }
 
-/* Item del dropdown */
+/* Item del dropdown (con ícono + label) */
 .user-menu-item {
   display: flex;
   align-items: center;
@@ -333,7 +334,7 @@ header {
   background: transparent;
   color: var(--text);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   text-align: left;
@@ -353,6 +354,10 @@ header {
   background: var(--surface-soft);
 }
 
+.user-menu-item:hover svg {
+  color: var(--accent);
+}
+
 .user-menu-item.danger {
   color: var(--danger);
 }
@@ -363,6 +368,13 @@ header {
 
 .user-menu-item.danger:hover {
   background: var(--danger-soft);
+}
+
+/* Separador dentro del dropdown */
+.user-menu-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 0.4rem 0.6rem;
 }
 
 /* Animación global de highlight (jobs + referidos) */
