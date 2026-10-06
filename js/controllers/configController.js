@@ -33,9 +33,34 @@ export function mountConfigController(configStore) {
     return JSON.parse(JSON.stringify(cfg));
   }
 
+  /**
+   * Comparación profunda (inmune al orden de claves).
+   */
+  function deepEqual(a, b) {
+    if (a === b) return true;
+    if (a === null || b === null) return false;
+    if (typeof a !== 'object' || typeof b !== 'object') return false;
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    if (Array.isArray(a)) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (!deepEqual(a[i], b[i])) return false;
+      }
+      return true;
+    }
+    const keysA = Object.keys(a).sort();
+    const keysB = Object.keys(b).sort();
+    if (keysA.length !== keysB.length) return false;
+    for (let i = 0; i < keysA.length; i++) {
+      if (keysA[i] !== keysB[i]) return false;
+      if (!deepEqual(a[keysA[i]], b[keysA[i]])) return false;
+    }
+    return true;
+  }
+
   function isDraftDirty() {
     if (!draft) return false;
-    return JSON.stringify(draft) !== JSON.stringify(configStore.get());
+    return !deepEqual(draft, configStore.get());
   }
 
   function updateBadge() {
@@ -46,9 +71,9 @@ export function mountConfigController(configStore) {
   // Abrir / cerrar
   // ----------------------------------------------------------
   function open() {
+    // Clonamos tal cual está guardado. NO tocamos el draft acá:
+    // si agregamos campos por defecto, el draft queda "sucio" al instante.
     draft = cloneConfig(configStore.get());
-    // Garantizamos que `logo` exista (compatibilidad con configs viejas)
-    if (!draft.logo) draft.logo = DEFAULT_LOGO;
     modal.classList.add('open');
     renderAll();
   }
@@ -60,7 +85,11 @@ export function mountConfigController(configStore) {
   }
 
   function saveDraft() {
-    configStore.update(() => cloneConfig(draft));
+    const next = cloneConfig(draft);
+    // Al guardar sí completamos el logo para que la próxima apertura no
+    // vuelva a considerarse "sucia".
+    if (!next.logo) next.logo = DEFAULT_LOGO;
+    configStore.update(() => next);
     draft = cloneConfig(configStore.get());
     unsavedBadge.classList.remove('visible');
   }
@@ -77,6 +106,10 @@ export function mountConfigController(configStore) {
   document.getElementById('closeConfigBtn').addEventListener('click', tryClose);
   document.getElementById('cancelConfigBtn').addEventListener('click', tryClose);
   document.getElementById('saveConfigBtn').addEventListener('click', () => {
+    if (!isDraftDirty()) {
+      closeDirect();
+      return;
+    }
     saveDraft();
     closeDirect();
     showToast('Configuración guardada', '✓');
@@ -450,8 +483,12 @@ export function mountConfigController(configStore) {
   document.getElementById('configLogos').addEventListener('click', (e) => {
     const btn = e.target.closest('.config-logo-option');
     if (!btn) return;
-    draft.logo = btn.dataset.logo;
-    renderAll();
+    const id = btn.dataset.logo;
+    // Sólo seteamos si es distinto, para no marcar "sucio" sin cambios reales
+    if ((draft.logo || DEFAULT_LOGO) !== id) {
+      draft.logo = id;
+      renderAll();
+    }
   });
 
   // ------------------------------------------------------------
