@@ -17,8 +17,8 @@ import { renderSteps } from './steps.js';
 export function renderRefCard(ref, ctx = {}) {
   const { jobs = [] } = ctx;
 
-  const linkedinTxt = ref.linkedin
-    ? `<a href="${escapeHtml(ref.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`
+  const linkTxt = ref.link
+    ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">Link ↗</a>`
     : '';
   const contactoTxt = ref.contacto
     ? `<span>✉️ ${escapeHtml(ref.contacto)}</span>`
@@ -72,7 +72,7 @@ export function renderRefCard(ref, ctx = {}) {
           <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(ref.estado)}</span>
         </div>
 
-        <div class="ref-meta">${rolTxt}${contactoTxt}${linkedinTxt}</div>
+        <div class="ref-meta">${rolTxt}${contactoTxt}${linkTxt}</div>
         ${empresasTxt}
         ${notasTxt}
 

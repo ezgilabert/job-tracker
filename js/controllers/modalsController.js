@@ -377,7 +377,7 @@ export function mountModalsController(jobsStore, refsStore) {
     setVal('refEditNombre', r.nombre);
     setVal('refEditRol', r.rol || '');
     setVal('refEditContacto', r.contacto || '');
-    setVal('refEditLinkedin', r.linkedin || '');
+    setVal('refEditLink', r.link || '');
     setVal('refEditNotas', r.notas || '');
 
     refEditRelacion.setValue(r.relacion || 'Conocido');
@@ -413,7 +413,7 @@ export function mountModalsController(jobsStore, refsStore) {
         nombre:   valueOf('refEditNombre'),
         rol:      valueOf('refEditRol'),
         contacto: valueOf('refEditContacto'),
-        linkedin: valueOf('refEditLinkedin'),
+        link:     valueOf('refEditLink'),
         relacion: refEditRelacion.getValue() || 'Conocido',
         estado:   refEditEstado.getValue() || 'Pendiente',
         empresasVinculadas: [...refEditEmpresas],

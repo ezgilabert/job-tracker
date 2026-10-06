@@ -97,7 +97,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       nombre,
       rol: valueOf('refRol'),
       contacto: valueOf('refContacto'),
-      linkedin: valueOf('refLinkedin'),
+      link: valueOf('refLink'),
       relacion: relacionChips?.getValue() || 'Conocido',
       estado: estadoChips?.getValue() || 'Pendiente',
       empresasVinculadas: [...selectedEmpresas],
