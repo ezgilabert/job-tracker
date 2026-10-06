@@ -290,11 +290,16 @@ header {
   color: white;
   display: grid;
   place-items: center;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
   flex-shrink: 0;
   box-shadow: 0 3px 10px rgba(124,92,255,0.3);
+}
+
+.user-menu-avatar svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  color: white;
+  display: block;
 }
 
 .user-menu-info {

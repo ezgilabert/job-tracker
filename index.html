@@ -34,7 +34,12 @@
         <div class="user-menu-dropdown" id="userMenuDropdown">
           <!-- Header del dropdown (solo cuando hay sesión) -->
           <div class="user-menu-header" id="userMenuHeader" style="display:none;">
-            <div class="user-menu-avatar" id="userMenuAvatar">U</div>
+            <div class="user-menu-avatar" id="userMenuAvatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
             <div class="user-menu-info">
               <strong id="userMenuName">User</strong>
               <span id="userMenuEmail">user@email.com</span>

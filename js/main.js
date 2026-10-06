@@ -59,7 +59,7 @@ function boot() {
   //   - Sin sesión → solo "Iniciar sesión"
   //   - Con sesión → header (avatar + nombre + email) + "Cerrar sesión"
   //   - Configuración y Tema viven dentro del dropdown
-  // El botón conserva siempre el ícono SVG de usuario.
+  // El botón y el avatar comparten el mismo SVG de usuario.
   // ----------------------------------------------------------
   function mountUserMenu() {
     const menu = document.getElementById('userMenu');
@@ -70,7 +70,6 @@ function boot() {
     const userHeader = document.getElementById('userMenuHeader');
     const nameEl = document.getElementById('userMenuName');
     const emailEl = document.getElementById('userMenuEmail');
-    const avatarEl = document.getElementById('userMenuAvatar');
 
     if (!menu || !btn) return;
 
@@ -87,12 +86,7 @@ function boot() {
 
         if (nameEl) nameEl.textContent = displayName;
         if (emailEl) emailEl.textContent = displayEmail;
-        if (avatarEl) {
-          const initials = displayName
-            .split(/\s+/).filter(Boolean)
-            .map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'U';
-          avatarEl.textContent = initials;
-        }
+        // El avatar usa un SVG fijo en el HTML, no iniciales.
 
         if (userHeader) userHeader.style.display = '';
         if (loginBtn)   loginBtn.style.display = 'none';
