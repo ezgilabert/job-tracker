@@ -102,14 +102,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
   function renderFilters() {
     const cfg = configStore.get();
-    const filtros = (cfg.filtros || []).filter(f => f.visible);
+    const filters = (cfg.filtros || []).filter(f => f.visible);
     const container = document.getElementById('filters');
 
-    if (!filtros.some(f => f.id === currentFilter)) {
+    if (!filters.some(f => f.id === currentFilter)) {
       currentFilter = 'all';
     }
 
-    container.innerHTML = filtros.map(f => {
+    container.innerHTML = filters.map(f => {
       const { label, icon } = getFilterLabel(f.id);
       const active = f.id === currentFilter ? 'active' : '';
       return `<button data-filter="${escapeHtml(f.id)}" class="${active}">${icon} ${escapeHtml(label)}</button>`;
@@ -121,28 +121,28 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   // ----------------------------------------------------------
   // Dynamic initial state
   // ----------------------------------------------------------
-  function renderEstadoInicial() {
+  function renderInitialStates() {
     const cfg = configStore.get();
-    const estados = cfg.estadosIniciales && cfg.estadosIniciales.length
+    const states = cfg.estadosIniciales && cfg.estadosIniciales.length
       ? cfg.estadosIniciales
       : WORKFLOW_STEPS.map(s => s.id);
 
-    const def = cfg.estadoInicialDefault || 'Aplicado';
+    const defaultState = cfg.estadoInicialDefault || 'Aplicado';
     const select = document.getElementById('estado');
 
-    select.innerHTML = estados.map(id => {
+    select.innerHTML = states.map(id => {
       const step = WORKFLOW_STEPS.find(s => s.id === id);
       const icon = step ? step.icon : '•';
-      const sel = id === def ? 'selected' : '';
-      return `<option value="${escapeHtml(id)}" ${sel}>${icon} ${escapeHtml(id)}</option>`;
+      const isSelected = id === defaultState ? 'selected' : '';
+      return `<option value="${escapeHtml(id)}" ${isSelected}>${icon} ${escapeHtml(id)}</option>`;
     }).join('');
   }
 
-  configStore.subscribe(renderEstadoInicial);
+  configStore.subscribe(renderInitialStates);
 
   // Initial render
   renderFilters();
-  renderEstadoInicial();
+  renderInitialStates();
 
   // ----------------------------------------------------------
   // Form: create application
@@ -157,14 +157,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const estadoInicial = document.getElementById('estado').value;
+    const initialState = document.getElementById('estado').value;
 
-    const nuevo = {
+    const newJob = {
       id: uid(),
       empresa: valueOf('empresa'),
       puesto: valueOf('puesto'),
       fecha: datePicker?.getValue() || '',
-      estado: estadoInicial,
+      estado: initialState,
       link: valueOf('link'),
       salario: valueOf('salario'),
       salarioPorHora: document.getElementById('salarioPorHora').checked,
@@ -172,15 +172,15 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       notas: valueOf('notas'),
       skipped: [],
       volvioAtras: false,
-      history: [{ estado: estadoInicial, fecha: new Date().toISOString() }],
+      history: [{ estado: initialState, fecha: new Date().toISOString() }],
     };
 
-    jobsStore.update(jobs => [nuevo, ...jobs]);
+    jobsStore.update(jobs => [newJob, ...jobs]);
 
     form.reset();
     updateSalaryPlaceholder();
     datePicker?.setValue('');
-    renderEstadoInicial();
+    renderInitialStates();
 
     // When adding an application, expand the list so they can see it
     expandJobs();

@@ -5,7 +5,7 @@
 import { WORKFLOW_STEPS } from '../constants.js';
 import {
   isClosed, stepIndex, progressPct,
-  currentStepNote, lastHistoryEntry, refsForEmpresa,
+  currentStepNote, lastHistoryEntry, refsForCompany,
 } from '../selectors.js';
 import { escapeHtml, daysSince, formatDate, ensureArray } from '../utils.js';
 import { renderSteps } from './steps.js';
@@ -21,27 +21,27 @@ import { renderSteps } from './steps.js';
 export function renderJobCard(job, ctx = {}) {
   const { referidos = [], index = 0 } = ctx;
 
-  const dias = daysSince(job.fecha);
-  const diasTxt = dias !== null
-    ? `<span>⏱️ hace ${dias} día${dias === 1 ? '' : 's'}</span>`
+  const days = daysSince(job.fecha);
+  const daysTxt = days !== null
+    ? `<span>⏱️ hace ${days} día${days === 1 ? '' : 's'}</span>`
     : '';
-  const fechaTxt = job.fecha ? `<span>📅 ${formatDate(job.fecha)}</span>` : '';
-  const salarioTxt = job.salario
+  const dateTxt = job.fecha ? `<span>📅 ${formatDate(job.fecha)}</span>` : '';
+  const salaryTxt = job.salario
     ? `<span>💰 ${escapeHtml(job.salario)}${job.salarioPorHora ? ' · por hora' : ''}</span>`
     : '';
-  const contactoTxt = job.contacto ? `<span>👤 ${escapeHtml(job.contacto)}</span>` : '';
+  const contactTxt = job.contacto ? `<span>👤 ${escapeHtml(job.contacto)}</span>` : '';
   const linkTxt = job.link
     ? `<a href="${escapeHtml(job.link)}" target="_blank" rel="noopener">Ver oferta ↗</a>`
     : '';
-  const notasTxt = job.notas
+  const notesTxt = job.notas
     ? `<div class="job-notas">${escapeHtml(job.notas)}</div>`
     : '';
 
-  const refsVinculados = refsForEmpresa(referidos, job.empresa);
-  const refsHtml = refsVinculados.length
+  const linkedRefs = refsForCompany(referidos, job.empresa);
+  const refsHtml = linkedRefs.length
     ? `<div class="job-refs">
-         <span class="job-refs-label">Referido${refsVinculados.length === 1 ? '' : 's'}</span>
-         ${refsVinculados.map(r => `
+         <span class="job-refs-label">Referido${linkedRefs.length === 1 ? '' : 's'}</span>
+         ${linkedRefs.map(r => `
            <button type="button"
                    class="job-ref-chip"
                    data-action="scroll-to-ref"
@@ -65,11 +65,11 @@ export function renderJobCard(job, ctx = {}) {
     ensureArray(job.skipped)
   );
 
-  const pd = currentStepNote(job);
-  const pdHtml = (!closed && pd)
+  const pendingNote = currentStepNote(job);
+  const pendingNoteHtml = (!closed && pendingNote)
     ? `<div class="step-note">
          <span class="pd-label">PD</span>
-         <span class="pd-text">${escapeHtml(pd)}</span>
+         <span class="pd-text">${escapeHtml(pendingNote)}</span>
        </div>`
     : '';
 
@@ -101,7 +101,7 @@ export function renderJobCard(job, ctx = {}) {
       <div class="job-header">
         <div class="job-info">
           <h3>${escapeHtml(job.puesto)} <span class="company">· ${escapeHtml(job.empresa)}</span></h3>
-          <div class="job-meta">${fechaTxt}${diasTxt}${salarioTxt}${contactoTxt}</div>
+          <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${contactTxt}</div>
         </div>
         <div class="job-actions">
           <button class="action-btn history" title="Ver historial" data-action="history">🕒</button>
@@ -110,11 +110,11 @@ export function renderJobCard(job, ctx = {}) {
         </div>
       </div>
 
-      ${notasTxt}
+      ${notesTxt}
       ${linkTxt}
       <span class="badge" data-estado="${escapeHtml(job.estado)}">${escapeHtml(job.estado)}</span>
       ${refsHtml}
-      ${pdHtml}
+      ${pendingNoteHtml}
 
       <div class="workflow ${closed ? 'closed' : ''}">
         ${stepsHtml}
@@ -134,16 +134,16 @@ function renderOpenActions(job, currentIdx) {
   const prevStep = canBack ? WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? WORKFLOW_STEPS[currentIdx + 1] : null;
   const isOffer = job.estado === 'Oferta';
-  const yaVolvio = Boolean(job.volvioAtras);
+  const alreadyWentBack = Boolean(job.volvioAtras);
 
   const mainBtn = nextStep
     ? `<button class="wf-btn-big" data-action="move-next">Avanzar a "${escapeHtml(nextStep.short)}"</button>`
     : `<button class="wf-btn-big success" data-action="close-offer">Confirmar Oferta</button>`;
 
   let backBtn;
-  if (prevStep && !yaVolvio) {
+  if (prevStep && !alreadyWentBack) {
     backBtn = `<button class="wf-btn-secondary" data-action="move-prev" title="Volver a ${escapeHtml(prevStep.short)}">Volver a "${escapeHtml(prevStep.short)}"</button>`;
-  } else if (prevStep && yaVolvio) {
+  } else if (prevStep && alreadyWentBack) {
     backBtn = `<button class="wf-btn-secondary" disabled title="Ya volviste atrás una vez en esta postulación">Volver a "${escapeHtml(prevStep.short)}"</button>`;
   } else {
     backBtn = `<button class="wf-btn-secondary" disabled title="Ya estás en el primer paso">Primer paso</button>`;
@@ -182,7 +182,7 @@ function renderOpenActions(job, currentIdx) {
 // ------------------------------------------------------------
 function renderClosedActions(job) {
   const last = lastHistoryEntry(job);
-  const motivoTxt = last && last.motivo
+  const reasonTxt = last && last.motivo
     ? `<div class="closed-banner-motivo">"${escapeHtml(last.motivo)}"</div>`
     : '';
   const fecha = last && last.fecha
@@ -200,7 +200,7 @@ function renderClosedActions(job) {
           <button class="wf-btn-secondary" data-action="reopen">Reabrir</button>
         </div>
       </div>
-      ${motivoTxt}
+      ${reasonTxt}
     </div>
   `;
 }

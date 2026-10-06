@@ -7,7 +7,7 @@
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import {
-  PUESTO_TAGS_LIST, PUESTO_TAGS, DEFAULT_PUESTOS,
+  ROLE_TAGS_LIST, ROLE_TAGS, DEFAULT_ROLES,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
   LOGO_OPTIONS, DEFAULT_LOGO,
 } from '../constants.js';
@@ -176,11 +176,11 @@ export function mountConfigController(configStore) {
   function renderAll() {
     if (!draft) return;
     renderTags();
-    renderPuestosList();
+    renderRolesList();
     renderHiddenList();
-    renderEstados();
-    renderDefaultEstado();
-    renderFiltros();
+    renderStateCheckboxes();
+    renderDefaultState();
+    renderFilters();
     renderLogos();
     updateBadge();
   }
@@ -190,11 +190,11 @@ export function mountConfigController(configStore) {
   // ------------------------------------------------------------
   function renderTags() {
     const active = new Set(draft.puestos.activeTags || []);
-    document.getElementById('configTags').innerHTML = PUESTO_TAGS_LIST.map(t => {
-      const sel = active.has(t.id);
+    document.getElementById('configTags').innerHTML = ROLE_TAGS_LIST.map(t => {
+      const isSelected = active.has(t.id);
       return `
         <button type="button"
-                class="config-tag ${sel ? 'selected' : ''}"
+                class="config-tag ${isSelected ? 'selected' : ''}"
                 data-tag="${escapeHtml(t.id)}">
           <span>${t.icon}</span> ${escapeHtml(t.label)}
         </button>
@@ -213,25 +213,25 @@ export function mountConfigController(configStore) {
     renderAll();
   });
 
-  function getVisiblePuestos() {
+  function getVisibleRoles() {
     const active = new Set(draft.puestos.activeTags || []);
     const hidden = new Set(draft.puestos.hidden || []);
     const custom = draft.puestos.custom || [];
 
     const customs = custom.filter(p => !hidden.has(p));
 
-    const defaults = DEFAULT_PUESTOS.filter(p => {
+    const defaults = DEFAULT_ROLES.filter(p => {
       if (hidden.has(p)) return false;
       if (active.size === 0) return true;
-      const tags = PUESTO_TAGS[p] || [];
+      const tags = ROLE_TAGS[p] || [];
       return tags.some(t => active.has(t));
     });
 
     return [...customs, ...defaults];
   }
 
-  function renderPuestosList() {
-    const list = getVisiblePuestos();
+  function renderRolesList() {
+    const list = getVisibleRoles();
     const container = document.getElementById('configPuestosList');
     document.getElementById('configPuestosCount').textContent = list.length;
 
@@ -298,35 +298,35 @@ export function mountConfigController(configStore) {
     renderAll();
   });
 
-  const newPuestoInput = document.getElementById('configNewPuesto');
+  const newRoleInput = document.getElementById('configNewPuesto');
 
-  function addCustom() {
-    const val = newPuestoInput.value.trim();
-    if (!val) return;
-    const existe = (draft.puestos.custom || []).includes(val) || DEFAULT_PUESTOS.includes(val);
-    if (existe) {
+  function addCustomRole() {
+    const value = newRoleInput.value.trim();
+    if (!value) return;
+    const alreadyExists = (draft.puestos.custom || []).includes(value) || DEFAULT_ROLES.includes(value);
+    if (alreadyExists) {
       showToast('Ese puesto ya existe', '!');
       return;
     }
-    draft.puestos.custom = [...(draft.puestos.custom || []), val];
-    draft.puestos.hidden = (draft.puestos.hidden || []).filter(p => p !== val);
-    newPuestoInput.value = '';
+    draft.puestos.custom = [...(draft.puestos.custom || []), value];
+    draft.puestos.hidden = (draft.puestos.hidden || []).filter(p => p !== value);
+    newRoleInput.value = '';
     renderAll();
     showToast('Puesto agregado', '✓');
   }
 
-  document.getElementById('configAddPuesto').addEventListener('click', addCustom);
-  newPuestoInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); addCustom(); }
+  document.getElementById('configAddPuesto').addEventListener('click', addCustomRole);
+  newRoleInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addCustomRole(); }
   });
 
   // ------------------------------------------------------------
   // Panel: Initial states
   // ------------------------------------------------------------
-  function renderEstados() {
-    const activos = new Set(draft.estadosIniciales || []);
+  function renderStateCheckboxes() {
+    const active = new Set(draft.estadosIniciales || []);
     document.getElementById('configEstados').innerHTML = WORKFLOW_STEPS.map(s => {
-      const checked = activos.has(s.id);
+      const checked = active.has(s.id);
       return `
         <label class="config-check ${checked ? 'checked' : ''}">
           <input type="checkbox" data-estado="${escapeHtml(s.id)}" ${checked ? 'checked' : ''}>
@@ -341,36 +341,36 @@ export function mountConfigController(configStore) {
     const input = e.target.closest('input[type="checkbox"]');
     if (!input) return;
     const estado = input.dataset.estado;
-    const set = new Set(draft.estadosIniciales || []);
+    const stateSet = new Set(draft.estadosIniciales || []);
 
-    if (input.checked) set.add(estado);
-    else set.delete(estado);
+    if (input.checked) stateSet.add(estado);
+    else stateSet.delete(estado);
 
-    draft.estadosIniciales = [...set];
+    draft.estadosIniciales = [...stateSet];
 
-    if (set.size > 0 && !set.has(draft.estadoInicialDefault)) {
-      draft.estadoInicialDefault = [...set][0];
+    if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
+      draft.estadoInicialDefault = [...stateSet][0];
     }
 
     renderAll();
   });
 
-  function renderDefaultEstado() {
-    const activos = draft.estadosIniciales || [];
+  function renderDefaultState() {
+    const active = draft.estadosIniciales || [];
     const container = document.getElementById('configDefaultEstado');
 
-    if (activos.length === 0) {
+    if (active.length === 0) {
       container.innerHTML = `<div class="config-empty">Activá al menos un estado arriba.</div>`;
       return;
     }
 
-    container.innerHTML = activos.map(id => {
+    container.innerHTML = active.map(id => {
       const step = WORKFLOW_STEPS.find(s => s.id === id);
       const icon = step ? step.icon : '•';
-      const sel = id === draft.estadoInicialDefault ? 'selected' : '';
+      const isSelected = id === draft.estadoInicialDefault ? 'selected' : '';
       return `
         <button type="button"
-                class="config-default-btn ${sel}"
+                class="config-default-btn ${isSelected}"
                 data-estado="${escapeHtml(id)}">
           ${icon} ${escapeHtml(id)}
         </button>
@@ -396,9 +396,9 @@ export function mountConfigController(configStore) {
     return { label: id, icon: '•', builtin: false };
   }
 
-  function renderFiltros() {
-    const filtros = draft.filtros || [];
-    document.getElementById('configFiltros').innerHTML = filtros.map((f, idx) => {
+  function renderFilters() {
+    const filters = draft.filtros || [];
+    document.getElementById('configFiltros').innerHTML = filters.map((f, idx) => {
       const { label, icon, builtin } = getFilterLabel(f.id);
       return `
         <div class="config-filtro-item ${f.visible ? '' : 'oculto'}">
@@ -418,7 +418,7 @@ export function mountConfigController(configStore) {
                     class="config-icon-btn"
                     data-move="down"
                     data-idx="${idx}"
-                    ${idx === filtros.length - 1 ? 'disabled' : ''}
+                    ${idx === filters.length - 1 ? 'disabled' : ''}
                     title="Bajar">↓</button>
             <button type="button"
                     class="config-icon-btn ${f.visible ? 'eye-on' : 'eye-off'}"
@@ -437,11 +437,11 @@ export function mountConfigController(configStore) {
     if (moveBtn && !moveBtn.disabled) {
       const idx = Number(moveBtn.dataset.idx);
       const dir = moveBtn.dataset.move === 'up' ? -1 : 1;
-      const target = idx + dir;
-      const filtros = cloneArray(draft.filtros);
-      if (target < 0 || target >= filtros.length) return;
-      [filtros[idx], filtros[target]] = [filtros[target], filtros[idx]];
-      draft.filtros = filtros;
+      const targetIdx = idx + dir;
+      const filters = cloneArray(draft.filtros);
+      if (targetIdx < 0 || targetIdx >= filters.length) return;
+      [filters[idx], filters[targetIdx]] = [filters[targetIdx], filters[idx]];
+      draft.filtros = filters;
       renderAll();
       return;
     }
@@ -449,9 +449,9 @@ export function mountConfigController(configStore) {
     const toggleBtn = e.target.closest('[data-toggle]');
     if (toggleBtn) {
       const idx = Number(toggleBtn.dataset.toggle);
-      const filtros = cloneArray(draft.filtros);
-      filtros[idx] = { ...filtros[idx], visible: !filtros[idx].visible };
-      draft.filtros = filtros;
+      const filters = cloneArray(draft.filtros);
+      filters[idx] = { ...filters[idx], visible: !filters[idx].visible };
+      draft.filtros = filters;
       renderAll();
     }
   });
@@ -460,14 +460,14 @@ export function mountConfigController(configStore) {
   // Panel: Appearance (logo)
   // ------------------------------------------------------------
   function renderLogos() {
-    const actual = draft.logo || DEFAULT_LOGO;
+    const current = draft.logo || DEFAULT_LOGO;
     const container = document.getElementById('configLogos');
 
     container.innerHTML = LOGO_OPTIONS.map(opt => {
-      const sel = opt.id === actual;
+      const isSelected = opt.id === current;
       return `
         <button type="button"
-                class="config-logo-option ${sel ? 'selected' : ''}"
+                class="config-logo-option ${isSelected ? 'selected' : ''}"
                 data-logo="${escapeHtml(opt.id)}">
           <div class="config-logo-preview">${opt.svg}</div>
           <div class="config-logo-info">
@@ -484,7 +484,7 @@ export function mountConfigController(configStore) {
     const btn = e.target.closest('.config-logo-option');
     if (!btn) return;
     const id = btn.dataset.logo;
-    // Sólo seteamos si es distinto, para no marcar "sucio" sin cambios reales
+    // Only set if different, to avoid marking "dirty" without real changes
     if ((draft.logo || DEFAULT_LOGO) !== id) {
       draft.logo = id;
       renderAll();

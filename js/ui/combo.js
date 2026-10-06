@@ -2,14 +2,14 @@
 // PuestoCombo: filterable role dropdown
 // ============================================================
 
-import { DEFAULT_PUESTOS, PUESTO_TAGS, PUESTO_ICONS } from '../constants.js';
+import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS } from '../constants.js';
 import { escapeHtml } from '../utils.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
 
-function getPuestoIcon(puesto) {
-  for (const key in PUESTO_ICONS) {
-    if (puesto.toLowerCase().includes(key.toLowerCase())) return PUESTO_ICONS[key];
+function getRoleIcon(role) {
+  for (const key in ROLE_ICONS) {
+    if (role.toLowerCase().includes(key.toLowerCase())) return ROLE_ICONS[key];
   }
   return '💼';
 }
@@ -17,37 +17,37 @@ function getPuestoIcon(puesto) {
 /**
  * Builds the list of roles according to user config.
  */
-export function getAvailablePuestos(config) {
-  if (!config || !config.puestos) return [...DEFAULT_PUESTOS];
+export function getAvailableRoles(config) {
+  if (!config || !config.puestos) return [...DEFAULT_ROLES];
 
   const { activeTags = [], hidden = [], custom = [] } = config.puestos;
   const activeSet = new Set(activeTags);
   const hiddenSet = new Set(hidden);
 
-  const defaultsFiltrados = DEFAULT_PUESTOS.filter(p => {
+  const filteredDefaults = DEFAULT_ROLES.filter(p => {
     if (hiddenSet.has(p)) return false;
     if (activeSet.size === 0) return true;
-    const tags = PUESTO_TAGS[p] || [];
+    const tags = ROLE_TAGS[p] || [];
     return tags.some(t => activeSet.has(t));
   });
 
-  const customsFiltrados = custom.filter(p => !hiddenSet.has(p));
+  const filteredCustoms = custom.filter(p => !hiddenSet.has(p));
 
-  return [...customsFiltrados, ...defaultsFiltrados];
+  return [...filteredCustoms, ...filteredDefaults];
 }
 
-function getOptions(jobsPuestos, query, config) {
-  const disponibles = getAvailablePuestos(config);
+function getOptions(jobsRoles, query, config) {
+  const available = getAvailableRoles(config);
 
-  const usados = [...new Set(jobsPuestos.filter(p => p && DEVELOPER_ROLE.test(p)))];
-  const full = [...new Set([...usados, ...disponibles])];
+  const used = [...new Set(jobsRoles.filter(p => p && DEVELOPER_ROLE.test(p)))];
+  const full = [...new Set([...used, ...available])];
 
   const q = query.toLowerCase().trim();
-  let filtrados;
+  let filtered;
 
   if (q) {
-    filtrados = full.filter(p => p.toLowerCase().includes(q));
-    filtrados.sort((a, b) => {
+    filtered = full.filter(p => p.toLowerCase().includes(q));
+    filtered.sort((a, b) => {
       const aLow = a.toLowerCase();
       const bLow = b.toLowerCase();
       const aStart = aLow.startsWith(q);
@@ -57,11 +57,11 @@ function getOptions(jobsPuestos, query, config) {
       return a.localeCompare(b);
     });
   } else {
-    const recientes = usados.filter(p => !disponibles.includes(p));
-    filtrados = [...recientes, ...disponibles];
+    const recent = used.filter(p => !available.includes(p));
+    filtered = [...recent, ...available];
   }
 
-  return filtrados.slice(0, 40);
+  return filtered.slice(0, 40);
 }
 
 export class PuestoCombo {
@@ -137,9 +137,9 @@ export class PuestoCombo {
   renderOptions() {
     const query = this.input.value.trim();
     const config = this.getConfig();
-    const puestos = getOptions(this.getJobPuestos(), query, config);
+    const roles = getOptions(this.getJobPuestos(), query, config);
 
-    if (puestos.length === 0) {
+    if (roles.length === 0) {
       this.dropdown.innerHTML = `
         <div class="combo-empty">
           No hay coincidencias.<br>
@@ -149,29 +149,29 @@ export class PuestoCombo {
       return;
     }
 
-    const usados = new Set(this.getJobPuestos());
-    const disponibles = new Set(getAvailablePuestos(config));
+    const used = new Set(this.getJobPuestos());
+    const available = new Set(getAvailableRoles(config));
     let html = '';
 
-    puestos.forEach((p, idx) => {
-      const isReciente = usados.has(p) && !disponibles.has(p);
-      const icon = getPuestoIcon(p);
+    roles.forEach((p, idx) => {
+      const isRecent = used.has(p) && !available.has(p);
+      const icon = getRoleIcon(p);
       const isSelected = this.input.value === p;
       const isHighlighted = idx === this.highlightedIdx;
-      const tag = isReciente ? 'Reciente' : '';
+      const tag = isRecent ? 'Reciente' : '';
 
-      if (isReciente && idx === 0) {
+      if (isRecent && idx === 0) {
         html += `<div class="combo-section-label">Usados recientemente</div>`;
       } else if (
-        !isReciente && idx > 0 &&
-        usados.has(puestos[idx - 1]) && !disponibles.has(puestos[idx - 1])
+        !isRecent && idx > 0 &&
+        used.has(roles[idx - 1]) && !available.has(roles[idx - 1])
       ) {
         html += `<div class="combo-section-label">Sugeridos</div>`;
       }
 
       html += `
         <button type="button"
-                class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isReciente ? 'recent' : ''}"
+                class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isRecent ? 'recent' : ''}"
                 data-value="${escapeHtml(p)}"
                 data-idx="${idx}">
           <span class="combo-option-icon">${icon}</span>

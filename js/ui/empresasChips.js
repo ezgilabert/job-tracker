@@ -1,5 +1,5 @@
 // ============================================================
-// EmpresasChips: reusable company chips for referrals
+// CompanyChips: reusable company chips for referrals
 // ============================================================
 
 import { escapeHtml } from '../utils.js';
@@ -7,18 +7,18 @@ import { escapeHtml } from '../utils.js';
 /**
  * @param {HTMLElement} container
  * @param {Set<string>} selectedSet
- * @param {string[]} availableEmpresas
+ * @param {string[]} availableCompanies
  * @returns {void}
  */
-export function renderEmpresasChips(container, selectedSet, availableEmpresas) {
-  if (availableEmpresas.length === 0) {
+export function renderCompanyChips(container, selectedSet, availableCompanies) {
+  if (availableCompanies.length === 0) {
     container.innerHTML = `<span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>`;
     return;
   }
 
-  container.innerHTML = availableEmpresas.map(emp => {
-    const sel = selectedSet.has(emp);
-    return `<button type="button" class="ref-empresa-chip ${sel ? 'selected' : ''}" data-empresa="${escapeHtml(emp)}">${escapeHtml(emp)}</button>`;
+  container.innerHTML = availableCompanies.map(emp => {
+    const isSelected = selectedSet.has(emp);
+    return `<button type="button" class="ref-empresa-chip ${isSelected ? 'selected' : ''}" data-empresa="${escapeHtml(emp)}">${escapeHtml(emp)}</button>`;
   }).join('');
 }
 
@@ -27,7 +27,7 @@ export function renderEmpresasChips(container, selectedSet, availableEmpresas) {
  * @param {Set<string>} selectedSet
  * @returns {void}
  */
-export function mountEmpresasChips(container, selectedSet) {
+export function mountCompanyChips(container, selectedSet) {
   container.addEventListener('click', (e) => {
     const chip = e.target.closest('.ref-empresa-chip');
     if (!chip) return;

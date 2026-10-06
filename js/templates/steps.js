@@ -26,10 +26,10 @@ export function renderSteps(steps, currentIdx, skipped = [], opts = {}) {
     <div class="${wrapperClass}">
       ${steps.map((s, idx) => {
         let cls = '';
-        const fueSaltada = showSkipped && Array.isArray(skipped) && skipped.includes(s.id);
+        const wasSkipped = showSkipped && Array.isArray(skipped) && skipped.includes(s.id);
 
-        if (fueSaltada)         cls = 'skipped';
-        else if (idx < currentIdx)  cls = 'done';
+        if (wasSkipped)              cls = 'skipped';
+        else if (idx < currentIdx)   cls = 'done';
         else if (idx === currentIdx) cls = 'current';
 
         const dot = cls === 'skipped'

@@ -20,20 +20,20 @@ export function renderRefCard(ref, ctx = {}) {
   const linkTxt = ref.link
     ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">Link ↗</a>`
     : '';
-  const contactoTxt = ref.contacto
+  const contactTxt = ref.contacto
     ? `<span>✉️ ${escapeHtml(ref.contacto)}</span>`
     : '';
-  const rolTxt = ref.rol
+  const roleTxt = ref.rol
     ? `<span>💼 ${escapeHtml(ref.rol)}</span>`
     : '';
-  const notasTxt = ref.notas
+  const notesTxt = ref.notas
     ? `<div class="ref-notas">${escapeHtml(ref.notas)}</div>`
     : '';
 
-  const empresas = ensureArray(ref.empresasVinculadas);
-  const empresasTxt = empresas.length
+  const companies = ensureArray(ref.empresasVinculadas);
+  const companiesTxt = companies.length
     ? `<div class="ref-empresas-lista">
-         ${empresas.map(e => {
+         ${companies.map(e => {
            const job = jobs.find(j => j.empresa === e);
            const clickable = job
              ? `data-action="scroll-to-job" data-job-id="${job.id}" title="Ir a la postulación en ${escapeHtml(e)}"`
@@ -59,12 +59,12 @@ export function renderRefCard(ref, ctx = {}) {
        </div>`
     : renderRefActions(ref, currentIdx);
 
-  // NEW: show current note (same stage) as PD
-  const pd = currentRefStepNote(ref);
-  const pdHtml = (!refClosed && pd)
+  // Show current note (same stage) as PD
+  const pendingNote = currentRefStepNote(ref);
+  const pendingNoteHtml = (!refClosed && pendingNote)
     ? `<div class="step-note">
          <span class="pd-label">PD</span>
-         <span class="pd-text">${escapeHtml(pd)}</span>
+         <span class="pd-text">${escapeHtml(pendingNote)}</span>
        </div>`
     : '';
 
@@ -81,10 +81,10 @@ export function renderRefCard(ref, ctx = {}) {
           <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(ref.estado)}</span>
         </div>
 
-        <div class="ref-meta">${rolTxt}${contactoTxt}${linkTxt}</div>
-        ${empresasTxt}
-        ${notasTxt}
-        ${pdHtml}
+        <div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>
+        ${companiesTxt}
+        ${notesTxt}
+        ${pendingNoteHtml}
 
         <div class="ref-workflow">
           ${stepsHtml}
@@ -106,16 +106,16 @@ function renderRefActions(ref, currentIdx) {
   const canNext = currentIdx < REF_WORKFLOW_STEPS.length - 1;
   const prevStep = canBack ? REF_WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? REF_WORKFLOW_STEPS[currentIdx + 1] : null;
-  const yaVolvio = Boolean(ref.volvioAtras);
+  const alreadyWentBack = Boolean(ref.volvioAtras);
 
   const nextBtn = nextStep
     ? `<button class="ref-wf-btn primary" data-action="move-ref-next">→ ${escapeHtml(nextStep.short)}</button>`
     : `<button class="ref-wf-btn success" disabled>✓ Contratado</button>`;
 
   let prevBtn = '';
-  if (prevStep && !yaVolvio) {
+  if (prevStep && !alreadyWentBack) {
     prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="Volver a ${escapeHtml(prevStep.short)}">← ${escapeHtml(prevStep.short)}</button>`;
-  } else if (prevStep && yaVolvio) {
+  } else if (prevStep && alreadyWentBack) {
     prevBtn = `<button class="ref-wf-btn" disabled title="Ya volviste atrás una vez en este referido">← ${escapeHtml(prevStep.short)}</button>`;
   }
 

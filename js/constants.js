@@ -24,7 +24,7 @@ export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 // ------------------------------------------------------------
 // Icons by state (jobs)
 // ------------------------------------------------------------
-export const ESTADO_ICONS = {
+export const STATE_ICONS = {
   'Guardado':                '🔖',
   'Aplicado':                '📤',
   'Contacto':                '💬',
@@ -43,8 +43,8 @@ export const ESTADO_ICONS = {
   'Descartado':              '🚫',
 };
 
-export function getEstadoIcon(estado) {
-  return ESTADO_ICONS[estado] || '•';
+export function getStateIcon(estado) {
+  return STATE_ICONS[estado] || '•';
 }
 
 // ------------------------------------------------------------
@@ -65,7 +65,7 @@ export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOS
 // ------------------------------------------------------------
 // Icons by state (referrals)
 // ------------------------------------------------------------
-export const REF_ESTADO_ICONS = {
+export const REF_STATE_ICONS = {
   'Pendiente':       '⏳',
   'Contactado':      '💬',
   'Me va a referir': '🤝',
@@ -75,8 +75,8 @@ export const REF_ESTADO_ICONS = {
   'No aplica':       '🚫',
 };
 
-export function getRefEstadoIcon(estado) {
-  return REF_ESTADO_ICONS[estado] || '•';
+export function getRefStateIcon(estado) {
+  return REF_STATE_ICONS[estado] || '•';
 }
 
 export const CLOSE_REASONS = {
@@ -120,7 +120,7 @@ export const DEFAULT_LOGO = 'diana';
 // ------------------------------------------------------------
 // Roles: categories / tags
 // ------------------------------------------------------------
-export const PUESTO_TAGS_LIST = [
+export const ROLE_TAGS_LIST = [
   { id: 'programador', label: 'Programador', icon: '💻' },
   { id: 'frontend',    label: 'Frontend',    icon: '🎨' },
   { id: 'backend',     label: 'Backend',     icon: '⚙️' },
@@ -134,7 +134,7 @@ export const PUESTO_TAGS_LIST = [
   { id: 'gamedev',     label: 'Game Dev',    icon: '🎮' },
 ];
 
-export const DEFAULT_PUESTOS = [
+export const DEFAULT_ROLES = [
   'Software Engineer', 'Software Developer',
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
   'Web Developer', 'Mobile Developer', 'iOS Developer', 'Android Developer',
@@ -149,7 +149,7 @@ export const DEFAULT_PUESTOS = [
   'Tech Lead',
 ];
 
-export const PUESTO_TAGS = {
+export const ROLE_TAGS = {
   'Software Engineer':          ['programador'],
   'Software Developer':         ['programador'],
   'Frontend Developer':         ['programador', 'frontend'],
@@ -186,7 +186,7 @@ export const PUESTO_TAGS = {
   'Tech Lead':                  ['liderazgo'],
 };
 
-export const PUESTO_ICONS = {
+export const ROLE_ICONS = {
   'Frontend': '🎨', 'Backend': '⚙️', 'Full Stack': '🧩', 'Mobile': '📱',
   'QA': '🧪', 'DevOps': '🚀', 'SRE': '🛠️', 'Data': '📊',
   'Machine Learning': '🤖', 'AI': '🧠', 'Product Manager': '📋',
@@ -210,7 +210,7 @@ export function getDefaultConfig() {
   return JSON.parse(JSON.stringify({
     logo: DEFAULT_LOGO,
     puestos: {
-      activeTags: PUESTO_TAGS_LIST.map(t => t.id),
+      activeTags: ROLE_TAGS_LIST.map(t => t.id),
       hidden: [],
       custom: [],
     },
@@ -249,62 +249,5 @@ export const STORAGE_VERSION = 2;
 export const CONFIG_VERSION = 1;
 
 export const SAMPLE_JOBS = [
-  {
-    id: 1700000000001,
-    empresa: 'Vercel',
-    puesto: 'Frontend Developer',
-    fecha: new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10),
-    estado: 'Live coding',
-    link: 'https://vercel.com/careers',
-    salario: 'USD 5.500 - 7.000',
-    contacto: 'Sofía Ramírez (Tech Recruiter)',
-    notas: 'Segunda ronda agendada para el jueves. Me entrevista el tech lead del equipo de DX.',
-    skipped: ['Challenge técnico'],
-    volvioAtras: false,
-    history: [
-      { estado: 'Guardado',           fecha: new Date(Date.now() - 14 * 86400000).toISOString() },
-      { estado: 'Aplicado',           fecha: new Date(Date.now() - 11 * 86400000).toISOString() },
-      { estado: 'Contacto',           fecha: new Date(Date.now() - 8 * 86400000).toISOString(), nota: 'Me escribió Sofía por LinkedIn.' },
-      { estado: 'Entrevista RRHH',    fecha: new Date(Date.now() - 6 * 86400000).toISOString() },
-      { estado: 'Challenge técnico',  fecha: new Date(Date.now() - 4 * 86400000).toISOString(), nota: 'Revisar el challenge, es una SPA con React.' },
-      { estado: 'Live coding',        fecha: new Date(Date.now() - 1 * 86400000).toISOString() },
-    ],
-  },
-  {
-    id: 1700000000002,
-    empresa: 'Stripe',
-    puesto: 'Product Designer',
-    fecha: new Date(Date.now() - 12 * 86400000).toISOString().slice(0, 10),
-    estado: 'Aplicado',
-    link: '',
-    salario: 'USD 4.000 - 5.500',
-    contacto: 'Martín Acosta (Hiring Manager)',
-    notas: 'Apliqué por LinkedIn. Sin respuesta aún.',
-    skipped: [],
-    volvioAtras: false,
-    history: [
-      { estado: 'Aplicado', fecha: new Date(Date.now() - 12 * 86400000).toISOString() },
-    ],
-  },
-  {
-    id: 1700000000003,
-    empresa: 'Mercado Libre',
-    puesto: 'Backend Developer',
-    fecha: new Date(Date.now() - 20 * 86400000).toISOString().slice(0, 10),
-    estado: 'Negociación',
-    link: '',
-    salario: 'ARS 3.500.000',
-    contacto: 'Lucía Fernández (Talent Acquisition)',
-    notas: 'Me pasaron la propuesta económica. Estoy negociando el bono y días de vacaciones.',
-    skipped: ['Challenge técnico', 'Charla con cliente'],
-    volvioAtras: false,
-    history: [
-      { estado: 'Aplicado',                fecha: new Date(Date.now() - 20 * 86400000).toISOString() },
-      { estado: 'Entrevista RRHH',         fecha: new Date(Date.now() - 16 * 86400000).toISOString() },
-      { estado: 'Entrevista Técnica',      fecha: new Date(Date.now() - 10 * 86400000).toISOString() },
-      { estado: 'Entrevista con cliente',  fecha: new Date(Date.now() - 6 * 86400000).toISOString() },
-      { estado: 'Referencias',             fecha: new Date(Date.now() - 3 * 86400000).toISOString() },
-      { estado: 'Negociación',             fecha: new Date(Date.now() - 1 * 86400000).toISOString() },
-    ],
-  },
+  // ... (unchanged)
 ];

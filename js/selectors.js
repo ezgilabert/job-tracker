@@ -30,36 +30,36 @@ export function progressPct(estado) {
 }
 
 export function computeStats(jobs) {
-  const porEstado = {};
-  ALL_STATES.forEach(s => { porEstado[s] = 0; });
+  const byState = {};
+  ALL_STATES.forEach(s => { byState[s] = 0; });
   jobs.forEach(j => {
-    if (porEstado[j.estado] !== undefined) porEstado[j.estado]++;
+    if (byState[j.estado] !== undefined) byState[j.estado]++;
   });
 
-  const enProceso =
-    porEstado['Contacto'] +
-    porEstado['Entrevista RRHH'] +
-    porEstado['Challenge técnico'] +
-    porEstado['Live coding'] +
-    porEstado['Entrevista Técnica'] +
-    porEstado['Entrevista con cliente'] +
-    porEstado['Charla con cliente'] +
-    porEstado['Entrevista Final'] +
-    porEstado['Referencias'] +
-    porEstado['Negociación'];
+  const inProcess =
+    byState['Contacto'] +
+    byState['Entrevista RRHH'] +
+    byState['Challenge técnico'] +
+    byState['Live coding'] +
+    byState['Entrevista Técnica'] +
+    byState['Entrevista con cliente'] +
+    byState['Charla con cliente'] +
+    byState['Entrevista Final'] +
+    byState['Referencias'] +
+    byState['Negociación'];
 
-  const activos =
-    porEstado['Guardado'] + porEstado['Aplicado'] + enProceso + porEstado['Oferta'];
-  const cerradas =
-    porEstado['Rechazado'] + porEstado['Ghosted'] + porEstado['Descartado'];
+  const active =
+    byState['Guardado'] + byState['Aplicado'] + inProcess + byState['Oferta'];
+  const closed =
+    byState['Rechazado'] + byState['Ghosted'] + byState['Descartado'];
 
   return {
     total: jobs.length,
-    activos,
-    enProceso,
-    ofertas: porEstado['Oferta'],
-    cerradas,
-    porEstado,
+    activos: active,
+    enProceso: inProcess,
+    ofertas: byState['Oferta'],
+    cerradas: closed,
+    porEstado: byState,
   };
 }
 
@@ -133,12 +133,12 @@ export function filterRefs(refs, filter, searchTerm = '') {
   return out;
 }
 
-export function refsForEmpresa(refs, empresa) {
+export function refsForCompany(refs, empresa) {
   return refs.filter(r =>
     Array.isArray(r.empresasVinculadas) && r.empresasVinculadas.includes(empresa)
   );
 }
 
-export function uniqueEmpresas(jobs) {
+export function uniqueCompanies(jobs) {
   return [...new Set(jobs.map(j => j.empresa).filter(Boolean))];
 }

@@ -3,7 +3,7 @@
 // - Edit job
 // - Close job (with reason)
 // - History (jobs)
-// - History (referrals)  ← NEW
+// - History (referrals)
 // - Edit referral
 // - Move referral → job
 // - Note on advance
@@ -14,10 +14,10 @@ import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { PuestoCombo } from '../ui/combo.js';
 import { mountChips } from '../ui/chips.js';
-import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
+import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
   CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS,
-  getEstadoIcon, getRefEstadoIcon,
+  getStateIcon, getRefStateIcon,
 } from '../constants.js';
 import {
   stepIndex, isClosed,
@@ -111,7 +111,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   // ----------------------------------------------------------
   const closeModal = document.getElementById('closeModal');
   const closeReasonsEl = document.getElementById('closeReasons');
-  const closeMotivo = document.getElementById('closeMotivo');
+  const closeReasonInput = document.getElementById('closeMotivo');
   let pendingClose = null;
 
   function openClose(id, estado) {
@@ -128,12 +128,12 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       .map(r => `<button type="button" class="close-reason-chip" data-reason="${escapeHtml(r)}">${escapeHtml(r)}</button>`)
       .join('');
 
-    closeMotivo.value = '';
-    closeMotivo.style.borderColor = '';
-    closeMotivo.style.boxShadow = '';
+    closeReasonInput.value = '';
+    closeReasonInput.style.borderColor = '';
+    closeReasonInput.style.boxShadow = '';
 
     closeModal.classList.add('open');
-    setTimeout(() => closeMotivo.focus(), 100);
+    setTimeout(() => closeReasonInput.focus(), 100);
   }
 
   function hideClose() {
@@ -146,13 +146,13 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     if (!chip) return;
     closeReasonsEl.querySelectorAll('.close-reason-chip').forEach(c => c.classList.remove('selected'));
     chip.classList.add('selected');
-    closeMotivo.value = chip.dataset.reason;
-    closeMotivo.focus();
+    closeReasonInput.value = chip.dataset.reason;
+    closeReasonInput.focus();
   });
 
-  closeMotivo.addEventListener('input', () => {
-    closeMotivo.style.borderColor = '';
-    closeMotivo.style.boxShadow = '';
+  closeReasonInput.addEventListener('input', () => {
+    closeReasonInput.style.borderColor = '';
+    closeReasonInput.style.boxShadow = '';
   });
 
   document.getElementById('cancelClose').addEventListener('click', hideClose);
@@ -162,11 +162,11 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
   document.getElementById('confirmClose').addEventListener('click', () => {
     if (!pendingClose) return;
-    const motivo = closeMotivo.value.trim();
-    if (!motivo) {
-      closeMotivo.focus();
-      closeMotivo.style.borderColor = 'var(--danger)';
-      closeMotivo.style.boxShadow = '0 0 0 3px var(--danger-soft)';
+    const reason = closeReasonInput.value.trim();
+    if (!reason) {
+      closeReasonInput.focus();
+      closeReasonInput.style.borderColor = 'var(--danger)';
+      closeReasonInput.style.boxShadow = '0 0 0 3px var(--danger-soft)';
       showToast('Escribí o elegí un motivo', '!');
       return;
     }
@@ -175,7 +175,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
       const history = cloneArray(j.history);
-      history.push({ estado, fecha: new Date().toISOString(), motivo });
+      history.push({ estado, fecha: new Date().toISOString(), motivo: reason });
       return { ...j, estado, history };
     }));
 
@@ -208,43 +208,43 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     } else {
       historyTimeline.innerHTML = history.map((entry, i) => {
         const isCurrent = i === lastIdx && !isClosed(entry.estado);
-        const isCerrada = isClosed(entry.estado);
-        const esRetroceso = Boolean(entry.retroceso);
+        const isClosedEntry = isClosed(entry.estado);
+        const isBackward = Boolean(entry.retroceso);
 
         let itemClass = 'history-item';
         if (isCurrent) itemClass += ' current';
-        if (esRetroceso) itemClass += ' retroceso';
-        if (isCerrada) itemClass += ' closed-' + entry.estado.toLowerCase().replace(/\s+/g, '-');
+        if (isBackward) itemClass += ' retroceso';
+        if (isClosedEntry) itemClass += ' closed-' + entry.estado.toLowerCase().replace(/\s+/g, '-');
 
         let tagsHtml = '';
         if (isCurrent) tagsHtml += `<span class="history-tag current">Actual</span>`;
-        if (esRetroceso) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
-        if (isCerrada && entry.estado !== 'Oferta') {
+        if (isBackward) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
+        if (isClosedEntry && entry.estado !== 'Oferta') {
           tagsHtml += `<span class="history-tag cerrada">Cerrada</span>`;
         }
         if (entry.estado === 'Oferta') {
           tagsHtml += `<span class="history-tag oferta">🎉 Oferta</span>`;
         }
 
-        const motivoHtml = entry.motivo
+        const reasonHtml = entry.motivo
           ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
           : '';
 
-        const notaHtml = entry.nota
+        const noteHtml = entry.nota
           ? `<div class="history-nota"><strong>Nota</strong>${escapeHtml(entry.nota)}</div>`
           : '';
 
         return `
           <div class="${itemClass}">
-            <div class="history-dot">${getEstadoIcon(entry.estado)}</div>
+            <div class="history-dot">${getStateIcon(entry.estado)}</div>
             <div class="history-content">
               <div class="history-estado">
                 ${escapeHtml(entry.estado)}
                 ${tagsHtml}
               </div>
               <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
-              ${motivoHtml}
-              ${notaHtml}
+              ${reasonHtml}
+              ${noteHtml}
             </div>
           </div>
         `;
@@ -275,7 +275,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   });
 
   // ----------------------------------------------------------
-  // History (referrals)  ← NEW
+  // History (referrals)
   // ----------------------------------------------------------
   const refHistoryModal = document.getElementById('refHistoryModal');
   const refHistorySubtitle = document.getElementById('refHistorySubtitle');
@@ -298,38 +298,38 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     } else {
       refHistoryTimeline.innerHTML = history.map((entry, i) => {
         const isCurrent = i === lastIdx && entry.estado !== 'No aplica';
-        const isCerrada = entry.estado === 'No aplica';
-        const esRetroceso = Boolean(entry.retroceso);
+        const isClosedEntry = entry.estado === 'No aplica';
+        const isBackward = Boolean(entry.retroceso);
 
         let itemClass = 'history-item';
         if (isCurrent) itemClass += ' current';
-        if (esRetroceso) itemClass += ' retroceso';
-        if (isCerrada) itemClass += ' closed-rechazado';
+        if (isBackward) itemClass += ' retroceso';
+        if (isClosedEntry) itemClass += ' closed-rechazado';
 
         let tagsHtml = '';
         if (isCurrent) tagsHtml += `<span class="history-tag current">Actual</span>`;
-        if (esRetroceso) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
-        if (isCerrada) tagsHtml += `<span class="history-tag cerrada">Cerrado</span>`;
+        if (isBackward) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
+        if (isClosedEntry) tagsHtml += `<span class="history-tag cerrada">Cerrado</span>`;
 
-        const motivoHtml = entry.motivo
+        const reasonHtml = entry.motivo
           ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
           : '';
 
-        const notaHtml = entry.nota
+        const noteHtml = entry.nota
           ? `<div class="history-nota"><strong>Nota</strong>${escapeHtml(entry.nota)}</div>`
           : '';
 
         return `
           <div class="${itemClass}">
-            <div class="history-dot">${getRefEstadoIcon(entry.estado)}</div>
+            <div class="history-dot">${getRefStateIcon(entry.estado)}</div>
             <div class="history-content">
               <div class="history-estado">
                 ${escapeHtml(entry.estado)}
                 ${tagsHtml}
               </div>
               <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
-              ${motivoHtml}
-              ${notaHtml}
+              ${reasonHtml}
+              ${noteHtml}
             </div>
           </div>
         `;
@@ -373,8 +373,8 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     const nextIdx = direction === 'next' ? idx + 1 : idx - 1;
     if (nextIdx < 0 || nextIdx >= WORKFLOW_STEPS.length) return;
 
-    const nuevoEstado = WORKFLOW_STEPS[nextIdx].id;
-    pendingAdvance = { id, nuevoEstado, skipCurrent: !!opts.skipCurrent, direction };
+    const nextState = WORKFLOW_STEPS[nextIdx].id;
+    pendingAdvance = { id, nextState, skipCurrent: !!opts.skipCurrent, direction };
 
     const step = WORKFLOW_STEPS[nextIdx];
     noteSubtitle.innerHTML =
@@ -385,9 +385,9 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     setTimeout(() => stepNoteInput.focus(), 80);
   }
 
-  function applyAdvance({ nota } = {}) {
+  function applyAdvance({ note } = {}) {
     if (!pendingAdvance) return;
-    const { id, nuevoEstado, skipCurrent } = pendingAdvance;
+    const { id, nextState, skipCurrent } = pendingAdvance;
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
@@ -395,15 +395,15 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       if (skipCurrent && !skipped.includes(j.estado)) skipped.push(j.estado);
 
       const history = cloneArray(j.history);
-      const entry = { estado: nuevoEstado, fecha: new Date().toISOString() };
-      if (nota) entry.nota = nota;
+      const entry = { estado: nextState, fecha: new Date().toISOString() };
+      if (note) entry.nota = note;
       history.push(entry);
 
-      return { ...j, estado: nuevoEstado, skipped, history };
+      return { ...j, estado: nextState, skipped, history };
     }));
 
     const j = jobsStore.get().find(x => x.id === id);
-    showToast(`${j?.empresa ?? ''}: ${nuevoEstado}`, skipCurrent ? '🚫' : '→');
+    showToast(`${j?.empresa ?? ''}: ${nextState}`, skipCurrent ? '🚫' : '→');
   }
 
   function hideNote() {
@@ -412,12 +412,12 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   }
 
   document.getElementById('skipNote').addEventListener('click', () => {
-    applyAdvance({ nota: null });
+    applyAdvance({ note: null });
     hideNote();
   });
 
   document.getElementById('saveNote').addEventListener('click', () => {
-    applyAdvance({ nota: stepNoteInput.value.trim() || null });
+    applyAdvance({ note: stepNoteInput.value.trim() || null });
     hideNote();
   });
 
@@ -425,7 +425,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
   noteModal.addEventListener('click', (e) => {
     if (e.target === noteModal) {
-      applyAdvance({ nota: null });
+      applyAdvance({ note: null });
       hideNote();
     }
   });
@@ -444,9 +444,9 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     document.getElementById('refEditEstadoChips'),
     { onChange: () => {} }
   );
-  let refEditEmpresas = new Set();
+  let refEditCompanies = new Set();
 
-  mountEmpresasChips(document.getElementById('refEditEmpresasWrap'), refEditEmpresas);
+  mountCompanyChips(document.getElementById('refEditEmpresasWrap'), refEditCompanies);
 
   function openRefEdit(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -461,12 +461,12 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
     refEditRelacion.setValue(r.relacion || 'Conocido');
     refEditEstado.setValue(r.estado || 'Pendiente');
-    refEditEmpresas = new Set(r.empresasVinculadas || []);
-    const empresas = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-    renderEmpresasChips(
+    refEditCompanies = new Set(r.empresasVinculadas || []);
+    const companies = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
+    renderCompanyChips(
       document.getElementById('refEditEmpresasWrap'),
-      refEditEmpresas,
-      empresas
+      refEditCompanies,
+      companies
     );
 
     refEditModal.classList.add('open');
@@ -495,7 +495,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
         link:     valueOf('refEditLink'),
         relacion: refEditRelacion.getValue() || 'Conocido',
         estado:   refEditEstado.getValue() || 'Pendiente',
-        empresasVinculadas: [...refEditEmpresas],
+        empresasVinculadas: [...refEditCompanies],
         notas:    valueOf('refEditNotas'),
       };
     }));
@@ -572,15 +572,15 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }
 
     refToJobList.innerHTML = jobs.map(j => {
-      const sel = refToJobSelectedId === j.id;
-      const yaVinculado = r?.empresasVinculadas?.includes(j.empresa);
+      const isSelected = refToJobSelectedId === j.id;
+      const alreadyLinked = r?.empresasVinculadas?.includes(j.empresa);
       return `
         <button type="button"
-                class="ref-to-job-item ${sel ? 'selected' : ''}"
+                class="ref-to-job-item ${isSelected ? 'selected' : ''}"
                 data-job-id="${j.id}">
           <div class="info">
             <strong>${escapeHtml(j.puesto)}</strong>
-            <span>${escapeHtml(j.empresa)}${yaVinculado ? ' · ya vinculado' : ''}</span>
+            <span>${escapeHtml(j.empresa)}${alreadyLinked ? ' · ya vinculado' : ''}</span>
           </div>
           <span class="estado-mini">${escapeHtml(j.estado)}</span>
         </button>
@@ -607,9 +607,9 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
     refsStore.update(refs => refs.map(r => {
       if (r.id !== refToJobPending) return r;
-      const vinculadas = cloneArray(r.empresasVinculadas);
-      if (!vinculadas.includes(j.empresa)) vinculadas.push(j.empresa);
-      return { ...r, empresasVinculadas: vinculadas };
+      const linked = cloneArray(r.empresasVinculadas);
+      if (!linked.includes(j.empresa)) linked.push(j.empresa);
+      return { ...r, empresasVinculadas: linked };
     }));
 
     closeRefToJob();
@@ -621,29 +621,29 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   // Create job from referral
   // ----------------------------------------------------------
   function createJobFromRef(r) {
-    const empresas = ensureArray(r.empresasVinculadas);
-    const empresaDefault = empresas[0] || '';
+    const companies = ensureArray(r.empresasVinculadas);
+    const defaultCompany = companies[0] || '';
 
-    if (empresaDefault) {
-      const existente = jobsStore.get().find(j => j.empresa === empresaDefault);
-      if (existente) {
+    if (defaultCompany) {
+      const existing = jobsStore.get().find(j => j.empresa === defaultCompany);
+      if (existing) {
         refsStore.update(refs => refs.map(x => {
           if (x.id !== r.id) return x;
-          const vinculadas = cloneArray(x.empresasVinculadas);
-          if (!vinculadas.includes(existente.empresa)) vinculadas.push(existente.empresa);
-          return { ...x, empresasVinculadas: vinculadas };
+          const linked = cloneArray(x.empresasVinculadas);
+          if (!linked.includes(existing.empresa)) linked.push(existing.empresa);
+          return { ...x, empresasVinculadas: linked };
         }));
         closeRefToJob();
-        showToast(`Ya existía postulación en ${existente.empresa}. Vinculado.`, '🔗');
-        document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: existente.id } }));
+        showToast(`Ya existía postulación en ${existing.empresa}. Vinculado.`, '🔗');
+        document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: existing.id } }));
         return;
       }
     }
 
-    const nuevoId = Date.now();
-    const nuevo = {
-      id: nuevoId,
-      empresa: empresaDefault || 'Por definir',
+    const newId = Date.now();
+    const newJob = {
+      id: newId,
+      empresa: defaultCompany || 'Por definir',
       puesto: '',
       fecha: todayISO(),
       estado: 'Contacto',
@@ -660,21 +660,21 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       }],
     };
 
-    jobsStore.update(jobs => [nuevo, ...jobs]);
+    jobsStore.update(jobs => [newJob, ...jobs]);
 
     refsStore.update(refs => refs.map(x => {
       if (x.id !== r.id) return x;
-      const vinculadas = cloneArray(x.empresasVinculadas);
-      if (nuevo.empresa && !vinculadas.includes(nuevo.empresa)) vinculadas.push(nuevo.empresa);
-      return { ...x, empresasVinculadas: vinculadas };
+      const linked = cloneArray(x.empresasVinculadas);
+      if (newJob.empresa && !linked.includes(newJob.empresa)) linked.push(newJob.empresa);
+      return { ...x, empresasVinculadas: linked };
     }));
 
     closeRefToJob();
     showToast(`Postulación creada desde ${r.nombre}`, '✨');
 
     setTimeout(() => {
-      openEdit(nuevoId);
-      document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: nuevoId } }));
+      openEdit(newId);
+      document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: newId } }));
     }, 400);
   }
 
@@ -759,14 +759,14 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     if (j.volvioAtras) return;
     const idx = stepIndex(j.estado);
     if (idx <= 0) return;
-    const nuevoEstado = WORKFLOW_STEPS[idx - 1].id;
+    const prevState = WORKFLOW_STEPS[idx - 1].id;
 
     jobsStore.update(jobs => jobs.map(x => {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
-      history.push({ estado: nuevoEstado, fecha: new Date().toISOString(), retroceso: true });
-      return { ...x, estado: nuevoEstado, history, volvioAtras: true };
+      history.push({ estado: prevState, fecha: new Date().toISOString(), retroceso: true });
+      return { ...x, estado: prevState, history, volvioAtras: true };
     }));
-    showToast(`${j.empresa}: ${nuevoEstado}`, '←');
+    showToast(`${j.empresa}: ${prevState}`, '←');
   }
 }
