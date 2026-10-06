@@ -9,7 +9,7 @@ export const SUPPORTED_LANGS = [
 
 const translations = {
   // ============================================================
-  // ESPAÑOL
+  // SPANISH
   // ============================================================
   es: {
     // Header
@@ -18,6 +18,26 @@ const translations = {
     'app.documentTitle': 'Job Tracker · Mi búsqueda laboral',
     'action.config': 'Configuración',
     'action.theme': 'Cambiar tema',
+
+    // Auth (Option 1 login screen)
+    'auth.documentTitle': 'Job Tracker · Acceso',
+    'auth.tab.login': 'Iniciar sesión',
+    'auth.tab.register': 'Crear cuenta',
+    'auth.email': 'Email',
+    'auth.email.placeholder': 'tu@email.com',
+    'auth.password': 'Contraseña',
+    'auth.password.placeholder': '••••••••',
+    'auth.password.new.placeholder': 'Mínimo 8 caracteres',
+    'auth.name': 'Nombre',
+    'auth.name.placeholder': 'Tu nombre',
+    'auth.remember': 'Recordarme',
+    'auth.forgot': '¿Olvidaste tu contraseña?',
+    'auth.submit.login': 'Iniciar sesión',
+    'auth.submit.register': 'Crear cuenta',
+    'auth.orContinue': 'o continuá con',
+    'auth.showPassword': 'Mostrar contraseña',
+    'auth.guest': 'Continuar sin cuenta',
+    'auth.logout': 'Cerrar sesión',
 
     // Stats
     'stats.total': 'Total',
@@ -374,6 +394,26 @@ const translations = {
     'app.documentTitle': 'Job Tracker · My job search',
     'action.config': 'Settings',
     'action.theme': 'Switch theme',
+
+    // Auth (Option 1 login screen)
+    'auth.documentTitle': 'Job Tracker · Sign in',
+    'auth.tab.login': 'Sign in',
+    'auth.tab.register': 'Create account',
+    'auth.email': 'Email',
+    'auth.email.placeholder': 'you@email.com',
+    'auth.password': 'Password',
+    'auth.password.placeholder': '••••••••',
+    'auth.password.new.placeholder': 'At least 8 characters',
+    'auth.name': 'Name',
+    'auth.name.placeholder': 'Your name',
+    'auth.remember': 'Remember me',
+    'auth.forgot': 'Forgot your password?',
+    'auth.submit.login': 'Sign in',
+    'auth.submit.register': 'Create account',
+    'auth.orContinue': 'or continue with',
+    'auth.showPassword': 'Show password',
+    'auth.guest': 'Continue without an account',
+    'auth.logout': 'Sign out',
 
     'stats.total': 'Total',
     'stats.active': 'Active',

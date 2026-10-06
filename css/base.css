@@ -134,6 +134,7 @@ header {
 
 .brand { display: flex; align-items: center; gap: 0.9rem; }
 
+/* ===== Brand logo (shared by header + login + config preview) ===== */
 .brand-logo {
   width: 48px;
   height: 48px;
@@ -141,13 +142,24 @@ header {
   background: linear-gradient(135deg, #a78bfa, #c084fc);
   display: grid;
   place-items: center;
-  font-size: 1.4rem;
   box-shadow: 0 6px 18px rgba(124,92,255,0.25);
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 [data-theme="dark"] .brand-logo {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   box-shadow: 0 8px 26px var(--accent-glow);
+}
+
+/* Explicit SVG sizing — without this the inline SVG
+   falls back to its intrinsic size and looks tiny. */
+.brand-logo svg {
+  width: 26px;
+  height: 26px;
+  color: #ffffff;
+  display: block;
+  flex-shrink: 0;
 }
 
 .brand h1 {
