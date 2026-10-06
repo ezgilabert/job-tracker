@@ -1,6 +1,6 @@
 // ============================================================
 // Controller: config
-// Modal with tabs (roles, initial states, filters, appearance)
+// Modal with tabs (roles, initial states, filters, appearance, language)
 // Draft in memory. Warns if there are unsaved changes.
 // ============================================================
 
@@ -9,9 +9,12 @@ import { showConfirm } from '../ui/confirmModal.js';
 import {
   ROLE_TAGS_LIST, ROLE_TAGS, DEFAULT_ROLES,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
-  LOGO_OPTIONS, DEFAULT_LOGO,
+  LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
 } from '../constants.js';
 import { escapeHtml, cloneArray } from '../utils.js';
+import {
+  SUPPORTED_LANGS, t, tState, tStateShort,
+} from '../i18n.js';
 
 /**
  * @param {import('../store.js').Store} configStore
@@ -33,9 +36,6 @@ export function mountConfigController(configStore) {
     return JSON.parse(JSON.stringify(cfg));
   }
 
-  /**
-   * Deep comparison (immune to key order).
-   */
   function deepEqual(a, b) {
     if (a === b) return true;
     if (a === null || b === null) return false;
@@ -71,9 +71,8 @@ export function mountConfigController(configStore) {
   // Open / close
   // ----------------------------------------------------------
   function open() {
-    // Clone exactly as saved. We DON'T touch the draft here:
-    // if we add default fields, the draft becomes "dirty" immediately.
     draft = cloneConfig(configStore.get());
+    if (!draft.lang) draft.lang = DEFAULT_LANG;
     modal.classList.add('open');
     renderAll();
   }
@@ -86,9 +85,8 @@ export function mountConfigController(configStore) {
 
   function saveDraft() {
     const next = cloneConfig(draft);
-    // When saving, we do complete the logo so the next opening
-    // doesn't consider it "dirty" again.
     if (!next.logo) next.logo = DEFAULT_LOGO;
+    if (!next.lang) next.lang = DEFAULT_LANG;
     configStore.update(() => next);
     draft = cloneConfig(configStore.get());
     unsavedBadge.classList.remove('visible');
@@ -112,7 +110,7 @@ export function mountConfigController(configStore) {
     }
     saveDraft();
     closeDirect();
-    showToast('Configuración guardada', '✓');
+    showToast(t('toast.savedConfig'), '✓');
   });
 
   modal.addEventListener('click', (e) => {
@@ -135,13 +133,13 @@ export function mountConfigController(configStore) {
   document.getElementById('unsavedDiscard').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
     closeDirect();
-    showToast('Cambios descartados', '↺');
+    showToast(t('toast.discardedChanges'), '↺');
   });
   document.getElementById('unsavedSave').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
     saveDraft();
     closeDirect();
-    showToast('Configuración guardada', '✓');
+    showToast(t('toast.savedConfig'), '✓');
   });
   unsavedModal.addEventListener('click', (e) => {
     if (e.target === unsavedModal) unsavedModal.classList.remove('open');
@@ -150,15 +148,15 @@ export function mountConfigController(configStore) {
   // Reset
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
-      title: '¿Restablecer configuración?',
-      message: 'Se van a borrar tus preferencias de puestos, estados, filtros y apariencia.<br>Esto <strong>no</strong> se aplica hasta que guardes.',
-      confirmText: 'Restablecer',
+      title: t('confirm.resetConfig.title'),
+      message: t('confirm.resetConfig.message'),
+      confirmText: t('confirm.resetConfig.confirm'),
       danger: true,
     });
     if (!ok) return;
     draft = getDefaultConfig();
     renderAll();
-    showToast('Configuración restablecida (recordá guardar)', '↺');
+    showToast(t('toast.resetConfig'), '↺');
   });
 
   // Tabs
@@ -182,6 +180,7 @@ export function mountConfigController(configStore) {
     renderDefaultState();
     renderFilters();
     renderLogos();
+    renderLangs();
     updateBadge();
   }
 
@@ -190,13 +189,13 @@ export function mountConfigController(configStore) {
   // ------------------------------------------------------------
   function renderTags() {
     const active = new Set(draft.puestos.activeTags || []);
-    document.getElementById('configTags').innerHTML = ROLE_TAGS_LIST.map(t => {
-      const isSelected = active.has(t.id);
+    document.getElementById('configTags').innerHTML = ROLE_TAGS_LIST.map(tag => {
+      const isSelected = active.has(tag.id);
       return `
         <button type="button"
                 class="config-tag ${isSelected ? 'selected' : ''}"
-                data-tag="${escapeHtml(t.id)}">
-          <span>${t.icon}</span> ${escapeHtml(t.label)}
+                data-tag="${escapeHtml(tag.id)}">
+          <span>${tag.icon}</span> ${escapeHtml(tag.label)}
         </button>
       `;
     }).join('');
@@ -224,7 +223,7 @@ export function mountConfigController(configStore) {
       if (hidden.has(p)) return false;
       if (active.size === 0) return true;
       const tags = ROLE_TAGS[p] || [];
-      return tags.some(t => active.has(t));
+      return tags.some(tg => active.has(tg));
     });
 
     return [...customs, ...defaults];
@@ -236,7 +235,7 @@ export function mountConfigController(configStore) {
     document.getElementById('configPuestosCount').textContent = list.length;
 
     if (list.length === 0) {
-      container.innerHTML = `<div class="config-empty">No hay puestos con las categorías activas. Activá alguna o agregá uno custom.</div>`;
+      container.innerHTML = `<div class="config-empty">${escapeHtml(t('config.noPuestos'))}</div>`;
       return;
     }
 
@@ -249,7 +248,7 @@ export function mountConfigController(configStore) {
                   class="remove"
                   data-puesto="${escapeHtml(p)}"
                   data-custom="${isCustom}"
-                  title="${isCustom ? 'Eliminar' : 'Ocultar'}">×</button>
+                  title="${isCustom ? t('config.removeCustom') : t('config.hide')}">×</button>
         </div>
       `;
     }).join('');
@@ -285,7 +284,7 @@ export function mountConfigController(configStore) {
     container.innerHTML = hidden.map(p => `
       <div class="config-puesto-item hidden-puesto">
         <span>${escapeHtml(p)}</span>
-        <button type="button" class="restore" data-puesto="${escapeHtml(p)}" title="Restaurar">+</button>
+        <button type="button" class="restore" data-puesto="${escapeHtml(p)}" title="${t('config.restore')}">+</button>
       </div>
     `).join('');
   }
@@ -305,14 +304,14 @@ export function mountConfigController(configStore) {
     if (!value) return;
     const alreadyExists = (draft.puestos.custom || []).includes(value) || DEFAULT_ROLES.includes(value);
     if (alreadyExists) {
-      showToast('Ese puesto ya existe', '!');
+      showToast(t('toast.roleExists'), '!');
       return;
     }
     draft.puestos.custom = [...(draft.puestos.custom || []), value];
     draft.puestos.hidden = (draft.puestos.hidden || []).filter(p => p !== value);
     newRoleInput.value = '';
     renderAll();
-    showToast('Puesto agregado', '✓');
+    showToast(t('toast.roleAdded'), '✓');
   }
 
   document.getElementById('configAddPuesto').addEventListener('click', addCustomRole);
@@ -331,7 +330,7 @@ export function mountConfigController(configStore) {
         <label class="config-check ${checked ? 'checked' : ''}">
           <input type="checkbox" data-estado="${escapeHtml(s.id)}" ${checked ? 'checked' : ''}>
           <span class="icon">${s.icon}</span>
-          <span>${escapeHtml(s.id)}</span>
+          <span>${escapeHtml(tState(s.id))}</span>
         </label>
       `;
     }).join('');
@@ -360,7 +359,7 @@ export function mountConfigController(configStore) {
     const container = document.getElementById('configDefaultEstado');
 
     if (active.length === 0) {
-      container.innerHTML = `<div class="config-empty">Activá al menos un estado arriba.</div>`;
+      container.innerHTML = `<div class="config-empty">${escapeHtml(t('config.noStates'))}</div>`;
       return;
     }
 
@@ -372,7 +371,7 @@ export function mountConfigController(configStore) {
         <button type="button"
                 class="config-default-btn ${isSelected}"
                 data-estado="${escapeHtml(id)}">
-          ${icon} ${escapeHtml(id)}
+          ${icon} ${escapeHtml(tState(id))}
         </button>
       `;
     }).join('');
@@ -390,9 +389,9 @@ export function mountConfigController(configStore) {
   // ------------------------------------------------------------
   function getFilterLabel(id) {
     const meta = CONFIG_FILTER_META[id];
-    if (meta) return { label: meta.label, icon: meta.icon, builtin: true };
+    if (meta) return { label: t('filter.' + id), icon: meta.icon, builtin: true };
     const step = WORKFLOW_STEPS.find(s => s.id === id);
-    if (step) return { label: step.short, icon: step.icon, builtin: false };
+    if (step) return { label: tStateShort(id), icon: step.icon, builtin: false };
     return { label: id, icon: '•', builtin: false };
   }
 
@@ -405,7 +404,7 @@ export function mountConfigController(configStore) {
           <div class="drag-info">
             <span class="icon">${icon}</span>
             <span>${escapeHtml(label)}</span>
-            ${builtin ? `<span class="builtin-tag">Fijo</span>` : ''}
+            ${builtin ? `<span class="builtin-tag">${escapeHtml(t('config.fixed'))}</span>` : ''}
           </div>
           <div class="config-filtro-actions">
             <button type="button"
@@ -413,17 +412,17 @@ export function mountConfigController(configStore) {
                     data-move="up"
                     data-idx="${idx}"
                     ${idx === 0 ? 'disabled' : ''}
-                    title="Subir">↑</button>
+                    title="${escapeHtml(t('config.moveUp'))}">↑</button>
             <button type="button"
                     class="config-icon-btn"
                     data-move="down"
                     data-idx="${idx}"
                     ${idx === filters.length - 1 ? 'disabled' : ''}
-                    title="Bajar">↓</button>
+                    title="${escapeHtml(t('config.moveDown'))}">↓</button>
             <button type="button"
                     class="config-icon-btn ${f.visible ? 'eye-on' : 'eye-off'}"
                     data-toggle="${idx}"
-                    title="${f.visible ? 'Ocultar filtro' : 'Mostrar filtro'}">
+                    title="${f.visible ? t('config.hideFilter') : t('config.showFilter')}">
               ${f.visible ? '👁' : '🚫'}
             </button>
           </div>
@@ -484,11 +483,53 @@ export function mountConfigController(configStore) {
     const btn = e.target.closest('.config-logo-option');
     if (!btn) return;
     const id = btn.dataset.logo;
-    // Only set if different, to avoid marking "dirty" without real changes
     if ((draft.logo || DEFAULT_LOGO) !== id) {
       draft.logo = id;
-      renderAll();
+      renderLogos();
+      updateBadge();
     }
+  });
+
+  // ------------------------------------------------------------
+  // Panel: Language
+  // ------------------------------------------------------------
+  function renderLangs() {
+    const current = draft.lang || DEFAULT_LANG;
+    const container = document.getElementById('configLangs');
+
+    container.innerHTML = SUPPORTED_LANGS.map(lang => {
+      const selected = lang.id === current;
+      return `
+        <button type="button"
+                class="config-lang-option ${selected ? 'selected' : ''}"
+                data-lang="${escapeHtml(lang.id)}">
+          <div class="config-lang-flag">${lang.flag}</div>
+          <div class="config-lang-info">
+            <strong>${escapeHtml(lang.label)}</strong>
+            <span>${escapeHtml(lang.hint)}</span>
+          </div>
+          <div class="config-lang-check"></div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('configLangs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.config-lang-option');
+    if (!btn) return;
+    const id = btn.dataset.lang;
+    if ((draft.lang || DEFAULT_LANG) !== id) {
+      draft.lang = id;
+      renderLangs();
+      updateBadge();
+    }
+  });
+
+  // ------------------------------------------------------------
+  // Re-render the panel labels on language change
+  // ------------------------------------------------------------
+  document.addEventListener('i18n-changed', () => {
+    if (modal.classList.contains('open') && draft) renderAll();
   });
 
   // ------------------------------------------------------------

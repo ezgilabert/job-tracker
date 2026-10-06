@@ -1,10 +1,5 @@
 // ============================================================
 // Controller: jobs
-// - create form
-// - dynamic filters (from config)
-// - dynamic initial state (from config)
-// - event delegation on #list (edit, delete, workflow, drag)
-// - collapsible sections (form + list) with counter
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -18,6 +13,7 @@ import { renderJobCard } from '../templates/jobCard.js';
 import {
   uid, cloneArray, bindHourlySalaryPlaceholder, escapeHtml,
 } from '../utils.js';
+import { t, tState, tStateShort } from '../i18n.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -74,8 +70,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       list.innerHTML = `
         <div class="empty">
           <div class="empty-icon">📭</div>
-          <h3>${jobs.length === 0 ? 'Todavía no cargaste postulaciones' : 'Sin resultados en este filtro'}</h3>
-          <p>${jobs.length === 0 ? 'Empezá agregando una arriba ☝️' : 'Probá con otro filtro'}</p>
+          <h3>${escapeHtml(jobs.length === 0 ? t('empty.jobs.title') : t('empty.jobs.filter.title'))}</h3>
+          <p>${escapeHtml(jobs.length === 0 ? t('empty.jobs.subtitle') : t('empty.jobs.filter.subtitle'))}</p>
         </div>
       `;
       return;
@@ -94,9 +90,9 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   // ----------------------------------------------------------
   function getFilterLabel(id) {
     const meta = CONFIG_FILTER_META[id];
-    if (meta) return { label: meta.label, icon: meta.icon };
+    if (meta) return { label: t('filter.' + id), icon: meta.icon };
     const step = WORKFLOW_STEPS.find(s => s.id === id);
-    if (step) return { label: step.short, icon: step.icon };
+    if (step) return { label: tStateShort(id), icon: step.icon };
     return { label: id, icon: '•' };
   }
 
@@ -134,7 +130,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       const step = WORKFLOW_STEPS.find(s => s.id === id);
       const icon = step ? step.icon : '•';
       const isSelected = id === defaultState ? 'selected' : '';
-      return `<option value="${escapeHtml(id)}" ${isSelected}>${icon} ${escapeHtml(id)}</option>`;
+      return `<option value="${escapeHtml(id)}" ${isSelected}>${icon} ${escapeHtml(tState(id))}</option>`;
     }).join('');
   }
 
@@ -182,10 +178,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     datePicker?.setValue('');
     renderInitialStates();
 
-    // When adding an application, expand the list so they can see it
     expandJobs();
-
-    showToast('Postulación agregada', '✓');
+    showToast(t('toast.jobAdded'), '✓');
   });
 
   // ----------------------------------------------------------
@@ -234,14 +228,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
   async function confirmDelete(id) {
     const confirmed = await showConfirm({
-      title: '¿Borrar postulación?',
-      message: 'Esta acción no se puede deshacer.',
-      confirmText: 'Borrar',
+      title: t('confirm.deleteJob.title'),
+      message: t('confirm.deleteJob.message'),
+      confirmText: t('confirm.deleteJob.confirm'),
       danger: true,
     });
     if (!confirmed) return;
     jobsStore.update(jobs => jobs.filter(j => j.id !== id));
-    showToast('Postulación borrada', '🗑️');
+    showToast(t('toast.jobDeleted'), '🗑️');
   }
 
   function reopenJob(id) {
@@ -251,7 +245,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       history.push({ estado: 'Aplicado', fecha: new Date().toISOString() });
       return { ...j, estado: 'Aplicado', history };
     }));
-    showToast('Postulación reabierta', '↻');
+    showToast(t('toast.jobReopened'), '↻');
   }
 
   function scrollToRef(refId) {
@@ -321,7 +315,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       return ordered;
     });
 
-    showToast('Orden actualizado', '⠿');
+    showToast(t('toast.orderUpdated'), '⠿');
   });
 
   // ----------------------------------------------------------
@@ -329,6 +323,15 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   // ----------------------------------------------------------
   document.addEventListener('scroll-to-job', () => {
     expandJobs();
+  });
+
+  // ----------------------------------------------------------
+  // i18n: re-render on language change
+  // ----------------------------------------------------------
+  document.addEventListener('i18n-changed', () => {
+    renderFilters();
+    renderInitialStates();
+    renderList();
   });
 
   // ----------------------------------------------------------

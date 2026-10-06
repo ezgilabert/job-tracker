@@ -2,7 +2,7 @@
 // ConfirmModal: reusable confirmation dialog
 // ============================================================
 
-import { escapeHtml } from '../utils.js';
+import { t } from '../i18n.js';
 
 const modal = document.getElementById('confirmModal');
 const titleEl = document.getElementById('confirmTitle');
@@ -12,13 +12,14 @@ const btnCancel = document.getElementById('confirmBtnCancel');
 
 let pendingResolve = null;
 
-export function showConfirm({ title, message, confirmText = 'Confirmar', danger = false }) {
+export function showConfirm({ title, message, confirmText, danger = false }) {
   return new Promise((resolve) => {
     pendingResolve = resolve;
 
     titleEl.textContent = title;
     messageEl.innerHTML = message;
-    btnConfirm.textContent = confirmText;
+    btnConfirm.textContent = confirmText || t('confirm.confirm');
+    btnCancel.textContent = t('confirm.cancel');
 
     if (danger) {
       btnConfirm.style.background = 'var(--danger)';

@@ -116,6 +116,7 @@ export const LOGO_OPTIONS = [
 ];
 
 export const DEFAULT_LOGO = 'diana';
+export const DEFAULT_LANG = 'es';
 
 // ------------------------------------------------------------
 // Roles: categories / tags
@@ -208,6 +209,7 @@ export const CONFIG_FILTER_META = {
 
 export function getDefaultConfig() {
   return JSON.parse(JSON.stringify({
+    lang: DEFAULT_LANG,
     logo: DEFAULT_LOGO,
     puestos: {
       activeTags: ROLE_TAGS_LIST.map(t => t.id),

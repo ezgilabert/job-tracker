@@ -3,6 +3,7 @@
 // ============================================================
 
 import { escapeHtml } from '../utils.js';
+import { t } from '../i18n.js';
 
 /**
  * @param {HTMLElement} container
@@ -12,7 +13,7 @@ import { escapeHtml } from '../utils.js';
  */
 export function renderCompanyChips(container, selectedSet, availableCompanies) {
   if (availableCompanies.length === 0) {
-    container.innerHTML = `<span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>`;
+    container.innerHTML = `<span class="ref-empresa-empty">${escapeHtml(t('refEmpresa.empty'))}</span>`;
     return;
   }
 

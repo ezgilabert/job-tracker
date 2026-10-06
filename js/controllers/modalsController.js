@@ -26,6 +26,9 @@ import {
   escapeHtml, todayISO, cloneArray, ensureArray, bindHourlySalaryPlaceholder,
   formatDateTime,
 } from '../utils.js';
+import {
+  t, tState, tStateShort, tRefState, tRefStateShort,
+} from '../i18n.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -45,7 +48,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   );
 
   editEstado.innerHTML = ALL_STATES
-    .map(s => `<option>${escapeHtml(s)}</option>`)
+    .map(s => `<option value="${escapeHtml(s)}">${escapeHtml(tState(s))}</option>`)
     .join('');
 
   let editingId = null;
@@ -103,7 +106,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }));
 
     closeEdit();
-    showToast('Cambios guardados', '✓');
+    showToast(t('modal.saveChanges'), '✓');
   });
 
   // ----------------------------------------------------------
@@ -119,7 +122,8 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     if (!j) return;
     pendingClose = { id, estado };
 
-    document.getElementById('closeModalTitle').textContent = `Cerrar como ${estado}`;
+    document.getElementById('closeModalTitle').textContent =
+      t('close.titleAs', { estado: tState(estado) });
     document.getElementById('closeModalSubtitle').innerHTML =
       `<strong>${escapeHtml(j.puesto)}</strong> · ${escapeHtml(j.empresa)}`;
 
@@ -167,7 +171,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       closeReasonInput.focus();
       closeReasonInput.style.borderColor = 'var(--danger)';
       closeReasonInput.style.boxShadow = '0 0 0 3px var(--danger-soft)';
-      showToast('Escribí o elegí un motivo', '!');
+      showToast(t('toast.needReason'), '!');
       return;
     }
 
@@ -181,7 +185,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
     hideClose();
     const icons = { 'Rechazado': '✕', 'Ghosted': '👻', 'Descartado': '🚫', 'Oferta': '🎉' };
-    showToast(`Cerrada como ${estado}`, icons[estado] || '✓');
+    showToast(t('toast.closedAs', { estado: tState(estado) }), icons[estado] || '✓');
   });
 
   // ----------------------------------------------------------
@@ -204,7 +208,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     const lastIdx = history.length - 1;
 
     if (history.length === 0) {
-      historyTimeline.innerHTML = `<div class="history-empty">Sin entradas en el historial</div>`;
+      historyTimeline.innerHTML = `<div class="history-empty">${escapeHtml(t('hist.empty'))}</div>`;
     } else {
       historyTimeline.innerHTML = history.map((entry, i) => {
         const isCurrent = i === lastIdx && !isClosed(entry.estado);
@@ -217,13 +221,13 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
         if (isClosedEntry) itemClass += ' closed-' + entry.estado.toLowerCase().replace(/\s+/g, '-');
 
         let tagsHtml = '';
-        if (isCurrent) tagsHtml += `<span class="history-tag current">Actual</span>`;
-        if (isBackward) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
+        if (isCurrent) tagsHtml += `<span class="history-tag current">${escapeHtml(t('hist.current'))}</span>`;
+        if (isBackward) tagsHtml += `<span class="history-tag retroceso">${escapeHtml(t('hist.backward'))}</span>`;
         if (isClosedEntry && entry.estado !== 'Oferta') {
-          tagsHtml += `<span class="history-tag cerrada">Cerrada</span>`;
+          tagsHtml += `<span class="history-tag cerrada">${escapeHtml(t('hist.closed'))}</span>`;
         }
         if (entry.estado === 'Oferta') {
-          tagsHtml += `<span class="history-tag oferta">🎉 Oferta</span>`;
+          tagsHtml += `<span class="history-tag oferta">${escapeHtml(t('hist.offer'))}</span>`;
         }
 
         const reasonHtml = entry.motivo
@@ -231,7 +235,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
           : '';
 
         const noteHtml = entry.nota
-          ? `<div class="history-nota"><strong>Nota</strong>${escapeHtml(entry.nota)}</div>`
+          ? `<div class="history-nota"><strong>${escapeHtml(t('hist.note'))}</strong>${escapeHtml(entry.nota)}</div>`
           : '';
 
         return `
@@ -239,7 +243,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
             <div class="history-dot">${getStateIcon(entry.estado)}</div>
             <div class="history-content">
               <div class="history-estado">
-                ${escapeHtml(entry.estado)}
+                ${escapeHtml(tState(entry.estado))}
                 ${tagsHtml}
               </div>
               <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
@@ -255,7 +259,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     if (skipped.length) {
       historySkipped.style.display = 'block';
       historySkippedList.innerHTML = skipped
-        .map(s => `<span class="history-skipped-tag">${escapeHtml(s)}</span>`)
+        .map(s => `<span class="history-skipped-tag">${escapeHtml(tState(s))}</span>`)
         .join('');
     } else {
       historySkipped.style.display = 'none';
@@ -294,7 +298,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
     if (history.length === 0) {
       refHistoryTimeline.innerHTML =
-        `<div class="history-empty">Sin entradas en el historial</div>`;
+        `<div class="history-empty">${escapeHtml(t('hist.empty'))}</div>`;
     } else {
       refHistoryTimeline.innerHTML = history.map((entry, i) => {
         const isCurrent = i === lastIdx && entry.estado !== 'No aplica';
@@ -307,16 +311,16 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
         if (isClosedEntry) itemClass += ' closed-rechazado';
 
         let tagsHtml = '';
-        if (isCurrent) tagsHtml += `<span class="history-tag current">Actual</span>`;
-        if (isBackward) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
-        if (isClosedEntry) tagsHtml += `<span class="history-tag cerrada">Cerrado</span>`;
+        if (isCurrent) tagsHtml += `<span class="history-tag current">${escapeHtml(t('hist.current'))}</span>`;
+        if (isBackward) tagsHtml += `<span class="history-tag retroceso">${escapeHtml(t('hist.backward'))}</span>`;
+        if (isClosedEntry) tagsHtml += `<span class="history-tag cerrada">${escapeHtml(t('hist.closedRef'))}</span>`;
 
         const reasonHtml = entry.motivo
           ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
           : '';
 
         const noteHtml = entry.nota
-          ? `<div class="history-nota"><strong>Nota</strong>${escapeHtml(entry.nota)}</div>`
+          ? `<div class="history-nota"><strong>${escapeHtml(t('hist.note'))}</strong>${escapeHtml(entry.nota)}</div>`
           : '';
 
         return `
@@ -324,7 +328,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
             <div class="history-dot">${getRefStateIcon(entry.estado)}</div>
             <div class="history-content">
               <div class="history-estado">
-                ${escapeHtml(entry.estado)}
+                ${escapeHtml(tRefState(entry.estado))}
                 ${tagsHtml}
               </div>
               <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
@@ -376,9 +380,10 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     const nextState = WORKFLOW_STEPS[nextIdx].id;
     pendingAdvance = { id, nextState, skipCurrent: !!opts.skipCurrent, direction };
 
-    const step = WORKFLOW_STEPS[nextIdx];
-    noteSubtitle.innerHTML =
-      `Vas a pasar a <strong>${escapeHtml(step.short)}</strong> en <strong>${escapeHtml(j.empresa)}</strong>. ¿Querés dejar un recordatorio para esta etapa?`;
+    noteSubtitle.innerHTML = t('note.subtitle', {
+      step: escapeHtml(tStateShort(nextState)),
+      name: escapeHtml(j.empresa),
+    });
 
     stepNoteInput.value = '';
     noteModal.classList.add('open');
@@ -403,7 +408,10 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }));
 
     const j = jobsStore.get().find(x => x.id === id);
-    showToast(`${j?.empresa ?? ''}: ${nextState}`, skipCurrent ? '🚫' : '→');
+    showToast(
+      t('toast.advanceTo', { name: j?.empresa ?? '', estado: tState(nextState) }),
+      skipCurrent ? '🚫' : '→'
+    );
   }
 
   function hideNote() {
@@ -501,7 +509,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }));
 
     closeRefEdit();
-    showToast('Referido actualizado', '✓');
+    showToast(t('toast.refUpdated'), '✓');
   });
 
   // ----------------------------------------------------------
@@ -566,7 +574,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     const r = refsStore.get().find(x => x.id === refToJobPending);
 
     if (jobs.length === 0) {
-      refToJobList.innerHTML = `<div class="ref-to-job-empty">No hay postulaciones cargadas todavía</div>`;
+      refToJobList.innerHTML = `<div class="ref-to-job-empty">${escapeHtml(t('empty.refToJob'))}</div>`;
       refToJobConfirm.disabled = true;
       return;
     }
@@ -580,9 +588,9 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
                 data-job-id="${j.id}">
           <div class="info">
             <strong>${escapeHtml(j.puesto)}</strong>
-            <span>${escapeHtml(j.empresa)}${alreadyLinked ? ' · ya vinculado' : ''}</span>
+            <span>${escapeHtml(j.empresa)}${alreadyLinked ? ' · ' + escapeHtml(t('refToJob.alreadyLinked')) : ''}</span>
           </div>
-          <span class="estado-mini">${escapeHtml(j.estado)}</span>
+          <span class="estado-mini">${escapeHtml(tState(j.estado))}</span>
         </button>
       `;
     }).join('');
@@ -613,7 +621,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }));
 
     closeRefToJob();
-    showToast(`Vinculado a ${j.empresa}`, '🔗');
+    showToast(t('toast.linkedTo', { empresa: j.empresa }), '🔗');
     document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: j.id } }));
   });
 
@@ -634,7 +642,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
           return { ...x, empresasVinculadas: linked };
         }));
         closeRefToJob();
-        showToast(`Ya existía postulación en ${existing.empresa}. Vinculado.`, '🔗');
+        showToast(t('toast.alreadyExisted', { empresa: existing.empresa }), '🔗');
         document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: existing.id } }));
         return;
       }
@@ -643,7 +651,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     const newId = Date.now();
     const newJob = {
       id: newId,
-      empresa: defaultCompany || 'Por definir',
+      empresa: defaultCompany || '—',
       puesto: '',
       fecha: todayISO(),
       estado: 'Contacto',
@@ -656,7 +664,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       history: [{
         estado: 'Contacto',
         fecha: new Date().toISOString(),
-        motivo: `Creado desde referido: ${r.nombre}`,
+        motivo: `Referido: ${r.nombre}`,
       }],
     };
 
@@ -670,7 +678,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }));
 
     closeRefToJob();
-    showToast(`Postulación creada desde ${r.nombre}`, '✨');
+    showToast(t('toast.jobCreatedFromRef', { name: r.nombre }), '✨');
 
     setTimeout(() => {
       openEdit(newId);
@@ -730,7 +738,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     if (!j) return;
 
     if (j.volvioAtras) {
-      showToast('Ya volviste atrás una vez en esta postulación', '!');
+      showToast(t('toast.alreadyWentBackJob'), '!');
       return;
     }
 
@@ -740,13 +748,14 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     const prevStep = WORKFLOW_STEPS[idx - 1];
 
     const confirmed = await showConfirm({
-      title: '¿Volver a la etapa anterior?',
-      message:
-        `Vas a retroceder <strong>${escapeHtml(j.puesto)}</strong> · ${escapeHtml(j.empresa)} ` +
-        `de <strong>${escapeHtml(j.estado)}</strong> a <strong>${escapeHtml(prevStep.short)}</strong>.<br>` +
-        `<span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">` +
-        `⚠️ Solo podés volver atrás una vez por postulación.</span>`,
-      confirmText: 'Sí, volver',
+      title: t('confirm.prevJob.title'),
+      message: t('confirm.prevJob.message', {
+        puesto: escapeHtml(j.puesto),
+        empresa: escapeHtml(j.empresa),
+        from: escapeHtml(tState(j.estado)),
+        to: escapeHtml(tStateShort(prevStep.id)),
+      }),
+      confirmText: t('confirm.prevJob.confirm'),
     });
 
     if (!confirmed) return;
@@ -767,6 +776,6 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       history.push({ estado: prevState, fecha: new Date().toISOString(), retroceso: true });
       return { ...x, estado: prevState, history, volvioAtras: true };
     }));
-    showToast(`${j.empresa}: ${prevState}`, '←');
+    showToast(t('toast.backTo', { name: j.empresa, estado: tState(prevState) }), '←');
   }
 }

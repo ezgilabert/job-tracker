@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="light" data-i18n-title-doc="app.documentTitle">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,18 +16,18 @@
     <div class="brand">
       <div class="brand-logo" id="brandLogo"></div>
       <div>
-        <h1>Job Tracker</h1>
-        <p>Tu búsqueda laboral, organizada</p>
+        <h1 data-i18n="app.name">Job Tracker</h1>
+        <p data-i18n="app.subtitle">Tu búsqueda laboral, organizada</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" id="configBtn" title="Configuración">
+      <button class="icon-btn" id="configBtn" title="Configuración" data-i18n-title="action.config">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
-      <button class="icon-btn" id="themeToggle" title="Cambiar tema">
+      <button class="icon-btn" id="themeToggle" title="Cambiar tema" data-i18n-title="action.theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
@@ -42,10 +42,10 @@
   <div class="form-card">
     <div class="form-card-header">
       <div>
-        <h2>✨ Nueva postulación</h2>
-        <p class="form-card-subtitle">Cargá una nueva oportunidad</p>
+        <h2 data-i18n="form.title">✨ Nueva postulación</h2>
+        <p class="form-card-subtitle" data-i18n="form.subtitle">Cargá una nueva oportunidad</p>
       </div>
-      <button class="icon-btn" id="jobFormToggleBtn" title="Mostrar/ocultar">
+      <button class="icon-btn" id="jobFormToggleBtn" title="Mostrar/ocultar" data-i18n-title="form.toggle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
@@ -55,46 +55,49 @@
     <div class="collapsible-body" id="jobFormBody">
       <form id="jobForm">
         <div class="field">
-          <label for="empresa">Empresa</label>
-          <input type="text" id="empresa" placeholder="Ej: Google" required>
+          <label for="empresa" data-i18n="form.empresa">Empresa</label>
+          <input type="text" id="empresa" placeholder="Ej: Google" data-i18n-placeholder="form.empresa.placeholder" required>
         </div>
         <div class="field">
-          <label for="puesto">Puesto</label>
+          <label for="puesto" data-i18n="form.puesto">Puesto</label>
           <div class="combo" id="puestoCombo">
             <div class="combo-input-wrap">
-              <input type="text" id="puesto" placeholder="Elegí o escribí un rol" autocomplete="off" required>
+              <input type="text" id="puesto" placeholder="Elegí o escribí un rol" data-i18n-placeholder="form.puesto.placeholder" autocomplete="off" required>
               <span class="combo-chevron">▾</span>
             </div>
             <div class="combo-dropdown" id="puestoDropdown"></div>
           </div>
         </div>
         <div class="field">
-          <label>Fecha</label>
+          <label data-i18n="form.fecha">Fecha</label>
           <div class="date-picker" id="fechaPicker"></div>
         </div>
         <div class="field">
-          <label for="estado">Estado inicial</label>
+          <label for="estado" data-i18n="form.estado">Estado inicial</label>
           <select id="estado"></select>
         </div>
         <div class="field">
-          <label for="link">Link de la oferta</label>
+          <label for="link" data-i18n="form.link">Link de la oferta</label>
           <input type="url" id="link" placeholder="https://...">
         </div>
         <div class="field">
-          <label for="salario">Rango salarial</label>
-          <input type="text" id="salario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h">
-          <label class="hourly-checkbox"><input type="checkbox" id="salarioPorHora"> Es por hora</label>
+          <label for="salario" data-i18n="form.salario">Rango salarial</label>
+          <input type="text" id="salario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+          <label class="hourly-checkbox">
+            <input type="checkbox" id="salarioPorHora">
+            <span data-i18n="form.salarioPorHora">Es por hora</span>
+          </label>
         </div>
         <div class="field">
-          <label for="contacto">Contacto</label>
-          <input type="text" id="contacto" placeholder="Ej: María López (Recruiter)">
+          <label for="contacto" data-i18n="form.contacto">Contacto</label>
+          <input type="text" id="contacto" placeholder="Ej: María López (Recruiter)" data-i18n-placeholder="form.contacto.placeholder">
         </div>
         <div class="field" style="grid-column: 1 / -1;">
-          <label for="notas">Notas</label>
-          <textarea id="notas" placeholder="Contacto, próxima instancia, referidos..."></textarea>
+          <label for="notas" data-i18n="form.notas">Notas</label>
+          <textarea id="notas" placeholder="Contacto, próxima instancia, referidos..." data-i18n-placeholder="form.notas.placeholder"></textarea>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Agregar postulación</button>
+          <button type="submit" class="btn btn-primary" data-i18n="form.submit">Agregar postulación</button>
         </div>
       </form>
     </div>
@@ -104,12 +107,12 @@
   <section class="jobs-section">
     <div class="jobs-header">
       <div>
-        <h2>📋 Postulaciones</h2>
-        <p>Tu historial de procesos</p>
+        <h2 data-i18n="jobs.title">📋 Postulaciones</h2>
+        <p data-i18n="jobs.subtitle">Tu historial de procesos</p>
       </div>
       <div class="jobs-header-actions">
         <span class="job-counter" id="jobCounter">0</span>
-        <button class="icon-btn" id="jobsToggleBtn" title="Mostrar/ocultar">
+        <button class="icon-btn" id="jobsToggleBtn" title="Mostrar/ocultar" data-i18n-title="form.toggle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -130,12 +133,12 @@
   <section class="referidos-section">
     <div class="referidos-header">
       <div>
-        <h2>🤝 Referidos</h2>
-        <p>Tu red de contactos que pueden recomendarte</p>
+        <h2 data-i18n="refs.title">🤝 Referidos</h2>
+        <p data-i18n="refs.subtitle">Tu red de contactos que pueden recomendarte</p>
       </div>
       <div class="referidos-header-actions">
         <span class="ref-counter" id="refCounter">0</span>
-        <button class="icon-btn" id="refToggleBtn" title="Mostrar/ocultar">
+        <button class="icon-btn" id="refToggleBtn" title="Mostrar/ocultar" data-i18n-title="form.toggle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -145,63 +148,66 @@
 
     <div class="referidos-body" id="referidosBody">
       <div class="form-card ref-form-card">
-        <h3>➕ Nuevo referido</h3>
+        <h3 data-i18n="refs.new">➕ Nuevo referido</h3>
         <form id="refForm">
           <div class="field">
-            <label for="refNombre">Nombre</label>
-            <input type="text" id="refNombre" placeholder="Ej: Ana García" required>
+            <label for="refNombre" data-i18n="refs.nombre">Nombre</label>
+            <input type="text" id="refNombre" placeholder="Ej: Ana García" data-i18n-placeholder="refs.nombre.placeholder" required>
           </div>
           <div class="field">
-            <label for="refRol">Rol / Empresa</label>
-            <input type="text" id="refRol" placeholder="Ej: Tech Lead @ Google">
+            <label for="refRol" data-i18n="refs.rol">Rol / Empresa</label>
+            <input type="text" id="refRol" placeholder="Ej: Tech Lead @ Google" data-i18n-placeholder="refs.rol.placeholder">
           </div>
           <div class="field">
-            <label for="refContacto">Contacto</label>
-            <input type="text" id="refContacto" placeholder="Email, teléfono, @usuario...">
+            <label for="refContacto" data-i18n="refs.contacto">Contacto</label>
+            <input type="text" id="refContacto" placeholder="Email, teléfono, @usuario..." data-i18n-placeholder="refs.contacto.placeholder">
           </div>
           <div class="field">
-            <label for="refLink">Link</label>
+            <label for="refLink" data-i18n="refs.link">Link</label>
             <input type="url" id="refLink" placeholder="https://...">
           </div>
 
           <div class="field" style="grid-column: 1 / -1;">
-            <label>Relación</label>
+            <label data-i18n="refs.relacion">Relación</label>
             <div class="ref-chips" id="refRelacionChips">
-              <button type="button" class="ref-chip" data-value="Amigo">Amigo</button>
-              <button type="button" class="ref-chip" data-value="Ex-colega">Ex-colega</button>
-              <button type="button" class="ref-chip" data-value="Familiar">Familiar</button>
-              <button type="button" class="ref-chip" data-value="Conocido">Conocido</button>
-              <button type="button" class="ref-chip" data-value="Recruiter">Recruiter</button>
-              <button type="button" class="ref-chip" data-value="Mentor">Mentor</button>
+              <button type="button" class="ref-chip" data-value="Amigo"     data-i18n="rel.Amigo">Amigo</button>
+              <button type="button" class="ref-chip" data-value="Ex-colega" data-i18n="rel.Ex-colega">Ex-colega</button>
+              <button type="button" class="ref-chip" data-value="Familiar"  data-i18n="rel.Familiar">Familiar</button>
+              <button type="button" class="ref-chip" data-value="Conocido"  data-i18n="rel.Conocido">Conocido</button>
+              <button type="button" class="ref-chip" data-value="Recruiter" data-i18n="rel.Recruiter">Recruiter</button>
+              <button type="button" class="ref-chip" data-value="Mentor"    data-i18n="rel.Mentor">Mentor</button>
             </div>
           </div>
 
           <div class="field" style="grid-column: 1 / -1;">
-            <label>Estado del referido</label>
+            <label data-i18n="refs.estado">Estado del referido</label>
             <div class="ref-chips ref-estado-chips" id="refEstadoChips">
-              <button type="button" class="ref-chip selected" data-value="Pendiente">Pendiente</button>
-              <button type="button" class="ref-chip" data-value="Contactado">Contactado</button>
-              <button type="button" class="ref-chip" data-value="Me va a referir">Me va a referir</button>
-              <button type="button" class="ref-chip" data-value="Referido hecho">Referido hecho</button>
-              <button type="button" class="ref-chip" data-value="En proceso">En proceso</button>
-              <button type="button" class="ref-chip" data-value="Contratado">Contratado</button>
-              <button type="button" class="ref-chip" data-value="No aplica">No aplica</button>
+              <button type="button" class="ref-chip selected" data-value="Pendiente"       data-i18n="refState.Pendiente">Pendiente</button>
+              <button type="button" class="ref-chip"          data-value="Contactado"      data-i18n="refState.Contactado">Contactado</button>
+              <button type="button" class="ref-chip"          data-value="Me va a referir" data-i18n="refState.Me va a referir">Me va a referir</button>
+              <button type="button" class="ref-chip"          data-value="Referido hecho"  data-i18n="refState.Referido hecho">Referido hecho</button>
+              <button type="button" class="ref-chip"          data-value="En proceso"      data-i18n="refState.En proceso">En proceso</button>
+              <button type="button" class="ref-chip"          data-value="Contratado"      data-i18n="refState.Contratado">Contratado</button>
+              <button type="button" class="ref-chip"          data-value="No aplica"       data-i18n="refState.No aplica">No aplica</button>
             </div>
           </div>
 
           <div class="field" style="grid-column: 1 / -1;">
-            <label>Empresas / postulaciones vinculadas <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:500;">(opcional)</span></label>
+            <label>
+              <span data-i18n="refs.empresas">Empresas / postulaciones vinculadas</span>
+              <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:500;" data-i18n="refs.empresas.optional">(opcional)</span>
+            </label>
             <div class="ref-empresas-wrap" id="refEmpresasWrap">
-              <span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>
+              <span class="ref-empresa-empty" data-i18n="refs.empresas.empty">Agregá postulaciones primero para poder vincularlas</span>
             </div>
           </div>
 
           <div class="field" style="grid-column: 1 / -1;">
-            <label for="refNotas">Notas</label>
-            <textarea id="refNotas" placeholder="En qué empresa está, si te puede referir, última charla..."></textarea>
+            <label for="refNotas" data-i18n="refs.notas">Notas</label>
+            <textarea id="refNotas" placeholder="En qué empresa está, si te puede referir, última charla..." data-i18n-placeholder="refs.notas.placeholder"></textarea>
           </div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Agregar referido</button>
+            <button type="submit" class="btn btn-primary" data-i18n="refs.submit">Agregar referido</button>
           </div>
         </form>
       </div>
@@ -212,17 +218,17 @@
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" id="refSearch" placeholder="Buscar por nombre, empresa, nota...">
+          <input type="text" id="refSearch" placeholder="Buscar por nombre, empresa, nota..." data-i18n-placeholder="refs.search.placeholder">
         </div>
         <div class="ref-filters" id="refFilters">
-          <button data-filter="all" class="active">Todos</button>
-          <button data-filter="Pendiente">Pendiente</button>
-          <button data-filter="Contactado">Contactado</button>
-          <button data-filter="Me va a referir">Va a referir</button>
-          <button data-filter="Referido hecho">Referido</button>
-          <button data-filter="En proceso">En proceso</button>
-          <button data-filter="Contratado">Contratado</button>
-          <button data-filter="No aplica">No aplica</button>
+          <button data-filter="all" class="active" data-i18n="refFilter.all">Todos</button>
+          <button data-filter="Pendiente"       data-i18n="refFilter.Pendiente">Pendiente</button>
+          <button data-filter="Contactado"      data-i18n="refFilter.Contactado">Contactado</button>
+          <button data-filter="Me va a referir" data-i18n="refFilter.Me va a referir">Va a referir</button>
+          <button data-filter="Referido hecho"  data-i18n="refFilter.Referido hecho">Referido</button>
+          <button data-filter="En proceso"      data-i18n="refFilter.En proceso">En proceso</button>
+          <button data-filter="Contratado"      data-i18n="refFilter.Contratado">Contratado</button>
+          <button data-filter="No aplica"       data-i18n="refFilter.No aplica">No aplica</button>
         </div>
       </div>
 
@@ -234,14 +240,14 @@
 <!-- Edit job modal -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
-    <h2>✏️ Editar postulación</h2>
+    <h2 data-i18n="modal.edit.title">✏️ Editar postulación</h2>
     <div class="form-grid">
       <div class="field">
-        <label>Empresa</label>
+        <label data-i18n="form.empresa">Empresa</label>
         <input type="text" id="editEmpresa">
       </div>
       <div class="field">
-        <label>Puesto</label>
+        <label data-i18n="form.puesto">Puesto</label>
         <div class="combo" id="editPuestoCombo">
           <div class="combo-input-wrap">
             <input type="text" id="editPuesto" autocomplete="off">
@@ -251,37 +257,40 @@
         </div>
       </div>
       <div class="field">
-        <label>Fecha</label>
+        <label data-i18n="form.fecha">Fecha</label>
         <div class="date-picker" id="editFechaPicker"></div>
       </div>
       <div class="field">
-        <label>Estado</label>
+        <label data-i18n="form.estado">Estado</label>
         <select id="editEstado" disabled></select>
-        <small style="display:block;margin-top:0.35rem;font-size:0.72rem;color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:normal;">
+        <small style="display:block;margin-top:0.35rem;font-size:0.72rem;color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:normal;" data-i18n="modal.edit.estadoNote">
           El estado se cambia desde los botones del workflow de la tarjeta.
         </small>
       </div>
       <div class="field">
-        <label>Link</label>
+        <label data-i18n="form.link">Link</label>
         <input type="url" id="editLink">
       </div>
       <div class="field">
-        <label for="editSalario">Rango salarial</label>
-        <input type="text" id="editSalario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h">
-        <label class="hourly-checkbox"><input type="checkbox" id="editSalarioPorHora"> Es por hora</label>
+        <label for="editSalario" data-i18n="form.salario">Rango salarial</label>
+        <input type="text" id="editSalario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+        <label class="hourly-checkbox">
+          <input type="checkbox" id="editSalarioPorHora">
+          <span data-i18n="form.salarioPorHora">Es por hora</span>
+        </label>
       </div>
       <div class="field">
-        <label>Contacto</label>
+        <label data-i18n="form.contacto">Contacto</label>
         <input type="text" id="editContacto" placeholder="Nombre y rol">
       </div>
       <div class="field full">
-        <label>Notas</label>
+        <label data-i18n="form.notas">Notas</label>
         <textarea id="editNotas" style="min-height:70px"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="cancelEdit">Cancelar</button>
-      <button class="btn btn-primary" id="saveEdit">Guardar cambios</button>
+      <button class="btn btn-ghost" id="cancelEdit" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="saveEdit" data-i18n="modal.saveChanges">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -289,18 +298,21 @@
 <!-- Close job modal -->
 <div class="modal-overlay" id="closeModal">
   <div class="modal" style="max-width: 480px;">
-    <h2 id="closeModalTitle">Cerrar postulación</h2>
+    <h2 id="closeModalTitle" data-i18n="close.titleDefault">Cerrar postulación</h2>
     <p id="closeModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;"></p>
     <div class="form-grid" style="grid-template-columns:1fr;">
       <div class="field full">
-        <label>Motivo <span style="color:var(--danger);font-weight:700;">*</span></label>
+        <label>
+          <span data-i18n="close.motivo">Motivo</span>
+          <span style="color:var(--danger);font-weight:700;">*</span>
+        </label>
         <div id="closeReasons" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;"></div>
-        <textarea id="closeMotivo" placeholder="Contá brevemente qué pasó..." style="min-height:80px;"></textarea>
+        <textarea id="closeMotivo" placeholder="Contá brevemente qué pasó..." data-i18n-placeholder="close.motivo.placeholder" style="min-height:80px;"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="cancelClose">Cancelar</button>
-      <button class="btn btn-primary" id="confirmClose" style="background:var(--danger);">Confirmar cierre</button>
+      <button class="btn btn-ghost" id="cancelClose" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="confirmClose" style="background:var(--danger);" data-i18n="close.confirm">Confirmar cierre</button>
     </div>
   </div>
 </div>
@@ -310,25 +322,25 @@
   <div class="modal" style="max-width: 560px; position: relative;">
     <button class="icon-btn" id="closeHistoryModal"
             style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Cerrar">
+            title="Cerrar" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
 
-    <h2>🕒 Historial de la postulación</h2>
+    <h2 data-i18n="hist.title">🕒 Historial de la postulación</h2>
     <p id="historySubtitle" class="history-subtitle"></p>
 
     <div class="history-timeline" id="historyTimeline"></div>
 
     <div class="history-skipped" id="historySkipped" style="display:none;">
-      <div class="history-skipped-title">Etapas no aplicables</div>
+      <div class="history-skipped-title" data-i18n="hist.skipped">Etapas no aplicables</div>
       <div class="history-skipped-list" id="historySkippedList"></div>
     </div>
 
     <div class="modal-actions" style="margin-top:1.5rem;">
-      <button class="btn btn-primary" id="closeHistoryBtn">Cerrar</button>
+      <button class="btn btn-primary" id="closeHistoryBtn" data-i18n="modal.close">Cerrar</button>
     </div>
   </div>
 </div>
@@ -338,20 +350,20 @@
   <div class="modal" style="max-width: 560px; position: relative;">
     <button class="icon-btn" id="closeRefHistoryModal"
             style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Cerrar">
+            title="Cerrar" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
 
-    <h2>🕒 Historial del referido</h2>
+    <h2 data-i18n="hist.refTitle">🕒 Historial del referido</h2>
     <p id="refHistorySubtitle" class="history-subtitle"></p>
 
     <div class="history-timeline" id="refHistoryTimeline"></div>
 
     <div class="modal-actions" style="margin-top:1.5rem;">
-      <button class="btn btn-primary" id="closeRefHistoryBtn">Cerrar</button>
+      <button class="btn btn-primary" id="closeRefHistoryBtn" data-i18n="modal.close">Cerrar</button>
     </div>
   </div>
 </div>
@@ -359,7 +371,7 @@
 <!-- Config modal -->
 <div class="modal-overlay" id="configModal">
   <div class="modal config-modal">
-    <button class="icon-btn config-close" id="closeConfigBtn" title="Cerrar">
+    <button class="icon-btn config-close" id="closeConfigBtn" title="Cerrar" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -367,23 +379,26 @@
     </button>
 
     <h2>
-      ⚙️ Configuración
-      <span class="unsaved-badge" id="configUnsavedBadge">Sin guardar</span>
+      <span data-i18n="config.title">⚙️ Configuración</span>
+      <span class="unsaved-badge" id="configUnsavedBadge" data-i18n="config.unsaved">Sin guardar</span>
     </h2>
-    <p class="config-subtitle">Personalizá tu Job Tracker</p>
+    <p class="config-subtitle" data-i18n="config.subtitle">Personalizá tu Job Tracker</p>
 
     <div class="config-tabs">
       <button class="config-tab active" data-tab="puestos">
-        <span>💼</span> Puestos
+        <span>💼</span> <span data-i18n="config.tab.puestos">Puestos</span>
       </button>
       <button class="config-tab" data-tab="estados">
-        <span>🚩</span> Estados iniciales
+        <span>🚩</span> <span data-i18n="config.tab.estados">Estados iniciales</span>
       </button>
       <button class="config-tab" data-tab="filtros">
-        <span>🎛️</span> Filtros
+        <span>🎛️</span> <span data-i18n="config.tab.filtros">Filtros</span>
       </button>
       <button class="config-tab" data-tab="apariencia">
-        <span>🎨</span> Apariencia
+        <span>🎨</span> <span data-i18n="config.tab.apariencia">Apariencia</span>
+      </button>
+      <button class="config-tab" data-tab="idioma">
+        <span>🌐</span> <span data-i18n="config.tab.idioma">Idioma</span>
       </button>
     </div>
 
@@ -391,34 +406,37 @@
       <div class="config-panel active" data-panel="puestos">
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Categorías</h3>
-            <p>Activá las categorías cuyos puestos quieras ver en el buscador.</p>
+            <h3 data-i18n="config.categorias.title">Categorías</h3>
+            <p data-i18n="config.categorias.desc">Activá las categorías cuyos puestos quieras ver en el buscador.</p>
           </div>
           <div class="config-tags" id="configTags"></div>
         </div>
 
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Agregar puesto personalizado</h3>
+            <h3 data-i18n="config.custom.title">Agregar puesto personalizado</h3>
           </div>
           <div class="config-add-row">
-            <input type="text" id="configNewPuesto" placeholder="Ej: Rust Developer">
-            <button class="btn btn-primary" id="configAddPuesto">Agregar</button>
+            <input type="text" id="configNewPuesto" placeholder="Ej: Rust Developer" data-i18n-placeholder="config.custom.placeholder">
+            <button class="btn btn-primary" id="configAddPuesto" data-i18n="config.custom.add">Agregar</button>
           </div>
         </div>
 
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Puestos disponibles <span class="config-count" id="configPuestosCount"></span></h3>
-            <p>Quitá los que no quieras ver. Los personalizados se eliminan del todo.</p>
+            <h3>
+              <span data-i18n="config.available.title">Puestos disponibles</span>
+              <span class="config-count" id="configPuestosCount"></span>
+            </h3>
+            <p data-i18n="config.available.desc">Quitá los que no quieras ver. Los personalizados se eliminan del todo.</p>
           </div>
           <div class="config-puestos-list" id="configPuestosList"></div>
         </div>
 
         <div class="config-section" id="configHiddenSection" style="display:none;">
           <div class="config-section-head">
-            <h3>Puestos ocultos</h3>
-            <p>Restaurá los que quieras recuperar.</p>
+            <h3 data-i18n="config.hidden.title">Puestos ocultos</h3>
+            <p data-i18n="config.hidden.desc">Restaurá los que quieras recuperar.</p>
           </div>
           <div class="config-puestos-list" id="configHiddenList"></div>
         </div>
@@ -427,16 +445,16 @@
       <div class="config-panel" data-panel="estados">
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Estados disponibles</h3>
-            <p>Elegí qué estados aparecen en el dropdown al crear una nueva postulación.</p>
+            <h3 data-i18n="config.states.title">Estados disponibles</h3>
+            <p data-i18n="config.states.desc">Elegí qué estados aparecen en el dropdown al crear una nueva postulación.</p>
           </div>
           <div class="config-checks" id="configEstados"></div>
         </div>
 
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Estado por defecto</h3>
-            <p>El estado que viene seleccionado al crear una nueva postulación.</p>
+            <h3 data-i18n="config.defaultState.title">Estado por defecto</h3>
+            <p data-i18n="config.defaultState.desc">El estado que viene seleccionado al crear una nueva postulación.</p>
           </div>
           <div class="config-default-estado" id="configDefaultEstado"></div>
         </div>
@@ -445,8 +463,8 @@
       <div class="config-panel" data-panel="filtros">
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Filtros de postulaciones</h3>
-            <p>Reordená con las flechas y mostrá/ocultá con el ojo. Los filtros fijos no se pueden eliminar.</p>
+            <h3 data-i18n="config.filters.title">Filtros de postulaciones</h3>
+            <p data-i18n="config.filters.desc">Reordená con las flechas y mostrá/ocultá con el ojo. Los filtros fijos no se pueden eliminar.</p>
           </div>
           <div class="config-filtros" id="configFiltros"></div>
         </div>
@@ -456,19 +474,30 @@
       <div class="config-panel" data-panel="apariencia">
         <div class="config-section">
           <div class="config-section-head">
-            <h3>Logo de la app</h3>
-            <p>Elegí cómo querés que se vea el ícono de Job Tracker.</p>
+            <h3 data-i18n="config.logo.title">Logo de la app</h3>
+            <p data-i18n="config.logo.desc">Elegí cómo querés que se vea el ícono de Job Tracker.</p>
           </div>
           <div class="config-logos" id="configLogos"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Idioma -->
+      <div class="config-panel" data-panel="idioma">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3 data-i18n="config.lang.title">Idioma de la interfaz</h3>
+            <p data-i18n="config.lang.desc">Elegí el idioma de los textos de la app. Los datos guardados no se modifican.</p>
+          </div>
+          <div class="config-langs" id="configLangs"></div>
         </div>
       </div>
     </div>
 
     <div class="config-actions">
-      <button class="btn btn-ghost" id="resetConfigBtn">↺ Restablecer</button>
+      <button class="btn btn-ghost" id="resetConfigBtn" data-i18n="config.reset">↺ Restablecer</button>
       <div class="config-actions-right">
-        <button class="btn btn-ghost" id="cancelConfigBtn">Cancelar</button>
-        <button class="btn btn-primary" id="saveConfigBtn">💾 Guardar cambios</button>
+        <button class="btn btn-ghost" id="cancelConfigBtn" data-i18n="modal.cancel">Cancelar</button>
+        <button class="btn btn-primary" id="saveConfigBtn" data-i18n="config.save">💾 Guardar cambios</button>
       </div>
     </div>
   </div>
@@ -477,15 +506,14 @@
 <!-- Unsaved changes modal -->
 <div class="modal-overlay nested" id="unsavedModal">
   <div class="modal" style="max-width: 460px;">
-    <h2>⚠️ Cambios sin guardar</h2>
-    <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.75rem;">
-      Modificaste la configuración pero todavía no la guardaste.<br>
-      ¿Qué querés hacer?
+    <h2 data-i18n="unsaved.title">⚠️ Cambios sin guardar</h2>
+    <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.75rem;" data-i18n-html="unsaved.message">
+      Modificaste la configuración pero todavía no la guardaste.<br>¿Qué querés hacer?
     </p>
     <div class="unsaved-actions">
-      <button class="btn btn-ghost" id="unsavedCancel">Seguir editando</button>
-      <button class="btn btn-danger-ghost" id="unsavedDiscard">Descartar</button>
-      <button class="btn btn-primary" id="unsavedSave">Guardar y salir</button>
+      <button class="btn btn-ghost" id="unsavedCancel" data-i18n="unsaved.keep">Seguir editando</button>
+      <button class="btn btn-danger-ghost" id="unsavedDiscard" data-i18n="unsaved.discard">Descartar</button>
+      <button class="btn btn-primary" id="unsavedSave" data-i18n="unsaved.save">Guardar y salir</button>
     </div>
   </div>
 </div>
@@ -493,61 +521,61 @@
 <!-- Edit referral modal -->
 <div class="modal-overlay" id="refEditModal">
   <div class="modal">
-    <h2>✏️ Editar referido</h2>
+    <h2 data-i18n="refEdit.title">✏️ Editar referido</h2>
     <div class="form-grid">
       <div class="field">
-        <label>Nombre</label>
+        <label data-i18n="refs.nombre">Nombre</label>
         <input type="text" id="refEditNombre">
       </div>
       <div class="field">
-        <label>Rol / Empresa</label>
+        <label data-i18n="refs.rol">Rol / Empresa</label>
         <input type="text" id="refEditRol">
       </div>
       <div class="field">
-        <label>Contacto</label>
+        <label data-i18n="refs.contacto">Contacto</label>
         <input type="text" id="refEditContacto">
       </div>
       <div class="field">
-        <label>Link</label>
+        <label data-i18n="refs.link">Link</label>
         <input type="url" id="refEditLink">
       </div>
       <div class="field full">
-        <label>Relación</label>
+        <label data-i18n="refs.relacion">Relación</label>
         <div class="ref-chips" id="refEditRelacionChips">
-          <button type="button" class="ref-chip" data-value="Amigo">Amigo</button>
-          <button type="button" class="ref-chip" data-value="Ex-colega">Ex-colega</button>
-          <button type="button" class="ref-chip" data-value="Familiar">Familiar</button>
-          <button type="button" class="ref-chip" data-value="Conocido">Conocido</button>
-          <button type="button" class="ref-chip" data-value="Recruiter">Recruiter</button>
-          <button type="button" class="ref-chip" data-value="Mentor">Mentor</button>
+          <button type="button" class="ref-chip" data-value="Amigo"     data-i18n="rel.Amigo">Amigo</button>
+          <button type="button" class="ref-chip" data-value="Ex-colega" data-i18n="rel.Ex-colega">Ex-colega</button>
+          <button type="button" class="ref-chip" data-value="Familiar"  data-i18n="rel.Familiar">Familiar</button>
+          <button type="button" class="ref-chip" data-value="Conocido"  data-i18n="rel.Conocido">Conocido</button>
+          <button type="button" class="ref-chip" data-value="Recruiter" data-i18n="rel.Recruiter">Recruiter</button>
+          <button type="button" class="ref-chip" data-value="Mentor"    data-i18n="rel.Mentor">Mentor</button>
         </div>
       </div>
       <div class="field full">
-        <label>Estado</label>
+        <label data-i18n="refs.estado">Estado</label>
         <div class="ref-chips ref-estado-chips" id="refEditEstadoChips">
-          <button type="button" class="ref-chip" data-value="Pendiente">Pendiente</button>
-          <button type="button" class="ref-chip" data-value="Contactado">Contactado</button>
-          <button type="button" class="ref-chip" data-value="Me va a referir">Me va a referir</button>
-          <button type="button" class="ref-chip" data-value="Referido hecho">Referido hecho</button>
-          <button type="button" class="ref-chip" data-value="En proceso">En proceso</button>
-          <button type="button" class="ref-chip" data-value="Contratado">Contratado</button>
-          <button type="button" class="ref-chip" data-value="No aplica">No aplica</button>
+          <button type="button" class="ref-chip" data-value="Pendiente"       data-i18n="refState.Pendiente">Pendiente</button>
+          <button type="button" class="ref-chip" data-value="Contactado"      data-i18n="refState.Contactado">Contactado</button>
+          <button type="button" class="ref-chip" data-value="Me va a referir" data-i18n="refState.Me va a referir">Me va a referir</button>
+          <button type="button" class="ref-chip" data-value="Referido hecho"  data-i18n="refState.Referido hecho">Referido hecho</button>
+          <button type="button" class="ref-chip" data-value="En proceso"      data-i18n="refState.En proceso">En proceso</button>
+          <button type="button" class="ref-chip" data-value="Contratado"      data-i18n="refState.Contratado">Contratado</button>
+          <button type="button" class="ref-chip" data-value="No aplica"       data-i18n="refState.No aplica">No aplica</button>
         </div>
       </div>
       <div class="field full">
-        <label>Empresas / postulaciones vinculadas</label>
+        <label data-i18n="refs.empresas">Empresas / postulaciones vinculadas</label>
         <div class="ref-empresas-wrap" id="refEditEmpresasWrap">
-          <span class="ref-empresa-empty">Agregá postulaciones primero para poder vincularlas</span>
+          <span class="ref-empresa-empty" data-i18n="refs.empresas.empty">Agregá postulaciones primero para poder vincularlas</span>
         </div>
       </div>
       <div class="field full">
-        <label>Notas</label>
+        <label data-i18n="refs.notas">Notas</label>
         <textarea id="refEditNotas" style="min-height:80px"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="refCancelEdit">Cancelar</button>
-      <button class="btn btn-primary" id="refSaveEdit">Guardar cambios</button>
+      <button class="btn btn-ghost" id="refCancelEdit" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="refSaveEdit" data-i18n="modal.saveChanges">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -555,39 +583,39 @@
 <!-- Move referral to jobs modal -->
 <div class="modal-overlay" id="refToJobModal">
   <div class="modal" style="max-width: 540px;">
-    <h2 style="color:var(--accent);">🎉 ¡Referido hecho!</h2>
+    <h2 style="color:var(--accent);" data-i18n="refToJob.title">🎉 ¡Referido hecho!</h2>
     <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">
-      <strong id="refToJobName" style="color:var(--text);"></strong> ya te hizo el referido.
-      ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?
+      <strong id="refToJobName" style="color:var(--text);"></strong>
+      <span data-i18n-html="refToJob.message"> ya te hizo el referido. ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?</span>
     </p>
 
     <div class="ref-to-job-options">
       <button type="button" class="ref-to-job-option" data-mode="new">
         <span class="ref-to-job-icon">✨</span>
         <div>
-          <strong>Crear nueva postulación</strong>
-          <span>Se precarga con los datos del referido</span>
+          <strong data-i18n="refToJob.createNew">Crear nueva postulación</strong>
+          <span data-i18n="refToJob.createNewDesc">Se precarga con los datos del referido</span>
         </div>
       </button>
       <button type="button" class="ref-to-job-option" data-mode="link">
         <span class="ref-to-job-icon">🔗</span>
         <div>
-          <strong>Vincular a una existente</strong>
-          <span>Elegí una postulación ya cargada</span>
+          <strong data-i18n="refToJob.linkExisting">Vincular a una existente</strong>
+          <span data-i18n="refToJob.linkExistingDesc">Elegí una postulación ya cargada</span>
         </div>
       </button>
     </div>
 
     <div id="refToJobLinkSection" style="display:none; margin-top:1rem;">
-      <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">
+      <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;" data-i18n="refToJob.available">
         Postulaciones disponibles
       </label>
       <div class="ref-to-job-list" id="refToJobList"></div>
     </div>
 
     <div class="modal-actions" style="margin-top:1.25rem;">
-      <button class="btn btn-ghost" id="refToJobSkip">Ahora no</button>
-      <button class="btn btn-primary" id="refToJobConfirm" style="display:none;">Vincular</button>
+      <button class="btn btn-ghost" id="refToJobSkip" data-i18n="refToJob.notNow">Ahora no</button>
+      <button class="btn btn-primary" id="refToJobConfirm" style="display:none;" data-i18n="refToJob.link">Vincular</button>
     </div>
   </div>
 </div>
@@ -597,22 +625,22 @@
   <div class="modal" style="max-width: 440px; position: relative;">
     <button class="icon-btn" id="closeNoteModal"
             style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Cerrar">
+            title="Cerrar" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
 
-    <h2 style="color:var(--accent);">📝 ¿Agregar un recordatorio?</h2>
+    <h2 style="color:var(--accent);" data-i18n="note.title">📝 ¿Agregar un recordatorio?</h2>
     <p id="noteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
     <div class="field" style="margin-bottom:1.25rem;">
-      <label for="stepNoteInput">Nota / PD (opcional)</label>
-      <textarea id="stepNoteInput" placeholder="Ej: Preparar preguntas sobre el stack, revisar el challenge..." style="min-height:90px"></textarea>
+      <label for="stepNoteInput" data-i18n="note.label">Nota / PD (opcional)</label>
+      <textarea id="stepNoteInput" placeholder="Ej: Preparar preguntas sobre el stack, revisar el challenge..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="skipNote">Continuar sin nota</button>
-      <button class="btn btn-primary" id="saveNote">Guardar y avanzar</button>
+      <button class="btn btn-ghost" id="skipNote" data-i18n="note.skip">Continuar sin nota</button>
+      <button class="btn btn-primary" id="saveNote" data-i18n="note.save">Guardar y avanzar</button>
     </div>
   </div>
 </div>
@@ -622,22 +650,22 @@
   <div class="modal" style="max-width: 440px; position: relative;">
     <button class="icon-btn" id="closeRefNoteModal"
             style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Cerrar">
+            title="Cerrar" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
 
-    <h2 style="color:var(--accent);">📝 ¿Agregar un recordatorio?</h2>
+    <h2 style="color:var(--accent);" data-i18n="note.title">📝 ¿Agregar un recordatorio?</h2>
     <p id="refNoteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
     <div class="field" style="margin-bottom:1.25rem;">
-      <label for="refStepNoteInput">Nota / PD (opcional)</label>
-      <textarea id="refStepNoteInput" placeholder="Ej: Mandarle mensaje para coordinar, agradecer la referencia..." style="min-height:90px"></textarea>
+      <label for="refStepNoteInput" data-i18n="note.label">Nota / PD (opcional)</label>
+      <textarea id="refStepNoteInput" placeholder="Ej: Mandarle mensaje para coordinar, agradecer la referencia..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="skipRefNote">Continuar sin nota</button>
-      <button class="btn btn-primary" id="saveRefNote">Guardar y avanzar</button>
+      <button class="btn btn-ghost" id="skipRefNote" data-i18n="note.skip">Continuar sin nota</button>
+      <button class="btn btn-primary" id="saveRefNote" data-i18n="note.save">Guardar y avanzar</button>
     </div>
   </div>
 </div>
@@ -648,8 +676,8 @@
     <h2 id="confirmTitle"></h2>
     <p id="confirmMessage" style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.5rem;"></p>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="confirmBtnCancel">Cancelar</button>
-      <button class="btn btn-primary" id="confirmBtnConfirm">Confirmar</button>
+      <button class="btn btn-ghost" id="confirmBtnCancel" data-i18n="confirm.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="confirmBtnConfirm" data-i18n="confirm.confirm">Confirmar</button>
     </div>
   </div>
 </div>

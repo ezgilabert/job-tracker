@@ -5,7 +5,7 @@
 import { Store } from './store.js';
 import {
   STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
-  SAMPLE_JOBS, getDefaultConfig, LOGO_OPTIONS, DEFAULT_LOGO,
+  SAMPLE_JOBS, getDefaultConfig, LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
 } from './constants.js';
 import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
@@ -15,6 +15,7 @@ import { DatePicker } from './ui/datePicker.js';
 import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
 import { ensureArray } from './utils.js';
+import { applyI18n, setLanguage, getLanguage } from './i18n.js';
 
 // ------------------------------------------------------------
 // Theme
@@ -87,9 +88,22 @@ const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
   seed: () => getDefaultConfig(),
 });
 
-// Subscription: apply chosen logo and react to changes
+// ------------------------------------------------------------
+// i18n: apply language at boot (before controllers render)
+// ------------------------------------------------------------
+setLanguage(configStore.get().lang || DEFAULT_LANG);
+applyI18n(document);
+
+// React to config changes (logo + language)
 configStore.subscribe(cfg => {
   applyLogo(cfg.logo || DEFAULT_LOGO);
+
+  const lang = cfg.lang || DEFAULT_LANG;
+  if (lang !== getLanguage()) {
+    setLanguage(lang);
+    applyI18n(document);
+    document.dispatchEvent(new CustomEvent('i18n-changed'));
+  }
 });
 
 // ------------------------------------------------------------
@@ -118,3 +132,11 @@ const refsCtrl = mountRefsController(jobsStore, refsStore, modals);
 refsCtrl.initChips(refRelacionChips, refEstadoChips);
 
 mountTheme();
+
+// ------------------------------------------------------------
+// Re-render dynamic controllers on language change
+// ------------------------------------------------------------
+document.addEventListener('i18n-changed', () => {
+  if (jobsCtrl?.renderList) jobsCtrl.renderList();
+  if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
+});

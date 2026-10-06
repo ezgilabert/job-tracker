@@ -6,19 +6,18 @@ import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { isRefClosed, refStepIndex } from '../selectors.js';
 import { escapeHtml, ensureArray } from '../utils.js';
 import { renderSteps } from './steps.js';
+import { t, tRefState, tRefStateShort } from '../i18n.js';
 
 /**
  * @param {object} ref
- * @param {{
- *   jobs: object[],
- * }} ctx
+ * @param {{ jobs: object[] }} ctx
  * @returns {string} HTML
  */
 export function renderRefCard(ref, ctx = {}) {
   const { jobs = [] } = ctx;
 
   const linkTxt = ref.link
-    ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">Link ↗</a>`
+    ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))} ↗</a>`
     : '';
   const contactTxt = ref.contacto
     ? `<span>✉️ ${escapeHtml(ref.contacto)}</span>`
@@ -36,7 +35,7 @@ export function renderRefCard(ref, ctx = {}) {
          ${companies.map(e => {
            const job = jobs.find(j => j.empresa === e);
            const clickable = job
-             ? `data-action="scroll-to-job" data-job-id="${job.id}" title="Ir a la postulación en ${escapeHtml(e)}"`
+             ? `data-action="scroll-to-job" data-job-id="${job.id}" title="${escapeHtml(t('ref.goToJob', { empresa: e }))}"`
              : '';
            return `<span class="ref-empresa-tag" ${clickable}>🏢 ${escapeHtml(e)}</span>`;
          }).join('')}
@@ -51,15 +50,15 @@ export function renderRefCard(ref, ctx = {}) {
     : renderSteps(REF_WORKFLOW_STEPS, currentIdx, [], {
         cssPrefix: 'ref-step',
         showSkipped: false,
+        kind: 'ref',
       });
 
   const actionsHtml = refClosed
     ? `<div class="ref-wf-actions">
-         <button class="ref-wf-btn" data-action="reopen-ref">↻ Reabrir</button>
+         <button class="ref-wf-btn" data-action="reopen-ref">↻ ${escapeHtml(t('ref.reopen'))}</button>
        </div>`
     : renderRefActions(ref, currentIdx);
 
-  // Show current note (same stage) as PD
   const pendingNote = currentRefStepNote(ref);
   const pendingNoteHtml = (!refClosed && pendingNote)
     ? `<div class="step-note">
@@ -78,7 +77,7 @@ export function renderRefCard(ref, ctx = {}) {
         <div class="ref-top">
           <h4>${escapeHtml(ref.nombre)}</h4>
           ${ref.relacion ? `<span class="ref-relacion-badge">${escapeHtml(ref.relacion)}</span>` : ''}
-          <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(ref.estado)}</span>
+          <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(tRefState(ref.estado))}</span>
         </div>
 
         <div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>
@@ -93,9 +92,9 @@ export function renderRefCard(ref, ctx = {}) {
       </div>
 
       <div class="ref-actions">
-        <button class="action-btn history" title="Ver historial" data-action="ref-history">🕒</button>
-        <button class="action-btn" title="Editar" data-action="edit-ref">✏️</button>
-        <button class="action-btn danger" title="Borrar" data-action="delete-ref">🗑️</button>
+        <button class="action-btn history" title="${escapeHtml(t('ref.historyTitle'))}" data-action="ref-history">🕒</button>
+        <button class="action-btn" title="${escapeHtml(t('ref.editTitle'))}" data-action="edit-ref">✏️</button>
+        <button class="action-btn danger" title="${escapeHtml(t('ref.deleteTitle'))}" data-action="delete-ref">🗑️</button>
       </div>
     </div>
   `;
@@ -109,30 +108,25 @@ function renderRefActions(ref, currentIdx) {
   const alreadyWentBack = Boolean(ref.volvioAtras);
 
   const nextBtn = nextStep
-    ? `<button class="ref-wf-btn primary" data-action="move-ref-next">→ ${escapeHtml(nextStep.short)}</button>`
-    : `<button class="ref-wf-btn success" disabled>✓ Contratado</button>`;
+    ? `<button class="ref-wf-btn primary" data-action="move-ref-next" title="${escapeHtml(t('ref.nextTitle', { step: tRefStateShort(nextStep.id) }))}">${escapeHtml(t('ref.next'))} ${escapeHtml(tRefStateShort(nextStep.id))}</button>`
+    : `<button class="ref-wf-btn success" disabled title="${escapeHtml(t('ref.contratadoTitle'))}">✓ ${escapeHtml(t('ref.contratado'))}</button>`;
 
   let prevBtn = '';
   if (prevStep && !alreadyWentBack) {
-    prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="Volver a ${escapeHtml(prevStep.short)}">← ${escapeHtml(prevStep.short)}</button>`;
+    prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="${escapeHtml(t('ref.prevTitle', { step: tRefStateShort(prevStep.id) }))}">${escapeHtml(t('ref.prev'))} ${escapeHtml(tRefStateShort(prevStep.id))}</button>`;
   } else if (prevStep && alreadyWentBack) {
-    prevBtn = `<button class="ref-wf-btn" disabled title="Ya volviste atrás una vez en este referido">← ${escapeHtml(prevStep.short)}</button>`;
+    prevBtn = `<button class="ref-wf-btn" disabled title="${escapeHtml(t('toast.alreadyWentBackRef'))}">${escapeHtml(t('ref.prev'))} ${escapeHtml(tRefStateShort(prevStep.id))}</button>`;
   }
 
   return `
     <div class="ref-wf-actions">
       ${nextBtn}
       ${prevBtn}
-      <button class="ref-wf-btn danger" data-action="close-ref">No aplica</button>
+      <button class="ref-wf-btn danger" data-action="close-ref" title="${escapeHtml(t('ref.notApplicableTitle'))}">${escapeHtml(t('ref.notApplicable'))}</button>
     </div>
   `;
 }
 
-/**
- * Finds the last registered note for the referral's current stage.
- * @param {object} ref
- * @returns {string|null}
- */
 function currentRefStepNote(ref) {
   const hist = ensureArray(ref.history);
   for (let i = hist.length - 1; i >= 0; i--) {

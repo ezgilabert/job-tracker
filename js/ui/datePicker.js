@@ -2,6 +2,8 @@
 // DatePicker: custom date selector
 // ============================================================
 
+import { t } from '../i18n.js';
+
 /**
  * Usage:
  *   const dp = new DatePicker(document.getElementById('miPicker'), {
@@ -38,6 +40,12 @@ export class DatePicker {
     document.addEventListener('click', this._outsideClick);
 
     this.popover.addEventListener('click', (e) => this._handlePopoverClick(e));
+
+    // Re-render trigger on language change
+    document.addEventListener('i18n-changed', () => {
+      this.renderTrigger();
+      if (this.open) this.renderPopover();
+    });
 
     this.renderTrigger();
   }
@@ -87,7 +95,7 @@ export class DatePicker {
       this.trigger.innerHTML = `<span>${txt}</span><span class="icon">📅</span>`;
     } else {
       this.trigger.classList.add('empty');
-      this.trigger.innerHTML = `<span>Elegí una fecha</span><span class="icon">📅</span>`;
+      this.trigger.innerHTML = `<span>${t('dp.empty')}</span><span class="icon">📅</span>`;
     }
   }
 
@@ -99,7 +107,7 @@ export class DatePicker {
     });
 
     const firstDay = new Date(year, month, 1);
-    const startWeekday = (firstDay.getDay() + 6) % 7; // Monday = 0
+    const startWeekday = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevMonthDays = new Date(year, month, 0).getDate();
 
@@ -107,7 +115,6 @@ export class DatePicker {
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString().slice(0, 10);
 
-    // Are we viewing the current month? In that case, can't go to the next.
     const isCurrentMonth =
       year === today.getFullYear() && month === today.getMonth();
 
@@ -143,8 +150,8 @@ export class DatePicker {
       <div class="dp-header">
         <div class="dp-month">${monthName}</div>
         <div class="dp-nav">
-          <button type="button" data-nav="prev" aria-label="Mes anterior">‹</button>
-          <button type="button" data-nav="next" aria-label="Mes siguiente" ${isCurrentMonth ? 'disabled' : ''}>›</button>
+          <button type="button" data-nav="prev" aria-label="Prev">‹</button>
+          <button type="button" data-nav="next" aria-label="Next" ${isCurrentMonth ? 'disabled' : ''}>›</button>
         </div>
       </div>
       <div class="dp-weekdays">
@@ -152,10 +159,10 @@ export class DatePicker {
       </div>
       <div class="dp-grid">${daysHtml}</div>
       <div class="dp-shortcuts">
-        <button type="button" data-shortcut="today">Hoy</button>
-        <button type="button" data-shortcut="-1">Ayer</button>
-        <button type="button" data-shortcut="-7">-1 sem</button>
-        <button type="button" data-shortcut="clear">Limpiar</button>
+        <button type="button" data-shortcut="today">${t('dp.today')}</button>
+        <button type="button" data-shortcut="-1">${t('dp.yesterday')}</button>
+        <button type="button" data-shortcut="-7">${t('dp.lastWeek')}</button>
+        <button type="button" data-shortcut="clear">${t('dp.clear')}</button>
       </div>
     `;
   }

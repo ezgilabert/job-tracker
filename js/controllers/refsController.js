@@ -1,13 +1,5 @@
 // ============================================================
 // Controller: referrals
-// - create form
-// - filters + search
-// - section toggle
-// - event delegation on #refList
-// - listens for 'scroll-to-ref' from jobsController
-// - limited backtracking to once per referral (with confirmation)
-// - note on advance (same as applications)
-// - complete history per referral
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -17,6 +9,7 @@ import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import { uid, highlightAndScroll, escapeHtml, cloneArray } from '../utils.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
+import { t, tRefState, tRefStateShort } from '../i18n.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -55,10 +48,10 @@ export function mountRefsController(jobsStore, refsStore, modals) {
         <div class="empty" style="padding: 2.5rem 1rem;">
           <div class="empty-icon" style="font-size: 2.2rem;">🤝</div>
           <h3 style="font-size: 1rem;">
-            ${refs.length === 0 ? 'Todavía no cargaste referidos' : 'Sin resultados'}
+            ${escapeHtml(refs.length === 0 ? t('empty.refs.title') : t('empty.refs.filter.title'))}
           </h3>
           <p style="font-size: 0.85rem;">
-            ${refs.length === 0 ? 'Agregá a alguien que te pueda recomendar' : 'Probá con otro filtro o búsqueda'}
+            ${escapeHtml(refs.length === 0 ? t('empty.refs.subtitle') : t('empty.refs.filter.subtitle'))}
           </p>
         </div>
       `;
@@ -124,7 +117,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       companies
     );
 
-    showToast('Referido agregado', '✓');
+    showToast(t('toast.refAdded'), '✓');
   });
 
   // ----------------------------------------------------------
@@ -209,18 +202,18 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
     const confirmed = await showConfirm({
-      title: `¿Borrar a ${r.nombre}?`,
-      message: 'Se eliminará de tu lista de referidos.',
-      confirmText: 'Borrar',
+      title: t('confirm.deleteRef.title', { name: r.nombre }),
+      message: t('confirm.deleteRef.message'),
+      confirmText: t('confirm.deleteRef.confirm'),
       danger: true,
     });
     if (!confirmed) return;
     refsStore.update(refs => refs.filter(x => x.id !== id));
-    showToast('Referido borrado', '🗑️');
+    showToast(t('toast.refDeleted'), '🗑️');
   }
 
   // ----------------------------------------------------------
-  // Advance: with note modal (like applications)
+  // Advance: with note modal
   // ----------------------------------------------------------
   const refNoteModal = document.getElementById('refNoteModal');
   const refStepNoteInput = document.getElementById('refStepNoteInput');
@@ -240,8 +233,10 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const step = REF_WORKFLOW_STEPS[nextIdx];
     pendingRefAdvance = { id, nextState: step.id };
 
-    refNoteSubtitle.innerHTML =
-      `Vas a pasar a <strong>${escapeHtml(step.short)}</strong> en <strong>${escapeHtml(r.nombre)}</strong>. ¿Querés dejar un recordatorio para esta etapa?`;
+    refNoteSubtitle.innerHTML = t('note.subtitle', {
+      step: escapeHtml(tRefStateShort(step.id)),
+      name: escapeHtml(r.nombre),
+    });
 
     refStepNoteInput.value = '';
     refNoteModal.classList.add('open');
@@ -265,10 +260,9 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       return { ...x, estado: nextState, history };
     }));
 
-    showToast(`${r.nombre}: ${nextState}`, '→');
+    showToast(t('toast.advanceTo', { name: r.nombre, estado: tRefState(nextState) }), '→');
 
-    if (nextState === 'Referido hecho'
-        && prevState !== 'Referido hecho') {
+    if (nextState === 'Referido hecho' && prevState !== 'Referido hecho') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
   }
@@ -305,7 +299,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     if (!r || isRefClosed(r.estado)) return;
 
     if (r.volvioAtras) {
-      showToast('Ya volviste atrás una vez en este referido', '!');
+      showToast(t('toast.alreadyWentBackRef'), '!');
       return;
     }
 
@@ -315,13 +309,13 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const prevStep = REF_WORKFLOW_STEPS[idx - 1];
 
     const confirmed = await showConfirm({
-      title: '¿Volver a la etapa anterior?',
-      message:
-        `Vas a retroceder a <strong>${escapeHtml(r.nombre)}</strong> ` +
-        `de <strong>${escapeHtml(r.estado)}</strong> a <strong>${escapeHtml(prevStep.short)}</strong>.<br>` +
-        `<span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">` +
-        `⚠️ Solo podés volver atrás una vez por referido.</span>`,
-      confirmText: 'Sí, volver',
+      title: t('confirm.prevRef.title'),
+      message: t('confirm.prevRef.message', {
+        name: escapeHtml(r.nombre),
+        from: escapeHtml(tRefState(r.estado)),
+        to: escapeHtml(tRefStateShort(prevStep.id)),
+      }),
+      confirmText: t('confirm.prevRef.confirm'),
     });
 
     if (!confirmed) return;
@@ -349,7 +343,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       return { ...x, estado: prevState, volvioAtras: true, history };
     }));
 
-    showToast(`${r.nombre}: ${prevState}`, '←');
+    showToast(t('toast.backTo', { name: r.nombre, estado: tRefState(prevState) }), '←');
   }
 
   // ----------------------------------------------------------
@@ -359,9 +353,9 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
     const confirmed = await showConfirm({
-      title: `¿Marcar a ${r.nombre} como "No aplica"?`,
-      message: 'Este referido ya no aplica para tu búsqueda.',
-      confirmText: 'Marcar',
+      title: t('confirm.closeRef.title', { name: r.nombre }),
+      message: t('confirm.closeRef.message'),
+      confirmText: t('confirm.closeRef.confirm'),
       danger: true,
     });
     if (!confirmed) return;
@@ -372,12 +366,12 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       history.push({
         estado: 'No aplica',
         fecha: new Date().toISOString(),
-        motivo: 'Marcado como No aplica',
+        motivo: 'No aplica',
       });
       return { ...x, estado: 'No aplica', history };
     }));
 
-    showToast(`${r.nombre}: No aplica`, '🚫');
+    showToast(t('toast.refClosed', { name: r.nombre }), '🚫');
   }
 
   function reopenRef(id) {
@@ -390,12 +384,12 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       history.push({
         estado: 'Pendiente',
         fecha: new Date().toISOString(),
-        motivo: 'Reabierto',
+        motivo: 'Reopen',
       });
       return { ...x, estado: 'Pendiente', history };
     }));
 
-    showToast('Referido reabierto como Pendiente', '↻');
+    showToast(t('toast.refReopened'), '↻');
   }
 
   function scrollToJob(jobId) {
@@ -430,8 +424,13 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     const target = refList.querySelector(`.referido[data-id="${refId}"]`);
     if (target) highlightAndScroll(target);
-    else showToast('No se encontró el referido', '!');
+    else showToast(t('toast.refNotFound'), '!');
   });
+
+  // ----------------------------------------------------------
+  // i18n: re-render on language change
+  // ----------------------------------------------------------
+  document.addEventListener('i18n-changed', renderRefs);
 
   // ----------------------------------------------------------
   // Helpers
