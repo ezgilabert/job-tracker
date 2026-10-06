@@ -5,7 +5,7 @@
 import { Store } from './store.js';
 import {
   STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
-  SAMPLE_JOBS, getDefaultConfig,
+  SAMPLE_JOBS, getDefaultConfig, LOGO_OPTIONS, DEFAULT_LOGO,
 } from './constants.js';
 import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
@@ -29,6 +29,16 @@ function mountTheme() {
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem(STORAGE_KEYS.THEME, next);
   });
+}
+
+// ------------------------------------------------------------
+// Logo (apariencia)
+// ------------------------------------------------------------
+function applyLogo(logoId) {
+  const el = document.getElementById('brandLogo');
+  if (!el) return;
+  const option = LOGO_OPTIONS.find(o => o.id === logoId) || LOGO_OPTIONS[0];
+  el.innerHTML = option.svg;
 }
 
 // ------------------------------------------------------------
@@ -63,7 +73,6 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
         link: r.link ?? r.linkedin ?? '',
         empresasVinculadas: ensureArray(r.empresasVinculadas),
         volvioAtras: Boolean(r.volvioAtras),
-        // NUEVO: cada referido guarda su propio historial
         history: Array.isArray(r.history) && r.history.length
           ? r.history
           : [{ estado: r.estado || 'Pendiente', fecha: r.createdAt || new Date().toISOString() }],
@@ -76,6 +85,11 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
 const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
   version: CONFIG_VERSION,
   seed: () => getDefaultConfig(),
+});
+
+// Suscripción: aplicar el logo elegido y reaccionar a cambios
+configStore.subscribe(cfg => {
+  applyLogo(cfg.logo || DEFAULT_LOGO);
 });
 
 // ------------------------------------------------------------

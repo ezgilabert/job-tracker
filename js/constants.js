@@ -87,6 +87,37 @@ export const CLOSE_REASONS = {
 };
 
 // ------------------------------------------------------------
+// Logos disponibles para el selector de Apariencia
+// ------------------------------------------------------------
+export const LOGO_OPTIONS = [
+  {
+    id: 'diana',
+    label: 'Diana',
+    description: 'Flecha apuntando al centro',
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <circle cx="12" cy="12" r="5"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      <path d="M12 3 L19 10"/>
+      <path d="M15 4 L20 9 L19 10 L14 5 Z" fill="currentColor" stroke="none"/>
+    </svg>`,
+  },
+  {
+    id: 'maletin',
+    label: 'Maletín',
+    description: 'Ícono clásico de trabajo',
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="7" width="18" height="13" rx="2"/>
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      <path d="M3 13h18"/>
+      <path d="M12 13v2"/>
+    </svg>`,
+  },
+];
+
+export const DEFAULT_LOGO = 'diana';
+
+// ------------------------------------------------------------
 // Puestos: categorías / tags
 // ------------------------------------------------------------
 export const PUESTO_TAGS_LIST = [
@@ -177,6 +208,7 @@ export const CONFIG_FILTER_META = {
 
 export function getDefaultConfig() {
   return JSON.parse(JSON.stringify({
+    logo: DEFAULT_LOGO,
     puestos: {
       activeTags: PUESTO_TAGS_LIST.map(t => t.id),
       hidden: [],

@@ -1,6 +1,6 @@
 // ============================================================
 // Controller: config
-// Modal con tabs (puestos, estados iniciales, filtros)
+// Modal con tabs (puestos, estados iniciales, filtros, apariencia)
 // Draft en memoria. Avisa si hay cambios sin guardar.
 // ============================================================
 
@@ -9,6 +9,7 @@ import { showConfirm } from '../ui/confirmModal.js';
 import {
   PUESTO_TAGS_LIST, PUESTO_TAGS, DEFAULT_PUESTOS,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
+  LOGO_OPTIONS, DEFAULT_LOGO,
 } from '../constants.js';
 import { escapeHtml, cloneArray } from '../utils.js';
 
@@ -46,6 +47,8 @@ export function mountConfigController(configStore) {
   // ----------------------------------------------------------
   function open() {
     draft = cloneConfig(configStore.get());
+    // Garantizamos que `logo` exista (compatibilidad con configs viejas)
+    if (!draft.logo) draft.logo = DEFAULT_LOGO;
     modal.classList.add('open');
     renderAll();
   }
@@ -115,7 +118,7 @@ export function mountConfigController(configStore) {
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
       title: '¿Restablecer configuración?',
-      message: 'Se van a borrar tus preferencias de puestos, estados y filtros.<br>Esto <strong>no</strong> se aplica hasta que guardes.',
+      message: 'Se van a borrar tus preferencias de puestos, estados, filtros y apariencia.<br>Esto <strong>no</strong> se aplica hasta que guardes.',
       confirmText: 'Restablecer',
       danger: true,
     });
@@ -145,6 +148,7 @@ export function mountConfigController(configStore) {
     renderEstados();
     renderDefaultEstado();
     renderFiltros();
+    renderLogos();
     updateBadge();
   }
 
@@ -417,6 +421,37 @@ export function mountConfigController(configStore) {
       draft.filtros = filtros;
       renderAll();
     }
+  });
+
+  // ------------------------------------------------------------
+  // Panel: Apariencia (logo)
+  // ------------------------------------------------------------
+  function renderLogos() {
+    const actual = draft.logo || DEFAULT_LOGO;
+    const container = document.getElementById('configLogos');
+
+    container.innerHTML = LOGO_OPTIONS.map(opt => {
+      const sel = opt.id === actual;
+      return `
+        <button type="button"
+                class="config-logo-option ${sel ? 'selected' : ''}"
+                data-logo="${escapeHtml(opt.id)}">
+          <div class="config-logo-preview">${opt.svg}</div>
+          <div class="config-logo-info">
+            <strong>${escapeHtml(opt.label)}</strong>
+            <span>${escapeHtml(opt.description)}</span>
+          </div>
+          <div class="config-logo-check"></div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('configLogos').addEventListener('click', (e) => {
+    const btn = e.target.closest('.config-logo-option');
+    if (!btn) return;
+    draft.logo = btn.dataset.logo;
+    renderAll();
   });
 
   // ------------------------------------------------------------

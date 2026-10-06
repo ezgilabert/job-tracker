@@ -14,7 +14,7 @@
 <div class="container">
   <header>
     <div class="brand">
-      <div class="brand-logo">🎯</div>
+      <div class="brand-logo" id="brandLogo"></div>
       <div>
         <h1>Job Tracker</h1>
         <p>Tu búsqueda laboral, organizada</p>
@@ -382,6 +382,9 @@
       <button class="config-tab" data-tab="filtros">
         <span>🎛️</span> Filtros
       </button>
+      <button class="config-tab" data-tab="apariencia">
+        <span>🎨</span> Apariencia
+      </button>
     </div>
 
     <div class="config-body">
@@ -446,6 +449,17 @@
             <p>Reordená con las flechas y mostrá/ocultá con el ojo. Los filtros fijos no se pueden eliminar.</p>
           </div>
           <div class="config-filtros" id="configFiltros"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Apariencia -->
+      <div class="config-panel" data-panel="apariencia">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Logo de la app</h3>
+            <p>Elegí cómo querés que se vea el ícono de Job Tracker.</p>
+          </div>
+          <div class="config-logos" id="configLogos"></div>
         </div>
       </div>
     </div>
