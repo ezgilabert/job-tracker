@@ -8,6 +8,7 @@ import {
   DEFAULT_BACKGROUND, applyBackground,
 } from '../constants.js';
 import { login, redirectIfAuthenticated } from './session.js';
+import { mountInputLimits } from '../ui/inputLimits.js';
 
 // ------------------------------------------------------------
 // Read persisted config (logo + language + background)
@@ -162,6 +163,9 @@ function boot() {
   mountForms();
   mountGuest();
   mountSocials();
+
+  // Límites en los campos del login / registro
+  mountInputLimits(document);
 }
 
 boot();

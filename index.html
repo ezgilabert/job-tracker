@@ -103,13 +103,13 @@
       <form id="jobForm">
         <div class="field">
           <label for="empresa" data-i18n="form.empresa">Empresa</label>
-          <input type="text" id="empresa" placeholder="Ej: Google" data-i18n-placeholder="form.empresa.placeholder" required>
+          <input type="text" id="empresa" maxlength="100" placeholder="Ej: Google" data-i18n-placeholder="form.empresa.placeholder" required>
         </div>
         <div class="field">
           <label for="puesto" data-i18n="form.puesto">Puesto</label>
           <div class="combo" id="puestoCombo">
             <div class="combo-input-wrap">
-              <input type="text" id="puesto" placeholder="Elegí o escribí un rol" data-i18n-placeholder="form.puesto.placeholder" autocomplete="off" required>
+              <input type="text" id="puesto" maxlength="100" placeholder="Elegí o escribí un rol" data-i18n-placeholder="form.puesto.placeholder" autocomplete="off" required>
               <span class="combo-chevron">▾</span>
             </div>
             <div class="combo-dropdown" id="puestoDropdown"></div>
@@ -125,11 +125,11 @@
         </div>
         <div class="field">
           <label for="link" data-i18n="form.link">Link de la oferta</label>
-          <input type="url" id="link" placeholder="https://...">
+          <input type="url" id="link" maxlength="500" placeholder="https://...">
         </div>
         <div class="field">
           <label for="salario" data-i18n="form.salario">Rango salarial</label>
-          <input type="text" id="salario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+          <input type="text" id="salario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
           <label class="hourly-checkbox">
             <input type="checkbox" id="salarioPorHora">
             <span data-i18n="form.salarioPorHora">Es por hora</span>
@@ -137,11 +137,11 @@
         </div>
         <div class="field">
           <label for="contacto" data-i18n="form.contacto">Contacto</label>
-          <input type="text" id="contacto" placeholder="Ej: María López (Recruiter)" data-i18n-placeholder="form.contacto.placeholder">
+          <input type="text" id="contacto" maxlength="120" placeholder="Ej: María López (Recruiter)" data-i18n-placeholder="form.contacto.placeholder">
         </div>
         <div class="field" style="grid-column: 1 / -1;">
           <label for="notas" data-i18n="form.notas">Notas</label>
-          <textarea id="notas" placeholder="Contacto, próxima instancia, referidos..." data-i18n-placeholder="form.notas.placeholder"></textarea>
+          <textarea id="notas" maxlength="2000" placeholder="Contacto, próxima instancia, referidos..." data-i18n-placeholder="form.notas.placeholder"></textarea>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" data-i18n="form.submit">Agregar postulación</button>
@@ -197,19 +197,19 @@
         <form id="refForm">
           <div class="field">
             <label for="refNombre" data-i18n="refs.nombre">Nombre</label>
-            <input type="text" id="refNombre" placeholder="Ej: Ana García" data-i18n-placeholder="refs.nombre.placeholder" required>
+            <input type="text" id="refNombre" maxlength="80" placeholder="Ej: Ana García" data-i18n-placeholder="refs.nombre.placeholder" required>
           </div>
           <div class="field">
             <label for="refRol" data-i18n="refs.rol">Rol / Empresa</label>
-            <input type="text" id="refRol" placeholder="Ej: Tech Lead @ Google" data-i18n-placeholder="refs.rol.placeholder">
+            <input type="text" id="refRol" maxlength="120" placeholder="Ej: Tech Lead @ Google" data-i18n-placeholder="refs.rol.placeholder">
           </div>
           <div class="field">
             <label for="refContacto" data-i18n="refs.contacto">Contacto</label>
-            <input type="text" id="refContacto" placeholder="Email, teléfono, @usuario..." data-i18n-placeholder="refs.contacto.placeholder">
+            <input type="text" id="refContacto" maxlength="200" placeholder="Email, teléfono, @usuario..." data-i18n-placeholder="refs.contacto.placeholder">
           </div>
           <div class="field">
             <label for="refLink" data-i18n="refs.link">Link</label>
-            <input type="url" id="refLink" placeholder="https://...">
+            <input type="url" id="refLink" maxlength="500" placeholder="https://...">
           </div>
 
           <div class="field" style="grid-column: 1 / -1;">
@@ -249,7 +249,7 @@
 
           <div class="field" style="grid-column: 1 / -1;">
             <label for="refNotas" data-i18n="refs.notas">Notas</label>
-            <textarea id="refNotas" placeholder="En qué empresa está, si te puede referir, última charla..." data-i18n-placeholder="refs.notas.placeholder"></textarea>
+            <textarea id="refNotas" maxlength="2000" placeholder="En qué empresa está, si te puede referir, última charla..." data-i18n-placeholder="refs.notas.placeholder"></textarea>
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary" data-i18n="refs.submit">Agregar referido</button>
@@ -263,7 +263,7 @@
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" id="refSearch" placeholder="Buscar por nombre, empresa, nota..." data-i18n-placeholder="refs.search.placeholder">
+          <input type="text" id="refSearch" maxlength="120" placeholder="Buscar por nombre, empresa, nota..." data-i18n-placeholder="refs.search.placeholder">
         </div>
         <div class="ref-filters" id="refFilters">
           <button data-filter="all" class="active" data-i18n="refFilter.all">Todos</button>
@@ -289,13 +289,13 @@
     <div class="form-grid">
       <div class="field">
         <label data-i18n="form.empresa">Empresa</label>
-        <input type="text" id="editEmpresa">
+        <input type="text" id="editEmpresa" maxlength="100">
       </div>
       <div class="field">
         <label data-i18n="form.puesto">Puesto</label>
         <div class="combo" id="editPuestoCombo">
           <div class="combo-input-wrap">
-            <input type="text" id="editPuesto" autocomplete="off">
+            <input type="text" id="editPuesto" maxlength="100" autocomplete="off">
             <span class="combo-chevron">▾</span>
           </div>
           <div class="combo-dropdown" id="editPuestoDropdown"></div>
@@ -314,11 +314,11 @@
       </div>
       <div class="field">
         <label data-i18n="form.link">Link</label>
-        <input type="url" id="editLink">
+        <input type="url" id="editLink" maxlength="500">
       </div>
       <div class="field">
         <label for="editSalario" data-i18n="form.salario">Rango salarial</label>
-        <input type="text" id="editSalario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+        <input type="text" id="editSalario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
         <label class="hourly-checkbox">
           <input type="checkbox" id="editSalarioPorHora">
           <span data-i18n="form.salarioPorHora">Es por hora</span>
@@ -326,11 +326,11 @@
       </div>
       <div class="field">
         <label data-i18n="form.contacto">Contacto</label>
-        <input type="text" id="editContacto" placeholder="Nombre y rol">
+        <input type="text" id="editContacto" maxlength="120" placeholder="Nombre y rol">
       </div>
       <div class="field full">
         <label data-i18n="form.notas">Notas</label>
-        <textarea id="editNotas" style="min-height:70px"></textarea>
+        <textarea id="editNotas" maxlength="2000" style="min-height:70px"></textarea>
       </div>
     </div>
     <div class="modal-actions">
@@ -352,7 +352,7 @@
           <span style="color:var(--danger);font-weight:700;">*</span>
         </label>
         <div id="closeReasons" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;"></div>
-        <textarea id="closeMotivo" placeholder="Contá brevemente qué pasó..." data-i18n-placeholder="close.motivo.placeholder" style="min-height:80px;"></textarea>
+        <textarea id="closeMotivo" maxlength="500" placeholder="Contá brevemente qué pasó..." data-i18n-placeholder="close.motivo.placeholder" style="min-height:80px;"></textarea>
       </div>
     </div>
     <div class="modal-actions">
@@ -465,7 +465,7 @@
             <h3 data-i18n="config.custom.title">Agregar puesto personalizado</h3>
           </div>
           <div class="config-add-row">
-            <input type="text" id="configNewPuesto" placeholder="Ej: Rust Developer" data-i18n-placeholder="config.custom.placeholder">
+            <input type="text" id="configNewPuesto" maxlength="80" placeholder="Ej: Rust Developer" data-i18n-placeholder="config.custom.placeholder">
             <button class="btn btn-primary" id="configAddPuesto" data-i18n="config.custom.add">Agregar</button>
           </div>
         </div>
@@ -527,7 +527,6 @@
           <div class="config-logos" id="configLogos"></div>
         </div>
 
-        <!-- NUEVO: selector de fondo -->
         <div class="config-section">
           <div class="config-section-head">
             <h3 data-i18n="config.bg.title">Fondo de la app</h3>
@@ -563,31 +562,31 @@
 
           <div class="field">
             <label for="configProfileNombre" data-i18n="profile.nombre">Nombre</label>
-            <input type="text" id="configProfileNombre" data-i18n-placeholder="profile.nombre.placeholder" placeholder="Tu nombre">
+            <input type="text" id="configProfileNombre" maxlength="60" data-i18n-placeholder="profile.nombre.placeholder" placeholder="Tu nombre">
           </div>
 
           <div class="field">
             <label for="configProfileApellido" data-i18n="profile.apellido">Apellido</label>
-            <input type="text" id="configProfileApellido" data-i18n-placeholder="profile.apellido.placeholder" placeholder="Tu apellido">
+            <input type="text" id="configProfileApellido" maxlength="60" data-i18n-placeholder="profile.apellido.placeholder" placeholder="Tu apellido">
           </div>
 
           <div class="field">
             <label for="configProfileUsername" data-i18n="profile.username">Nombre de usuario</label>
             <div class="input-prefix">
               <span class="prefix">@</span>
-              <input type="text" id="configProfileUsername" data-i18n-placeholder="profile.username.placeholder" placeholder="usuario" autocomplete="off" spellcheck="false">
+              <input type="text" id="configProfileUsername" maxlength="30" pattern="[a-zA-Z0-9_-]*" data-i18n-placeholder="profile.username.placeholder" placeholder="usuario" autocomplete="off" spellcheck="false">
             </div>
             <span class="profile-hint" data-i18n="profile.username.hint">Solo letras, números, guiones y guiones bajos.</span>
           </div>
 
           <div class="field">
             <label for="configProfileEmail" data-i18n="profile.email">Email</label>
-            <input type="email" id="configProfileEmail" data-i18n-placeholder="profile.email.placeholder" placeholder="tu@email.com">
+            <input type="email" id="configProfileEmail" maxlength="150" data-i18n-placeholder="profile.email.placeholder" placeholder="tu@email.com">
           </div>
 
           <div class="field">
             <label for="configProfileBio" data-i18n="profile.bio">Bio</label>
-            <textarea id="configProfileBio" rows="3" data-i18n-placeholder="profile.bio.placeholder" placeholder="Contá algo sobre vos..."></textarea>
+            <textarea id="configProfileBio" maxlength="500" rows="3" data-i18n-placeholder="profile.bio.placeholder" placeholder="Contá algo sobre vos..."></textarea>
           </div>
         </div>
       </div>
@@ -642,19 +641,19 @@
     <div class="form-grid">
       <div class="field">
         <label data-i18n="refs.nombre">Nombre</label>
-        <input type="text" id="refEditNombre">
+        <input type="text" id="refEditNombre" maxlength="80">
       </div>
       <div class="field">
         <label data-i18n="refs.rol">Rol / Empresa</label>
-        <input type="text" id="refEditRol">
+        <input type="text" id="refEditRol" maxlength="120">
       </div>
       <div class="field">
         <label data-i18n="refs.contacto">Contacto</label>
-        <input type="text" id="refEditContacto">
+        <input type="text" id="refEditContacto" maxlength="200">
       </div>
       <div class="field">
         <label data-i18n="refs.link">Link</label>
-        <input type="url" id="refEditLink">
+        <input type="url" id="refEditLink" maxlength="500">
       </div>
       <div class="field full">
         <label data-i18n="refs.relacion">Relación</label>
@@ -687,7 +686,7 @@
       </div>
       <div class="field full">
         <label data-i18n="refs.notas">Notas</label>
-        <textarea id="refEditNotas" style="min-height:80px"></textarea>
+        <textarea id="refEditNotas" maxlength="2000" style="min-height:80px"></textarea>
       </div>
     </div>
     <div class="modal-actions">
@@ -753,7 +752,7 @@
     <p id="noteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
     <div class="field" style="margin-bottom:1.25rem;">
       <label for="stepNoteInput" data-i18n="note.label">Nota / PD (opcional)</label>
-      <textarea id="stepNoteInput" placeholder="Ej: Preparar preguntas sobre el stack, revisar el challenge..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
+      <textarea id="stepNoteInput" maxlength="500" placeholder="Ej: Preparar preguntas sobre el stack, revisar el challenge..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="skipNote" data-i18n="note.skip">Continuar sin nota</button>
@@ -778,7 +777,7 @@
     <p id="refNoteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
     <div class="field" style="margin-bottom:1.25rem;">
       <label for="refStepNoteInput" data-i18n="note.label">Nota / PD (opcional)</label>
-      <textarea id="refStepNoteInput" placeholder="Ej: Mandarle mensaje para coordinar, agradecer la referencia..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
+      <textarea id="refStepNoteInput" maxlength="500" placeholder="Ej: Mandarle mensaje para coordinar, agradecer la referencia..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="skipRefNote" data-i18n="note.skip">Continuar sin nota</button>

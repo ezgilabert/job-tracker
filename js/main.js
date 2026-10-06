@@ -15,6 +15,7 @@ import { mountConfigController } from './controllers/configController.js';
 import { DatePicker } from './ui/datePicker.js';
 import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
+import { mountInputLimits } from './ui/inputLimits.js';
 import { ensureArray } from './utils.js';
 import { applyI18n, setLanguage, getLanguage } from './i18n.js';
 import { logout, getSession } from './auth/session.js';
@@ -57,10 +58,6 @@ function boot() {
 
   // ----------------------------------------------------------
   // User menu
-  //   - Sin sesión → solo "Iniciar sesión"
-  //   - Con sesión → header (avatar + nombre + email) + "Cerrar sesión"
-  //   - Configuración y Tema viven dentro del dropdown
-  // El botón y el avatar comparten el mismo SVG de usuario.
   // ----------------------------------------------------------
   function mountUserMenu() {
     const menu = document.getElementById('userMenu');
@@ -100,34 +97,29 @@ function boot() {
 
     refresh();
 
-    // Toggle dropdown
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       menu.classList.toggle('open');
     });
 
-    // Close on outside click
     document.addEventListener('click', (e) => {
       if (menu.classList.contains('open') && !menu.contains(e.target)) {
         menu.classList.remove('open');
       }
     });
 
-    // Close on Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menu.classList.contains('open')) {
         menu.classList.remove('open');
       }
     });
 
-    // Configuración → cerrar el menú (abre un modal encima)
     if (configBtn) {
       configBtn.addEventListener('click', () => {
         menu.classList.remove('open');
       });
     }
 
-    // Logout → limpiar sesión y refrescar (sin redirigir)
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         logout();
@@ -136,14 +128,12 @@ function boot() {
       });
     }
 
-    // Sign in → ir a la pantalla de login
     if (loginBtn) {
       loginBtn.addEventListener('click', () => {
         window.location.href = './login.html';
       });
     }
 
-    // Re-render cuando cambia el idioma
     document.addEventListener('i18n-changed', refresh);
   }
 
@@ -226,6 +216,11 @@ function boot() {
 
   const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
   const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
+
+  // ----------------------------------------------------------
+  // Input limits: maxlength counters + paste sanitizer
+  // ----------------------------------------------------------
+  mountInputLimits(document);
 
   // ----------------------------------------------------------
   // Controllers
