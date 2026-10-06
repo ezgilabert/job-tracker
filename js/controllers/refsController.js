@@ -6,6 +6,8 @@
 // - event delegation on #refList
 // - listens for 'scroll-to-ref' from jobsController
 // - retroceso limitado a una vez por referido (con confirmación)
+// - nota al avanzar (igual que postulaciones)
+// - historial completo por referido
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -13,15 +15,16 @@ import { showConfirm } from '../ui/confirmModal.js';
 import { filterRefs, refStepIndex, isRefClosed } from '../selectors.js';
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
-import { uid, highlightAndScroll, escapeHtml } from '../utils.js';
+import { uid, highlightAndScroll, escapeHtml, cloneArray } from '../utils.js';
 import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
  * @param {{
- *   onOpenRefEdit: (id:number)=>void,
- *   onRefToJob:    (refId:number)=>void,
+ *   onOpenRefEdit:  (id:number)=>void,
+ *   onRefToJob:     (refId:number)=>void,
+ *   onOpenRefHistory: (id:number)=>void,
  * }} modals
  */
 export function mountRefsController(jobsStore, refsStore, modals) {
@@ -30,8 +33,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   // ----------------------------------------------------------
   let currentFilter = 'all';
   let searchTerm = '';
-  let selectedRelacion = '';
-  let selectedEstado = 'Pendiente';
   let selectedEmpresas = new Set();
 
   let relacionChips = null;
@@ -92,6 +93,9 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const nombre = valueOf('refNombre');
     if (!nombre) return;
 
+    const estadoInicial = estadoChips?.getValue() || 'Pendiente';
+    const now = new Date().toISOString();
+
     const nuevo = {
       id: uid(),
       nombre,
@@ -99,11 +103,12 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       contacto: valueOf('refContacto'),
       link: valueOf('refLink'),
       relacion: relacionChips?.getValue() || 'Conocido',
-      estado: estadoChips?.getValue() || 'Pendiente',
+      estado: estadoInicial,
       empresasVinculadas: [...selectedEmpresas],
       notas: valueOf('refNotas'),
       volvioAtras: false,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      history: [{ estado: estadoInicial, fecha: now }],
     };
 
     refsStore.update(refs => [nuevo, ...refs]);
@@ -189,13 +194,14 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const action = actionEl.dataset.action;
 
     switch (action) {
-      case 'edit-ref':        modals.onOpenRefEdit(id); break;
-      case 'delete-ref':      confirmDelete(id);        break;
-      case 'move-ref-next':   moveRef(id, 'next');      break;
-      case 'move-ref-prev':   requestMovePrev(id);      break;
-      case 'close-ref':       closeRef(id);             break;
-      case 'reopen-ref':      reopenRef(id);            break;
-      case 'scroll-to-job':   scrollToJob(Number(actionEl.dataset.jobId)); break;
+      case 'edit-ref':         modals.onOpenRefEdit(id);   break;
+      case 'delete-ref':       confirmDelete(id);          break;
+      case 'move-ref-next':    requestMoveNext(id);        break;
+      case 'move-ref-prev':    requestMovePrev(id);        break;
+      case 'close-ref':        closeRef(id);               break;
+      case 'reopen-ref':       reopenRef(id);              break;
+      case 'ref-history':      modals.onOpenRefHistory(id); break;
+      case 'scroll-to-job':    scrollToJob(Number(actionEl.dataset.jobId)); break;
     }
   });
 
@@ -214,34 +220,82 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   // ----------------------------------------------------------
-  // Advance next (libre, sin confirmación)
+  // Avanzar: con modal de nota (como postulaciones)
   // ----------------------------------------------------------
-  function moveRef(id, direction) {
-    const refs = refsStore.get();
-    const r = refs.find(x => x.id === id);
+  const refNoteModal = document.getElementById('refNoteModal');
+  const refStepNoteInput = document.getElementById('refStepNoteInput');
+  const refNoteSubtitle = document.getElementById('refNoteModalSubtitle');
+  let pendingRefAdvance = null;
+
+  function requestMoveNext(id) {
+    const r = refsStore.get().find(x => x.id === id);
     if (!r || isRefClosed(r.estado)) return;
 
     const idx = refStepIndex(r.estado);
     if (idx < 0) return;
 
-    const nextIdx = direction === 'next' ? idx + 1 : idx - 1;
-    if (nextIdx < 0 || nextIdx >= REF_WORKFLOW_STEPS.length) return;
+    const nextIdx = idx + 1;
+    if (nextIdx >= REF_WORKFLOW_STEPS.length) return;
 
+    const step = REF_WORKFLOW_STEPS[nextIdx];
+    pendingRefAdvance = { id, nuevoEstado: step.id };
+
+    refNoteSubtitle.innerHTML =
+      `Vas a pasar a <strong>${escapeHtml(step.short)}</strong> en <strong>${escapeHtml(r.nombre)}</strong>. ¿Querés dejar un recordatorio para esta etapa?`;
+
+    refStepNoteInput.value = '';
+    refNoteModal.classList.add('open');
+    setTimeout(() => refStepNoteInput.focus(), 80);
+  }
+
+  function applyRefAdvance({ nota } = {}) {
+    if (!pendingRefAdvance) return;
+    const { id, nuevoEstado } = pendingRefAdvance;
+
+    const r = refsStore.get().find(x => x.id === id);
+    if (!r) return;
     const prevEstado = r.estado;
-    const nuevoEstado = REF_WORKFLOW_STEPS[nextIdx].id;
 
-    refsStore.update(refs => refs.map(x =>
-      x.id === id ? { ...x, estado: nuevoEstado } : x
-    ));
+    refsStore.update(refs => refs.map(x => {
+      if (x.id !== id) return x;
+      const history = cloneArray(x.history);
+      const entry = { estado: nuevoEstado, fecha: new Date().toISOString() };
+      if (nota) entry.nota = nota;
+      history.push(entry);
+      return { ...x, estado: nuevoEstado, history };
+    }));
 
-    showToast(`${r.nombre}: ${nuevoEstado}`, direction === 'next' ? '→' : '←');
+    showToast(`${r.nombre}: ${nuevoEstado}`, '→');
 
     if (nuevoEstado === 'Referido hecho'
-        && prevEstado !== 'Referido hecho'
-        && direction === 'next') {
+        && prevEstado !== 'Referido hecho') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
   }
+
+  function hideRefNote() {
+    refNoteModal.classList.remove('open');
+    pendingRefAdvance = null;
+  }
+
+  document.getElementById('skipRefNote').addEventListener('click', () => {
+    applyRefAdvance({ nota: null });
+    hideRefNote();
+  });
+
+  document.getElementById('saveRefNote').addEventListener('click', () => {
+    applyRefAdvance({ nota: refStepNoteInput.value.trim() || null });
+    hideRefNote();
+  });
+
+  document.getElementById('closeRefNoteModal').addEventListener('click', hideRefNote);
+
+  refNoteModal.addEventListener('click', (e) => {
+    if (e.target === refNoteModal) {
+      applyRefAdvance({ nota: null });
+      hideRefNote();
+    }
+  });
 
   // ----------------------------------------------------------
   // Retroceso: con confirmación, sólo una vez por referido
@@ -284,13 +338,23 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     const nuevoEstado = REF_WORKFLOW_STEPS[idx - 1].id;
 
-    refsStore.update(refs => refs.map(x =>
-      x.id === id ? { ...x, estado: nuevoEstado, volvioAtras: true } : x
-    ));
+    refsStore.update(refs => refs.map(x => {
+      if (x.id !== id) return x;
+      const history = cloneArray(x.history);
+      history.push({
+        estado: nuevoEstado,
+        fecha: new Date().toISOString(),
+        retroceso: true,
+      });
+      return { ...x, estado: nuevoEstado, volvioAtras: true, history };
+    }));
 
     showToast(`${r.nombre}: ${nuevoEstado}`, '←');
   }
 
+  // ----------------------------------------------------------
+  // Cerrar / Reabrir
+  // ----------------------------------------------------------
   async function closeRef(id) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
@@ -301,16 +365,36 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       danger: true,
     });
     if (!confirmed) return;
-    refsStore.update(refs => refs.map(x =>
-      x.id === id ? { ...x, estado: 'No aplica' } : x
-    ));
+
+    refsStore.update(refs => refs.map(x => {
+      if (x.id !== id) return x;
+      const history = cloneArray(x.history);
+      history.push({
+        estado: 'No aplica',
+        fecha: new Date().toISOString(),
+        motivo: 'Marcado como No aplica',
+      });
+      return { ...x, estado: 'No aplica', history };
+    }));
+
     showToast(`${r.nombre}: No aplica`, '🚫');
   }
 
   function reopenRef(id) {
-    refsStore.update(refs => refs.map(x =>
-      x.id === id ? { ...x, estado: 'Pendiente' } : x
-    ));
+    const r = refsStore.get().find(x => x.id === id);
+    if (!r) return;
+
+    refsStore.update(refs => refs.map(x => {
+      if (x.id !== id) return x;
+      const history = cloneArray(x.history);
+      history.push({
+        estado: 'Pendiente',
+        fecha: new Date().toISOString(),
+        motivo: 'Reabierto',
+      });
+      return { ...x, estado: 'Pendiente', history };
+    }));
+
     showToast('Referido reabierto como Pendiente', '↻');
   }
 

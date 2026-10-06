@@ -60,11 +60,13 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
       return data.map(r => ({
         ...r,
         estado: r.estado || 'Pendiente',
-        // Renombramos `linkedin` → `link` (compatibilidad con datos viejos)
         link: r.link ?? r.linkedin ?? '',
         empresasVinculadas: ensureArray(r.empresasVinculadas),
-        // NUEVO: sólo se puede retroceder una vez por referido
         volvioAtras: Boolean(r.volvioAtras),
+        // NUEVO: cada referido guarda su propio historial
+        history: Array.isArray(r.history) && r.history.length
+          ? r.history
+          : [{ estado: r.estado || 'Pendiente', fecha: r.createdAt || new Date().toISOString() }],
       }));
     }
     return data;

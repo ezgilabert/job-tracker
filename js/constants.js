@@ -22,7 +22,7 @@ export const CLOSED_STATES = ['Rechazado', 'Ghosted', 'Descartado'];
 export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 
 // ------------------------------------------------------------
-// Iconos por estado (para historial y otras vistas)
+// Iconos por estado (jobs)
 // ------------------------------------------------------------
 export const ESTADO_ICONS = {
   'Guardado':                '🔖',
@@ -61,6 +61,23 @@ export const REF_WORKFLOW_STEPS = [
 
 export const REF_CLOSED_STATES = ['No aplica'];
 export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOSED_STATES];
+
+// ------------------------------------------------------------
+// Iconos por estado (referidos)
+// ------------------------------------------------------------
+export const REF_ESTADO_ICONS = {
+  'Pendiente':       '⏳',
+  'Contactado':      '💬',
+  'Me va a referir': '🤝',
+  'Referido hecho':  '✅',
+  'En proceso':      '⏱️',
+  'Contratado':      '🎉',
+  'No aplica':       '🚫',
+};
+
+export function getRefEstadoIcon(estado) {
+  return REF_ESTADO_ICONS[estado] || '•';
+}
 
 export const CLOSE_REASONS = {
   'Oferta':     ['Acepté la oferta', 'Recibí una mejor oferta', 'Fue mi primera opción'],

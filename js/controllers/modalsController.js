@@ -2,7 +2,8 @@
 // Controller: modals
 // - Edit job
 // - Close job (with reason)
-// - History
+// - History (jobs)
+// - History (referidos)  ← NUEVO
 // - Edit referral
 // - Move referral → job
 // - Note on advance
@@ -15,7 +16,8 @@ import { PuestoCombo } from '../ui/combo.js';
 import { mountChips } from '../ui/chips.js';
 import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
 import {
-  CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS, getEstadoIcon,
+  CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS,
+  getEstadoIcon, getRefEstadoIcon,
 } from '../constants.js';
 import {
   stepIndex, isClosed,
@@ -183,7 +185,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   });
 
   // ----------------------------------------------------------
-  // History
+  // History (jobs)
   // ----------------------------------------------------------
   const historyModal = document.getElementById('historyModal');
   const historySubtitle = document.getElementById('historySubtitle');
@@ -271,12 +273,90 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   historyModal.addEventListener('click', (e) => {
     if (e.target === historyModal) closeHistory();
   });
+
+  // ----------------------------------------------------------
+  // History (referidos)  ← NUEVO
+  // ----------------------------------------------------------
+  const refHistoryModal = document.getElementById('refHistoryModal');
+  const refHistorySubtitle = document.getElementById('refHistorySubtitle');
+  const refHistoryTimeline = document.getElementById('refHistoryTimeline');
+
+  function openRefHistory(id) {
+    const r = refsStore.get().find(x => x.id === id);
+    if (!r) return;
+
+    refHistorySubtitle.innerHTML =
+      `<strong>${escapeHtml(r.nombre)}</strong>` +
+      (r.rol ? ` · ${escapeHtml(r.rol)}` : '');
+
+    const history = ensureArray(r.history);
+    const lastIdx = history.length - 1;
+
+    if (history.length === 0) {
+      refHistoryTimeline.innerHTML =
+        `<div class="history-empty">Sin entradas en el historial</div>`;
+    } else {
+      refHistoryTimeline.innerHTML = history.map((entry, i) => {
+        const isCurrent = i === lastIdx && entry.estado !== 'No aplica';
+        const isCerrada = entry.estado === 'No aplica';
+        const esRetroceso = Boolean(entry.retroceso);
+
+        let itemClass = 'history-item';
+        if (isCurrent) itemClass += ' current';
+        if (esRetroceso) itemClass += ' retroceso';
+        if (isCerrada) itemClass += ' closed-rechazado';
+
+        let tagsHtml = '';
+        if (isCurrent) tagsHtml += `<span class="history-tag current">Actual</span>`;
+        if (esRetroceso) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
+        if (isCerrada) tagsHtml += `<span class="history-tag cerrada">Cerrado</span>`;
+
+        const motivoHtml = entry.motivo
+          ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
+          : '';
+
+        const notaHtml = entry.nota
+          ? `<div class="history-nota"><strong>Nota</strong>${escapeHtml(entry.nota)}</div>`
+          : '';
+
+        return `
+          <div class="${itemClass}">
+            <div class="history-dot">${getRefEstadoIcon(entry.estado)}</div>
+            <div class="history-content">
+              <div class="history-estado">
+                ${escapeHtml(entry.estado)}
+                ${tagsHtml}
+              </div>
+              <div class="history-fecha">${formatFechaHora(entry.fecha)}</div>
+              ${motivoHtml}
+              ${notaHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    refHistoryModal.classList.add('open');
+  }
+
+  function closeRefHistory() {
+    refHistoryModal.classList.remove('open');
+  }
+
+  document.getElementById('closeRefHistoryBtn').addEventListener('click', closeRefHistory);
+  document.getElementById('closeRefHistoryModal').addEventListener('click', closeRefHistory);
+  refHistoryModal.addEventListener('click', (e) => {
+    if (e.target === refHistoryModal) closeRefHistory();
+  });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && historyModal.classList.contains('open')) closeHistory();
+    if (e.key !== 'Escape') return;
+    if (refHistoryModal.classList.contains('open')) closeRefHistory();
+    else if (historyModal.classList.contains('open')) closeHistory();
   });
 
   // ----------------------------------------------------------
-  // Note on advance
+  // Note on advance (jobs)
   // ----------------------------------------------------------
   const noteModal = document.getElementById('noteModal');
   const stepNoteInput = document.getElementById('stepNoteInput');
@@ -632,6 +712,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     onOpenEdit: openEdit,
     onClose: openClose,
     onOpenHistory: openHistory,
+    onOpenRefHistory: openRefHistory,
     onAdvance: (id, opts = {}) => {
       const direction = opts.direction || 'next';
       if (direction === 'next') openNote(id, 'next', opts);
@@ -642,7 +723,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   };
 
   // ----------------------------------------------------------
-  // Advance previous (with confirmation, only once per job)
+  // Advance previous (job)
   // ----------------------------------------------------------
   async function confirmPrev(id) {
     const j = jobsStore.get().find(x => x.id === id);

@@ -59,6 +59,15 @@ export function renderRefCard(ref, ctx = {}) {
        </div>`
     : renderRefActions(ref, currentIdx);
 
+  // NUEVO: mostrar la nota actual (misma etapa) como PD
+  const pd = currentRefStepNote(ref);
+  const pdHtml = (!refClosed && pd)
+    ? `<div class="step-note">
+         <span class="pd-label">PD</span>
+         <span class="pd-text">${escapeHtml(pd)}</span>
+       </div>`
+    : '';
+
   return `
     <div class="referido"
          data-relacion="${escapeHtml(ref.relacion || '')}"
@@ -75,6 +84,7 @@ export function renderRefCard(ref, ctx = {}) {
         <div class="ref-meta">${rolTxt}${contactoTxt}${linkTxt}</div>
         ${empresasTxt}
         ${notasTxt}
+        ${pdHtml}
 
         <div class="ref-workflow">
           ${stepsHtml}
@@ -83,6 +93,7 @@ export function renderRefCard(ref, ctx = {}) {
       </div>
 
       <div class="ref-actions">
+        <button class="action-btn history" title="Ver historial" data-action="ref-history">🕒</button>
         <button class="action-btn" title="Editar" data-action="edit-ref">✏️</button>
         <button class="action-btn danger" title="Borrar" data-action="delete-ref">🗑️</button>
       </div>
@@ -115,4 +126,17 @@ function renderRefActions(ref, currentIdx) {
       <button class="ref-wf-btn danger" data-action="close-ref">No aplica</button>
     </div>
   `;
+}
+
+/**
+ * Busca la última nota registrada para la etapa actual del referido.
+ * @param {object} ref
+ * @returns {string|null}
+ */
+function currentRefStepNote(ref) {
+  const hist = ensureArray(ref.history);
+  for (let i = hist.length - 1; i >= 0; i--) {
+    if (hist[i].estado === ref.estado && hist[i].nota) return hist[i].nota;
+  }
+  return null;
 }

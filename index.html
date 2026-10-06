@@ -271,7 +271,7 @@
   </div>
 </div>
 
-<!-- History modal -->
+<!-- History modal (jobs) -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal" style="max-width: 560px; position: relative;">
     <button class="icon-btn" id="closeHistoryModal"
@@ -295,6 +295,29 @@
 
     <div class="modal-actions" style="margin-top:1.5rem;">
       <button class="btn btn-primary" id="closeHistoryBtn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- History modal (referidos) -->
+<div class="modal-overlay" id="refHistoryModal">
+  <div class="modal" style="max-width: 560px; position: relative;">
+    <button class="icon-btn" id="closeRefHistoryModal"
+            style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
+            title="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <h2>🕒 Historial del referido</h2>
+    <p id="refHistorySubtitle" class="history-subtitle"></p>
+
+    <div class="history-timeline" id="refHistoryTimeline"></div>
+
+    <div class="modal-actions" style="margin-top:1.5rem;">
+      <button class="btn btn-primary" id="closeRefHistoryBtn">Cerrar</button>
     </div>
   </div>
 </div>
@@ -328,7 +351,6 @@
     </div>
 
     <div class="config-body">
-      <!-- Panel: Puestos -->
       <div class="config-panel active" data-panel="puestos">
         <div class="config-section">
           <div class="config-section-head">
@@ -365,7 +387,6 @@
         </div>
       </div>
 
-      <!-- Panel: Estados -->
       <div class="config-panel" data-panel="estados">
         <div class="config-section">
           <div class="config-section-head">
@@ -384,7 +405,6 @@
         </div>
       </div>
 
-      <!-- Panel: Filtros -->
       <div class="config-panel" data-panel="filtros">
         <div class="config-section">
           <div class="config-section-head">
@@ -524,7 +544,7 @@
   </div>
 </div>
 
-<!-- Note on advance modal -->
+<!-- Note on advance modal (jobs) -->
 <div class="modal-overlay" id="noteModal">
   <div class="modal" style="max-width: 440px; position: relative;">
     <button class="icon-btn" id="closeNoteModal"
@@ -545,6 +565,31 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" id="skipNote">Continuar sin nota</button>
       <button class="btn btn-primary" id="saveNote">Guardar y avanzar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note on advance modal (referidos) -->
+<div class="modal-overlay" id="refNoteModal">
+  <div class="modal" style="max-width: 440px; position: relative;">
+    <button class="icon-btn" id="closeRefNoteModal"
+            style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
+            title="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <h2 style="color:var(--accent);">📝 ¿Agregar un recordatorio?</h2>
+    <p id="refNoteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
+    <div class="field" style="margin-bottom:1.25rem;">
+      <label for="refStepNoteInput">Nota / PD (opcional)</label>
+      <textarea id="refStepNoteInput" placeholder="Ej: Mandarle mensaje para coordinar, agradecer la referencia..." style="min-height:90px"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="skipRefNote">Continuar sin nota</button>
+      <button class="btn btn-primary" id="saveRefNote">Guardar y avanzar</button>
     </div>
   </div>
 </div>
