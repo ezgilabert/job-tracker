@@ -60,8 +60,11 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
       return data.map(r => ({
         ...r,
         estado: r.estado || 'Pendiente',
+        // Renombramos `linkedin` → `link` (compatibilidad con datos viejos)
         link: r.link ?? r.linkedin ?? '',
         empresasVinculadas: ensureArray(r.empresasVinculadas),
+        // NUEVO: sólo se puede retroceder una vez por referido
+        volvioAtras: Boolean(r.volvioAtras),
       }));
     }
     return data;

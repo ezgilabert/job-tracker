@@ -95,14 +95,18 @@ function renderRefActions(ref, currentIdx) {
   const canNext = currentIdx < REF_WORKFLOW_STEPS.length - 1;
   const prevStep = canBack ? REF_WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? REF_WORKFLOW_STEPS[currentIdx + 1] : null;
+  const yaVolvio = Boolean(ref.volvioAtras);
 
   const nextBtn = nextStep
     ? `<button class="ref-wf-btn primary" data-action="move-ref-next">→ ${escapeHtml(nextStep.short)}</button>`
     : `<button class="ref-wf-btn success" disabled>✓ Contratado</button>`;
 
-  const prevBtn = prevStep
-    ? `<button class="ref-wf-btn" data-action="move-ref-prev" title="Volver a ${escapeHtml(prevStep.short)}">← ${escapeHtml(prevStep.short)}</button>`
-    : '';
+  let prevBtn = '';
+  if (prevStep && !yaVolvio) {
+    prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="Volver a ${escapeHtml(prevStep.short)}">← ${escapeHtml(prevStep.short)}</button>`;
+  } else if (prevStep && yaVolvio) {
+    prevBtn = `<button class="ref-wf-btn" disabled title="Ya volviste atrás una vez en este referido">← ${escapeHtml(prevStep.short)}</button>`;
+  }
 
   return `
     <div class="ref-wf-actions">

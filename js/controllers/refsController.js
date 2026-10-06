@@ -5,6 +5,7 @@
 // - section toggle
 // - event delegation on #refList
 // - listens for 'scroll-to-ref' from jobsController
+// - retroceso limitado a una vez por referido (con confirmación)
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -12,7 +13,7 @@ import { showConfirm } from '../ui/confirmModal.js';
 import { filterRefs, refStepIndex, isRefClosed } from '../selectors.js';
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
-import { uid, highlightAndScroll } from '../utils.js';
+import { uid, highlightAndScroll, escapeHtml } from '../utils.js';
 import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
 
 /**
@@ -69,12 +70,11 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   refsStore.subscribe(renderRefs);
-  jobsStore.subscribe(renderRefs); // linked companies come from jobs
+  jobsStore.subscribe(renderRefs);
 
   // ----------------------------------------------------------
   // Chips
   // ----------------------------------------------------------
-  // Mounted in main.js; injected here so this controller stays decoupled from ui/chips.js.
   function initChips(relacion, estado) {
     relacionChips = relacion;
     estadoChips = estado;
@@ -102,6 +102,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       estado: estadoChips?.getValue() || 'Pendiente',
       empresasVinculadas: [...selectedEmpresas],
       notas: valueOf('refNotas'),
+      volvioAtras: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -191,7 +192,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       case 'edit-ref':        modals.onOpenRefEdit(id); break;
       case 'delete-ref':      confirmDelete(id);        break;
       case 'move-ref-next':   moveRef(id, 'next');      break;
-      case 'move-ref-prev':   moveRef(id, 'prev');      break;
+      case 'move-ref-prev':   requestMovePrev(id);      break;
       case 'close-ref':       closeRef(id);             break;
       case 'reopen-ref':      reopenRef(id);            break;
       case 'scroll-to-job':   scrollToJob(Number(actionEl.dataset.jobId)); break;
@@ -212,6 +213,9 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     showToast('Referido borrado', '🗑️');
   }
 
+  // ----------------------------------------------------------
+  // Advance next (libre, sin confirmación)
+  // ----------------------------------------------------------
   function moveRef(id, direction) {
     const refs = refsStore.get();
     const r = refs.find(x => x.id === id);
@@ -237,6 +241,54 @@ export function mountRefsController(jobsStore, refsStore, modals) {
         && direction === 'next') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
+  }
+
+  // ----------------------------------------------------------
+  // Retroceso: con confirmación, sólo una vez por referido
+  // ----------------------------------------------------------
+  async function requestMovePrev(id) {
+    const r = refsStore.get().find(x => x.id === id);
+    if (!r || isRefClosed(r.estado)) return;
+
+    if (r.volvioAtras) {
+      showToast('Ya volviste atrás una vez en este referido', '!');
+      return;
+    }
+
+    const idx = refStepIndex(r.estado);
+    if (idx <= 0) return;
+
+    const prevStep = REF_WORKFLOW_STEPS[idx - 1];
+
+    const confirmed = await showConfirm({
+      title: '¿Volver a la etapa anterior?',
+      message:
+        `Vas a retroceder a <strong>${escapeHtml(r.nombre)}</strong> ` +
+        `de <strong>${escapeHtml(r.estado)}</strong> a <strong>${escapeHtml(prevStep.short)}</strong>.<br>` +
+        `<span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">` +
+        `⚠️ Solo podés volver atrás una vez por referido.</span>`,
+      confirmText: 'Sí, volver',
+    });
+
+    if (!confirmed) return;
+    applyMovePrev(id);
+  }
+
+  function applyMovePrev(id) {
+    const r = refsStore.get().find(x => x.id === id);
+    if (!r) return;
+    if (r.volvioAtras) return;
+
+    const idx = refStepIndex(r.estado);
+    if (idx <= 0) return;
+
+    const nuevoEstado = REF_WORKFLOW_STEPS[idx - 1].id;
+
+    refsStore.update(refs => refs.map(x =>
+      x.id === id ? { ...x, estado: nuevoEstado, volvioAtras: true } : x
+    ));
+
+    showToast(`${r.nombre}: ${nuevoEstado}`, '←');
   }
 
   async function closeRef(id) {
