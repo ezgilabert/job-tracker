@@ -10,6 +10,7 @@ import {
   ROLE_TAGS_LIST, ROLE_TAGS, DEFAULT_ROLES,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
+  BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
 } from '../constants.js';
 import { escapeHtml, cloneArray } from '../utils.js';
 import {
@@ -81,11 +82,15 @@ export function mountConfigController(configStore) {
     });
 
     if (!draft.lang) draft.lang = DEFAULT_LANG;
+    if (!draft.background) draft.background = DEFAULT_BACKGROUND;
     modal.classList.add('open');
     renderAll();
   }
 
   function closeDirect() {
+    // Si quedó un preview de fondo sin guardar, lo revertimos
+    const saved = configStore.get().background || DEFAULT_BACKGROUND;
+    applyBackground(saved);
     draft = null;
     modal.classList.remove('open');
     unsavedBadge.classList.remove('visible');
@@ -100,6 +105,7 @@ export function mountConfigController(configStore) {
     });
     if (!next.logo) next.logo = DEFAULT_LOGO;
     if (!next.lang) next.lang = DEFAULT_LANG;
+    if (!next.background) next.background = DEFAULT_BACKGROUND;
     configStore.update(() => next);
     draft = cloneConfig(configStore.get());
     unsavedBadge.classList.remove('visible');
@@ -193,6 +199,7 @@ export function mountConfigController(configStore) {
     renderDefaultState();
     renderFilters();
     renderLogos();
+    renderBackgrounds();
     renderLangs();
     renderPerfil();
     updateBadge();
@@ -500,6 +507,44 @@ export function mountConfigController(configStore) {
     if ((draft.logo || DEFAULT_LOGO) !== id) {
       draft.logo = id;
       renderLogos();
+      updateBadge();
+    }
+  });
+
+  // ------------------------------------------------------------
+  // Panel: Appearance (background)
+  // ------------------------------------------------------------
+  function renderBackgrounds() {
+    const current = draft.background || DEFAULT_BACKGROUND;
+    const container = document.getElementById('configBgs');
+    if (!container) return;
+
+    container.innerHTML = BACKGROUND_OPTIONS.map(opt => {
+      const isSelected = opt.id === current;
+      const previewClass = opt.id === 'none' ? 'bg-none' : `bg-${opt.id}`;
+      return `
+        <button type="button"
+                class="config-bg-option ${isSelected ? 'selected' : ''}"
+                data-bg="${escapeHtml(opt.id)}">
+          <div class="config-bg-preview ${previewClass}"></div>
+          <div class="config-bg-info">
+            <strong>${escapeHtml(opt.label)}</strong>
+            <span>${escapeHtml(opt.description)}</span>
+          </div>
+          <div class="config-bg-check"></div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('configBgs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.config-bg-option');
+    if (!btn) return;
+    const id = btn.dataset.bg;
+    if ((draft.background || DEFAULT_BACKGROUND) !== id) {
+      draft.background = id;
+      applyBackground(id);   // preview en vivo
+      renderBackgrounds();
       updateBadge();
     }
   });

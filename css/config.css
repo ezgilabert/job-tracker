@@ -880,3 +880,189 @@
   text-transform: none;
   letter-spacing: normal;
 }
+
+/* ============================================================
+   Panel: Apariencia — selector de fondo
+   ============================================================ */
+
+.config-bgs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.config-bg-option {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-soft);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.config-bg-option:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.config-bg-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.config-bg-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-1);
+  position: relative;
+}
+
+.config-bg-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.config-bg-preview.bg-aurora::before {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(124,92,255,0.85), transparent 60%),
+    radial-gradient(circle at 75% 70%, rgba(236,72,153,0.7), transparent 60%),
+    radial-gradient(circle at 60% 85%, rgba(59,130,246,0.7), transparent 60%);
+  filter: blur(6px);
+}
+
+.config-bg-preview.bg-mesh::before {
+  background:
+    radial-gradient(at 25% 25%, rgba(124,92,255,0.75), transparent 60%),
+    radial-gradient(at 80% 30%, rgba(236,72,153,0.65), transparent 60%),
+    radial-gradient(at 60% 85%, rgba(59,130,246,0.7), transparent 60%);
+}
+
+.config-bg-preview.bg-grid::before {
+  background-image:
+    linear-gradient(rgba(124,92,255,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,92,255,0.5) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.config-bg-preview.bg-dots::before {
+  background-image: radial-gradient(rgba(124,92,255,0.75) 1px, transparent 1px);
+  background-size: 7px 7px;
+}
+
+.config-bg-preview.bg-waves::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124,92,255,0.85), transparent 60%),
+    radial-gradient(circle at 85% 85%, rgba(236,72,153,0.75), transparent 60%);
+  filter: blur(8px);
+}
+
+.config-bg-preview.bg-conic::before {
+  background: conic-gradient(
+    from 0deg,
+    rgba(124,92,255,0.85),
+    rgba(236,72,153,0.75),
+    rgba(59,130,246,0.8),
+    rgba(168,85,247,0.85),
+    rgba(124,92,255,0.85)
+  );
+  filter: blur(4px);
+}
+
+.config-bg-preview.bg-noise::before {
+  background:
+    radial-gradient(at 30% 20%, rgba(124,92,255,0.55), transparent 60%),
+    radial-gradient(at 70% 80%, rgba(236,72,153,0.5), transparent 60%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.config-bg-preview.bg-stripes::before {
+  background:
+    radial-gradient(at 30% 30%, rgba(124,92,255,0.55), transparent 60%),
+    repeating-linear-gradient(45deg,
+      rgba(124,92,255,0.45) 0,
+      rgba(124,92,255,0.45) 3px,
+      transparent 3px,
+      transparent 6px);
+}
+
+.config-bg-preview.bg-cosmos::before {
+  background:
+    radial-gradient(1px 1px at 20% 30%, white, transparent),
+    radial-gradient(1px 1px at 60% 20%, white, transparent),
+    radial-gradient(1px 1px at 80% 60%, white, transparent),
+    radial-gradient(1px 1px at 30% 80%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(ellipse at 50% 100%, rgba(124,92,255,0.65), transparent 70%),
+    linear-gradient(180deg, #1e1b4b 0%, #0a0c18 100%);
+}
+
+.config-bg-preview.bg-blobs::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124,92,255,0.85), transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(236,72,153,0.75), transparent 55%);
+  filter: blur(6px);
+}
+
+.config-bg-preview.bg-none::before { display: none; }
+.config-bg-preview.bg-none {
+  background: linear-gradient(135deg, var(--bg-1), var(--surface-soft));
+}
+
+.config-bg-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.config-bg-info strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.config-bg-info span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  line-height: 1.3;
+}
+
+.config-bg-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.config-bg-option.selected .config-bg-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.config-bg-option.selected .config-bg-check::after {
+  content: '✓';
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+}

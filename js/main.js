@@ -6,6 +6,7 @@ import { Store } from './store.js';
 import {
   STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
   SAMPLE_JOBS, getDefaultConfig, LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
+  BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
 } from './constants.js';
 import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
@@ -86,7 +87,6 @@ function boot() {
 
         if (nameEl) nameEl.textContent = displayName;
         if (emailEl) emailEl.textContent = displayEmail;
-        // El avatar usa un SVG fijo en el HTML, no iniciales.
 
         if (userHeader) userHeader.style.display = '';
         if (loginBtn)   loginBtn.style.display = 'none';
@@ -199,9 +199,10 @@ function boot() {
   setLanguage(configStore.get().lang || DEFAULT_LANG);
   applyI18n(document);
 
-  // React to config changes (logo + language)
+  // React to config changes (logo + language + background)
   configStore.subscribe(cfg => {
     applyLogo(cfg.logo || DEFAULT_LOGO);
+    applyBackground(cfg.background || DEFAULT_BACKGROUND);
 
     const lang = cfg.lang || DEFAULT_LANG;
     if (lang !== getLanguage()) {

@@ -5,11 +5,13 @@
 import { applyI18n, setLanguage } from '../i18n.js';
 import {
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG, STORAGE_KEYS,
+  DEFAULT_BACKGROUND, applyBackground,
 } from '../constants.js';
 import { login, redirectIfAuthenticated } from './session.js';
 
 // ------------------------------------------------------------
-// Read persisted config (logo + language) without side effects
+// Read persisted config (logo + language + background)
+// without side effects
 // ------------------------------------------------------------
 function readConfig() {
   try {
@@ -152,6 +154,7 @@ function boot() {
   setLanguage(config.lang || DEFAULT_LANG);
   applyI18n(document);
   applyLogo(config.logo || DEFAULT_LOGO);
+  applyBackground(config.background || DEFAULT_BACKGROUND);
 
   mountTheme();
   mountTabs();

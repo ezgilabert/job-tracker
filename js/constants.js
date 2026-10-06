@@ -106,6 +106,38 @@ export const LOGO_OPTIONS = [
 export const DEFAULT_LOGO = 'diana';
 export const DEFAULT_LANG = 'es';
 
+// ============================================================
+// Backgrounds
+// ============================================================
+
+export const BACKGROUND_OPTIONS = [
+  { id: 'aurora',  label: 'Aurora',     description: 'Manchas de color animadas y borrosas' },
+  { id: 'mesh',    label: 'Mesh',       description: 'Gradiente estático suave, sin animación' },
+  { id: 'grid',    label: 'Grid',       description: 'Cuadrícula fina con foco radial' },
+  { id: 'dots',    label: 'Puntos',     description: 'Patrón de puntos minimalista' },
+  { id: 'waves',   label: 'Olas',       description: 'Dos manchas de color que se mueven lentamente' },
+  { id: 'conic',   label: 'Conic',      description: 'Gradiente cónico girando lentamente' },
+  { id: 'noise',   label: 'Grano',      description: 'Textura sutil de ruido sobre gradiente' },
+  { id: 'stripes', label: 'Rayas',      description: 'Líneas diagonales finas' },
+  { id: 'cosmos',  label: 'Cosmos',     description: 'Cielo nocturno con estrellas. Ideal para modo oscuro' },
+  { id: 'blobs',   label: 'Blobs',      description: 'Dos manchas grandes que flotan lentamente' },
+  { id: 'none',    label: 'Sin fondo',  description: 'Fondo plano por defecto' },
+];
+
+export const DEFAULT_BACKGROUND = 'aurora';
+
+/**
+ * Aplica el fondo al <body>. Se llama en boot y cada vez que
+ * cambia la config.
+ */
+export function applyBackground(bgId) {
+  const allClasses = BACKGROUND_OPTIONS.map(o => `bg-${o.id}`);
+  document.body.classList.remove(...allClasses);
+  if (bgId && bgId !== 'none') {
+    document.body.classList.add(`bg-${bgId}`);
+  }
+}
+
 export const ROLE_TAGS_LIST = [
   { id: 'programador', label: 'Programador', icon: '💻' },
   { id: 'frontend',    label: 'Frontend',    icon: '🎨' },
@@ -193,6 +225,7 @@ export function getDefaultConfig() {
   return JSON.parse(JSON.stringify({
     lang: DEFAULT_LANG,
     logo: DEFAULT_LOGO,
+    background: DEFAULT_BACKGROUND,
     profile: {
       nombre: '',
       apellido: '',
