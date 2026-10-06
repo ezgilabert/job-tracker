@@ -6,13 +6,12 @@
 .config-modal {
   max-width: 620px;
   position: relative;
-  /* Ocultar la scrollbar del modal pero mantener el scroll */
-  scrollbar-width: none;         /* Firefox */
-  -ms-overflow-style: none;      /* IE/Edge legacy */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .config-modal::-webkit-scrollbar {
-  display: none;                 /* Chrome/Safari/Edge */
+  display: none;
   width: 0;
   height: 0;
 }
@@ -89,20 +88,19 @@
   border-radius: 12px;
   margin-bottom: 1.25rem;
   overflow-x: auto;
-  /* Ocultar la scrollbar visualmente pero mantener el scroll táctil */
-  scrollbar-width: none;         /* Firefox */
-  -ms-overflow-style: none;      /* IE/Edge legacy */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .config-tabs::-webkit-scrollbar {
-  display: none;                 /* Chrome/Safari/Edge */
+  display: none;
   width: 0;
   height: 0;
 }
 
 .config-tab {
   flex: 1 1 0;
-  min-width: 0;                  /* permite que flex-shrink funcione */
+  min-width: 0;
   padding: 0.55rem 0.7rem;
   border-radius: 9px;
   border: none;
@@ -134,7 +132,6 @@
 }
 
 /* ===== Body ===== */
-/* Sin scroll interno: el scroll lo maneja el .modal padre */
 .config-body {
   padding-right: 0.25rem;
   margin-bottom: 1rem;
@@ -249,7 +246,6 @@
 }
 
 /* ===== Puestos list ===== */
-/* Sin scroll interno: la lista crece y el modal padre scrollea */
 .config-puestos-list {
   display: flex;
   flex-wrap: wrap;
@@ -529,16 +525,12 @@
   color: white;
 }
 
-/* ============================================================
-   Modal: Cambios sin guardar — layout con cruz de cierre
-   ============================================================ */
-
 .unsaved-modal {
   position: relative;
 }
 
 .unsaved-modal h2 {
-  padding-right: 2.5rem; /* espacio para la cruz */
+  padding-right: 2.5rem;
 }
 
 .unsaved-close {
@@ -765,4 +757,126 @@
   font-weight: 800;
   color: white;
   line-height: 1;
+}
+
+/* ============================================================
+   Panel: Perfil — avatar + campos
+   ============================================================ */
+
+.profile-avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid;
+  place-items: center;
+  color: white;
+  box-shadow: 0 8px 24px rgba(124,92,255,0.3);
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--surface);
+}
+
+.profile-avatar svg {
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.8;
+}
+
+.profile-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.profile-avatar-actions button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.profile-avatar-actions button:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.profile-avatar-actions button.danger:hover {
+  color: var(--danger);
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.profile-avatar-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+/* Input con prefijo @ */
+.input-prefix {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-2);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .input-prefix { background: var(--bg-1); }
+
+.input-prefix:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input-prefix .prefix {
+  display: grid;
+  place-items: center;
+  padding: 0 0.75rem;
+  background: var(--surface-soft);
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 0.88rem;
+  border-right: 1px solid var(--border);
+}
+
+.input-prefix input {
+  border: none;
+  background: transparent;
+  box-shadow: none !important;
+  border-radius: 0;
+  flex: 1;
+}
+
+.input-prefix input:focus { box-shadow: none !important; }
+
+.profile-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
 }

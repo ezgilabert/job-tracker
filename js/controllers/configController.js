@@ -1,7 +1,7 @@
 // ============================================================
 // Controller: config
-// Modal with tabs (roles, initial states, filters, appearance, language)
-// Draft in memory. Warns if there are unsaved changes.
+// Modal with tabs (roles, initial states, filters, appearance,
+// profile, language). Draft in memory. Warns if unsaved changes.
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -71,7 +71,15 @@ export function mountConfigController(configStore) {
   // Open / close
   // ----------------------------------------------------------
   function open() {
-    draft = cloneConfig(configStore.get());
+    const stored = configStore.get();
+    const defaults = getDefaultConfig();
+
+    draft = cloneConfig({
+      ...defaults,
+      ...stored,
+      profile: { ...defaults.profile, ...(stored.profile || {}) },
+    });
+
     if (!draft.lang) draft.lang = DEFAULT_LANG;
     modal.classList.add('open');
     renderAll();
@@ -84,7 +92,12 @@ export function mountConfigController(configStore) {
   }
 
   function saveDraft() {
-    const next = cloneConfig(draft);
+    const defaults = getDefaultConfig();
+    const next = cloneConfig({
+      ...defaults,
+      ...draft,
+      profile: { ...defaults.profile, ...(draft.profile || {}) },
+    });
     if (!next.logo) next.logo = DEFAULT_LOGO;
     if (!next.lang) next.lang = DEFAULT_LANG;
     configStore.update(() => next);
@@ -181,6 +194,7 @@ export function mountConfigController(configStore) {
     renderFilters();
     renderLogos();
     renderLangs();
+    renderPerfil();
     updateBadge();
   }
 
@@ -524,6 +538,102 @@ export function mountConfigController(configStore) {
       updateBadge();
     }
   });
+
+  // ------------------------------------------------------------
+  // Panel: Perfil
+  // ------------------------------------------------------------
+  function setVal(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val ?? '';
+  }
+
+  function renderPerfil() {
+    const p = draft.profile || {};
+
+    setVal('configProfileNombre',   p.nombre   || '');
+    setVal('configProfileApellido', p.apellido || '');
+    setVal('configProfileUsername', p.username || '');
+    setVal('configProfileEmail',    p.email    || '');
+    setVal('configProfileBio',      p.bio      || '');
+
+    const av = document.getElementById('configProfileAvatar');
+    if (!av) return;
+    const svg = av.querySelector('svg');
+    let img = av.querySelector('img');
+
+    if (p.avatar) {
+      if (svg) svg.style.display = 'none';
+      if (!img) {
+        img = document.createElement('img');
+        img.alt = 'Avatar';
+        av.appendChild(img);
+      }
+      img.src = p.avatar;
+    } else {
+      if (svg) svg.style.display = '';
+      if (img) img.remove();
+    }
+  }
+
+  // Inputs del perfil: actualizan el draft sin re-renderizar todo
+  const profileFields = {
+    configProfileNombre:   'nombre',
+    configProfileApellido: 'apellido',
+    configProfileUsername: 'username',
+    configProfileEmail:    'email',
+    configProfileBio:      'bio',
+  };
+
+  Object.entries(profileFields).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      if (!draft) return;
+      draft.profile = draft.profile || {};
+      draft.profile[key] = el.value;
+      updateBadge();
+    });
+  });
+
+  // Subir foto
+  const profileFileInput = document.getElementById('configProfileFileInput');
+  const profileUploadBtn = document.getElementById('configProfileUpload');
+
+  if (profileUploadBtn && profileFileInput) {
+    profileUploadBtn.addEventListener('click', () => profileFileInput.click());
+
+    profileFileInput.addEventListener('change', () => {
+      const file = profileFileInput.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showToast(t('toast.profileImageTooBig'), '!');
+        profileFileInput.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (!draft) return;
+        draft.profile = draft.profile || {};
+        draft.profile.avatar = ev.target.result;
+        renderPerfil();
+        updateBadge();
+      };
+      reader.readAsDataURL(file);
+      profileFileInput.value = '';
+    });
+  }
+
+  // Eliminar foto
+  const profileRemoveBtn = document.getElementById('configProfileRemove');
+  if (profileRemoveBtn) {
+    profileRemoveBtn.addEventListener('click', () => {
+      if (!draft) return;
+      draft.profile = draft.profile || {};
+      draft.profile.avatar = '';
+      renderPerfil();
+      updateBadge();
+    });
+  }
 
   // ------------------------------------------------------------
   // Re-render the panel labels on language change

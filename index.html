@@ -22,7 +22,6 @@
     </div>
 
     <div class="header-actions">
-      <!-- User menu: contiene Configuración, Tema y Login/Logout -->
       <div class="user-menu" id="userMenu">
         <button class="icon-btn" id="userBtn" title="Cuenta" data-i18n-title="auth.account">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -32,7 +31,6 @@
         </button>
 
         <div class="user-menu-dropdown" id="userMenuDropdown">
-          <!-- Header del dropdown (solo cuando hay sesión) -->
           <div class="user-menu-header" id="userMenuHeader" style="display:none;">
             <div class="user-menu-avatar" id="userMenuAvatar" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -46,7 +44,6 @@
             </div>
           </div>
 
-          <!-- Configuración -->
           <button type="button" class="user-menu-item" id="configBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
@@ -55,7 +52,6 @@
             <span data-i18n="action.config">Configuración</span>
           </button>
 
-          <!-- Tema -->
           <button type="button" class="user-menu-item" id="themeToggle">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="4"/>
@@ -66,7 +62,6 @@
 
           <div class="user-menu-sep"></div>
 
-          <!-- Sign in (visible solo cuando NO hay sesión) -->
           <button type="button" class="user-menu-item" id="loginBtn" style="display:none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -76,7 +71,6 @@
             <span data-i18n="auth.login">Iniciar sesión</span>
           </button>
 
-          <!-- Logout (visible solo cuando SÍ hay sesión) -->
           <button type="button" class="user-menu-item danger" id="logoutBtn" style="display:none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -92,7 +86,6 @@
 
   <div class="stats" id="stats"></div>
 
-  <!-- ===== Nueva postulación ===== -->
   <div class="form-card">
     <div class="form-card-header">
       <div>
@@ -157,7 +150,6 @@
     </div>
   </div>
 
-  <!-- ===== Postulaciones ===== -->
   <section class="jobs-section">
     <div class="jobs-header">
       <div>
@@ -183,7 +175,6 @@
     </div>
   </section>
 
-  <!-- ===== REFERRALS ===== -->
   <section class="referidos-section">
     <div class="referidos-header">
       <div>
@@ -451,6 +442,9 @@
       <button class="config-tab" data-tab="apariencia">
         <span>🎨</span> <span data-i18n="config.tab.apariencia">Apariencia</span>
       </button>
+      <button class="config-tab" data-tab="perfil">
+        <span>👤</span> <span data-i18n="config.tab.perfil">Perfil</span>
+      </button>
       <button class="config-tab" data-tab="idioma">
         <span>🌐</span> <span data-i18n="config.tab.idioma">Idioma</span>
       </button>
@@ -524,7 +518,6 @@
         </div>
       </div>
 
-      <!-- Panel: Apariencia -->
       <div class="config-panel" data-panel="apariencia">
         <div class="config-section">
           <div class="config-section-head">
@@ -535,7 +528,61 @@
         </div>
       </div>
 
-      <!-- Panel: Idioma -->
+      <!-- Panel: Perfil -->
+      <div class="config-panel" data-panel="perfil">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3 data-i18n="profile.title">👤 Editar perfil</h3>
+            <p data-i18n="profile.subtitle">Actualizá tu información personal</p>
+          </div>
+
+          <!-- Avatar -->
+          <div class="profile-avatar-block">
+            <div class="profile-avatar" id="configProfileAvatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="profile-avatar-actions">
+              <button type="button" id="configProfileUpload" data-i18n="profile.upload">Cambiar foto</button>
+              <button type="button" class="danger" id="configProfileRemove" data-i18n="profile.remove">Eliminar</button>
+            </div>
+            <span class="profile-avatar-hint" data-i18n="profile.formats">JPG, PNG o GIF · máx. 2 MB</span>
+            <input type="file" id="configProfileFileInput" accept="image/*" style="display:none;">
+          </div>
+
+          <div class="field">
+            <label for="configProfileNombre" data-i18n="profile.nombre">Nombre</label>
+            <input type="text" id="configProfileNombre" data-i18n-placeholder="profile.nombre.placeholder" placeholder="Tu nombre">
+          </div>
+
+          <div class="field">
+            <label for="configProfileApellido" data-i18n="profile.apellido">Apellido</label>
+            <input type="text" id="configProfileApellido" data-i18n-placeholder="profile.apellido.placeholder" placeholder="Tu apellido">
+          </div>
+
+          <div class="field">
+            <label for="configProfileUsername" data-i18n="profile.username">Nombre de usuario</label>
+            <div class="input-prefix">
+              <span class="prefix">@</span>
+              <input type="text" id="configProfileUsername" data-i18n-placeholder="profile.username.placeholder" placeholder="usuario" autocomplete="off" spellcheck="false">
+            </div>
+            <span class="profile-hint" data-i18n="profile.username.hint">Solo letras, números, guiones y guiones bajos.</span>
+          </div>
+
+          <div class="field">
+            <label for="configProfileEmail" data-i18n="profile.email">Email</label>
+            <input type="email" id="configProfileEmail" data-i18n-placeholder="profile.email.placeholder" placeholder="tu@email.com">
+          </div>
+
+          <div class="field">
+            <label for="configProfileBio" data-i18n="profile.bio">Bio</label>
+            <textarea id="configProfileBio" rows="3" data-i18n-placeholder="profile.bio.placeholder" placeholder="Contá algo sobre vos..."></textarea>
+          </div>
+        </div>
+      </div>
+
       <div class="config-panel" data-panel="idioma">
         <div class="config-section">
           <div class="config-section-head">
@@ -560,8 +607,6 @@
 <!-- Unsaved changes modal -->
 <div class="modal-overlay nested" id="unsavedModal">
   <div class="modal unsaved-modal" style="max-width: 460px;">
-
-    <!-- Close (top-right) -->
     <button class="icon-btn unsaved-close" id="unsavedCloseBtn"
             title="Cerrar" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -21,9 +21,6 @@ export const WORKFLOW_STEPS = [
 export const CLOSED_STATES = ['Rechazado', 'Ghosted', 'Descartado'];
 export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 
-// ------------------------------------------------------------
-// Icons by state (jobs)
-// ------------------------------------------------------------
 export const STATE_ICONS = {
   'Guardado':                '🔖',
   'Aplicado':                '📤',
@@ -47,9 +44,6 @@ export function getStateIcon(estado) {
   return STATE_ICONS[estado] || '•';
 }
 
-// ------------------------------------------------------------
-// Referrals
-// ------------------------------------------------------------
 export const REF_WORKFLOW_STEPS = [
   { id: 'Pendiente',       short: 'Pendiente' },
   { id: 'Contactado',      short: 'Contactado' },
@@ -62,9 +56,6 @@ export const REF_WORKFLOW_STEPS = [
 export const REF_CLOSED_STATES = ['No aplica'];
 export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOSED_STATES];
 
-// ------------------------------------------------------------
-// Icons by state (referrals)
-// ------------------------------------------------------------
 export const REF_STATE_ICONS = {
   'Pendiente':       '⏳',
   'Contactado':      '💬',
@@ -86,9 +77,6 @@ export const CLOSE_REASONS = {
   'Descartado': ['Me arrepentí', 'No me convenció la empresa', 'Pausé la búsqueda', 'La ubicación no servía'],
 };
 
-// ------------------------------------------------------------
-// Available logos for the Appearance selector
-// ------------------------------------------------------------
 export const LOGO_OPTIONS = [
   {
     id: 'diana',
@@ -118,9 +106,6 @@ export const LOGO_OPTIONS = [
 export const DEFAULT_LOGO = 'diana';
 export const DEFAULT_LANG = 'es';
 
-// ------------------------------------------------------------
-// Roles: categories / tags
-// ------------------------------------------------------------
 export const ROLE_TAGS_LIST = [
   { id: 'programador', label: 'Programador', icon: '💻' },
   { id: 'frontend',    label: 'Frontend',    icon: '🎨' },
@@ -198,9 +183,6 @@ export const ROLE_ICONS = {
   'Platform': '🧱',
 };
 
-// ------------------------------------------------------------
-// Config: fixed filters metadata
-// ------------------------------------------------------------
 export const CONFIG_FILTER_META = {
   'all':    { label: 'Todas',    icon: '🗂️' },
   'active': { label: 'Activas',  icon: '🔥' },
@@ -211,6 +193,14 @@ export function getDefaultConfig() {
   return JSON.parse(JSON.stringify({
     lang: DEFAULT_LANG,
     logo: DEFAULT_LOGO,
+    profile: {
+      nombre: '',
+      apellido: '',
+      username: '',
+      email: '',
+      bio: '',
+      avatar: '',
+    },
     puestos: {
       activeTags: ROLE_TAGS_LIST.map(t => t.id),
       hidden: [],
@@ -237,9 +227,6 @@ export function getDefaultConfig() {
   }));
 }
 
-// ------------------------------------------------------------
-// Storage
-// ------------------------------------------------------------
 export const STORAGE_KEYS = {
   JOBS: 'jobTrackerV2',
   REFS: 'jobTrackerReferidos',

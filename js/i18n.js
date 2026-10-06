@@ -12,14 +12,13 @@ const translations = {
   // SPANISH
   // ============================================================
   es: {
-    // Header
     'app.name': 'Job Tracker',
     'app.subtitle': 'Tu búsqueda laboral, organizada',
     'app.documentTitle': 'Job Tracker · Mi búsqueda laboral',
     'action.config': 'Configuración',
     'action.theme': 'Cambiar tema',
 
-    // Auth (Option 1 login screen)
+    // Auth
     'auth.documentTitle': 'Job Tracker · Acceso',
     'auth.tab.login': 'Iniciar sesión',
     'auth.tab.register': 'Crear cuenta',
@@ -41,14 +40,12 @@ const translations = {
     'auth.logout': 'Cerrar sesión',
     'auth.account': 'Cuenta',
 
-    // Stats
     'stats.total': 'Total',
     'stats.active': 'Activas',
     'stats.inProcess': 'En proceso',
     'stats.offers': 'Ofertas',
     'stats.closed': 'Cerradas',
 
-    // Form
     'form.title': '✨ Nueva postulación',
     'form.subtitle': 'Cargá una nueva oportunidad',
     'form.toggle': 'Mostrar/ocultar',
@@ -68,11 +65,9 @@ const translations = {
     'form.notas.placeholder': 'Contacto, próxima instancia, referidos...',
     'form.submit': 'Agregar postulación',
 
-    // Jobs
     'jobs.title': '📋 Postulaciones',
     'jobs.subtitle': 'Tu historial de procesos',
 
-    // Referrals
     'refs.title': '🤝 Referidos',
     'refs.subtitle': 'Tu red de contactos que pueden recomendarte',
     'refs.new': '➕ Nuevo referido',
@@ -93,7 +88,6 @@ const translations = {
     'refs.submit': 'Agregar referido',
     'refs.search.placeholder': 'Buscar por nombre, empresa, nota...',
 
-    // Relation chips
     'rel.Amigo': 'Amigo',
     'rel.Ex-colega': 'Ex-colega',
     'rel.Familiar': 'Familiar',
@@ -101,12 +95,10 @@ const translations = {
     'rel.Recruiter': 'Recruiter',
     'rel.Mentor': 'Mentor',
 
-    // Jobs filters
     'filter.all': 'Todas',
     'filter.active': 'Activas',
     'filter.closed': 'Cerradas',
 
-    // Referral filters
     'refFilter.all': 'Todos',
     'refFilter.Pendiente': 'Pendiente',
     'refFilter.Contactado': 'Contactado',
@@ -116,14 +108,12 @@ const translations = {
     'refFilter.Contratado': 'Contratado',
     'refFilter.No aplica': 'No aplica',
 
-    // Date picker
     'dp.empty': 'Elegí una fecha',
     'dp.today': 'Hoy',
     'dp.yesterday': 'Ayer',
     'dp.lastWeek': '-1 sem',
     'dp.clear': 'Limpiar',
 
-    // Job card
     'job.daysAgoOne': 'hace {n} día',
     'job.daysAgoMany': 'hace {n} días',
     'job.perHour': 'por hora',
@@ -156,7 +146,6 @@ const translations = {
     'job.deleteTitle': 'Borrar',
     'job.refChipTitle': 'Ver referido: {name}',
 
-    // Referral card
     'ref.link': 'Link',
     'ref.goToJob': 'Ir a la postulación en {empresa}',
     'ref.reopen': 'Reabrir',
@@ -173,7 +162,6 @@ const translations = {
     'ref.deleteTitle': 'Borrar',
     'ref.historyTitle': 'Ver historial',
 
-    // Empty states
     'empty.jobs.title': 'Todavía no cargaste postulaciones',
     'empty.jobs.subtitle': 'Empezá agregando una arriba ☝️',
     'empty.jobs.filter.title': 'Sin resultados en este filtro',
@@ -184,21 +172,18 @@ const translations = {
     'empty.refs.filter.subtitle': 'Probá con otro filtro o búsqueda',
     'empty.refToJob': 'No hay postulaciones cargadas todavía',
 
-    // Edit modal
     'modal.edit.title': '✏️ Editar postulación',
     'modal.edit.estadoNote': 'El estado se cambia desde los botones del workflow de la tarjeta.',
     'modal.cancel': 'Cancelar',
     'modal.saveChanges': 'Guardar cambios',
     'modal.close': 'Cerrar',
 
-    // Close modal
     'close.titleDefault': 'Cerrar postulación',
     'close.titleAs': 'Cerrar como {estado}',
     'close.motivo': 'Motivo',
     'close.motivo.placeholder': 'Contá brevemente qué pasó...',
     'close.confirm': 'Confirmar cierre',
 
-    // History modal
     'hist.title': '🕒 Historial de la postulación',
     'hist.refTitle': '🕒 Historial del referido',
     'hist.empty': 'Sin entradas en el historial',
@@ -210,7 +195,6 @@ const translations = {
     'hist.note': 'Nota',
     'hist.skipped': 'Etapas no aplicables',
 
-    // Config modal
     'config.title': '⚙️ Configuración',
     'config.unsaved': 'Sin guardar',
     'config.subtitle': 'Personalizá tu Job Tracker',
@@ -218,6 +202,7 @@ const translations = {
     'config.tab.estados': 'Estados iniciales',
     'config.tab.filtros': 'Filtros',
     'config.tab.apariencia': 'Apariencia',
+    'config.tab.perfil': 'Perfil',
     'config.tab.idioma': 'Idioma',
     'config.categorias.title': 'Categorías',
     'config.categorias.desc': 'Activá las categorías cuyos puestos quieras ver en el buscador.',
@@ -251,17 +236,32 @@ const translations = {
     'config.noPuestos': 'No hay puestos con las categorías activas. Activá alguna o agregá uno custom.',
     'config.noStates': 'Activá al menos un estado arriba.',
 
-    // Unsaved modal
+    // Perfil
+    'profile.title': '👤 Editar perfil',
+    'profile.subtitle': 'Actualizá tu información personal',
+    'profile.nombre': 'Nombre',
+    'profile.nombre.placeholder': 'Tu nombre',
+    'profile.apellido': 'Apellido',
+    'profile.apellido.placeholder': 'Tu apellido',
+    'profile.username': 'Nombre de usuario',
+    'profile.username.placeholder': 'usuario',
+    'profile.username.hint': 'Solo letras, números, guiones y guiones bajos.',
+    'profile.email': 'Email',
+    'profile.email.placeholder': 'tu@email.com',
+    'profile.bio': 'Bio',
+    'profile.bio.placeholder': 'Contá algo sobre vos...',
+    'profile.upload': 'Cambiar foto',
+    'profile.remove': 'Eliminar',
+    'profile.formats': 'JPG, PNG o GIF · máx. 2 MB',
+
     'unsaved.title': '⚠️ Cambios sin guardar',
     'unsaved.message': 'Modificaste la configuración pero todavía no la guardaste.<br>¿Qué querés hacer?',
     'unsaved.keep': 'Seguir editando',
     'unsaved.discard': 'Descartar',
     'unsaved.save': 'Guardar y salir',
 
-    // Ref edit modal
     'refEdit.title': '✏️ Editar referido',
 
-    // Ref → Job modal
     'refToJob.title': '🎉 ¡Referido hecho!',
     'refToJob.message': '<strong>{name}</strong> ya te hizo el referido. ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?',
     'refToJob.createNew': 'Crear nueva postulación',
@@ -273,7 +273,6 @@ const translations = {
     'refToJob.link': 'Vincular',
     'refToJob.alreadyLinked': 'ya vinculado',
 
-    // Note modal
     'note.title': '📝 ¿Agregar un recordatorio?',
     'note.subtitle': 'Vas a pasar a <strong>{step}</strong> en <strong>{name}</strong>. ¿Querés dejar un recordatorio para esta etapa?',
     'note.label': 'Nota / PD (opcional)',
@@ -281,11 +280,9 @@ const translations = {
     'note.skip': 'Continuar sin nota',
     'note.save': 'Guardar y avanzar',
 
-    // Confirm generic
     'confirm.cancel': 'Cancelar',
     'confirm.confirm': 'Confirmar',
 
-    // Confirm dialogs
     'confirm.deleteJob.title': '¿Borrar postulación?',
     'confirm.deleteJob.message': 'Esta acción no se puede deshacer.',
     'confirm.deleteJob.confirm': 'Borrar',
@@ -305,7 +302,6 @@ const translations = {
     'confirm.prevRef.message': 'Vas a retroceder a <strong>{name}</strong> de <strong>{from}</strong> a <strong>{to}</strong>.<br><span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">⚠️ Solo podés volver atrás una vez por referido.</span>',
     'confirm.prevRef.confirm': 'Sí, volver',
 
-    // Toasts
     'toast.savedConfig': 'Configuración guardada',
     'toast.discardedChanges': 'Cambios descartados',
     'toast.resetConfig': 'Configuración restablecida (recordá guardar)',
@@ -330,11 +326,10 @@ const translations = {
     'toast.jobCreatedFromRef': 'Postulación creada desde {name}',
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
+    'toast.profileImageTooBig': 'La imagen supera los 2 MB',
 
-    // Referral company empty
     'refEmpresa.empty': 'Agregá postulaciones primero para poder vincularlas',
 
-    // States (display labels)
     'state.Guardado': 'Guardado',
     'state.Aplicado': 'Aplicado',
     'state.Contacto': 'Contacto',
@@ -369,7 +364,6 @@ const translations = {
     'stateShort.Ghosted': 'Ghosted',
     'stateShort.Descartado': 'Descartado',
 
-    // Referral states
     'refState.Pendiente': 'Pendiente',
     'refState.Contactado': 'Contactado',
     'refState.Me va a referir': 'Me va a referir',
@@ -397,7 +391,6 @@ const translations = {
     'action.config': 'Settings',
     'action.theme': 'Switch theme',
 
-    // Auth (Option 1 login screen)
     'auth.documentTitle': 'Job Tracker · Sign in',
     'auth.tab.login': 'Sign in',
     'auth.tab.register': 'Create account',
@@ -581,6 +574,7 @@ const translations = {
     'config.tab.estados': 'Initial statuses',
     'config.tab.filtros': 'Filters',
     'config.tab.apariencia': 'Appearance',
+    'config.tab.perfil': 'Profile',
     'config.tab.idioma': 'Language',
     'config.categorias.title': 'Categories',
     'config.categorias.desc': 'Enable the categories whose roles you want to see in the picker.',
@@ -613,6 +607,24 @@ const translations = {
     'config.restore': 'Restore',
     'config.noPuestos': 'No roles with active categories. Enable one or add a custom role.',
     'config.noStates': 'Enable at least one status above.',
+
+    // Profile
+    'profile.title': '👤 Edit profile',
+    'profile.subtitle': 'Update your personal information',
+    'profile.nombre': 'First name',
+    'profile.nombre.placeholder': 'Your first name',
+    'profile.apellido': 'Last name',
+    'profile.apellido.placeholder': 'Your last name',
+    'profile.username': 'Username',
+    'profile.username.placeholder': 'username',
+    'profile.username.hint': 'Only letters, numbers, hyphens and underscores.',
+    'profile.email': 'Email',
+    'profile.email.placeholder': 'you@email.com',
+    'profile.bio': 'Bio',
+    'profile.bio.placeholder': 'Tell something about yourself...',
+    'profile.upload': 'Change photo',
+    'profile.remove': 'Remove',
+    'profile.formats': 'JPG, PNG or GIF · max 2 MB',
 
     'unsaved.title': '⚠️ Unsaved changes',
     'unsaved.message': "You modified the settings but haven't saved yet.<br>What do you want to do?",
@@ -686,6 +698,7 @@ const translations = {
     'toast.jobCreatedFromRef': 'Application created from {name}',
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
+    'toast.profileImageTooBig': 'Image is larger than 2 MB',
 
     'refEmpresa.empty': 'Add applications first to link them',
 
@@ -784,12 +797,6 @@ export function tRefStateShort(id) { return t('refStateShort.' + id); }
 
 // ------------------------------------------------------------
 // Apply translations to a DOM tree
-// Supports:
-//   data-i18n="key"              → textContent
-//   data-i18n-html="key"         → innerHTML
-//   data-i18n-placeholder="key"  → placeholder
-//   data-i18n-title="key"        → title
-//   <html data-i18n-title-doc="key"> → document.title
 // ------------------------------------------------------------
 export function applyI18n(root = document) {
   root.querySelectorAll('[data-i18n]').forEach(el => {
