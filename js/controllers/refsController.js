@@ -5,9 +5,9 @@
 // - section toggle
 // - event delegation on #refList
 // - listens for 'scroll-to-ref' from jobsController
-// - retroceso limitado a una vez por referido (con confirmación)
-// - nota al avanzar (igual que postulaciones)
-// - historial completo por referido
+// - limited backtracking to once per referral (with confirmation)
+// - note on advance (same as applications)
+// - complete history per referral
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -220,7 +220,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   // ----------------------------------------------------------
-  // Avanzar: con modal de nota (como postulaciones)
+  // Advance: with note modal (like applications)
   // ----------------------------------------------------------
   const refNoteModal = document.getElementById('refNoteModal');
   const refStepNoteInput = document.getElementById('refStepNoteInput');
@@ -298,7 +298,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // Retroceso: con confirmación, sólo una vez por referido
+  // Backtrack: with confirmation, only once per referral
   // ----------------------------------------------------------
   async function requestMovePrev(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -353,7 +353,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   }
 
   // ----------------------------------------------------------
-  // Cerrar / Reabrir
+  // Close / Reopen
   // ----------------------------------------------------------
   async function closeRef(id) {
     const r = refsStore.get().find(x => x.id === id);

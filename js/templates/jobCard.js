@@ -7,7 +7,7 @@ import {
   isClosed, stepIndex, progressPct,
   currentStepNote, lastHistoryEntry, refsForEmpresa,
 } from '../selectors.js';
-import { escapeHtml, diasDesde, formatFecha, ensureArray } from '../utils.js';
+import { escapeHtml, daysSince, formatDate, ensureArray } from '../utils.js';
 import { renderSteps } from './steps.js';
 
 /**
@@ -21,11 +21,11 @@ import { renderSteps } from './steps.js';
 export function renderJobCard(job, ctx = {}) {
   const { referidos = [], index = 0 } = ctx;
 
-  const dias = diasDesde(job.fecha);
+  const dias = daysSince(job.fecha);
   const diasTxt = dias !== null
     ? `<span>⏱️ hace ${dias} día${dias === 1 ? '' : 's'}</span>`
     : '';
-  const fechaTxt = job.fecha ? `<span>📅 ${formatFecha(job.fecha)}</span>` : '';
+  const fechaTxt = job.fecha ? `<span>📅 ${formatDate(job.fecha)}</span>` : '';
   const salarioTxt = job.salario
     ? `<span>💰 ${escapeHtml(job.salario)}${job.salarioPorHora ? ' · por hora' : ''}</span>`
     : '';
@@ -186,7 +186,7 @@ function renderClosedActions(job) {
     ? `<div class="closed-banner-motivo">"${escapeHtml(last.motivo)}"</div>`
     : '';
   const fecha = last && last.fecha
-    ? ` · cerrada el ${formatFecha(last.fecha.slice(0, 10))}`
+    ? ` · cerrada el ${formatDate(last.fecha.slice(0, 10))}`
     : '';
 
   return `

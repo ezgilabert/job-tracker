@@ -59,7 +59,7 @@ export function renderRefCard(ref, ctx = {}) {
        </div>`
     : renderRefActions(ref, currentIdx);
 
-  // NUEVO: mostrar la nota actual (misma etapa) como PD
+  // NEW: show current note (same stage) as PD
   const pd = currentRefStepNote(ref);
   const pdHtml = (!refClosed && pd)
     ? `<div class="step-note">
@@ -129,7 +129,7 @@ function renderRefActions(ref, currentIdx) {
 }
 
 /**
- * Busca la última nota registrada para la etapa actual del referido.
+ * Finds the last registered note for the referral's current stage.
  * @param {object} ref
  * @returns {string|null}
  */

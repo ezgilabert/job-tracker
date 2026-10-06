@@ -22,7 +22,7 @@ export const CLOSED_STATES = ['Rechazado', 'Ghosted', 'Descartado'];
 export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 
 // ------------------------------------------------------------
-// Iconos por estado (jobs)
+// Icons by state (jobs)
 // ------------------------------------------------------------
 export const ESTADO_ICONS = {
   'Guardado':                '🔖',
@@ -63,7 +63,7 @@ export const REF_CLOSED_STATES = ['No aplica'];
 export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOSED_STATES];
 
 // ------------------------------------------------------------
-// Iconos por estado (referidos)
+// Icons by state (referrals)
 // ------------------------------------------------------------
 export const REF_ESTADO_ICONS = {
   'Pendiente':       '⏳',
@@ -87,7 +87,7 @@ export const CLOSE_REASONS = {
 };
 
 // ------------------------------------------------------------
-// Logos disponibles para el selector de Apariencia
+// Available logos for the Appearance selector
 // ------------------------------------------------------------
 export const LOGO_OPTIONS = [
   {
@@ -118,7 +118,7 @@ export const LOGO_OPTIONS = [
 export const DEFAULT_LOGO = 'diana';
 
 // ------------------------------------------------------------
-// Puestos: categorías / tags
+// Roles: categories / tags
 // ------------------------------------------------------------
 export const PUESTO_TAGS_LIST = [
   { id: 'programador', label: 'Programador', icon: '💻' },
@@ -198,7 +198,7 @@ export const PUESTO_ICONS = {
 };
 
 // ------------------------------------------------------------
-// Config: meta de filtros fijos
+// Config: fixed filters metadata
 // ------------------------------------------------------------
 export const CONFIG_FILTER_META = {
   'all':    { label: 'Todas',    icon: '🗂️' },

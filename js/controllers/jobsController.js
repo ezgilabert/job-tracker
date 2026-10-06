@@ -4,7 +4,7 @@
 // - dynamic filters (from config)
 // - dynamic initial state (from config)
 // - event delegation on #list (edit, delete, workflow, drag)
-// - secciones colapsables (form + lista) con contador
+// - collapsible sections (form + list) with counter
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -31,7 +31,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   const datePicker = fechaPicker;
 
   // ----------------------------------------------------------
-  // Colapsables
+  // Collapsibles
   // ----------------------------------------------------------
   const jobFormToggleBtn = document.getElementById('jobFormToggleBtn');
   const jobFormBody = document.getElementById('jobFormBody');
@@ -56,7 +56,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   }
 
   // ----------------------------------------------------------
-  // Render principal
+  // Main render
   // ----------------------------------------------------------
   function renderList() {
     const jobs = jobsStore.get();
@@ -90,7 +90,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   refsStore.subscribe(renderList);
 
   // ----------------------------------------------------------
-  // Filtros dinámicos
+  // Dynamic filters
   // ----------------------------------------------------------
   function getFilterLabel(id) {
     const meta = CONFIG_FILTER_META[id];
@@ -119,7 +119,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   configStore.subscribe(renderFilters);
 
   // ----------------------------------------------------------
-  // Estado inicial dinámico
+  // Dynamic initial state
   // ----------------------------------------------------------
   function renderEstadoInicial() {
     const cfg = configStore.get();
@@ -140,12 +140,12 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
   configStore.subscribe(renderEstadoInicial);
 
-  // Render inicial
+  // Initial render
   renderFilters();
   renderEstadoInicial();
 
   // ----------------------------------------------------------
-  // Form: crear postulación
+  // Form: create application
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
   const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
@@ -182,14 +182,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     datePicker?.setValue('');
     renderEstadoInicial();
 
-    // Al agregar una postulación, abrimos la lista para que la vea
+    // When adding an application, expand the list so they can see it
     expandJobs();
 
     showToast('Postulación agregada', '✓');
   });
 
   // ----------------------------------------------------------
-  // Filtros: click
+  // Filters: click
   // ----------------------------------------------------------
   document.getElementById('filters').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-filter]');
@@ -325,7 +325,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
-  // scroll-to-job: expandir la sección si está colapsada
+  // scroll-to-job: expand section if collapsed
   // ----------------------------------------------------------
   document.addEventListener('scroll-to-job', () => {
     expandJobs();

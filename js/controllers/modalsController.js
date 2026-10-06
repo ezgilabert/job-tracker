@@ -3,7 +3,7 @@
 // - Edit job
 // - Close job (with reason)
 // - History (jobs)
-// - History (referidos)  ← NUEVO
+// - History (referrals)  ← NEW
 // - Edit referral
 // - Move referral → job
 // - Note on advance
@@ -24,7 +24,7 @@ import {
 } from '../selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray, bindHourlySalaryPlaceholder,
-  formatFechaHora,
+  formatDateTime,
 } from '../utils.js';
 
 /**
@@ -242,7 +242,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
                 ${escapeHtml(entry.estado)}
                 ${tagsHtml}
               </div>
-              <div class="history-fecha">${formatFechaHora(entry.fecha)}</div>
+              <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
               ${motivoHtml}
               ${notaHtml}
             </div>
@@ -275,7 +275,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   });
 
   // ----------------------------------------------------------
-  // History (referidos)  ← NUEVO
+  // History (referrals)  ← NEW
   // ----------------------------------------------------------
   const refHistoryModal = document.getElementById('refHistoryModal');
   const refHistorySubtitle = document.getElementById('refHistorySubtitle');
@@ -327,7 +327,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
                 ${escapeHtml(entry.estado)}
                 ${tagsHtml}
               </div>
-              <div class="history-fecha">${formatFechaHora(entry.fecha)}</div>
+              <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
               ${motivoHtml}
               ${notaHtml}
             </div>
@@ -723,7 +723,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   };
 
   // ----------------------------------------------------------
-  // Advance previous (job)
+  // Go back (job)
   // ----------------------------------------------------------
   async function confirmPrev(id) {
     const j = jobsStore.get().find(x => x.id === id);

@@ -1,7 +1,7 @@
 // ============================================================
 // Controller: config
-// Modal con tabs (puestos, estados iniciales, filtros, apariencia)
-// Draft en memoria. Avisa si hay cambios sin guardar.
+// Modal with tabs (roles, initial states, filters, appearance)
+// Draft in memory. Warns if there are unsaved changes.
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -34,7 +34,7 @@ export function mountConfigController(configStore) {
   }
 
   /**
-   * Comparación profunda (inmune al orden de claves).
+   * Deep comparison (immune to key order).
    */
   function deepEqual(a, b) {
     if (a === b) return true;
@@ -68,11 +68,11 @@ export function mountConfigController(configStore) {
   }
 
   // ----------------------------------------------------------
-  // Abrir / cerrar
+  // Open / close
   // ----------------------------------------------------------
   function open() {
-    // Clonamos tal cual está guardado. NO tocamos el draft acá:
-    // si agregamos campos por defecto, el draft queda "sucio" al instante.
+    // Clone exactly as saved. We DON'T touch the draft here:
+    // if we add default fields, the draft becomes "dirty" immediately.
     draft = cloneConfig(configStore.get());
     modal.classList.add('open');
     renderAll();
@@ -86,8 +86,8 @@ export function mountConfigController(configStore) {
 
   function saveDraft() {
     const next = cloneConfig(draft);
-    // Al guardar sí completamos el logo para que la próxima apertura no
-    // vuelva a considerarse "sucia".
+    // When saving, we do complete the logo so the next opening
+    // doesn't consider it "dirty" again.
     if (!next.logo) next.logo = DEFAULT_LOGO;
     configStore.update(() => next);
     draft = cloneConfig(configStore.get());
@@ -186,7 +186,7 @@ export function mountConfigController(configStore) {
   }
 
   // ------------------------------------------------------------
-  // Panel: Puestos
+  // Panel: Roles
   // ------------------------------------------------------------
   function renderTags() {
     const active = new Set(draft.puestos.activeTags || []);
@@ -321,7 +321,7 @@ export function mountConfigController(configStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Estados iniciales
+  // Panel: Initial states
   // ------------------------------------------------------------
   function renderEstados() {
     const activos = new Set(draft.estadosIniciales || []);
@@ -386,7 +386,7 @@ export function mountConfigController(configStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Filtros
+  // Panel: Filters
   // ------------------------------------------------------------
   function getFilterLabel(id) {
     const meta = CONFIG_FILTER_META[id];
@@ -457,7 +457,7 @@ export function mountConfigController(configStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Apariencia (logo)
+  // Panel: Appearance (logo)
   // ------------------------------------------------------------
   function renderLogos() {
     const actual = draft.logo || DEFAULT_LOGO;
@@ -492,7 +492,7 @@ export function mountConfigController(configStore) {
   });
 
   // ------------------------------------------------------------
-  // API pública
+  // Public API
   // ------------------------------------------------------------
   return { open, close: closeDirect };
 }

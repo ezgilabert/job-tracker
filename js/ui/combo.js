@@ -15,7 +15,7 @@ function getPuestoIcon(puesto) {
 }
 
 /**
- * Arma la lista de puestos según la config del usuario.
+ * Builds the list of roles according to user config.
  */
 export function getAvailablePuestos(config) {
   if (!config || !config.puestos) return [...DEFAULT_PUESTOS];

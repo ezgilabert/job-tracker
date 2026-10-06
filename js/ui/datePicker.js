@@ -107,7 +107,7 @@ export class DatePicker {
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString().slice(0, 10);
 
-    // ¿Estamos viendo el mes actual? En ese caso no se puede ir al siguiente.
+    // Are we viewing the current month? In that case, can't go to the next.
     const isCurrentMonth =
       year === today.getFullYear() && month === today.getMonth();
 

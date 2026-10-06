@@ -24,13 +24,13 @@ export function bindHourlySalaryPlaceholder(input, checkbox) {
   return update;
 }
 
-export function diasDesde(fecha) {
+export function daysSince(fecha) {
   if (!fecha) return null;
   const iso = fecha.length === 10 ? fecha + 'T00:00:00' : fecha;
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 }
 
-export function formatFecha(fecha) {
+export function formatDate(fecha) {
   if (!fecha) return '';
   const iso = fecha.length === 10 ? fecha + 'T00:00:00' : fecha;
   return new Date(iso).toLocaleDateString('es-AR', {
@@ -38,7 +38,7 @@ export function formatFecha(fecha) {
   });
 }
 
-export function formatFechaHora(fechaISO) {
+export function formatDateTime(fechaISO) {
   if (!fechaISO) return '';
   const d = new Date(fechaISO);
   if (isNaN(d.getTime())) return '';

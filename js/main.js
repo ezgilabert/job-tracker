@@ -32,7 +32,7 @@ function mountTheme() {
 }
 
 // ------------------------------------------------------------
-// Logo (apariencia)
+// Logo (appearance)
 // ------------------------------------------------------------
 function applyLogo(logoId) {
   const el = document.getElementById('brandLogo');
@@ -87,7 +87,7 @@ const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
   seed: () => getDefaultConfig(),
 });
 
-// Suscripción: aplicar el logo elegido y reaccionar a cambios
+// Subscription: apply chosen logo and react to changes
 configStore.subscribe(cfg => {
   applyLogo(cfg.logo || DEFAULT_LOGO);
 });
