@@ -105,7 +105,7 @@
 .job[data-estado="Entrevista Final"]::before { background: linear-gradient(180deg, #fb7185, #f43f5e); }
 .job[data-estado="Referencias"]::before { background: linear-gradient(180deg, #c084fc, #a855f7); }
 .job[data-estado="Negociación"]::before { background: linear-gradient(180deg, #2dd4bf, #14b8a6); }
-.job[data-estado="Oferta"]::before { background: linear-gradient(180deg, #34d399, #10b981); }
+.job[data-estado="Oferta"]::before { background: linear-gradient(180deg, #f5b301, #d99500); }
 .job[data-estado="Rechazado"]::before { background: linear-gradient(180deg, #f87171, #ef4444); }
 .job[data-estado="Ghosted"]::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
 .job[data-estado="Descartado"]::before { background: linear-gradient(180deg, #cbd5e1, #94a3b8); }
@@ -123,6 +123,67 @@
 [data-theme="dark"] .job[data-estado="Rechazado"],
 [data-theme="dark"] .job[data-estado="Ghosted"],
 [data-theme="dark"] .job[data-estado="Descartado"] { opacity: 0.65; }
+
+/* ============================================================
+   Oferta final: borde dorado + cinta de esquina
+   La card se destaca mientras espera confirmación del usuario.
+   ============================================================ */
+
+.job[data-estado="Oferta"] {
+  border-color: var(--gold-border);
+  box-shadow:
+    0 8px 28px rgba(245,179,1,0.18),
+    var(--shadow-sm);
+}
+
+.job[data-estado="Oferta"]:hover {
+  border-color: var(--gold);
+  box-shadow:
+    0 12px 32px rgba(245,179,1,0.28),
+    var(--shadow);
+}
+
+/* Cinta diagonal en la esquina superior derecha.
+   El .job tiene overflow:hidden, así que la cinta se recorta
+   automáticamente contra el borde de la card. */
+.job-offer-ribbon {
+  position: absolute;
+  top: 22px;
+  right: -46px;
+  width: 180px;
+  text-align: center;
+  background: linear-gradient(135deg, #f5b301, #d99500);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.4rem 0;
+  transform: rotate(45deg);
+  box-shadow: 0 4px 12px rgba(245,179,1,0.5);
+  z-index: 4;
+  pointer-events: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Empujamos las acciones hacia la izquierda para que no
+   queden debajo de la cinta en estado Oferta. */
+.job[data-estado="Oferta"] .job-actions {
+  margin-right: 70px;
+}
+
+@media (max-width: 640px) {
+  .job-offer-ribbon {
+    top: 18px;
+    right: -50px;
+    width: 160px;
+    font-size: 0.62rem;
+    padding: 0.35rem 0;
+  }
+  .job[data-estado="Oferta"] .job-actions {
+    margin-right: 55px;
+  }
+}
 
 /* Drag & drop */
 .job.dragging {
@@ -235,7 +296,7 @@
   gap: 0.4rem;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, margin-right 0.2s ease;
 }
 
 .job:hover .job-actions { opacity: 1; }

@@ -145,6 +145,7 @@ const translations = {
     'job.editTitle': 'Editar',
     'job.deleteTitle': 'Borrar',
     'job.refChipTitle': 'Ver referido: {name}',
+    'job.offerRibbon': '🏆 Oferta',
 
     'ref.link': 'Link',
     'ref.goToJob': 'Ir a la postulación en {empresa}',
@@ -519,6 +520,7 @@ const translations = {
     'job.editTitle': 'Edit',
     'job.deleteTitle': 'Delete',
     'job.refChipTitle': 'View referral: {name}',
+    'job.offerRibbon': '🏆 Offer',
 
     'ref.link': 'Link',
     'ref.goToJob': 'Go to application at {empresa}',

@@ -57,6 +57,11 @@ export function renderJobCard(job, ctx = {}) {
   const currentIdx = stepIndex(job.estado);
   const pct = progressPct(job.estado);
 
+  // Cinta diagonal dorada para la etapa final (Oferta)
+  const offerRibbon = job.estado === 'Oferta'
+    ? `<span class="job-offer-ribbon" aria-hidden="true">${escapeHtml(t('job.offerRibbon'))}</span>`
+    : '';
+
   const stepsHtml = closed ? '' : renderSteps(
     WORKFLOW_STEPS,
     currentIdx,
@@ -96,6 +101,7 @@ export function renderJobCard(job, ctx = {}) {
          style="animation-delay:${Math.min(index * 40, 400)}ms">
 
       <div class="drag-handle" title="${escapeHtml(t('job.dragHandle'))}">⠿</div>
+      ${offerRibbon}
 
       <div class="job-header">
         <div class="job-info">
