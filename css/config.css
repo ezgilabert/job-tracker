@@ -1,0 +1,513 @@
+/* ============================================================
+   Config: modal de configuración con tabs
+   ============================================================ */
+
+.config-modal {
+  max-width: 620px;
+  position: relative;
+}
+
+.config-modal h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  padding-right: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.config-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.config-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+/* Badge "Sin guardar" */
+.unsaved-badge {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.22rem 0.6rem;
+  border-radius: 20px;
+  background: var(--warning-soft);
+  color: var(--warning-2);
+  border: 1px solid var(--warning-border);
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+.unsaved-badge.visible { display: inline-flex; }
+
+.unsaved-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warning);
+  box-shadow: 0 0 6px var(--warning);
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* Tabs */
+.config-tabs {
+  display: flex;
+  gap: 0.3rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  padding: 0.3rem;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.config-tab {
+  flex: 1;
+  padding: 0.6rem 0.9rem;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.config-tab:hover { color: var(--text); background: var(--surface); }
+
+.config-tab.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+/* Body */
+.config-body {
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+}
+
+.config-body::-webkit-scrollbar { width: 6px; }
+.config-body::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+}
+
+.config-panel { display: none; }
+.config-panel.active { display: block; }
+
+.config-section {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.config-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.config-section-head { margin-bottom: 0.85rem; }
+
+.config-section-head h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.config-section-head p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.config-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* Tags */
+.config-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.config-tag {
+  padding: 0.5rem 0.85rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.config-tag:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.config-tag.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+/* Add row */
+.config-add-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.config-add-row input {
+  flex: 1;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.config-add-row .btn {
+  padding: 0 1rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+/* Lista de puestos */
+.config-puestos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  scrollbar-width: thin;
+}
+
+.config-puestos-list::-webkit-scrollbar { width: 6px; }
+.config-puestos-list::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+}
+
+.config-puesto-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.4rem 0.35rem 0.7rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.config-puesto-item:hover { border-color: var(--border-strong); }
+
+.config-puesto-item .remove,
+.config-puesto-item .restore {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  padding: 0;
+}
+
+.config-puesto-item .remove:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.config-puesto-item.hidden-puesto {
+  opacity: 0.55;
+  border-style: dashed;
+}
+
+.config-puesto-item .restore:hover {
+  background: var(--success-soft);
+  color: var(--success-2);
+}
+
+.config-empty {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-style: italic;
+  width: 100%;
+}
+
+/* Checks de estados */
+.config-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.4rem;
+}
+
+.config-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+
+.config-check:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.config-check.checked {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.config-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  margin: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.config-check .icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Default estado */
+.config-default-estado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.config-default-btn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.config-default-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.config-default-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+/* Filtros */
+.config-filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.config-filtro-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  transition: all 0.15s ease;
+}
+
+.config-filtro-item:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.config-filtro-item.oculto { opacity: 0.5; }
+
+.config-filtro-item .drag-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.config-filtro-item .drag-info .icon { font-size: 1rem; }
+
+.config-filtro-item .drag-info .builtin-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+}
+
+.config-filtro-actions {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.config-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  padding: 0;
+}
+
+.config-icon-btn:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.config-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.config-icon-btn.eye-off { color: var(--text-dim); }
+
+.config-icon-btn.eye-on {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+/* Actions */
+.config-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.config-actions-right {
+  display: flex;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+/* Unsaved modal */
+.modal-overlay.nested { z-index: 110; }
+
+.unsaved-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-danger-ghost {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-2);
+}
+
+.btn-danger-ghost:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}

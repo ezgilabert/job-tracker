@@ -18,7 +18,7 @@ import {
   CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS, getEstadoIcon,
 } from '../constants.js';
 import {
-  stepIndex, progressPct, isClosed,
+  stepIndex, isClosed,
 } from '../selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray, bindHourlySalaryPlaceholder,
@@ -28,8 +28,9 @@ import {
 /**
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
+ * @param {import('../store.js').Store} configStore
  */
-export function mountModalsController(jobsStore, refsStore) {
+export function mountModalsController(jobsStore, refsStore, configStore) {
   // ----------------------------------------------------------
   // Edit job
   // ----------------------------------------------------------
@@ -41,7 +42,6 @@ export function mountModalsController(jobsStore, refsStore) {
     editSalaryHourlyCheckbox
   );
 
-  // El estado se muestra solo como referencia (no editable desde este modal)
   editEstado.innerHTML = ALL_STATES
     .map(s => `<option>${escapeHtml(s)}</option>`)
     .join('');
@@ -50,6 +50,7 @@ export function mountModalsController(jobsStore, refsStore) {
   const editFecha = new DatePicker(document.getElementById('editFechaPicker'));
   const editPuesto = new PuestoCombo(document.getElementById('editPuestoCombo'), {
     getJobPuestos: () => jobsStore.get().map(j => j.puesto),
+    getConfig: () => configStore.get(),
   });
 
   function openEdit(id) {
@@ -84,8 +85,6 @@ export function mountModalsController(jobsStore, refsStore) {
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
 
-    // OJO: no tocamos `estado`, `history` ni `volvioAtras` acá.
-    // El estado solo se modifica desde los botones del workflow de la tarjeta.
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
       return {
@@ -649,7 +648,6 @@ export function mountModalsController(jobsStore, refsStore) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
 
-    // Regla: solo se puede retroceder una vez por postulación
     if (j.volvioAtras) {
       showToast('Ya volviste atrás una vez en esta postulación', '!');
       return;
@@ -674,7 +672,6 @@ export function mountModalsController(jobsStore, refsStore) {
     applyPrev(id);
   }
 
-  // Stepping backward skips the note modal
   function applyPrev(id) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;

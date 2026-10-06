@@ -1,7 +1,8 @@
 // ============================================================
 // Controller: jobs
 // - create form
-// - filters
+// - dynamic filters (from config)
+// - dynamic initial state (from config)
 // - event delegation on #list (edit, delete, workflow, drag)
 // ============================================================
 
@@ -11,30 +12,26 @@ import {
   computeStats, filterJobs, sortJobs,
   isClosed, stepIndex, progressPct,
 } from '../selectors.js';
-import { WORKFLOW_STEPS, CLOSED_STATES } from '../constants.js';
+import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
 import { renderStats } from '../templates/stats.js';
 import { renderJobCard } from '../templates/jobCard.js';
-import { uid, todayISO, cloneArray, bindHourlySalaryPlaceholder } from '../utils.js';
+import {
+  uid, todayISO, cloneArray, bindHourlySalaryPlaceholder, escapeHtml,
+} from '../utils.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
- * @param {{ onOpenEdit: (id:number)=>void, onClose: (id:number, estado:string)=>void, onAdvance: (id:number, opts:object)=>void, onOpenHistory: (id:number)=>void }} modals
+ * @param {{ onOpenEdit, onClose, onAdvance, onOpenHistory }} modals
  * @param {import('../ui/datePicker.js').DatePicker} fechaPicker
+ * @param {import('../store.js').Store} configStore
  */
-export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
-  // ----------------------------------------------------------
-  // Local UI state
-  // ----------------------------------------------------------
+export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore) {
   let currentFilter = 'all';
-
-  // ----------------------------------------------------------
-  // UI components
-  // ----------------------------------------------------------
   const datePicker = fechaPicker;
 
   // ----------------------------------------------------------
-  // Render
+  // Render principal
   // ----------------------------------------------------------
   function renderList() {
     const jobs = jobsStore.get();
@@ -66,7 +63,63 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
   refsStore.subscribe(renderList);
 
   // ----------------------------------------------------------
-  // Create form
+  // Filtros dinámicos
+  // ----------------------------------------------------------
+  function getFilterLabel(id) {
+    const meta = CONFIG_FILTER_META[id];
+    if (meta) return { label: meta.label, icon: meta.icon };
+    const step = WORKFLOW_STEPS.find(s => s.id === id);
+    if (step) return { label: step.short, icon: step.icon };
+    return { label: id, icon: '•' };
+  }
+
+  function renderFilters() {
+    const cfg = configStore.get();
+    const filtros = (cfg.filtros || []).filter(f => f.visible);
+    const container = document.getElementById('filters');
+
+    // Si el filtro actual ya no está visible, resetear a 'all'
+    if (!filtros.some(f => f.id === currentFilter)) {
+      currentFilter = 'all';
+    }
+
+    container.innerHTML = filtros.map(f => {
+      const { label, icon } = getFilterLabel(f.id);
+      const active = f.id === currentFilter ? 'active' : '';
+      return `<button data-filter="${escapeHtml(f.id)}" class="${active}">${icon} ${escapeHtml(label)}</button>`;
+    }).join('');
+  }
+
+  configStore.subscribe(renderFilters);
+
+  // ----------------------------------------------------------
+  // Estado inicial dinámico
+  // ----------------------------------------------------------
+  function renderEstadoInicial() {
+    const cfg = configStore.get();
+    const estados = cfg.estadosIniciales && cfg.estadosIniciales.length
+      ? cfg.estadosIniciales
+      : WORKFLOW_STEPS.map(s => s.id);
+
+    const def = cfg.estadoInicialDefault || 'Aplicado';
+    const select = document.getElementById('estado');
+
+    select.innerHTML = estados.map(id => {
+      const step = WORKFLOW_STEPS.find(s => s.id === id);
+      const icon = step ? step.icon : '•';
+      const sel = id === def ? 'selected' : '';
+      return `<option value="${escapeHtml(id)}" ${sel}>${icon} ${escapeHtml(id)}</option>`;
+    }).join('');
+  }
+
+  configStore.subscribe(renderEstadoInicial);
+
+  // Render inicial
+  renderFilters();
+  renderEstadoInicial();
+
+  // ----------------------------------------------------------
+  // Form: crear postulación
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
   const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
@@ -74,15 +127,18 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
     document.getElementById('salario'),
     salaryHourlyCheckbox
   );
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+
+    const estadoInicial = document.getElementById('estado').value;
 
     const nuevo = {
       id: uid(),
       empresa: valueOf('empresa'),
       puesto: valueOf('puesto'),
       fecha: datePicker?.getValue() || '',
-      estado: document.getElementById('estado').value,
+      estado: estadoInicial,
       link: valueOf('link'),
       salario: valueOf('salario'),
       salarioPorHora: document.getElementById('salarioPorHora').checked,
@@ -90,7 +146,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
       notas: valueOf('notas'),
       skipped: [],
       volvioAtras: false,
-      history: [{ estado: document.getElementById('estado').value, fecha: new Date().toISOString() }],
+      history: [{ estado: estadoInicial, fecha: new Date().toISOString() }],
     };
 
     jobsStore.update(jobs => [nuevo, ...jobs]);
@@ -98,11 +154,12 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
     form.reset();
     updateSalaryPlaceholder();
     datePicker?.setValue('');
+    renderEstadoInicial();
     showToast('Postulación agregada', '✓');
   });
 
   // ----------------------------------------------------------
-  // Filters
+  // Filtros: click
   // ----------------------------------------------------------
   document.getElementById('filters').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-filter]');

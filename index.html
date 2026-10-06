@@ -21,6 +21,12 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="icon-btn" id="configBtn" title="Configuración">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
       <button class="icon-btn" id="themeToggle" title="Cambiar tema">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="4"/>
@@ -55,21 +61,7 @@
       </div>
       <div class="field">
         <label for="estado">Estado inicial</label>
-        <select id="estado">
-          <option>Guardado</option>
-          <option selected>Aplicado</option>
-          <option>Contacto</option>
-          <option>Entrevista RRHH</option>
-          <option>Challenge técnico</option>
-          <option>Live coding</option>
-          <option>Entrevista Técnica</option>
-          <option>Entrevista con cliente</option>
-          <option>Charla con cliente</option>
-          <option>Entrevista Final</option>
-          <option>Referencias</option>
-          <option>Negociación</option>
-          <option>Oferta</option>
-        </select>
+        <select id="estado"></select>
       </div>
       <div class="field">
         <label for="link">Link de la oferta</label>
@@ -95,22 +87,7 @@
   </div>
 
   <div class="toolbar">
-    <div class="filters" id="filters">
-      <button data-filter="all" class="active">Todas</button>
-      <button data-filter="active">Activas</button>
-      <button data-filter="Guardado">Guardado</button>
-      <button data-filter="Aplicado">Aplicado</button>
-      <button data-filter="Contacto">Contacto</button>
-      <button data-filter="Entrevista RRHH">RRHH</button>
-      <button data-filter="Challenge técnico">Challenge</button>
-      <button data-filter="Live coding">Live coding</button>
-      <button data-filter="Entrevista Técnica">Técnica</button>
-      <button data-filter="Charla con cliente">Charla cliente</button>
-      <button data-filter="Referencias">Referencias</button>
-      <button data-filter="Negociación">Negociación</button>
-      <button data-filter="Oferta">Oferta</button>
-      <button data-filter="closed">Cerradas</button>
-    </div>
+    <div class="filters" id="filters"></div>
   </div>
 
   <div id="list"></div>
@@ -318,6 +295,129 @@
 
     <div class="modal-actions" style="margin-top:1.5rem;">
       <button class="btn btn-primary" id="closeHistoryBtn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Config modal -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal config-modal">
+    <button class="icon-btn config-close" id="closeConfigBtn" title="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <h2>
+      ⚙️ Configuración
+      <span class="unsaved-badge" id="configUnsavedBadge">Sin guardar</span>
+    </h2>
+    <p class="config-subtitle">Personalizá tu Job Tracker</p>
+
+    <div class="config-tabs">
+      <button class="config-tab active" data-tab="puestos">
+        <span>💼</span> Puestos
+      </button>
+      <button class="config-tab" data-tab="estados">
+        <span>🚩</span> Estados iniciales
+      </button>
+      <button class="config-tab" data-tab="filtros">
+        <span>🎛️</span> Filtros
+      </button>
+    </div>
+
+    <div class="config-body">
+      <!-- Panel: Puestos -->
+      <div class="config-panel active" data-panel="puestos">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Categorías</h3>
+            <p>Activá las categorías cuyos puestos quieras ver en el buscador.</p>
+          </div>
+          <div class="config-tags" id="configTags"></div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Agregar puesto personalizado</h3>
+          </div>
+          <div class="config-add-row">
+            <input type="text" id="configNewPuesto" placeholder="Ej: Rust Developer">
+            <button class="btn btn-primary" id="configAddPuesto">Agregar</button>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Puestos disponibles <span class="config-count" id="configPuestosCount"></span></h3>
+            <p>Quitá los que no quieras ver. Los personalizados se eliminan del todo.</p>
+          </div>
+          <div class="config-puestos-list" id="configPuestosList"></div>
+        </div>
+
+        <div class="config-section" id="configHiddenSection" style="display:none;">
+          <div class="config-section-head">
+            <h3>Puestos ocultos</h3>
+            <p>Restaurá los que quieras recuperar.</p>
+          </div>
+          <div class="config-puestos-list" id="configHiddenList"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Estados -->
+      <div class="config-panel" data-panel="estados">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Estados disponibles</h3>
+            <p>Elegí qué estados aparecen en el dropdown al crear una nueva postulación.</p>
+          </div>
+          <div class="config-checks" id="configEstados"></div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Estado por defecto</h3>
+            <p>El estado que viene seleccionado al crear una nueva postulación.</p>
+          </div>
+          <div class="config-default-estado" id="configDefaultEstado"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Filtros -->
+      <div class="config-panel" data-panel="filtros">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>Filtros de postulaciones</h3>
+            <p>Reordená con las flechas y mostrá/ocultá con el ojo. Los filtros fijos no se pueden eliminar.</p>
+          </div>
+          <div class="config-filtros" id="configFiltros"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-actions">
+      <button class="btn btn-ghost" id="resetConfigBtn">↺ Restablecer</button>
+      <div class="config-actions-right">
+        <button class="btn btn-ghost" id="cancelConfigBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveConfigBtn">💾 Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Unsaved changes modal -->
+<div class="modal-overlay nested" id="unsavedModal">
+  <div class="modal" style="max-width: 460px;">
+    <h2>⚠️ Cambios sin guardar</h2>
+    <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.75rem;">
+      Modificaste la configuración pero todavía no la guardaste.<br>
+      ¿Qué querés hacer?
+    </p>
+    <div class="unsaved-actions">
+      <button class="btn btn-ghost" id="unsavedCancel">Seguir editando</button>
+      <button class="btn btn-danger-ghost" id="unsavedDiscard">Descartar</button>
+      <button class="btn btn-primary" id="unsavedSave">Guardar y salir</button>
     </div>
   </div>
 </div>

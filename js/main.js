@@ -3,10 +3,14 @@
 // ============================================================
 
 import { Store } from './store.js';
-import { STORAGE_KEYS, STORAGE_VERSION, SAMPLE_JOBS } from './constants.js';
+import {
+  STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
+  SAMPLE_JOBS, getDefaultConfig,
+} from './constants.js';
 import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
 import { mountModalsController } from './controllers/modalsController.js';
+import { mountConfigController } from './controllers/configController.js';
 import { DatePicker } from './ui/datePicker.js';
 import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
@@ -34,7 +38,6 @@ const jobsStore = new Store(STORAGE_KEYS.JOBS, [], {
   version: STORAGE_VERSION,
   seed: () => SAMPLE_JOBS.map(j => ({ ...j })),
   migrate: (data, from, to) => {
-    // v0 (flat array) → v2
     if (Array.isArray(data)) {
       return data.map(j => ({
         ...j,
@@ -57,13 +60,17 @@ const refsStore = new Store(STORAGE_KEYS.REFS, [], {
       return data.map(r => ({
         ...r,
         estado: r.estado || 'Pendiente',
-        // Renombramos `linkedin` → `link` (compatibilidad con datos viejos)
         link: r.link ?? r.linkedin ?? '',
         empresasVinculadas: ensureArray(r.empresasVinculadas),
       }));
     }
     return data;
   },
+});
+
+const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
+  version: CONFIG_VERSION,
+  seed: () => getDefaultConfig(),
 });
 
 // ------------------------------------------------------------
@@ -75,6 +82,7 @@ const fechaPicker = new DatePicker(document.getElementById('fechaPicker'), {
 
 const puestoCombo = new PuestoCombo(document.getElementById('puestoCombo'), {
   getJobPuestos: () => jobsStore.get().map(j => j.puesto),
+  getConfig: () => configStore.get(),
 });
 
 const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
@@ -83,8 +91,9 @@ const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 // ------------------------------------------------------------
 // Controllers
 // ------------------------------------------------------------
-const modals = mountModalsController(jobsStore, refsStore);
-const jobsCtrl = mountJobsController(jobsStore, refsStore, modals, fechaPicker);
+mountConfigController(configStore);
+const modals = mountModalsController(jobsStore, refsStore, configStore);
+const jobsCtrl = mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore);
 const refsCtrl = mountRefsController(jobsStore, refsStore, modals);
 
 refsCtrl.initChips(refRelacionChips, refEstadoChips);

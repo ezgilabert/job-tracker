@@ -69,6 +69,23 @@ export const CLOSE_REASONS = {
   'Descartado': ['Me arrepentí', 'No me convenció la empresa', 'Pausé la búsqueda', 'La ubicación no servía'],
 };
 
+// ------------------------------------------------------------
+// Puestos: categorías / tags
+// ------------------------------------------------------------
+export const PUESTO_TAGS_LIST = [
+  { id: 'programador', label: 'Programador', icon: '💻' },
+  { id: 'frontend',    label: 'Frontend',    icon: '🎨' },
+  { id: 'backend',     label: 'Backend',     icon: '⚙️' },
+  { id: 'fullstack',   label: 'Full Stack',  icon: '🧩' },
+  { id: 'mobile',      label: 'Mobile',      icon: '📱' },
+  { id: 'qa',          label: 'QA',          icon: '🧪' },
+  { id: 'devops',      label: 'DevOps',      icon: '🚀' },
+  { id: 'data',        label: 'Data / IA',   icon: '📊' },
+  { id: 'security',    label: 'Seguridad',   icon: '🔒' },
+  { id: 'liderazgo',   label: 'Liderazgo',   icon: '👑' },
+  { id: 'gamedev',     label: 'Game Dev',    icon: '🎮' },
+];
+
 export const DEFAULT_PUESTOS = [
   'Software Engineer', 'Software Developer',
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
@@ -84,6 +101,43 @@ export const DEFAULT_PUESTOS = [
   'Tech Lead',
 ];
 
+export const PUESTO_TAGS = {
+  'Software Engineer':          ['programador'],
+  'Software Developer':         ['programador'],
+  'Frontend Developer':         ['programador', 'frontend'],
+  'Backend Developer':          ['programador', 'backend'],
+  'Full Stack Developer':       ['programador', 'fullstack'],
+  'Web Developer':              ['programador', 'frontend'],
+  'Mobile Developer':           ['programador', 'mobile'],
+  'iOS Developer':              ['programador', 'mobile'],
+  'Android Developer':          ['programador', 'mobile'],
+  'Java Developer':             ['programador', 'backend'],
+  'JavaScript Developer':       ['programador', 'frontend'],
+  'TypeScript Developer':       ['programador'],
+  'Python Developer':           ['programador', 'backend'],
+  'Node.js Developer':          ['programador', 'backend'],
+  'React Developer':            ['programador', 'frontend'],
+  'Angular Developer':          ['programador', 'frontend'],
+  'Vue.js Developer':           ['programador', 'frontend'],
+  '.NET Developer':             ['programador', 'backend'],
+  'PHP Developer':              ['programador', 'backend'],
+  'Go Developer':               ['programador', 'backend'],
+  'Ruby Developer':             ['programador', 'backend'],
+  'C++ Developer':              ['programador', 'backend'],
+  'Embedded Software Engineer': ['programador'],
+  'Game Developer':             ['programador', 'gamedev'],
+  'QA Automation Engineer':     ['qa'],
+  'DevOps Engineer':            ['devops'],
+  'SRE':                        ['devops'],
+  'Data Engineer':              ['data'],
+  'Machine Learning Engineer':  ['data'],
+  'AI Engineer':                ['data'],
+  'Security Engineer':          ['security'],
+  'Cloud Engineer':             ['devops'],
+  'Platform Engineer':          ['devops'],
+  'Tech Lead':                  ['liderazgo'],
+};
+
 export const PUESTO_ICONS = {
   'Frontend': '🎨', 'Backend': '⚙️', 'Full Stack': '🧩', 'Mobile': '📱',
   'QA': '🧪', 'DevOps': '🚀', 'SRE': '🛠️', 'Data': '📊',
@@ -95,13 +149,55 @@ export const PUESTO_ICONS = {
   'Platform': '🧱',
 };
 
+// ------------------------------------------------------------
+// Config: meta de filtros fijos
+// ------------------------------------------------------------
+export const CONFIG_FILTER_META = {
+  'all':    { label: 'Todas',    icon: '🗂️' },
+  'active': { label: 'Activas',  icon: '🔥' },
+  'closed': { label: 'Cerradas', icon: '📦' },
+};
+
+export function getDefaultConfig() {
+  return JSON.parse(JSON.stringify({
+    puestos: {
+      activeTags: PUESTO_TAGS_LIST.map(t => t.id),
+      hidden: [],
+      custom: [],
+    },
+    estadosIniciales: WORKFLOW_STEPS.map(s => s.id),
+    estadoInicialDefault: 'Aplicado',
+    filtros: [
+      { id: 'all',                visible: true },
+      { id: 'active',             visible: true },
+      { id: 'Guardado',           visible: true },
+      { id: 'Aplicado',           visible: true },
+      { id: 'Contacto',           visible: true },
+      { id: 'Entrevista RRHH',    visible: true },
+      { id: 'Challenge técnico',  visible: true },
+      { id: 'Live coding',        visible: true },
+      { id: 'Entrevista Técnica', visible: true },
+      { id: 'Charla con cliente', visible: true },
+      { id: 'Referencias',        visible: true },
+      { id: 'Negociación',        visible: true },
+      { id: 'Oferta',             visible: true },
+      { id: 'closed',             visible: true },
+    ],
+  }));
+}
+
+// ------------------------------------------------------------
+// Storage
+// ------------------------------------------------------------
 export const STORAGE_KEYS = {
   JOBS: 'jobTrackerV2',
   REFS: 'jobTrackerReferidos',
   THEME: 'jobTrackerTheme',
+  CONFIG: 'jobTrackerConfig',
 };
 
 export const STORAGE_VERSION = 2;
+export const CONFIG_VERSION = 1;
 
 export const SAMPLE_JOBS = [
   {

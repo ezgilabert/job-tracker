@@ -2,7 +2,7 @@
 // PuestoCombo: filterable role dropdown
 // ============================================================
 
-import { DEFAULT_PUESTOS, PUESTO_ICONS } from '../constants.js';
+import { DEFAULT_PUESTOS, PUESTO_TAGS, PUESTO_ICONS } from '../constants.js';
 import { escapeHtml } from '../utils.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
@@ -15,19 +15,38 @@ function getPuestoIcon(puesto) {
 }
 
 /**
- * @param {string[]} jobsPuestos  roles already used (shown as "Reciente")
- * @param {string} query
- * @param {string} currentValue
+ * Arma la lista de puestos según la config del usuario.
  */
-function getOptions(jobsPuestos, query) {
+export function getAvailablePuestos(config) {
+  if (!config || !config.puestos) return [...DEFAULT_PUESTOS];
+
+  const { activeTags = [], hidden = [], custom = [] } = config.puestos;
+  const activeSet = new Set(activeTags);
+  const hiddenSet = new Set(hidden);
+
+  const defaultsFiltrados = DEFAULT_PUESTOS.filter(p => {
+    if (hiddenSet.has(p)) return false;
+    if (activeSet.size === 0) return true;
+    const tags = PUESTO_TAGS[p] || [];
+    return tags.some(t => activeSet.has(t));
+  });
+
+  const customsFiltrados = custom.filter(p => !hiddenSet.has(p));
+
+  return [...customsFiltrados, ...defaultsFiltrados];
+}
+
+function getOptions(jobsPuestos, query, config) {
+  const disponibles = getAvailablePuestos(config);
+
   const usados = [...new Set(jobsPuestos.filter(p => p && DEVELOPER_ROLE.test(p)))];
-  const todos = [...new Set([...usados, ...DEFAULT_PUESTOS])];
+  const full = [...new Set([...usados, ...disponibles])];
 
   const q = query.toLowerCase().trim();
   let filtrados;
 
   if (q) {
-    filtrados = todos.filter(p => p.toLowerCase().includes(q));
+    filtrados = full.filter(p => p.toLowerCase().includes(q));
     filtrados.sort((a, b) => {
       const aLow = a.toLowerCase();
       const bLow = b.toLowerCase();
@@ -38,8 +57,8 @@ function getOptions(jobsPuestos, query) {
       return a.localeCompare(b);
     });
   } else {
-    const recientes = usados.filter(p => !DEFAULT_PUESTOS.includes(p));
-    filtrados = [...recientes, ...DEFAULT_PUESTOS];
+    const recientes = usados.filter(p => !disponibles.includes(p));
+    filtrados = [...recientes, ...disponibles];
   }
 
   return filtrados.slice(0, 40);
@@ -47,9 +66,10 @@ function getOptions(jobsPuestos, query) {
 
 export class PuestoCombo {
   /**
-   * @param {HTMLElement} comboEl  .combo container with input + .combo-dropdown
+   * @param {HTMLElement} comboEl
    * @param {{
    *   getJobPuestos?: () => string[],
+   *   getConfig?: () => object,
    *   onSelect?: (value:string) => void,
    * }} opts
    */
@@ -58,6 +78,7 @@ export class PuestoCombo {
     this.input = comboEl.querySelector('input');
     this.dropdown = comboEl.querySelector('.combo-dropdown');
     this.getJobPuestos = opts.getJobPuestos || (() => []);
+    this.getConfig = opts.getConfig || (() => null);
     this.onSelect = opts.onSelect || (() => {});
 
     this.open = false;
@@ -80,7 +101,6 @@ export class PuestoCombo {
     };
     document.addEventListener('click', this._outsideClick);
 
-    // Keep focus on the input so mousedown on an option still registers as a click
     this.dropdown.addEventListener('mousedown', (e) => e.preventDefault());
     this.dropdown.addEventListener('click', (e) => {
       const opt = e.target.closest('.combo-option');
@@ -116,7 +136,8 @@ export class PuestoCombo {
 
   renderOptions() {
     const query = this.input.value.trim();
-    const puestos = getOptions(this.getJobPuestos(), query);
+    const config = this.getConfig();
+    const puestos = getOptions(this.getJobPuestos(), query, config);
 
     if (puestos.length === 0) {
       this.dropdown.innerHTML = `
@@ -129,10 +150,11 @@ export class PuestoCombo {
     }
 
     const usados = new Set(this.getJobPuestos());
+    const disponibles = new Set(getAvailablePuestos(config));
     let html = '';
 
     puestos.forEach((p, idx) => {
-      const isReciente = usados.has(p) && !DEFAULT_PUESTOS.includes(p);
+      const isReciente = usados.has(p) && !disponibles.has(p);
       const icon = getPuestoIcon(p);
       const isSelected = this.input.value === p;
       const isHighlighted = idx === this.highlightedIdx;
@@ -140,7 +162,10 @@ export class PuestoCombo {
 
       if (isReciente && idx === 0) {
         html += `<div class="combo-section-label">Usados recientemente</div>`;
-      } else if (!isReciente && idx > 0 && usados.has(puestos[idx - 1]) && !DEFAULT_PUESTOS.includes(puestos[idx - 1])) {
+      } else if (
+        !isReciente && idx > 0 &&
+        usados.has(puestos[idx - 1]) && !disponibles.has(puestos[idx - 1])
+      ) {
         html += `<div class="combo-section-label">Sugeridos</div>`;
       }
 

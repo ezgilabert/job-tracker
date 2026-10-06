@@ -16,4 +16,18 @@
   .wf-btn-big { min-width: 100%; }
   .wf-btn-secondary, .wf-btn-skip { width: 100%; }
   .job .drag-handle { opacity: 0.6; }
+
+  /* Config modal */
+  .config-modal { padding: 1.25rem; }
+  .config-body { max-height: 50vh; }
+  .config-tab { font-size: 0.75rem; padding: 0.55rem 0.5rem; }
+  .config-tab span { display: none; }
+  .config-checks { grid-template-columns: 1fr; }
+  .config-actions { flex-direction: column-reverse; align-items: stretch; }
+  .config-actions .btn { width: 100%; }
+  .config-actions-right { flex-direction: column; margin-left: 0; width: 100%; }
+  .config-add-row { flex-direction: column; }
+  .config-add-row .btn { width: 100%; padding: 0.7rem; }
+  .unsaved-actions { flex-direction: column-reverse; }
+  .unsaved-actions .btn { width: 100%; }
 }
