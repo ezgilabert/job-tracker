@@ -40,6 +40,7 @@ const jobsStore = new Store(STORAGE_KEYS.JOBS, [], {
         ...j,
         contacto: j.contacto ?? '',
         skipped: ensureArray(j.skipped),
+        volvioAtras: Boolean(j.volvioAtras),
         history: Array.isArray(j.history) && j.history.length
           ? j.history
           : [{ estado: j.estado, fecha: new Date().toISOString() }],

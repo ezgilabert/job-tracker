@@ -8,6 +8,7 @@
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
+import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { PuestoCombo } from '../ui/combo.js';
 import { mountChips } from '../ui/chips.js';
@@ -81,7 +82,7 @@ export function mountModalsController(jobsStore, refsStore) {
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
 
-    // OJO: no tocamos `estado` ni `history` acá.
+    // OJO: no tocamos `estado`, `history` ni `volvioAtras` acá.
     // El estado solo se modifica desde los botones del workflow de la tarjeta.
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
@@ -246,7 +247,7 @@ export function mountModalsController(jobsStore, refsStore) {
     hideNote();
   });
 
-  // NUEVO: listener para la cruz (×)
+  // Listener para la cruz (×)
   document.getElementById('closeNoteModal').addEventListener('click', hideNote);
 
   noteModal.addEventListener('click', (e) => {
@@ -479,6 +480,7 @@ export function mountModalsController(jobsStore, refsStore) {
       contacto: r.nombre + (r.rol ? ` (${r.rol})` : ''),
       notas: `Referido por ${r.nombre}${r.notas ? '. ' + r.notas : ''}`,
       skipped: [],
+      volvioAtras: false,
       history: [{
         estado: 'Contacto',
         fecha: new Date().toISOString(),
@@ -541,16 +543,49 @@ export function mountModalsController(jobsStore, refsStore) {
     onAdvance: (id, opts = {}) => {
       const direction = opts.direction || 'next';
       if (direction === 'next') openNote(id, 'next', opts);
-      else applyPrev(id);
+      else confirmPrev(id);
     },
     onOpenRefEdit: openRefEdit,
     onRefToJob: openRefToJob,
   };
 
+  // ----------------------------------------------------------
+  // Advance previous (with confirmation, only once per job)
+  // ----------------------------------------------------------
+  async function confirmPrev(id) {
+    const j = jobsStore.get().find(x => x.id === id);
+    if (!j) return;
+
+    // Regla: solo se puede retroceder una vez por postulación
+    if (j.volvioAtras) {
+      showToast('Ya volviste atrás una vez en esta postulación', '!');
+      return;
+    }
+
+    const idx = stepIndex(j.estado);
+    if (idx <= 0) return;
+
+    const prevStep = WORKFLOW_STEPS[idx - 1];
+
+    const confirmed = await showConfirm({
+      title: '¿Volver a la etapa anterior?',
+      message:
+        `Vas a retroceder <strong>${escapeHtml(j.puesto)}</strong> · ${escapeHtml(j.empresa)} ` +
+        `de <strong>${escapeHtml(j.estado)}</strong> a <strong>${escapeHtml(prevStep.short)}</strong>.<br>` +
+        `<span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">` +
+        `⚠️ Solo podés volver atrás una vez por postulación.</span>`,
+      confirmText: 'Sí, volver',
+    });
+
+    if (!confirmed) return;
+    applyPrev(id);
+  }
+
   // Stepping backward skips the note modal
   function applyPrev(id) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
+    if (j.volvioAtras) return;
     const idx = stepIndex(j.estado);
     if (idx <= 0) return;
     const nuevoEstado = WORKFLOW_STEPS[idx - 1].id;
@@ -558,8 +593,8 @@ export function mountModalsController(jobsStore, refsStore) {
     jobsStore.update(jobs => jobs.map(x => {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
-      history.push({ estado: nuevoEstado, fecha: new Date().toISOString() });
-      return { ...x, estado: nuevoEstado, history };
+      history.push({ estado: nuevoEstado, fecha: new Date().toISOString(), retroceso: true });
+      return { ...x, estado: nuevoEstado, history, volvioAtras: true };
     }));
     showToast(`${j.empresa}: ${nuevoEstado}`, '←');
   }

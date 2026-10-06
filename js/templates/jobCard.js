@@ -130,14 +130,20 @@ function renderOpenActions(job, currentIdx) {
   const prevStep = canBack ? WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? WORKFLOW_STEPS[currentIdx + 1] : null;
   const isOffer = job.estado === 'Oferta';
+  const yaVolvio = Boolean(job.volvioAtras);
 
   const mainBtn = nextStep
     ? `<button class="wf-btn-big" data-action="move-next">Avanzar a "${escapeHtml(nextStep.short)}"</button>`
     : `<button class="wf-btn-big success" data-action="close-offer">Confirmar Oferta</button>`;
 
-  const backBtn = prevStep
-    ? `<button class="wf-btn-secondary" data-action="move-prev" title="Volver a ${escapeHtml(prevStep.short)}">Volver a "${escapeHtml(prevStep.short)}"</button>`
-    : `<button class="wf-btn-secondary" disabled title="Ya estás en el primer paso">Primer paso</button>`;
+  let backBtn;
+  if (prevStep && !yaVolvio) {
+    backBtn = `<button class="wf-btn-secondary" data-action="move-prev" title="Volver a ${escapeHtml(prevStep.short)}">Volver a "${escapeHtml(prevStep.short)}"</button>`;
+  } else if (prevStep && yaVolvio) {
+    backBtn = `<button class="wf-btn-secondary" disabled title="Ya volviste atrás una vez en esta postulación">Volver a "${escapeHtml(prevStep.short)}"</button>`;
+  } else {
+    backBtn = `<button class="wf-btn-secondary" disabled title="Ya estás en el primer paso">Primer paso</button>`;
+  }
 
   const skipBtn = nextStep
     ? `<button class="wf-btn-skip" data-action="skip-step" title="Esta etapa no aplica, pasar a la siguiente">No aplica</button>`
