@@ -16,7 +16,7 @@ import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
 import { ensureArray } from './utils.js';
 import { applyI18n, setLanguage, getLanguage } from './i18n.js';
-import { requireSession, logout } from './auth/session.js';
+import { requireSession, logout, getSession } from './auth/session.js';
 
 // ------------------------------------------------------------
 // Session guard: bounce to the login screen when unauthenticated.
@@ -53,15 +53,67 @@ function boot() {
   }
 
   // ----------------------------------------------------------
-  // Logout button
+  // User menu: dropdown with account info + logout
   // ----------------------------------------------------------
-  function mountLogout() {
-    const btn = document.getElementById('logoutBtn');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-      logout();
-      window.location.replace('./login.html');
+  function mountUserMenu() {
+    const menu = document.getElementById('userMenu');
+    const btn = document.getElementById('userBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (!menu || !btn) return;
+
+    // ----- Fill session data into the dropdown -----
+    const session = getSession() || {};
+    const nameEl = document.getElementById('userMenuName');
+    const emailEl = document.getElementById('userMenuEmail');
+    const avatarEl = document.getElementById('userMenuAvatar');
+
+    const displayName = session.name
+      || (session.email ? session.email.split('@')[0] : 'User');
+    const displayEmail = session.guest
+      ? 'Guest session'
+      : (session.email || '');
+
+    if (nameEl) nameEl.textContent = displayName;
+    if (emailEl) emailEl.textContent = displayEmail;
+    if (avatarEl) {
+      const initials = displayName
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(w => w[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase() || 'U';
+      avatarEl.textContent = initials;
+    }
+
+    // ----- Toggle dropdown -----
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('open');
     });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (menu.classList.contains('open') && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) {
+        menu.classList.remove('open');
+      }
+    });
+
+    // ----- Logout -----
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        logout();
+        window.location.replace('./login.html');
+      });
+    }
   }
 
   // ----------------------------------------------------------
@@ -154,7 +206,7 @@ function boot() {
   refsCtrl.initChips(refRelacionChips, refEstadoChips);
 
   mountTheme();
-  mountLogout();
+  mountUserMenu();
 
   // ----------------------------------------------------------
   // Re-render dynamic controllers on language change

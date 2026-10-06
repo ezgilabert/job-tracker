@@ -38,6 +38,7 @@ const translations = {
     'auth.showPassword': 'Mostrar contraseña',
     'auth.guest': 'Continuar sin cuenta',
     'auth.logout': 'Cerrar sesión',
+    'auth.account': 'Cuenta',
 
     // Stats
     'stats.total': 'Total',
@@ -414,6 +415,7 @@ const translations = {
     'auth.showPassword': 'Show password',
     'auth.guest': 'Continue without an account',
     'auth.logout': 'Sign out',
+    'auth.account': 'Account',
 
     'stats.total': 'Total',
     'stats.active': 'Active',
