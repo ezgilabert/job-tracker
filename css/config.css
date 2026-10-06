@@ -530,6 +530,35 @@
 }
 
 /* ============================================================
+   Modal: Cambios sin guardar — layout con cruz de cierre
+   ============================================================ */
+
+.unsaved-modal {
+  position: relative;
+}
+
+.unsaved-modal h2 {
+  padding-right: 2.5rem; /* espacio para la cruz */
+}
+
+.unsaved-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.unsaved-close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* ============================================================
    Panel: Apariencia — selector de logo
    ============================================================ */
 

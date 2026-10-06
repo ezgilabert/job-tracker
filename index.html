@@ -512,13 +512,22 @@
 
 <!-- Unsaved changes modal -->
 <div class="modal-overlay nested" id="unsavedModal">
-  <div class="modal" style="max-width: 460px;">
+  <div class="modal unsaved-modal" style="max-width: 460px;">
+
+    <!-- Close (top-right) -->
+    <button class="icon-btn unsaved-close" id="unsavedCloseBtn"
+            title="Cerrar" data-i18n-title="modal.close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
     <h2 data-i18n="unsaved.title">⚠️ Cambios sin guardar</h2>
     <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.75rem;" data-i18n-html="unsaved.message">
       Modificaste la configuración pero todavía no la guardaste.<br>¿Qué querés hacer?
     </p>
     <div class="unsaved-actions">
-      <button class="btn btn-ghost" id="unsavedCancel" data-i18n="unsaved.keep">Seguir editando</button>
       <button class="btn btn-danger-ghost" id="unsavedDiscard" data-i18n="unsaved.discard">Descartar</button>
       <button class="btn btn-primary" id="unsavedSave" data-i18n="unsaved.save">Guardar y salir</button>
     </div>

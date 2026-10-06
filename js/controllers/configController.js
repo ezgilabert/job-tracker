@@ -127,7 +127,7 @@ export function mountConfigController(configStore) {
   });
 
   // Modal unsaved
-  document.getElementById('unsavedCancel').addEventListener('click', () => {
+  document.getElementById('unsavedCloseBtn').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
   });
   document.getElementById('unsavedDiscard').addEventListener('click', () => {
