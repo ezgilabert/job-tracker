@@ -1,0 +1,208 @@
+/* ============================================================
+   DatePicker: selector de fecha custom
+   ============================================================ */
+
+.date-picker { position: relative; }
+
+.date-trigger {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .date-trigger { background: var(--bg-1); }
+
+.date-trigger:hover { border-color: var(--border-strong); }
+.date-trigger.empty { color: var(--text-dim); }
+.date-trigger.open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.date-trigger .icon {
+  font-size: 0.9rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.date-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  padding: 0.85rem;
+  width: 280px;
+  display: none;
+  animation: popIn 0.15s ease;
+}
+
+[data-theme="dark"] .date-popover { background: var(--bg-2); }
+.date-popover.open { display: block; }
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.dp-month {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.dp-nav { display: flex; gap: 0.25rem; }
+
+.dp-nav button {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.dp-nav button:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.dp-nav button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dp-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 0.35rem;
+}
+
+.dp-weekdays span {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0;
+}
+
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.dp-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.12s ease;
+  position: relative;
+}
+
+.dp-day:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); }
+.dp-day.other-month { color: var(--text-dim); opacity: 0.4; }
+.dp-day.today { font-weight: 800; color: var(--accent); }
+
+.dp-day.today::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.dp-day.future {
+  color: var(--text-dim);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.dp-day.future:hover {
+  background: transparent;
+  color: var(--text-dim);
+}
+
+.dp-day.selected {
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.dp-day.selected::after { background: white; }
+
+.dp-shortcuts {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--border);
+  flex-wrap: wrap;
+}
+
+.dp-shortcuts button {
+  flex: 1;
+  min-width: 60px;
+  padding: 0.4rem 0.5rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dp-shortcuts button:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}

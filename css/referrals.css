@@ -1,0 +1,736 @@
+/* ============================================================
+   Referrals: sección completa de referidos
+   + tags de referidos en tarjetas de jobs
+   ============================================================ */
+
+.referidos-section {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.referidos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.referidos-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.referidos-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.referidos-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ref-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.7rem;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--accent-border);
+}
+
+.referidos-body {
+  max-height: 8000px;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.referidos-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.ref-form-card {
+  margin-bottom: 1.5rem;
+}
+
+.ref-form-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+  color: var(--text);
+}
+
+.ref-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ref-chip {
+  padding: 0.5rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ref-chip:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.ref-chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+/* Referral status chips */
+.ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
+  background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
+}
+.ref-estado-chips .ref-chip.selected[data-value="Contactado"] {
+  background: var(--info); border-color: var(--info); box-shadow: 0 3px 10px rgba(59,130,246,0.35);
+}
+.ref-estado-chips .ref-chip.selected[data-value="Me va a referir"] {
+  background: #06b6d4; border-color: #06b6d4; box-shadow: 0 3px 10px rgba(6,182,212,0.35);
+}
+.ref-estado-chips .ref-chip.selected[data-value="Referido hecho"] {
+  background: var(--accent); border-color: var(--accent); box-shadow: 0 3px 10px var(--accent-glow);
+}
+.ref-estado-chips .ref-chip.selected[data-value="En proceso"] {
+  background: var(--warning); border-color: var(--warning); box-shadow: 0 3px 10px rgba(245,158,11,0.35);
+}
+.ref-estado-chips .ref-chip.selected[data-value="Contratado"] {
+  background: var(--success); border-color: var(--success); box-shadow: 0 3px 10px rgba(16,185,129,0.35);
+}
+.ref-estado-chips .ref-chip.selected[data-value="No aplica"] {
+  background: var(--danger); border-color: var(--danger); box-shadow: 0 3px 10px rgba(239,68,68,0.35);
+}
+
+.ref-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ref-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 380px;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.ref-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.ref-search svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  stroke-width: 2;
+}
+
+.ref-search input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.ref-search input:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.ref-filters {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.35rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.ref-filters button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.ref-filters button:hover { color: var(--text); background: var(--surface-soft); }
+.ref-filters button.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+#refList { display: grid; gap: 0.75rem; }
+
+.referido {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.1rem 1.35rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .referido {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.referido::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+}
+
+.referido[data-relacion="Amigo"]::before { background: linear-gradient(180deg, #fb923c, #f97316); }
+.referido[data-relacion="Ex-colega"]::before { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
+.referido[data-relacion="Familiar"]::before { background: linear-gradient(180deg, #f472b6, #ec4899); }
+.referido[data-relacion="Conocido"]::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
+.referido[data-relacion="Recruiter"]::before { background: linear-gradient(180deg, #34d399, #10b981); }
+.referido[data-relacion="Mentor"]::before { background: linear-gradient(180deg, #facc15, #eab308); }
+
+.referido:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+}
+
+.ref-body { flex: 1; min-width: 0; }
+
+.ref-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.ref-top h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.ref-relacion-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.referido[data-relacion="Amigo"] .ref-relacion-badge { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.referido[data-relacion="Ex-colega"] .ref-relacion-badge { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
+.referido[data-relacion="Familiar"] .ref-relacion-badge { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+.referido[data-relacion="Conocido"] .ref-relacion-badge { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.referido[data-relacion="Recruiter"] .ref-relacion-badge { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
+.referido[data-relacion="Mentor"] .ref-relacion-badge { background: #fefce8; color: #a16207; border-color: #fef08a; }
+
+[data-theme="dark"] .referido[data-relacion="Amigo"] .ref-relacion-badge { background: rgba(249,115,22,0.16); color: #fb923c; border-color: transparent; }
+[data-theme="dark"] .referido[data-relacion="Ex-colega"] .ref-relacion-badge { background: var(--info-soft); color: #60a5fa; border-color: transparent; }
+[data-theme="dark"] .referido[data-relacion="Familiar"] .ref-relacion-badge { background: rgba(236,72,153,0.16); color: #f472b6; border-color: transparent; }
+[data-theme="dark"] .referido[data-relacion="Conocido"] .ref-relacion-badge { background: rgba(124,58,237,0.16); color: #a78bfa; border-color: transparent; }
+[data-theme="dark"] .referido[data-relacion="Recruiter"] .ref-relacion-badge { background: var(--success-soft); color: #34d399; border-color: transparent; }
+[data-theme="dark"] .referido[data-relacion="Mentor"] .ref-relacion-badge { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
+
+/* ===== Referral status badge ===== */
+.ref-estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.ref-estado-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.ref-estado-badge[data-estado="Pendiente"] {
+  background: #f1f5f9; color: #64748b; border-color: #e2e8f0;
+}
+.ref-estado-badge[data-estado="Contactado"] {
+  background: var(--info-soft); color: var(--info-2); border-color: var(--info-border);
+}
+.ref-estado-badge[data-estado="Me va a referir"] {
+  background: #ecfeff; color: #0891b2; border-color: #cffafe;
+}
+.ref-estado-badge[data-estado="Referido hecho"] {
+  background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border);
+}
+.ref-estado-badge[data-estado="En proceso"] {
+  background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border);
+}
+.ref-estado-badge[data-estado="Contratado"] {
+  background: var(--success-soft); color: var(--success-2); border-color: var(--success-border);
+}
+.ref-estado-badge[data-estado="No aplica"] {
+  background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border);
+}
+
+[data-theme="dark"] .ref-estado-badge { border-color: transparent; }
+[data-theme="dark"] .ref-estado-badge[data-estado="Pendiente"] { background: rgba(100,116,139,0.18); color: #94a3b8; }
+[data-theme="dark"] .ref-estado-badge[data-estado="Contactado"] { background: var(--info-soft); color: #60a5fa; }
+[data-theme="dark"] .ref-estado-badge[data-estado="Me va a referir"] { background: rgba(6,182,212,0.16); color: #22d3ee; }
+[data-theme="dark"] .ref-estado-badge[data-estado="Referido hecho"] { background: var(--accent-soft); color: #a78bfa; }
+[data-theme="dark"] .ref-estado-badge[data-estado="En proceso"] { background: var(--warning-soft); color: #fbbf24; }
+[data-theme="dark"] .ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: #34d399; }
+[data-theme="dark"] .ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: #f87171; }
+
+/* ===== Referral workflow ===== */
+.ref-workflow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+
+.ref-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+.ref-steps::-webkit-scrollbar { height: 4px; }
+.ref-steps::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+.ref-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  position: relative;
+  min-width: 84px;
+}
+
+.ref-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  transition: all 0.25s ease;
+  z-index: 2;
+}
+
+[data-theme="dark"] .ref-step-dot { background: var(--bg-1); }
+
+.ref-step-line {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--border-strong);
+  z-index: 1;
+}
+
+.ref-step:last-child .ref-step-line { display: none; }
+
+.ref-step-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  max-width: 84px;
+}
+
+.ref-step.done .ref-step-dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+.ref-step.done .ref-step-line {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: 0.6;
+}
+
+.ref-step.current .ref-step-dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: white;
+  color: white;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px var(--accent-soft-2), 0 0 12px var(--accent-glow);
+}
+
+.ref-step.current .ref-step-label { color: var(--accent); font-weight: 700; }
+.ref-step.done .ref-step-label { color: var(--text-muted); }
+
+.ref-step[data-step="Contratado"].done .ref-step-dot,
+.ref-step[data-step="Contratado"].current .ref-step-dot {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  box-shadow: 0 0 0 3px rgba(52,211,153,0.2), 0 0 12px rgba(52,211,153,0.4);
+}
+
+.ref-step[data-step="No aplica"].done .ref-step-dot,
+.ref-step[data-step="No aplica"].current .ref-step-dot {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.2), 0 0 12px rgba(239,68,68,0.4);
+}
+
+.ref-wf-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ref-wf-btn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ref-wf-btn:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.ref-wf-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ref-wf-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+.ref-wf-btn.primary:hover:not(:disabled) {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: white;
+  box-shadow: 0 5px 14px var(--accent-glow);
+}
+
+.ref-wf-btn.success {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+  box-shadow: 0 3px 10px rgba(16,185,129,0.3);
+}
+.ref-wf-btn.success:hover:not(:disabled) {
+  background: var(--success-2);
+  box-shadow: 0 5px 14px rgba(16,185,129,0.4);
+}
+
+.ref-wf-btn.danger {
+  color: var(--danger-2);
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+.ref-wf-btn.danger:hover:not(:disabled) {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+/* ===== Empresas vinculadas (chips) ===== */
+.ref-empresas-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  min-height: 46px;
+  align-items: center;
+}
+
+.ref-empresas-wrap .ref-empresa-empty {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.ref-empresa-chip {
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ref-empresa-chip:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.ref-empresa-chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+.ref-empresa-chip.selected::before {
+  content: '✓';
+  font-size: 0.7rem;
+}
+
+.ref-empresas-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.ref-empresa-tag {
+  padding: 0.22rem 0.6rem;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ref-empresa-tag:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.ref-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.ref-meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+.ref-meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.ref-meta a:hover { opacity: 0.75; }
+
+.ref-notas {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--accent-border);
+  margin-top: 0.5rem;
+}
+
+.ref-actions {
+  display: flex;
+  gap: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.referido:hover .ref-actions { opacity: 1; }
+
+@media (max-width: 640px) {
+  .ref-actions { opacity: 1; }
+  .ref-toolbar { flex-direction: column; align-items: stretch; }
+  .ref-search { max-width: 100%; }
+}
+
+/* ===== Referral tags on jobs ===== */
+.job-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.6rem 0.85rem;
+  background: linear-gradient(135deg, var(--accent-soft), transparent);
+  border: 1px dashed var(--accent-border);
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+.job-refs-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.job-refs-label::before {
+  content: '🤝';
+  font-size: 0.85rem;
+}
+
+.job-ref-chip {
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--accent-border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.job-ref-chip:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.job-ref-chip .job-ref-estado-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  flex-shrink: 0;
+}
+
+.job-ref-chip[data-estado="Pendiente"] .job-ref-estado-dot { background: #64748b; box-shadow: 0 0 6px #64748b; }
+.job-ref-chip[data-estado="Contactado"] .job-ref-estado-dot { background: var(--info); box-shadow: 0 0 6px var(--info); }
+.job-ref-chip[data-estado="Me va a referir"] .job-ref-estado-dot { background: #06b6d4; box-shadow: 0 0 6px #06b6d4; }
+.job-ref-chip[data-estado="Referido hecho"] .job-ref-estado-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.job-ref-chip[data-estado="En proceso"] .job-ref-estado-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.job-ref-chip[data-estado="Contratado"] .job-ref-estado-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.job-ref-chip[data-estado="No aplica"] .job-ref-estado-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); }

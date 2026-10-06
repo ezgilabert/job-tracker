@@ -1,0 +1,394 @@
+/* ============================================================
+   Workflow: steps, progress, acciones, step-note
+   ============================================================ */
+
+.workflow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+}
+
+.workflow.closed { padding-top: 0.75rem; }
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.steps::-webkit-scrollbar { height: 4px; }
+.steps::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  position: relative;
+  min-width: 76px;
+}
+
+.step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  transition: all 0.25s ease;
+  z-index: 2;
+}
+
+[data-theme="dark"] .step-dot { background: var(--bg-1); }
+
+.step-line {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--border-strong);
+  z-index: 1;
+}
+
+.step:last-child .step-line { display: none; }
+
+.step-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition: color 0.25s ease;
+  line-height: 1.2;
+  max-width: 76px;
+}
+
+.step.done .step-dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+.step.done .step-line {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: 0.6;
+}
+
+.step.current .step-dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: white;
+  color: white;
+  transform: scale(1.18);
+  box-shadow: 0 0 0 4px var(--accent-soft-2), 0 0 16px var(--accent-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+[data-theme="dark"] .step.current .step-dot {
+  border-color: rgba(255,255,255,0.4);
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 0 22px var(--accent-glow);
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--accent-soft-2), 0 0 16px var(--accent-glow); }
+  50% { box-shadow: 0 0 0 6px rgba(124,92,255,0.12), 0 0 22px var(--accent-glow); }
+}
+
+.step.current .step-label { color: var(--accent); font-weight: 700; }
+.step.done .step-label { color: var(--text-muted); }
+
+.step.skipped .step-dot {
+  background: var(--surface-soft);
+  border-style: dashed;
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+  opacity: 0.7;
+}
+
+.step.skipped .step-label {
+  text-decoration: line-through;
+  opacity: 0.5;
+  color: var(--text-dim);
+}
+
+.step.skipped .step-line {
+  background: repeating-linear-gradient(
+    to right,
+    var(--border-strong) 0,
+    var(--border-strong) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+.step[data-step="Oferta"].done .step-dot,
+.step[data-step="Oferta"].current .step-dot {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  box-shadow: 0 0 0 4px rgba(52,211,153,0.2), 0 0 14px rgba(52,211,153,0.4);
+}
+
+/* ===== Progress ===== */
+.workflow-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.status-text strong { color: var(--text); font-weight: 700; }
+
+.progress-bar {
+  flex: 1;
+  min-width: 120px;
+  height: 8px;
+  background: var(--surface-soft);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+  background-size: 200% 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+  animation: shimmer 3s linear infinite;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* ===== Workflow actions ===== */
+.wf-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.wf-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wf-main-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.wf-btn-big {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.9rem 1.35rem;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 12px var(--accent-glow);
+  letter-spacing: 0.01em;
+}
+
+.wf-btn-big:hover:not(:disabled) {
+  background: var(--accent-2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--accent-glow);
+}
+
+.wf-btn-big:active:not(:disabled) { transform: translateY(0); }
+
+.wf-btn-big.success {
+  background: var(--success);
+  box-shadow: 0 3px 12px rgba(16,185,129,0.3);
+}
+
+.wf-btn-big.success:hover:not(:disabled) {
+  background: var(--success-2);
+  box-shadow: 0 6px 18px rgba(16,185,129,0.4);
+}
+
+.wf-btn-secondary {
+  padding: 0.9rem 1.15rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.wf-btn-secondary:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.wf-btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wf-btn-skip {
+  padding: 0.9rem 1.15rem;
+  border-radius: 12px;
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.wf-btn-skip:hover {
+  border-color: var(--accent-border);
+  border-style: solid;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.wf-close-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+
+.wf-close-actions .wf-section-label {
+  margin-right: 0.25rem;
+}
+
+.wf-close-btn {
+  padding: 0.55rem 0.95rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.wf-close-btn:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.wf-close-btn.offer {
+  color: var(--success-2);
+  border-color: var(--success-border);
+  background: var(--success-soft);
+}
+
+.wf-close-btn.offer:hover {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+  box-shadow: 0 6px 16px rgba(16,185,129,0.35);
+}
+
+.wf-close-btn.reject {
+  color: var(--danger-2);
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.wf-close-btn.reject:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+  box-shadow: 0 6px 16px rgba(239,68,68,0.35);
+}
+
+/* ===== Step note (PD) ===== */
+.step-note {
+  margin-top: 0.65rem;
+  padding: 0.7rem 0.95rem;
+  background: linear-gradient(135deg, var(--warning-soft), transparent);
+  border: 1px dashed var(--warning-border);
+  border-radius: 10px;
+  font-size: 0.84rem;
+  color: var(--text);
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.step-note .pd-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--warning-2);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.step-note .pd-text {
+  flex: 1;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.4;
+}

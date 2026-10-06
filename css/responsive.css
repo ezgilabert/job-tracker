@@ -1,0 +1,19 @@
+/* ============================================================
+   Responsive: media queries globales
+   ============================================================ */
+
+@media (max-width: 640px) {
+  body { padding: 1.25rem 0.75rem 3rem; }
+  .brand h1 { font-size: 1.25rem; }
+  .stat .num { font-size: 1.6rem; }
+  .modal .form-grid { grid-template-columns: 1fr; }
+  .job { padding: 1rem; }
+  .job-actions { opacity: 1; }
+  .form-card { padding: 1.25rem; }
+  .step { min-width: 66px; }
+  .step-label { font-size: 0.56rem; max-width: 66px; }
+  .date-popover { width: 260px; }
+  .wf-btn-big { min-width: 100%; }
+  .wf-btn-secondary, .wf-btn-skip { width: 100%; }
+  .job .drag-handle { opacity: 0.6; }
+}

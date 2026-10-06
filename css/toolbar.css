@@ -1,0 +1,52 @@
+/* ============================================================
+   Toolbar: filtros de postulaciones
+   ============================================================ */
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.35rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .filters {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.filters button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.filters button:hover { color: var(--text); background: var(--surface-soft); }
+
+.filters button.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+.toolbar-actions { display: flex; gap: 0.5rem; }
