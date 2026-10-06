@@ -503,7 +503,7 @@ export function mountConfigController(configStore) {
         <button type="button"
                 class="config-lang-option ${selected ? 'selected' : ''}"
                 data-lang="${escapeHtml(lang.id)}">
-          <div class="config-lang-flag">${lang.flag}</div>
+          <div class="config-lang-flag">${escapeHtml(lang.code)}</div>
           <div class="config-lang-info">
             <strong>${escapeHtml(lang.label)}</strong>
             <span>${escapeHtml(lang.hint)}</span>

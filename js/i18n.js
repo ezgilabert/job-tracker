@@ -3,8 +3,8 @@
 // ============================================================
 
 export const SUPPORTED_LANGS = [
-  { id: 'es', label: 'Español',  flag: '🇦🇷', hint: 'Interfaz en español' },
-  { id: 'en', label: 'English',  flag: '🇬🇧', hint: 'Interface in English' },
+  { id: 'es', label: 'Español',  code: 'ES', hint: 'Interfaz en español' },
+  { id: 'en', label: 'English',  code: 'EN', hint: 'Interface in English' },
 ];
 
 const translations = {
