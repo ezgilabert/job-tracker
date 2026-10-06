@@ -1,0 +1,289 @@
+/* ============================================================
+   History: botón 🕒 + status clickeable + timeline de etapas
+   ============================================================ */
+
+/* ===== Botón 🕒 en las acciones de la tarjeta ===== */
+.action-btn.history {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  position: relative;
+}
+
+.action-btn.history:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.action-btn.history::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.action-btn.history:hover::after {
+  background: white;
+  box-shadow: 0 0 6px rgba(255,255,255,0.8);
+}
+
+/* ===== Status clickeable (reemplaza al status-text) ===== */
+.status-clickable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 9px;
+  background: transparent;
+  border: 1px dashed var(--accent-border);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.status-clickable strong {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.status-clickable:hover {
+  background: var(--accent-soft);
+  border-style: solid;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* ===== Modal de historial ===== */
+.history-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  margin-top: -0.5rem;
+}
+
+.history-subtitle strong { color: var(--text); font-weight: 700; }
+
+.history-timeline {
+  position: relative;
+  padding-left: 44px;
+  margin-top: 0.5rem;
+}
+
+.history-timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 14px;
+  bottom: 14px;
+  width: 2px;
+  background: linear-gradient(180deg,
+    var(--accent-border) 0%,
+    var(--border-strong) 60%,
+    transparent 100%);
+  border-radius: 2px;
+}
+
+.history-item {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.history-item:last-child { margin-bottom: 0; }
+
+.history-dot {
+  position: absolute;
+  left: -44px;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  color: var(--text-dim);
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .history-dot { background: var(--bg-2); }
+
+.history-item.current .history-dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 3px 12px var(--accent-glow);
+}
+
+.history-item.retroceso .history-dot {
+  background: var(--warning-soft);
+  border-color: var(--warning-border);
+  color: var(--warning-2);
+}
+
+.history-item.closed-rechazado .history-dot,
+.history-item.closed-ghosted .history-dot,
+.history-item.closed-descartado .history-dot {
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+  color: var(--danger-2);
+}
+
+.history-item.closed-oferta .history-dot {
+  background: var(--success-soft);
+  border-color: var(--success-border);
+  color: var(--success-2);
+}
+
+.history-content {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.history-item.current .history-content {
+  border-color: var(--accent-border);
+  background: linear-gradient(135deg, var(--accent-soft), transparent);
+}
+
+.history-estado {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.history-fecha {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+.history-motivo {
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--danger-soft);
+  border-left: 3px solid var(--danger);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text);
+}
+
+.history-nota {
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--warning-soft);
+  border-left: 3px solid var(--warning);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.history-nota strong {
+  color: var(--warning-2);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 0.3rem;
+}
+
+.history-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.55rem;
+  border-radius: 20px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.history-tag.current {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.history-tag.retroceso {
+  background: var(--warning-soft);
+  color: var(--warning-2);
+  border-color: var(--warning-border);
+}
+
+.history-tag.cerrada {
+  background: var(--danger-soft);
+  color: var(--danger-2);
+  border-color: var(--danger-border);
+}
+
+.history-tag.oferta {
+  background: var(--success-soft);
+  color: var(--success-2);
+  border-color: var(--success-border);
+}
+
+[data-theme="dark"] .history-tag { border-color: transparent; }
+
+.history-skipped {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.history-skipped-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 0.6rem;
+}
+
+.history-skipped-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.history-skipped-tag {
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: line-through;
+  text-decoration-color: var(--text-dim);
+  opacity: 0.75;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-style: italic;
+}

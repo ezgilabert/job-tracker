@@ -38,6 +38,19 @@ export function formatFecha(fecha) {
   });
 }
 
+export function formatFechaHora(fechaISO) {
+  if (!fechaISO) return '';
+  const d = new Date(fechaISO);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export function todayISO() {
   const d = new Date();
   const off = d.getTimezoneOffset() * 60000;

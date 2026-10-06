@@ -21,6 +21,35 @@ export const WORKFLOW_STEPS = [
 export const CLOSED_STATES = ['Rechazado', 'Ghosted', 'Descartado'];
 export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 
+// ------------------------------------------------------------
+// Iconos por estado (para historial y otras vistas)
+// ------------------------------------------------------------
+export const ESTADO_ICONS = {
+  'Guardado':                '🔖',
+  'Aplicado':                '📤',
+  'Contacto':                '💬',
+  'Entrevista RRHH':         '👤',
+  'Challenge técnico':       '🧪',
+  'Live coding':             '⌨️',
+  'Entrevista Técnica':      '💻',
+  'Entrevista con cliente':  '🤝',
+  'Charla con cliente':      '☕',
+  'Entrevista Final':        '🎤',
+  'Referencias':             '📞',
+  'Negociación':             '💼',
+  'Oferta':                  '🎉',
+  'Rechazado':               '✕',
+  'Ghosted':                 '👻',
+  'Descartado':              '🚫',
+};
+
+export function getEstadoIcon(estado) {
+  return ESTADO_ICONS[estado] || '•';
+}
+
+// ------------------------------------------------------------
+// Referrals
+// ------------------------------------------------------------
 export const REF_WORKFLOW_STEPS = [
   { id: 'Pendiente',       short: 'Pendiente' },
   { id: 'Contactado',      short: 'Contactado' },
@@ -86,12 +115,13 @@ export const SAMPLE_JOBS = [
     contacto: 'Sofía Ramírez (Tech Recruiter)',
     notas: 'Segunda ronda agendada para el jueves. Me entrevista el tech lead del equipo de DX.',
     skipped: ['Challenge técnico'],
+    volvioAtras: false,
     history: [
       { estado: 'Guardado',           fecha: new Date(Date.now() - 14 * 86400000).toISOString() },
       { estado: 'Aplicado',           fecha: new Date(Date.now() - 11 * 86400000).toISOString() },
-      { estado: 'Contacto',           fecha: new Date(Date.now() - 8 * 86400000).toISOString() },
+      { estado: 'Contacto',           fecha: new Date(Date.now() - 8 * 86400000).toISOString(), nota: 'Me escribió Sofía por LinkedIn.' },
       { estado: 'Entrevista RRHH',    fecha: new Date(Date.now() - 6 * 86400000).toISOString() },
-      { estado: 'Challenge técnico',  fecha: new Date(Date.now() - 4 * 86400000).toISOString() },
+      { estado: 'Challenge técnico',  fecha: new Date(Date.now() - 4 * 86400000).toISOString(), nota: 'Revisar el challenge, es una SPA con React.' },
       { estado: 'Live coding',        fecha: new Date(Date.now() - 1 * 86400000).toISOString() },
     ],
   },
@@ -106,6 +136,7 @@ export const SAMPLE_JOBS = [
     contacto: 'Martín Acosta (Hiring Manager)',
     notas: 'Apliqué por LinkedIn. Sin respuesta aún.',
     skipped: [],
+    volvioAtras: false,
     history: [
       { estado: 'Aplicado', fecha: new Date(Date.now() - 12 * 86400000).toISOString() },
     ],
@@ -121,6 +152,7 @@ export const SAMPLE_JOBS = [
     contacto: 'Lucía Fernández (Talent Acquisition)',
     notas: 'Me pasaron la propuesta económica. Estoy negociando el bono y días de vacaciones.',
     skipped: ['Challenge técnico', 'Charla con cliente'],
+    volvioAtras: false,
     history: [
       { estado: 'Aplicado',                fecha: new Date(Date.now() - 20 * 86400000).toISOString() },
       { estado: 'Entrevista RRHH',         fecha: new Date(Date.now() - 16 * 86400000).toISOString() },

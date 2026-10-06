@@ -19,7 +19,7 @@ import { uid, todayISO, cloneArray, bindHourlySalaryPlaceholder } from '../utils
 /**
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
- * @param {{ onOpenEdit: (id:number)=>void, onClose: (id:number, estado:string)=>void, onAdvance: (id:number, opts:object)=>void }} modals
+ * @param {{ onOpenEdit: (id:number)=>void, onClose: (id:number, estado:string)=>void, onAdvance: (id:number, opts:object)=>void, onOpenHistory: (id:number)=>void }} modals
  * @param {import('../ui/datePicker.js').DatePicker} fechaPicker
  */
 export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
@@ -89,6 +89,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
       contacto: valueOf('contacto'),
       notas: valueOf('notas'),
       skipped: [],
+      volvioAtras: false,
       history: [{ estado: document.getElementById('estado').value, fecha: new Date().toISOString() }],
     };
 
@@ -133,6 +134,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker) {
     switch (action) {
       case 'edit':         modals.onOpenEdit(id); break;
       case 'delete':       confirmDelete(id);     break;
+      case 'history':      modals.onOpenHistory(id); break;
       case 'move-next':    modals.onAdvance(id, { direction: 'next' }); break;
       case 'move-prev':    modals.onAdvance(id, { direction: 'prev' }); break;
       case 'skip-step':    modals.onAdvance(id, { direction: 'next', skipCurrent: true }); break;

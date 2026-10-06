@@ -2,6 +2,7 @@
 // Controller: modals
 // - Edit job
 // - Close job (with reason)
+// - History
 // - Edit referral
 // - Move referral → job
 // - Note on advance
@@ -14,13 +15,14 @@ import { PuestoCombo } from '../ui/combo.js';
 import { mountChips } from '../ui/chips.js';
 import { renderEmpresasChips, mountEmpresasChips } from '../ui/empresasChips.js';
 import {
-  CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS,
+  CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS, getEstadoIcon,
 } from '../constants.js';
 import {
-  stepIndex, progressPct,
+  stepIndex, progressPct, isClosed,
 } from '../selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray, bindHourlySalaryPlaceholder,
+  formatFechaHora,
 } from '../utils.js';
 
 /**
@@ -182,6 +184,99 @@ export function mountModalsController(jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
+  // History
+  // ----------------------------------------------------------
+  const historyModal = document.getElementById('historyModal');
+  const historySubtitle = document.getElementById('historySubtitle');
+  const historyTimeline = document.getElementById('historyTimeline');
+  const historySkipped = document.getElementById('historySkipped');
+  const historySkippedList = document.getElementById('historySkippedList');
+
+  function openHistory(id) {
+    const j = jobsStore.get().find(x => x.id === id);
+    if (!j) return;
+
+    historySubtitle.innerHTML =
+      `<strong>${escapeHtml(j.puesto)}</strong> · ${escapeHtml(j.empresa)}`;
+
+    const history = ensureArray(j.history);
+    const lastIdx = history.length - 1;
+
+    if (history.length === 0) {
+      historyTimeline.innerHTML = `<div class="history-empty">Sin entradas en el historial</div>`;
+    } else {
+      historyTimeline.innerHTML = history.map((entry, i) => {
+        const isCurrent = i === lastIdx && !isClosed(entry.estado);
+        const isCerrada = isClosed(entry.estado);
+        const esRetroceso = Boolean(entry.retroceso);
+
+        let itemClass = 'history-item';
+        if (isCurrent) itemClass += ' current';
+        if (esRetroceso) itemClass += ' retroceso';
+        if (isCerrada) itemClass += ' closed-' + entry.estado.toLowerCase().replace(/\s+/g, '-');
+
+        let tagsHtml = '';
+        if (isCurrent) tagsHtml += `<span class="history-tag current">Actual</span>`;
+        if (esRetroceso) tagsHtml += `<span class="history-tag retroceso">↺ Retroceso</span>`;
+        if (isCerrada && entry.estado !== 'Oferta') {
+          tagsHtml += `<span class="history-tag cerrada">Cerrada</span>`;
+        }
+        if (entry.estado === 'Oferta') {
+          tagsHtml += `<span class="history-tag oferta">🎉 Oferta</span>`;
+        }
+
+        const motivoHtml = entry.motivo
+          ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
+          : '';
+
+        const notaHtml = entry.nota
+          ? `<div class="history-nota"><strong>Nota</strong>${escapeHtml(entry.nota)}</div>`
+          : '';
+
+        return `
+          <div class="${itemClass}">
+            <div class="history-dot">${getEstadoIcon(entry.estado)}</div>
+            <div class="history-content">
+              <div class="history-estado">
+                ${escapeHtml(entry.estado)}
+                ${tagsHtml}
+              </div>
+              <div class="history-fecha">${formatFechaHora(entry.fecha)}</div>
+              ${motivoHtml}
+              ${notaHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const skipped = ensureArray(j.skipped);
+    if (skipped.length) {
+      historySkipped.style.display = 'block';
+      historySkippedList.innerHTML = skipped
+        .map(s => `<span class="history-skipped-tag">${escapeHtml(s)}</span>`)
+        .join('');
+    } else {
+      historySkipped.style.display = 'none';
+    }
+
+    historyModal.classList.add('open');
+  }
+
+  function closeHistory() {
+    historyModal.classList.remove('open');
+  }
+
+  document.getElementById('closeHistoryBtn').addEventListener('click', closeHistory);
+  document.getElementById('closeHistoryModal').addEventListener('click', closeHistory);
+  historyModal.addEventListener('click', (e) => {
+    if (e.target === historyModal) closeHistory();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && historyModal.classList.contains('open')) closeHistory();
+  });
+
+  // ----------------------------------------------------------
   // Note on advance
   // ----------------------------------------------------------
   const noteModal = document.getElementById('noteModal');
@@ -247,7 +342,6 @@ export function mountModalsController(jobsStore, refsStore) {
     hideNote();
   });
 
-  // Listener para la cruz (×)
   document.getElementById('closeNoteModal').addEventListener('click', hideNote);
 
   noteModal.addEventListener('click', (e) => {
@@ -451,7 +545,6 @@ export function mountModalsController(jobsStore, refsStore) {
     const empresas = ensureArray(r.empresasVinculadas);
     const empresaDefault = empresas[0] || '';
 
-    // If a job for that company already exists, link instead of duplicating
     if (empresaDefault) {
       const existente = jobsStore.get().find(j => j.empresa === empresaDefault);
       if (existente) {
@@ -520,7 +613,6 @@ export function mountModalsController(jobsStore, refsStore) {
 
   document.addEventListener('scroll-to-job', (e) => {
     const { jobId } = e.detail;
-    // Clear the job filter so the target card is visible
     const btn = document.querySelector('#filters button[data-filter="all"]');
     if (btn && !btn.classList.contains('active')) btn.click();
 
@@ -540,6 +632,7 @@ export function mountModalsController(jobsStore, refsStore) {
   return {
     onOpenEdit: openEdit,
     onClose: openClose,
+    onOpenHistory: openHistory,
     onAdvance: (id, opts = {}) => {
       const direction = opts.direction || 'next';
       if (direction === 'next') openNote(id, 'next', opts);

@@ -79,9 +79,12 @@ export function renderJobCard(job, ctx = {}) {
 
   const statusBlock = closed ? '' : `
     <div class="workflow-status">
-      <div class="status-text">
-        Etapa <strong>${currentIdx + 1}/${WORKFLOW_STEPS.length}</strong> · ${pct}% del proceso
-      </div>
+      <button type="button"
+              class="status-clickable"
+              data-action="history"
+              title="Ver historial completo de la postulación">
+        🕒 Ver historial · <strong>${currentIdx + 1}/${WORKFLOW_STEPS.length}</strong> etapas
+      </button>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
     </div>
   `;
@@ -101,6 +104,7 @@ export function renderJobCard(job, ctx = {}) {
           <div class="job-meta">${fechaTxt}${diasTxt}${salarioTxt}${contactoTxt}</div>
         </div>
         <div class="job-actions">
+          <button class="action-btn history" title="Ver historial" data-action="history">🕒</button>
           <button class="action-btn" title="Editar" data-action="edit">✏️</button>
           <button class="action-btn danger" title="Borrar" data-action="delete">🗑️</button>
         </div>
@@ -191,7 +195,10 @@ function renderClosedActions(job) {
         <div class="text">
           Postulación <strong>${escapeHtml(job.estado)}</strong>${fecha}
         </div>
-        <button class="wf-btn-secondary" data-action="reopen">Reabrir</button>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+          <button class="status-clickable" data-action="history" title="Ver historial completo">🕒 Ver historial</button>
+          <button class="wf-btn-secondary" data-action="reopen">Reabrir</button>
+        </div>
       </div>
       ${motivoTxt}
     </div>
