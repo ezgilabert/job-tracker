@@ -1,4 +1,4 @@
-  :root {
+:root {
     --bg-1: #f6f7fb;
     --bg-2: #ffffff;
     --surface: #ffffff;
@@ -1407,10 +1407,15 @@
     font-family: inherit;
   }
 
-  .dp-nav button:hover {
+  .dp-nav button:hover:not(:disabled) {
     background: var(--accent-soft);
     color: var(--accent);
     border-color: var(--accent-border);
+  }
+
+  .dp-nav button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 
   .dp-weekdays {
@@ -1466,6 +1471,18 @@
     height: 4px;
     border-radius: 50%;
     background: var(--accent);
+  }
+
+  /* Días futuros: deshabilitados (no se pueden elegir) */
+  .dp-day.future {
+    color: var(--text-dim);
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .dp-day.future:hover {
+    background: transparent;
+    color: var(--text-dim);
   }
 
   .dp-day.selected {

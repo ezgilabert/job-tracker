@@ -38,7 +38,7 @@ export function mountModalsController(jobsStore, refsStore) {
     editSalaryHourlyCheckbox
   );
 
-  // Include open + closed states so edits can also close a job
+  // El estado se muestra solo como referencia (no editable desde este modal)
   editEstado.innerHTML = ALL_STATES
     .map(s => `<option>${escapeHtml(s)}</option>`)
     .join('');
@@ -80,26 +80,21 @@ export function mountModalsController(jobsStore, refsStore) {
 
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
-    const nuevoEstado = editEstado.value;
 
+    // OJO: no tocamos `estado` ni `history` acá.
+    // El estado solo se modifica desde los botones del workflow de la tarjeta.
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
-      const history = cloneArray(j.history);
-      if (nuevoEstado !== j.estado) {
-        history.push({ estado: nuevoEstado, fecha: new Date().toISOString() });
-      }
       return {
         ...j,
         empresa:   valueOf('editEmpresa'),
         puesto:    valueOf('editPuesto'),
         fecha:     editFecha.getValue(),
-        estado:    nuevoEstado,
         link:      valueOf('editLink'),
         salario:   valueOf('editSalario'),
         salarioPorHora: editSalaryHourlyCheckbox.checked,
         contacto:  valueOf('editContacto'),
         notas:     valueOf('editNotas'),
-        history,
       };
     }));
 

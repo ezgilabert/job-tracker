@@ -107,6 +107,10 @@ export class DatePicker {
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString().slice(0, 10);
 
+    // ¿Estamos viendo el mes actual? En ese caso no se puede ir al siguiente.
+    const isCurrentMonth =
+      year === today.getFullYear() && month === today.getMonth();
+
     let daysHtml = '';
 
     for (let i = startWeekday - 1; i >= 0; i--) {
@@ -116,10 +120,17 @@ export class DatePicker {
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const isFuture = dateStr > todayStr;
+
       const classes = ['dp-day'];
       if (dateStr === todayStr) classes.push('today');
       if (dateStr === this.value) classes.push('selected');
-      daysHtml += `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}">${d}</button>`;
+      if (isFuture) classes.push('future');
+
+      daysHtml += `<button type="button"
+                           class="${classes.join(' ')}"
+                           data-date="${dateStr}"
+                           ${isFuture ? 'disabled' : ''}>${d}</button>`;
     }
 
     const totalCells = startWeekday + daysInMonth;
@@ -133,7 +144,7 @@ export class DatePicker {
         <div class="dp-month">${monthName}</div>
         <div class="dp-nav">
           <button type="button" data-nav="prev" aria-label="Mes anterior">‹</button>
-          <button type="button" data-nav="next" aria-label="Mes siguiente">›</button>
+          <button type="button" data-nav="next" aria-label="Mes siguiente" ${isCurrentMonth ? 'disabled' : ''}>›</button>
         </div>
       </div>
       <div class="dp-weekdays">
@@ -154,6 +165,7 @@ export class DatePicker {
 
     const navBtn = e.target.closest('[data-nav]');
     if (navBtn) {
+      if (navBtn.disabled) return;
       const dir = navBtn.dataset.nav === 'prev' ? -1 : 1;
       this.viewMonth.setMonth(this.viewMonth.getMonth() + dir);
       this.renderPopover();
@@ -162,6 +174,7 @@ export class DatePicker {
 
     const dayBtn = e.target.closest('.dp-day[data-date]');
     if (dayBtn) {
+      if (dayBtn.disabled) return;
       const dateStr = dayBtn.dataset.date;
       this.setValue(dateStr);
       this.onChange(dateStr);
