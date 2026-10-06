@@ -4,19 +4,19 @@
 // - dynamic filters (from config)
 // - dynamic initial state (from config)
 // - event delegation on #list (edit, delete, workflow, drag)
+// - secciones colapsables (form + lista) con contador
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import {
   computeStats, filterJobs, sortJobs,
-  isClosed, stepIndex, progressPct,
 } from '../selectors.js';
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
 import { renderStats } from '../templates/stats.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
-  uid, todayISO, cloneArray, bindHourlySalaryPlaceholder, escapeHtml,
+  uid, cloneArray, bindHourlySalaryPlaceholder, escapeHtml,
 } from '../utils.js';
 
 /**
@@ -31,6 +31,31 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   const datePicker = fechaPicker;
 
   // ----------------------------------------------------------
+  // Colapsables
+  // ----------------------------------------------------------
+  const jobFormToggleBtn = document.getElementById('jobFormToggleBtn');
+  const jobFormBody = document.getElementById('jobFormBody');
+  const jobsToggleBtn = document.getElementById('jobsToggleBtn');
+  const jobsBody = document.getElementById('jobsBody');
+
+  jobFormToggleBtn.addEventListener('click', () => {
+    const collapsed = jobFormBody.classList.toggle('collapsed');
+    jobFormToggleBtn.classList.toggle('collapsed', collapsed);
+  });
+
+  jobsToggleBtn.addEventListener('click', () => {
+    const collapsed = jobsBody.classList.toggle('collapsed');
+    jobsToggleBtn.classList.toggle('collapsed', collapsed);
+  });
+
+  function expandJobs() {
+    if (jobsBody.classList.contains('collapsed')) {
+      jobsBody.classList.remove('collapsed');
+      jobsToggleBtn.classList.remove('collapsed');
+    }
+  }
+
+  // ----------------------------------------------------------
   // Render principal
   // ----------------------------------------------------------
   function renderList() {
@@ -39,6 +64,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     document.getElementById('stats').innerHTML =
       renderStats(computeStats(jobs));
+
+    document.getElementById('jobCounter').textContent = jobs.length;
 
     const filtered = sortJobs(filterJobs(jobs, currentFilter));
     const list = document.getElementById('list');
@@ -78,7 +105,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const filtros = (cfg.filtros || []).filter(f => f.visible);
     const container = document.getElementById('filters');
 
-    // Si el filtro actual ya no está visible, resetear a 'all'
     if (!filtros.some(f => f.id === currentFilter)) {
       currentFilter = 'all';
     }
@@ -155,6 +181,10 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     updateSalaryPlaceholder();
     datePicker?.setValue('');
     renderEstadoInicial();
+
+    // Al agregar una postulación, abrimos la lista para que la vea
+    expandJobs();
+
     showToast('Postulación agregada', '✓');
   });
 
@@ -292,6 +322,13 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     });
 
     showToast('Orden actualizado', '⠿');
+  });
+
+  // ----------------------------------------------------------
+  // scroll-to-job: expandir la sección si está colapsada
+  // ----------------------------------------------------------
+  document.addEventListener('scroll-to-job', () => {
+    expandJobs();
   });
 
   // ----------------------------------------------------------

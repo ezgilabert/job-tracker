@@ -38,59 +38,93 @@
 
   <div class="stats" id="stats"></div>
 
+  <!-- ===== Nueva postulación ===== -->
   <div class="form-card">
-    <h2>✨ Nueva postulación</h2>
-    <form id="jobForm">
-      <div class="field">
-        <label for="empresa">Empresa</label>
-        <input type="text" id="empresa" placeholder="Ej: Google" required>
+    <div class="form-card-header">
+      <div>
+        <h2>✨ Nueva postulación</h2>
+        <p class="form-card-subtitle">Cargá una nueva oportunidad</p>
       </div>
-      <div class="field">
-        <label for="puesto">Puesto</label>
-        <div class="combo" id="puestoCombo">
-          <div class="combo-input-wrap">
-            <input type="text" id="puesto" placeholder="Elegí o escribí un rol" autocomplete="off" required>
-            <span class="combo-chevron">▾</span>
-          </div>
-          <div class="combo-dropdown" id="puestoDropdown"></div>
+      <button class="icon-btn" id="jobFormToggleBtn" title="Mostrar/ocultar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="collapsible-body" id="jobFormBody">
+      <form id="jobForm">
+        <div class="field">
+          <label for="empresa">Empresa</label>
+          <input type="text" id="empresa" placeholder="Ej: Google" required>
         </div>
-      </div>
-      <div class="field">
-        <label>Fecha</label>
-        <div class="date-picker" id="fechaPicker"></div>
-      </div>
-      <div class="field">
-        <label for="estado">Estado inicial</label>
-        <select id="estado"></select>
-      </div>
-      <div class="field">
-        <label for="link">Link de la oferta</label>
-        <input type="url" id="link" placeholder="https://...">
-      </div>
-      <div class="field">
-        <label for="salario">Rango salarial</label>
-        <input type="text" id="salario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h">
-        <label class="hourly-checkbox"><input type="checkbox" id="salarioPorHora"> Es por hora</label>
-      </div>
-      <div class="field">
-        <label for="contacto">Contacto</label>
-        <input type="text" id="contacto" placeholder="Ej: María López (Recruiter)">
-      </div>
-      <div class="field" style="grid-column: 1 / -1;">
-        <label for="notas">Notas</label>
-        <textarea id="notas" placeholder="Contacto, próxima instancia, referidos..."></textarea>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Agregar postulación</button>
-      </div>
-    </form>
+        <div class="field">
+          <label for="puesto">Puesto</label>
+          <div class="combo" id="puestoCombo">
+            <div class="combo-input-wrap">
+              <input type="text" id="puesto" placeholder="Elegí o escribí un rol" autocomplete="off" required>
+              <span class="combo-chevron">▾</span>
+            </div>
+            <div class="combo-dropdown" id="puestoDropdown"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Fecha</label>
+          <div class="date-picker" id="fechaPicker"></div>
+        </div>
+        <div class="field">
+          <label for="estado">Estado inicial</label>
+          <select id="estado"></select>
+        </div>
+        <div class="field">
+          <label for="link">Link de la oferta</label>
+          <input type="url" id="link" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label for="salario">Rango salarial</label>
+          <input type="text" id="salario" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h">
+          <label class="hourly-checkbox"><input type="checkbox" id="salarioPorHora"> Es por hora</label>
+        </div>
+        <div class="field">
+          <label for="contacto">Contacto</label>
+          <input type="text" id="contacto" placeholder="Ej: María López (Recruiter)">
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="notas">Notas</label>
+          <textarea id="notas" placeholder="Contacto, próxima instancia, referidos..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Agregar postulación</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <div class="toolbar">
-    <div class="filters" id="filters"></div>
-  </div>
+  <!-- ===== Postulaciones ===== -->
+  <section class="jobs-section">
+    <div class="jobs-header">
+      <div>
+        <h2>📋 Postulaciones</h2>
+        <p>Tu historial de procesos</p>
+      </div>
+      <div class="jobs-header-actions">
+        <span class="job-counter" id="jobCounter">0</span>
+        <button class="icon-btn" id="jobsToggleBtn" title="Mostrar/ocultar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-  <div id="list"></div>
+    <div class="collapsible-body" id="jobsBody">
+      <div class="toolbar">
+        <div class="filters" id="filters"></div>
+      </div>
+
+      <div id="list"></div>
+    </div>
+  </section>
 
   <!-- ===== REFERRALS ===== -->
   <section class="referidos-section">

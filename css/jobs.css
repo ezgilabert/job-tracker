@@ -1,7 +1,59 @@
 /* ============================================================
-   Jobs: tarjetas de postulaciones, badges, closed, empty
+   Jobs: sección colapsable, tarjetas de postulaciones, badges
    ============================================================ */
 
+/* ===== Sección de postulaciones ===== */
+.jobs-section {
+  margin-bottom: 1.5rem;
+}
+
+.jobs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.jobs-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.jobs-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.jobs-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.job-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.7rem;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--accent-border);
+}
+
+/* ===== Lista ===== */
 #list { display: grid; gap: 1rem; }
 
 .job {

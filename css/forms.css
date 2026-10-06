@@ -1,5 +1,6 @@
 /* ============================================================
    Forms: form-card, fields, inputs, combo de puesto
+   + header colapsable
    ============================================================ */
 
 .form-card {
@@ -17,7 +18,34 @@
   box-shadow: var(--shadow);
 }
 
-.form-card h2 {
+/* Header de la sección (título + toggle) */
+.form-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.form-card-header > div:first-child { flex: 1; min-width: 0; }
+
+.form-card-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+}
+
+.form-card-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.form-card > h2 {
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 1.25rem;
@@ -27,6 +55,33 @@
   color: var(--text);
 }
 
+/* Cuerpo colapsable */
+.collapsible-body {
+  max-height: 5000px;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.collapsible-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Botón chevron — rota cuando está colapsado */
+.form-card-header .icon-btn svg,
+.jobs-header .icon-btn svg,
+.referidos-header .icon-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.form-card-header .icon-btn.collapsed svg,
+.jobs-header .icon-btn.collapsed svg,
+.referidos-header .icon-btn.collapsed svg {
+  transform: rotate(-90deg);
+}
+
+/* Form */
 form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
