@@ -15,7 +15,12 @@
   align-items: center;
   margin-bottom: 1.5rem;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+.referidos-header > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .referidos-header h2 {
@@ -32,12 +37,15 @@
 .referidos-header p {
   font-size: 0.85rem;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .referidos-header-actions {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  flex-shrink: 0;
 }
 
 .ref-counter {
