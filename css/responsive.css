@@ -2,7 +2,10 @@
    Responsive: media queries globales
    ============================================================ */
 
-@media (max-width: 640px) {
+/* ============================================================
+   Mobile / tablet chico
+   ============================================================ */
+@media (max-width: 720px) {
   body { padding: 1.25rem 0.75rem 3rem; }
   .brand h1 { font-size: 1.25rem; }
   .stat .num { font-size: 1.6rem; }
@@ -17,10 +20,29 @@
   .wf-btn-secondary, .wf-btn-skip { width: 100%; }
   .job .drag-handle { opacity: 0.6; }
 
-  /* Config modal */
+  /* Config modal: el sidebar pasa a scroll horizontal arriba */
   .config-modal { padding: 1.25rem; }
-  .config-tab { font-size: 0.75rem; padding: 0.55rem 0.5rem; }
-  .config-tab span:last-child { display: none; }
+  .config-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .config-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: static;
+    padding: 0.35rem;
+  }
+  .config-nav::-webkit-scrollbar { display: none; }
+  .config-tab {
+    width: auto;
+    flex-shrink: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.78rem;
+  }
+  .config-tab-icon { width: auto; }
+
   .config-checks { grid-template-columns: 1fr; }
   .config-actions { flex-direction: column-reverse; align-items: stretch; }
   .config-actions .btn { width: 100%; }
@@ -29,12 +51,4 @@
   .config-add-row .btn { width: 100%; padding: 0.7rem; }
   .unsaved-actions { flex-direction: column-reverse; }
   .unsaved-actions .btn { width: 100%; }
-}
-
-/* ============================================================
-   Tablet: config tabs solo con íconos para que no se corten
-   ============================================================ */
-@media (max-width: 820px) and (min-width: 641px) {
-  .config-tab span:last-child { display: none; }
-  .config-tab { font-size: 0.9rem; padding: 0.6rem 0.5rem; }
 }

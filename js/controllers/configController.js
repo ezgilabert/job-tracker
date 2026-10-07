@@ -1,7 +1,7 @@
 // ============================================================
 // Controller: config
 // Modal with tabs (roles, initial states, filters, appearance,
-// profile, language). Draft in memory. Warns if unsaved changes.
+// profile, language, advanced). Draft in memory. Warns if unsaved.
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -33,9 +33,9 @@ export function mountConfigController(configStore) {
   // ----------------------------------------------------------
   let draft = null;
 
-  // Recordamos la elección explícita del usuario para el estado
-  // por defecto, incluso si temporalmente queda fuera del set de
-  // estados activos (uncheck → recheck debe restaurarlo).
+  // Remember the user's explicit choice for the default state,
+  // even if it temporarily falls outside the active states set
+  // (uncheck → recheck should restore it).
   let preferredDefaultState = null;
 
   function cloneConfig(cfg) {
@@ -67,13 +67,11 @@ export function mountConfigController(configStore) {
   // ----------------------------------------------------------
   // Dirty check
   // ----------------------------------------------------------
-  // Los arrays de tags/puestos/estados se comportan como sets:
-  // un toggle-off + toggle-on cambia el orden de inserción pero
-  // la selección es la misma. Los normalizamos (sort) antes de
-  // comparar para no marcar cambios inexistentes.
-  //
-  // Los `filtros` SÍ son order-sensitive (se reordenan a propósito),
-  // por eso no se normalizan.
+  // Tag/role/state arrays behave like sets: toggle-off + toggle-on
+  // changes insertion order but the selection is the same. We
+  // normalize (sort) before comparing to avoid false positives.
+  // Filters ARE order-sensitive (reordered on purpose), so they
+  // aren't normalized.
   function normalizeForDirtyCheck(cfg) {
     const copy = cloneConfig(cfg || {});
     if (copy.puestos) {
@@ -106,12 +104,11 @@ export function mountConfigController(configStore) {
   }
 
   // ----------------------------------------------------------
-  // Brand logo helper (para revertir preview al descartar)
+  // Brand logo helper (to revert preview when discarding)
   // ----------------------------------------------------------
-  // Replica la lógica que main.js/login.js tienen inline.
-  // Se usa en closeDirect() para restaurar el logo guardado cuando
-  // se descartan cambios (hoy el logo no se preview-ea en vivo,
-  // pero dejamos el revert listo para cuando se agregue).
+  // Mirrors the inline logic from main.js/login.js. Used in
+  // closeDirect() to restore the saved logo when discarding
+  // changes.
   function applyLogoToBrand(logoId) {
     const el = document.getElementById('brandLogo');
     if (!el) return;
@@ -135,7 +132,7 @@ export function mountConfigController(configStore) {
     if (!draft.lang) draft.lang = DEFAULT_LANG;
     if (!draft.background) draft.background = DEFAULT_BACKGROUND;
 
-    // Inicializamos la preferencia de default con la guardada.
+    // Initialize the default preference from the saved value.
     preferredDefaultState = draft.estadoInicialDefault || null;
 
     modal.classList.add('open');
@@ -143,7 +140,7 @@ export function mountConfigController(configStore) {
   }
 
   function closeDirect() {
-    // Si quedó un preview sin guardar, revertimos al estado guardado.
+    // If an unsaved preview is left, revert to the saved state.
     const saved = configStore.get();
     applyBackground(saved.background || DEFAULT_BACKGROUND);
     applyLogoToBrand(saved.logo || DEFAULT_LOGO);
@@ -203,7 +200,7 @@ export function mountConfigController(configStore) {
     if (modal.classList.contains('open')) tryClose();
   });
 
-  // Modal unsaved
+  // Unsaved changes modal
   document.getElementById('unsavedCloseBtn').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
   });
@@ -222,7 +219,7 @@ export function mountConfigController(configStore) {
     if (e.target === unsavedModal) unsavedModal.classList.remove('open');
   });
 
-  // Reset
+  // Reset (lives in the "Advanced" panel → Danger zone)
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
       title: t('confirm.resetConfig.title'),
@@ -424,8 +421,8 @@ export function mountConfigController(configStore) {
 
     if (input.checked) {
       stateSet.add(estado);
-      // Si el usuario re-tilda el estado que había elegido como
-      // default (y que se perdió al destildarlo), lo restauramos.
+      // If the user re-checks the state they had chosen as default
+      // (and was lost when unchecked), restore it.
       if (estado === preferredDefaultState) {
         draft.estadoInicialDefault = estado;
       }
@@ -435,9 +432,9 @@ export function mountConfigController(configStore) {
 
     draft.estadosIniciales = [...stateSet];
 
-    // Fallback: si el default actual ya no está en el set, elegimos
-    // el primero disponible. La preferencia real queda guardada en
-    // preferredDefaultState para cuando el usuario lo re-active.
+    // Fallback: if the current default is no longer in the set,
+    // pick the first available. The real preference stays in
+    // preferredDefaultState for when the user re-enables it.
     if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
       draft.estadoInicialDefault = [...stateSet][0];
     }
@@ -472,7 +469,7 @@ export function mountConfigController(configStore) {
     const btn = e.target.closest('.config-default-btn');
     if (!btn) return;
     draft.estadoInicialDefault = btn.dataset.estado;
-    // Elección explícita del usuario: la recordamos.
+    // Explicit user choice: remember it.
     preferredDefaultState = btn.dataset.estado;
     renderAll();
   });
@@ -615,7 +612,7 @@ export function mountConfigController(configStore) {
     const id = btn.dataset.bg;
     if ((draft.background || DEFAULT_BACKGROUND) !== id) {
       draft.background = id;
-      applyBackground(id);   // preview en vivo
+      applyBackground(id);   // live preview
       renderBackgrounds();
       updateBadge();
     }
@@ -657,7 +654,7 @@ export function mountConfigController(configStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Perfil
+  // Panel: Profile
   // ------------------------------------------------------------
   function setVal(id, val) {
     const el = document.getElementById(id);
@@ -692,7 +689,7 @@ export function mountConfigController(configStore) {
     }
   }
 
-  // Inputs del perfil: actualizan el draft sin re-renderizar todo
+  // Profile inputs: update the draft without re-rendering everything
   const profileFields = {
     configProfileNombre:   'nombre',
     configProfileApellido: 'apellido',
@@ -712,7 +709,7 @@ export function mountConfigController(configStore) {
     });
   });
 
-  // Subir foto
+  // Upload photo
   const profileFileInput = document.getElementById('configProfileFileInput');
   const profileUploadBtn = document.getElementById('configProfileUpload');
 
@@ -740,7 +737,7 @@ export function mountConfigController(configStore) {
     });
   }
 
-  // Eliminar foto
+  // Remove photo
   const profileRemoveBtn = document.getElementById('configProfileRemove');
   if (profileRemoveBtn) {
     profileRemoveBtn.addEventListener('click', () => {

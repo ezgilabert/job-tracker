@@ -205,6 +205,7 @@ const translations = {
     'config.tab.apariencia': 'Apariencia',
     'config.tab.perfil': 'Perfil',
     'config.tab.idioma': 'Idioma',
+    'config.tab.advanced': 'Avanzado',
     'config.categorias.title': 'Categorías',
     'config.categorias.desc': 'Activá las categorías cuyos puestos quieras ver en el buscador.',
     'config.custom.title': 'Agregar puesto personalizado',
@@ -228,6 +229,7 @@ const translations = {
     'config.lang.title': 'Idioma de la interfaz',
     'config.lang.desc': 'Elegí el idioma de los textos de la app. Los datos guardados no se modifican.',
     'config.reset': '↺ Restablecer',
+    'config.reset.short': 'Restablecer todo',
     'config.save': '💾 Guardar cambios',
     'config.moveUp': 'Subir',
     'config.moveDown': 'Bajar',
@@ -239,7 +241,14 @@ const translations = {
     'config.noPuestos': 'No hay puestos con las categorías activas. Activá alguna o agregá uno custom.',
     'config.noStates': 'Activá al menos un estado arriba.',
 
-    // Perfil
+    // Danger zone (Advanced panel)
+    'config.danger.title': '⚠️ Zona de peligro',
+    'config.danger.desc': 'Estas acciones no se pueden deshacer.',
+    'config.danger.reset.title': 'Restablecer toda la configuración',
+    'config.danger.reset.desc': 'Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
+    'config.danger.reset.button': 'Restablecer',
+
+    // Profile
     'profile.title': '👤 Editar perfil',
     'profile.subtitle': 'Actualizá tu información personal',
     'profile.nombre': 'Nombre',
@@ -578,6 +587,7 @@ const translations = {
     'config.tab.apariencia': 'Appearance',
     'config.tab.perfil': 'Profile',
     'config.tab.idioma': 'Language',
+    'config.tab.advanced': 'Advanced',
     'config.categorias.title': 'Categories',
     'config.categorias.desc': 'Enable the categories whose roles you want to see in the picker.',
     'config.custom.title': 'Add custom role',
@@ -601,6 +611,7 @@ const translations = {
     'config.lang.title': 'Interface language',
     'config.lang.desc': 'Choose the language of the app texts. Saved data is not modified.',
     'config.reset': '↺ Reset',
+    'config.reset.short': 'Reset all',
     'config.save': '💾 Save changes',
     'config.moveUp': 'Move up',
     'config.moveDown': 'Move down',
@@ -611,6 +622,13 @@ const translations = {
     'config.restore': 'Restore',
     'config.noPuestos': 'No roles with active categories. Enable one or add a custom role.',
     'config.noStates': 'Enable at least one status above.',
+
+    // Danger zone (Advanced panel)
+    'config.danger.title': '⚠️ Danger zone',
+    'config.danger.desc': "These actions can't be undone.",
+    'config.danger.reset.title': 'Reset all settings',
+    'config.danger.reset.desc': 'Restore roles, states, filters and appearance to their defaults. Not applied until you save.',
+    'config.danger.reset.button': 'Reset',
 
     // Profile
     'profile.title': '👤 Edit profile',

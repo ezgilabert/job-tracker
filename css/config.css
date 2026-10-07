@@ -1,10 +1,10 @@
 /* ============================================================
-   Config: modal de configuración con tabs + cambios sin guardar
+   Config: settings modal with tabs + unsaved changes
    ============================================================ */
 
-/* ===== Modal principal ===== */
+/* ===== Main modal ===== */
 .config-modal {
-  max-width: 620px;
+  max-width: 780px;
   position: relative;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -45,7 +45,7 @@
   color: var(--text-muted);
 }
 
-/* ===== Badge "sin guardar" ===== */
+/* ===== "Unsaved" badge ===== */
 .unsaved-badge {
   display: none;
   align-items: center;
@@ -78,52 +78,55 @@
   50% { opacity: 0.65; }
 }
 
-/* ===== Tabs ===== */
-.config-tabs {
-  display: flex;
-  gap: 0.3rem;
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
-  padding: 0.3rem;
-  border-radius: 12px;
-  margin-bottom: 1.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+/* ============================================================
+   Layout: sidebar + body
+   ============================================================ */
+.config-layout {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1rem;
 }
 
-.config-tabs::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+/* ============================================================
+   Sidebar nav
+   ============================================================ */
+.config-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.4rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: sticky;
+  top: 0;
+  align-self: start;
 }
 
 .config-tab {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 0.55rem 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
   border-radius: 9px;
   border: none;
   background: transparent;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  white-space: nowrap;
+  text-align: left;
+  transition: all 0.18s ease;
 }
 
-.config-tab > span:last-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
+.config-tab:hover {
+  background: var(--surface);
+  color: var(--text);
 }
-
-.config-tab:hover { color: var(--text); background: var(--surface); }
 
 .config-tab.active {
   background: var(--accent);
@@ -131,10 +134,36 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* ===== Body ===== */
+.config-tab-icon {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.config-tab-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   Divider between sidebar groups
+   ============================================================ */
+.config-nav-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 0.35rem 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   Body (panels)
+   ============================================================ */
 .config-body {
-  padding-right: 0.25rem;
-  margin-bottom: 1rem;
+  min-width: 0;
+  margin-bottom: 0;
 }
 
 .config-panel { display: none; }
@@ -245,7 +274,7 @@
   white-space: nowrap;
 }
 
-/* ===== Puestos list ===== */
+/* ===== Roles list ===== */
 .config-puestos-list {
   display: flex;
   flex-wrap: wrap;
@@ -314,7 +343,7 @@
   width: 100%;
 }
 
-/* ===== Checks de estados ===== */
+/* ===== State checkboxes ===== */
 .config-checks {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -359,7 +388,7 @@
 
 .config-check .icon { font-size: 1rem; flex-shrink: 0; }
 
-/* ===== Default estado ===== */
+/* ===== Default state ===== */
 .config-default-estado {
   display: flex;
   flex-wrap: wrap;
@@ -395,7 +424,7 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* ===== Filtros ===== */
+/* ===== Filters ===== */
 .config-filtros {
   display: flex;
   flex-direction: column;
@@ -485,24 +514,79 @@
   background: var(--accent-soft);
 }
 
-/* ===== Actions ===== */
+/* ============================================================
+   Footer actions
+   ============================================================ */
 .config-actions {
   display: flex;
   gap: 0.75rem;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding-top: 1rem;
   border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
-.config-actions-right {
-  display: flex;
-  gap: 0.6rem;
-  margin-left: auto;
+/* ============================================================
+   Danger section (Advanced tab)
+   ============================================================ */
+
+.config-section-danger {
+  border-bottom: none;
 }
 
-/* ===== Modal unsaved ===== */
+.config-section-danger .config-section-head h3 {
+  color: var(--danger-2);
+}
+
+.config-danger-zone {
+  border: 1px solid var(--danger-border);
+  border-radius: 12px;
+  background: var(--danger-soft);
+  padding: 0.25rem;
+}
+
+[data-theme="dark"] .config-danger-zone {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.config-danger-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  flex-wrap: wrap;
+}
+
+.config-danger-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.config-danger-info strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.config-danger-info span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.config-danger-item .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Unsaved changes modal
+   ============================================================ */
 .modal-overlay.nested { z-index: 110; }
 
 .unsaved-actions {
@@ -551,7 +635,7 @@
 }
 
 /* ============================================================
-   Panel: Apariencia — selector de logo
+   Panel: Appearance — logo selector
    ============================================================ */
 
 .config-logos {
@@ -656,7 +740,7 @@
 }
 
 /* ============================================================
-   Panel: Idioma — selector de idioma
+   Panel: Language — language selector
    ============================================================ */
 
 .config-langs {
@@ -760,7 +844,7 @@
 }
 
 /* ============================================================
-   Panel: Perfil — avatar + campos
+   Panel: Profile — avatar + fields
    ============================================================ */
 
 .profile-avatar-block {
@@ -834,7 +918,7 @@
   color: var(--text-dim);
 }
 
-/* Input con prefijo @ */
+/* Input with @ prefix */
 .input-prefix {
   display: flex;
   align-items: stretch;
@@ -882,7 +966,7 @@
 }
 
 /* ============================================================
-   Panel: Apariencia — selector de fondo
+   Panel: Appearance — background selector
    ============================================================ */
 
 .config-bgs {

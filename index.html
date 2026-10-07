@@ -388,7 +388,7 @@
   </div>
 </div>
 
-<!-- History modal (referidos) -->
+<!-- History modal (referrals) -->
 <div class="modal-overlay" id="refHistoryModal">
   <div class="modal" style="max-width: 560px; position: relative;">
     <button class="icon-btn" id="closeRefHistoryModal"
@@ -427,185 +427,227 @@
     </h2>
     <p class="config-subtitle" data-i18n="config.subtitle">Personalizá tu Job Tracker</p>
 
-    <div class="config-tabs">
-      <button class="config-tab active" data-tab="puestos">
-        <span>💼</span> <span data-i18n="config.tab.puestos">Puestos</span>
-      </button>
-      <button class="config-tab" data-tab="estados">
-        <span>🚩</span> <span data-i18n="config.tab.estados">Estados iniciales</span>
-      </button>
-      <button class="config-tab" data-tab="filtros">
-        <span>🎛️</span> <span data-i18n="config.tab.filtros">Filtros</span>
-      </button>
-      <button class="config-tab" data-tab="apariencia">
-        <span>🎨</span> <span data-i18n="config.tab.apariencia">Apariencia</span>
-      </button>
-      <button class="config-tab" data-tab="perfil">
-        <span>👤</span> <span data-i18n="config.tab.perfil">Perfil</span>
-      </button>
-      <button class="config-tab" data-tab="idioma">
-        <span>🌐</span> <span data-i18n="config.tab.idioma">Idioma</span>
-      </button>
-    </div>
+    <div class="config-layout">
+      <nav class="config-nav" role="tablist">
+        <!-- Dashboard content -->
+        <button class="config-tab active" data-tab="puestos" role="tab">
+          <span class="config-tab-icon">💼</span>
+          <span class="config-tab-label" data-i18n="config.tab.puestos">Puestos</span>
+        </button>
+        <button class="config-tab" data-tab="estados" role="tab">
+          <span class="config-tab-icon">🚩</span>
+          <span class="config-tab-label" data-i18n="config.tab.estados">Estados iniciales</span>
+        </button>
+        <button class="config-tab" data-tab="filtros" role="tab">
+          <span class="config-tab-icon">🎛️</span>
+          <span class="config-tab-label" data-i18n="config.tab.filtros">Filtros</span>
+        </button>
 
-    <div class="config-body">
-      <div class="config-panel active" data-panel="puestos">
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.categorias.title">Categorías</h3>
-            <p data-i18n="config.categorias.desc">Activá las categorías cuyos puestos quieras ver en el buscador.</p>
-          </div>
-          <div class="config-tags" id="configTags"></div>
-        </div>
+        <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.custom.title">Agregar puesto personalizado</h3>
-          </div>
-          <div class="config-add-row">
-            <input type="text" id="configNewPuesto" maxlength="80" placeholder="Ej: Rust Developer" data-i18n-placeholder="config.custom.placeholder">
-            <button class="btn btn-primary" id="configAddPuesto" data-i18n="config.custom.add">Agregar</button>
-          </div>
-        </div>
+        <!-- Personalization -->
+        <button class="config-tab" data-tab="apariencia" role="tab">
+          <span class="config-tab-icon">🎨</span>
+          <span class="config-tab-label" data-i18n="config.tab.apariencia">Apariencia</span>
+        </button>
+        <button class="config-tab" data-tab="idioma" role="tab">
+          <span class="config-tab-icon">🌐</span>
+          <span class="config-tab-label" data-i18n="config.tab.idioma">Idioma</span>
+        </button>
 
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3>
-              <span data-i18n="config.available.title">Puestos disponibles</span>
-              <span class="config-count" id="configPuestosCount"></span>
-            </h3>
-            <p data-i18n="config.available.desc">Quitá los que no quieras ver. Los personalizados se eliminan del todo.</p>
-          </div>
-          <div class="config-puestos-list" id="configPuestosList"></div>
-        </div>
+        <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <div class="config-section" id="configHiddenSection" style="display:none;">
-          <div class="config-section-head">
-            <h3 data-i18n="config.hidden.title">Puestos ocultos</h3>
-            <p data-i18n="config.hidden.desc">Restaurá los que quieras recuperar.</p>
-          </div>
-          <div class="config-puestos-list" id="configHiddenList"></div>
-        </div>
-      </div>
+        <!-- Account -->
+        <button class="config-tab" data-tab="perfil" role="tab">
+          <span class="config-tab-icon">👤</span>
+          <span class="config-tab-label" data-i18n="config.tab.perfil">Perfil</span>
+        </button>
 
-      <div class="config-panel" data-panel="estados">
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.states.title">Estados disponibles</h3>
-            <p data-i18n="config.states.desc">Elegí qué estados aparecen en el dropdown al crear una nueva postulación.</p>
-          </div>
-          <div class="config-checks" id="configEstados"></div>
-        </div>
+        <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.defaultState.title">Estado por defecto</h3>
-            <p data-i18n="config.defaultState.desc">El estado que viene seleccionado al crear una nueva postulación.</p>
-          </div>
-          <div class="config-default-estado" id="configDefaultEstado"></div>
-        </div>
-      </div>
+        <!-- Advanced -->
+        <button class="config-tab" data-tab="advanced" role="tab">
+          <span class="config-tab-icon">⚠️</span>
+          <span class="config-tab-label" data-i18n="config.tab.advanced">Avanzado</span>
+        </button>
+      </nav>
 
-      <div class="config-panel" data-panel="filtros">
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.filters.title">Filtros de postulaciones</h3>
-            <p data-i18n="config.filters.desc">Reordená con las flechas y mostrá/ocultá con el ojo. Los filtros fijos no se pueden eliminar.</p>
-          </div>
-          <div class="config-filtros" id="configFiltros"></div>
-        </div>
-      </div>
-
-      <div class="config-panel" data-panel="apariencia">
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.logo.title">Logo de la app</h3>
-            <p data-i18n="config.logo.desc">Elegí cómo querés que se vea el ícono de Job Tracker.</p>
-          </div>
-          <div class="config-logos" id="configLogos"></div>
-        </div>
-
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.bg.title">Fondo de la app</h3>
-            <p data-i18n="config.bg.desc">Elegí el estilo de fondo que más te guste.</p>
-          </div>
-          <div class="config-bgs" id="configBgs"></div>
-        </div>
-      </div>
-
-      <!-- Panel: Perfil -->
-      <div class="config-panel" data-panel="perfil">
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="profile.title">👤 Editar perfil</h3>
-            <p data-i18n="profile.subtitle">Actualizá tu información personal</p>
-          </div>
-
-          <!-- Avatar -->
-          <div class="profile-avatar-block">
-            <div class="profile-avatar" id="configProfileAvatar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
+      <div class="config-body">
+        <div class="config-panel active" data-panel="puestos">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.categorias.title">Categorías</h3>
+              <p data-i18n="config.categorias.desc">Activá las categorías cuyos puestos quieras ver en el buscador.</p>
             </div>
-            <div class="profile-avatar-actions">
-              <button type="button" id="configProfileUpload" data-i18n="profile.upload">Cambiar foto</button>
-              <button type="button" class="danger" id="configProfileRemove" data-i18n="profile.remove">Eliminar</button>
+            <div class="config-tags" id="configTags"></div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.custom.title">Agregar puesto personalizado</h3>
             </div>
-            <span class="profile-avatar-hint" data-i18n="profile.formats">JPG, PNG o GIF · máx. 2 MB</span>
-            <input type="file" id="configProfileFileInput" accept="image/*" style="display:none;">
-          </div>
-
-          <div class="field">
-            <label for="configProfileNombre" data-i18n="profile.nombre">Nombre</label>
-            <input type="text" id="configProfileNombre" maxlength="60" data-i18n-placeholder="profile.nombre.placeholder" placeholder="Tu nombre">
-          </div>
-
-          <div class="field">
-            <label for="configProfileApellido" data-i18n="profile.apellido">Apellido</label>
-            <input type="text" id="configProfileApellido" maxlength="60" data-i18n-placeholder="profile.apellido.placeholder" placeholder="Tu apellido">
-          </div>
-
-          <div class="field">
-            <label for="configProfileUsername" data-i18n="profile.username">Nombre de usuario</label>
-            <div class="input-prefix">
-              <span class="prefix">@</span>
-              <input type="text" id="configProfileUsername" maxlength="30" pattern="[a-zA-Z0-9_-]*" data-i18n-placeholder="profile.username.placeholder" placeholder="usuario" autocomplete="off" spellcheck="false">
+            <div class="config-add-row">
+              <input type="text" id="configNewPuesto" maxlength="80" placeholder="Ej: Rust Developer" data-i18n-placeholder="config.custom.placeholder">
+              <button class="btn btn-primary" id="configAddPuesto" data-i18n="config.custom.add">Agregar</button>
             </div>
-            <span class="profile-hint" data-i18n="profile.username.hint">Solo letras, números, guiones y guiones bajos.</span>
           </div>
 
-          <div class="field">
-            <label for="configProfileEmail" data-i18n="profile.email">Email</label>
-            <input type="email" id="configProfileEmail" maxlength="150" data-i18n-placeholder="profile.email.placeholder" placeholder="tu@email.com">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3>
+                <span data-i18n="config.available.title">Puestos disponibles</span>
+                <span class="config-count" id="configPuestosCount"></span>
+              </h3>
+              <p data-i18n="config.available.desc">Quitá los que no quieras ver. Los personalizados se eliminan del todo.</p>
+            </div>
+            <div class="config-puestos-list" id="configPuestosList"></div>
           </div>
 
-          <div class="field">
-            <label for="configProfileBio" data-i18n="profile.bio">Bio</label>
-            <textarea id="configProfileBio" maxlength="500" rows="3" data-i18n-placeholder="profile.bio.placeholder" placeholder="Contá algo sobre vos..."></textarea>
+          <div class="config-section" id="configHiddenSection" style="display:none;">
+            <div class="config-section-head">
+              <h3 data-i18n="config.hidden.title">Puestos ocultos</h3>
+              <p data-i18n="config.hidden.desc">Restaurá los que quieras recuperar.</p>
+            </div>
+            <div class="config-puestos-list" id="configHiddenList"></div>
           </div>
         </div>
-      </div>
 
-      <div class="config-panel" data-panel="idioma">
-        <div class="config-section">
-          <div class="config-section-head">
-            <h3 data-i18n="config.lang.title">Idioma de la interfaz</h3>
-            <p data-i18n="config.lang.desc">Elegí el idioma de los textos de la app. Los datos guardados no se modifican.</p>
+        <div class="config-panel" data-panel="estados">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.states.title">Estados disponibles</h3>
+              <p data-i18n="config.states.desc">Elegí qué estados aparecen en el dropdown al crear una nueva postulación.</p>
+            </div>
+            <div class="config-checks" id="configEstados"></div>
           </div>
-          <div class="config-langs" id="configLangs"></div>
+
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.defaultState.title">Estado por defecto</h3>
+              <p data-i18n="config.defaultState.desc">El estado que viene seleccionado al crear una nueva postulación.</p>
+            </div>
+            <div class="config-default-estado" id="configDefaultEstado"></div>
+          </div>
+        </div>
+
+        <div class="config-panel" data-panel="filtros">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.filters.title">Filtros de postulaciones</h3>
+              <p data-i18n="config.filters.desc">Reordená con las flechas y mostrá/ocultá con el ojo. Los filtros fijos no se pueden eliminar.</p>
+            </div>
+            <div class="config-filtros" id="configFiltros"></div>
+          </div>
+        </div>
+
+        <div class="config-panel" data-panel="apariencia">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.logo.title">Logo de la app</h3>
+              <p data-i18n="config.logo.desc">Elegí cómo querés que se vea el ícono de Job Tracker.</p>
+            </div>
+            <div class="config-logos" id="configLogos"></div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.bg.title">Fondo de la app</h3>
+              <p data-i18n="config.bg.desc">Elegí el estilo de fondo que más te guste.</p>
+            </div>
+            <div class="config-bgs" id="configBgs"></div>
+          </div>
+        </div>
+
+        <!-- Panel: Profile -->
+        <div class="config-panel" data-panel="perfil">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="profile.title">👤 Editar perfil</h3>
+              <p data-i18n="profile.subtitle">Actualizá tu información personal</p>
+            </div>
+
+            <div class="profile-avatar-block">
+              <div class="profile-avatar" id="configProfileAvatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <div class="profile-avatar-actions">
+                <button type="button" id="configProfileUpload" data-i18n="profile.upload">Cambiar foto</button>
+                <button type="button" class="danger" id="configProfileRemove" data-i18n="profile.remove">Eliminar</button>
+              </div>
+              <span class="profile-avatar-hint" data-i18n="profile.formats">JPG, PNG o GIF · máx. 2 MB</span>
+              <input type="file" id="configProfileFileInput" accept="image/*" style="display:none;">
+            </div>
+
+            <div class="field">
+              <label for="configProfileNombre" data-i18n="profile.nombre">Nombre</label>
+              <input type="text" id="configProfileNombre" maxlength="60" data-i18n-placeholder="profile.nombre.placeholder" placeholder="Tu nombre">
+            </div>
+
+            <div class="field">
+              <label for="configProfileApellido" data-i18n="profile.apellido">Apellido</label>
+              <input type="text" id="configProfileApellido" maxlength="60" data-i18n-placeholder="profile.apellido.placeholder" placeholder="Tu apellido">
+            </div>
+
+            <div class="field">
+              <label for="configProfileUsername" data-i18n="profile.username">Nombre de usuario</label>
+              <div class="input-prefix">
+                <span class="prefix">@</span>
+                <input type="text" id="configProfileUsername" maxlength="30" pattern="[a-zA-Z0-9_-]*" data-i18n-placeholder="profile.username.placeholder" placeholder="usuario" autocomplete="off" spellcheck="false">
+              </div>
+              <span class="profile-hint" data-i18n="profile.username.hint">Solo letras, números, guiones y guiones bajos.</span>
+            </div>
+
+            <div class="field">
+              <label for="configProfileEmail" data-i18n="profile.email">Email</label>
+              <input type="email" id="configProfileEmail" maxlength="150" data-i18n-placeholder="profile.email.placeholder" placeholder="tu@email.com">
+            </div>
+
+            <div class="field">
+              <label for="configProfileBio" data-i18n="profile.bio">Bio</label>
+              <textarea id="configProfileBio" maxlength="500" rows="3" data-i18n-placeholder="profile.bio.placeholder" placeholder="Contá algo sobre vos..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-panel" data-panel="idioma">
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.lang.title">Idioma de la interfaz</h3>
+              <p data-i18n="config.lang.desc">Elegí el idioma de los textos de la app. Los datos guardados no se modifican.</p>
+            </div>
+            <div class="config-langs" id="configLangs"></div>
+          </div>
+        </div>
+
+        <!-- Panel: Advanced (danger zone) -->
+        <div class="config-panel" data-panel="advanced">
+          <div class="config-section config-section-danger">
+            <div class="config-section-head">
+              <h3 data-i18n="config.danger.title">⚠️ Zona de peligro</h3>
+              <p data-i18n="config.danger.desc">Estas acciones no se pueden deshacer.</p>
+            </div>
+            <div class="config-danger-zone">
+              <div class="config-danger-item">
+                <div class="config-danger-info">
+                  <strong data-i18n="config.danger.reset.title">Restablecer toda la configuración</strong>
+                  <span data-i18n="config.danger.reset.desc">Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.</span>
+                </div>
+                <button type="button" class="btn btn-danger-ghost" id="resetConfigBtn">
+                  ↺ <span data-i18n="config.danger.reset.button">Restablecer</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="config-actions">
-      <button class="btn btn-ghost" id="resetConfigBtn" data-i18n="config.reset">↺ Restablecer</button>
-      <div class="config-actions-right">
-        <button class="btn btn-ghost" id="cancelConfigBtn" data-i18n="modal.cancel">Cancelar</button>
-        <button class="btn btn-primary" id="saveConfigBtn" data-i18n="config.save">💾 Guardar cambios</button>
-      </div>
+      <button class="btn btn-ghost" id="cancelConfigBtn" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="saveConfigBtn" data-i18n="config.save">💾 Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -758,7 +800,7 @@
   </div>
 </div>
 
-<!-- Note on advance modal (referidos) -->
+<!-- Note on advance modal (referrals) -->
 <div class="modal-overlay" id="refNoteModal">
   <div class="modal" style="max-width: 440px; position: relative;">
     <button class="icon-btn" id="closeRefNoteModal"
