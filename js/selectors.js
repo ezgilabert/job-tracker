@@ -63,11 +63,35 @@ export function computeStats(jobs) {
   };
 }
 
-export function filterJobs(jobs, filter) {
-  if (filter === 'all') return jobs;
-  if (filter === 'active') return jobs.filter(j => !isClosed(j.estado));
-  if (filter === 'closed') return jobs.filter(j => isClosed(j.estado));
-  return jobs.filter(j => j.estado === filter);
+/**
+ * Filter jobs by status AND free-text search.
+ * Search matches company, role, contact, notes and salary.
+ */
+export function filterJobs(jobs, filter, searchTerm = '') {
+  let out = jobs;
+
+  if (filter === 'all') {
+    // no status filter
+  } else if (filter === 'active') {
+    out = out.filter(j => !isClosed(j.estado));
+  } else if (filter === 'closed') {
+    out = out.filter(j => isClosed(j.estado));
+  } else {
+    out = out.filter(j => j.estado === filter);
+  }
+
+  const q = searchTerm.trim().toLowerCase();
+  if (q) {
+    out = out.filter(j =>
+      (j.empresa  || '').toLowerCase().includes(q) ||
+      (j.puesto   || '').toLowerCase().includes(q) ||
+      (j.contacto || '').toLowerCase().includes(q) ||
+      (j.notas    || '').toLowerCase().includes(q) ||
+      (j.salario  || '').toLowerCase().includes(q)
+    );
+  }
+
+  return out;
 }
 
 function advanceRank(estado) {

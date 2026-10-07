@@ -67,6 +67,7 @@ const translations = {
 
     'jobs.title': '📋 Postulaciones',
     'jobs.subtitle': 'Tu historial de procesos',
+    'jobs.search.placeholder': 'Buscar por puesto, empresa, nota...',
 
     'refs.title': '🤝 Referidos',
     'refs.subtitle': 'Tu red de contactos que pueden recomendarte',
@@ -173,7 +174,7 @@ const translations = {
     'empty.jobs.title': 'Todavía no cargaste postulaciones',
     'empty.jobs.subtitle': 'Empezá agregando una arriba ☝️',
     'empty.jobs.filter.title': 'Sin resultados en este filtro',
-    'empty.jobs.filter.subtitle': 'Probá con otro filtro',
+    'empty.jobs.filter.subtitle': 'Probá con otro filtro o búsqueda',
     'empty.refs.title': 'Todavía no cargaste referidos',
     'empty.refs.subtitle': 'Agregá a alguien que te pueda recomendar',
     'empty.refs.filter.title': 'Sin resultados',
@@ -457,6 +458,7 @@ const translations = {
 
     'jobs.title': '📋 Applications',
     'jobs.subtitle': 'Your process history',
+    'jobs.search.placeholder': 'Search by role, company, note...',
 
     'refs.title': '🤝 Referrals',
     'refs.subtitle': 'Your network that can recommend you',
@@ -563,7 +565,7 @@ const translations = {
     'empty.jobs.title': "You haven't added any applications yet",
     'empty.jobs.subtitle': 'Start by adding one above ☝️',
     'empty.jobs.filter.title': 'No results for this filter',
-    'empty.jobs.filter.subtitle': 'Try another filter',
+    'empty.jobs.filter.subtitle': 'Try another filter or search',
     'empty.refs.title': "You haven't added any referrals yet",
     'empty.refs.subtitle': 'Add someone who can recommend you',
     'empty.refs.filter.title': 'No results',

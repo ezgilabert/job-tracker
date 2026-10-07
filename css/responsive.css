@@ -1,10 +1,7 @@
 /* ============================================================
-   Responsive: media queries globales
+   Responsive: global media queries
    ============================================================ */
 
-/* ============================================================
-   Mobile / tablet chico
-   ============================================================ */
 @media (max-width: 720px) {
   body { padding: 1.25rem 0.75rem 3rem; }
   .brand h1 { font-size: 1.25rem; }
@@ -20,7 +17,7 @@
   .wf-btn-secondary, .wf-btn-skip { width: 100%; }
   .job .drag-handle { opacity: 0.6; }
 
-  /* Config modal: el sidebar pasa a scroll horizontal arriba */
+  /* Config modal: sidebar becomes horizontal scroll on top */
   .config-modal { padding: 1.25rem; }
   .config-layout {
     grid-template-columns: 1fr;
@@ -51,4 +48,11 @@
   .config-add-row .btn { width: 100%; padding: 0.7rem; }
   .unsaved-actions { flex-direction: column-reverse; }
   .unsaved-actions .btn { width: 100%; }
+
+  /* Toolbar: stack search above filters */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .jobs-search { max-width: 100%; }
 }

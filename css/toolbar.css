@@ -1,5 +1,5 @@
 /* ============================================================
-   Toolbar: filtros de postulaciones
+   Toolbar: application filters + search
    ============================================================ */
 
 .toolbar {
@@ -11,6 +11,55 @@
   flex-wrap: wrap;
 }
 
+/* ===== Search box (mirrors .ref-search in referrals) ===== */
+.jobs-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 380px;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .jobs-search {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.jobs-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.jobs-search svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  stroke-width: 2;
+}
+
+.jobs-search input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.jobs-search input:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* ===== Filter chips ===== */
 .filters {
   display: flex;
   gap: 0.3rem;

@@ -24,6 +24,7 @@ import { t, tState, tStateShort } from '../i18n.js';
  */
 export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore) {
   let currentFilter = 'all';
+  let searchTerm = '';
   const datePicker = fechaPicker;
 
   // ----------------------------------------------------------
@@ -63,15 +64,18 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     document.getElementById('jobCounter').textContent = jobs.length;
 
-    const filtered = sortJobs(filterJobs(jobs, currentFilter));
+    const filtered = sortJobs(filterJobs(jobs, currentFilter, searchTerm));
     const list = document.getElementById('list');
 
     if (filtered.length === 0) {
+      // Different empty states: no jobs at all, or no match for the
+      // current filter/search combination.
+      const noJobsAtAll = jobs.length === 0;
       list.innerHTML = `
         <div class="empty">
           <div class="empty-icon">📭</div>
-          <h3>${escapeHtml(jobs.length === 0 ? t('empty.jobs.title') : t('empty.jobs.filter.title'))}</h3>
-          <p>${escapeHtml(jobs.length === 0 ? t('empty.jobs.subtitle') : t('empty.jobs.filter.subtitle'))}</p>
+          <h3>${escapeHtml(noJobsAtAll ? t('empty.jobs.title') : t('empty.jobs.filter.title'))}</h3>
+          <p>${escapeHtml(noJobsAtAll ? t('empty.jobs.subtitle') : t('empty.jobs.filter.subtitle'))}</p>
         </div>
       `;
       return;
@@ -139,6 +143,15 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   // Initial render
   renderFilters();
   renderInitialStates();
+
+  // ----------------------------------------------------------
+  // Search input: live filtering
+  // ----------------------------------------------------------
+  const searchInput = document.getElementById('jobSearch');
+  searchInput.addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    renderList();
+  });
 
   // ----------------------------------------------------------
   // Form: create application

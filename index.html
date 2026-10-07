@@ -168,6 +168,13 @@
 
     <div class="collapsible-body" id="jobsBody">
       <div class="toolbar">
+        <div class="jobs-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="jobSearch" maxlength="120" placeholder="Buscar por puesto, empresa, nota..." data-i18n-placeholder="jobs.search.placeholder">
+        </div>
         <div class="filters" id="filters"></div>
       </div>
 
@@ -429,7 +436,6 @@
 
     <div class="config-layout">
       <nav class="config-nav" role="tablist">
-        <!-- Dashboard content -->
         <button class="config-tab active" data-tab="puestos" role="tab">
           <span class="config-tab-icon">💼</span>
           <span class="config-tab-label" data-i18n="config.tab.puestos">Puestos</span>
@@ -445,7 +451,6 @@
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <!-- Personalization -->
         <button class="config-tab" data-tab="apariencia" role="tab">
           <span class="config-tab-icon">🎨</span>
           <span class="config-tab-label" data-i18n="config.tab.apariencia">Apariencia</span>
@@ -457,7 +462,6 @@
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <!-- Account -->
         <button class="config-tab" data-tab="perfil" role="tab">
           <span class="config-tab-icon">👤</span>
           <span class="config-tab-label" data-i18n="config.tab.perfil">Perfil</span>
@@ -465,7 +469,6 @@
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <!-- Advanced -->
         <button class="config-tab" data-tab="advanced" role="tab">
           <span class="config-tab-icon">⚠️</span>
           <span class="config-tab-label" data-i18n="config.tab.advanced">Avanzado</span>
@@ -558,7 +561,6 @@
           </div>
         </div>
 
-        <!-- Panel: Profile -->
         <div class="config-panel" data-panel="perfil">
           <div class="config-section">
             <div class="config-section-head">
@@ -622,7 +624,6 @@
           </div>
         </div>
 
-        <!-- Panel: Advanced (danger zone) -->
         <div class="config-panel" data-panel="advanced">
           <div class="config-section config-section-danger">
             <div class="config-section-head">
