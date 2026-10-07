@@ -1,38 +1,8 @@
 /* ============================================================
-   History: botón 🕒 + status clickeable + timeline de etapas
+   History: clickable status + stage timeline
    ============================================================ */
 
-/* ===== Botón 🕒 en las acciones de la tarjeta ===== */
-.action-btn.history {
-  color: var(--accent);
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-  position: relative;
-}
-
-.action-btn.history:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  box-shadow: 0 4px 12px var(--accent-glow);
-}
-
-.action-btn.history::after {
-  content: '';
-  position: absolute;
-  top: 4px; right: 4px;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
-}
-
-.action-btn.history:hover::after {
-  background: white;
-  box-shadow: 0 0 6px rgba(255,255,255,0.8);
-}
-
-/* ===== Status clickeable (reemplaza al status-text) ===== */
+/* ===== Clickable status (replaces the status-text) ===== */
 .status-clickable {
   display: inline-flex;
   align-items: center;
@@ -63,7 +33,7 @@
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-/* ===== Modal de historial ===== */
+/* ===== History modal ===== */
 .history-subtitle {
   font-size: 0.88rem;
   color: var(--text-muted);

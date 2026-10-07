@@ -92,7 +92,6 @@ export function renderRefCard(ref, ctx = {}) {
       </div>
 
       <div class="ref-actions">
-        <button class="action-btn history" title="${escapeHtml(t('ref.historyTitle'))}" data-action="ref-history">🕒</button>
         <button class="action-btn" title="${escapeHtml(t('ref.editTitle'))}" data-action="edit-ref">✏️</button>
         <button class="action-btn danger" title="${escapeHtml(t('ref.deleteTitle'))}" data-action="delete-ref">🗑️</button>
       </div>

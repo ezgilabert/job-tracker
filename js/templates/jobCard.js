@@ -57,7 +57,7 @@ export function renderJobCard(job, ctx = {}) {
   const currentIdx = stepIndex(job.estado);
   const pct = progressPct(job.estado);
 
-  // Cinta diagonal dorada para la etapa final (Oferta)
+  // Golden diagonal ribbon for the final stage (Offer)
   const offerRibbon = job.estado === 'Oferta'
     ? `<span class="job-offer-ribbon" aria-hidden="true">${escapeHtml(t('job.offerRibbon'))}</span>`
     : '';
@@ -109,7 +109,6 @@ export function renderJobCard(job, ctx = {}) {
           <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${contactTxt}</div>
         </div>
         <div class="job-actions">
-          <button class="action-btn history" title="${escapeHtml(t('job.historyTitle'))}" data-action="history">🕒</button>
           <button class="action-btn" title="${escapeHtml(t('job.editTitle'))}" data-action="edit">✏️</button>
           <button class="action-btn danger" title="${escapeHtml(t('job.deleteTitle'))}" data-action="delete">🗑️</button>
         </div>
