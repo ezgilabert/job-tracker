@@ -1,8 +1,8 @@
 /* ============================================================
-   Jobs: sección colapsable, tarjetas de postulaciones, badges
+   Jobs: collapsible section, job cards, badges
    ============================================================ */
 
-/* ===== Sección de postulaciones ===== */
+/* ===== Jobs section ===== */
 .jobs-section {
   margin-bottom: 1.5rem;
 }
@@ -53,7 +53,7 @@
   border: 1px solid var(--accent-border);
 }
 
-/* ===== Lista ===== */
+/* ===== List ===== */
 #list { display: grid; gap: 1rem; }
 
 .job {
@@ -125,8 +125,8 @@
 [data-theme="dark"] .job[data-estado="Descartado"] { opacity: 0.65; }
 
 /* ============================================================
-   Oferta final: borde dorado + cinta de esquina
-   La card se destaca mientras espera confirmación del usuario.
+   Final offer: golden border + corner ribbon
+   Shown while the offer waits for user confirmation.
    ============================================================ */
 
 .job[data-estado="Oferta"] {
@@ -143,9 +143,9 @@
     var(--shadow);
 }
 
-/* Cinta diagonal en la esquina superior derecha.
-   El .job tiene overflow:hidden, así que la cinta se recorta
-   automáticamente contra el borde de la card. */
+/* Diagonal ribbon in the top-right corner.
+   .job has overflow: hidden, so the ribbon is clipped
+   automatically against the card border. */
 .job-offer-ribbon {
   position: absolute;
   top: 22px;
@@ -166,9 +166,9 @@
   white-space: nowrap;
 }
 
-/* Empujamos las acciones hacia la izquierda para que no
-   queden debajo de la cinta en estado Oferta. */
-.job[data-estado="Oferta"] .job-actions {
+/* Push the actions left so they don't sit under the
+   ribbon while the card is in the raw Oferta state. */
+.job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions {
   margin-right: 70px;
 }
 
@@ -180,9 +180,159 @@
     font-size: 0.62rem;
     padding: 0.35rem 0;
   }
-  .job[data-estado="Oferta"] .job-actions {
+  .job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions {
     margin-right: 55px;
   }
+}
+
+/* ============================================================
+   Offer CONFIRMED: festive confetti + banner
+   Card stays interactive, but the workflow is locked with an
+   "unmark" escape hatch.
+   ============================================================ */
+
+.job.offer-confirmed {
+  border-color: var(--gold-border);
+  background:
+    radial-gradient(circle at 100% 0%, var(--gold-soft), transparent 55%),
+    var(--surface);
+  box-shadow:
+    0 8px 32px rgba(245,179,1,0.18),
+    var(--shadow-sm);
+}
+
+.job.offer-confirmed:hover {
+  border-color: var(--gold);
+  box-shadow:
+    0 12px 36px rgba(245,179,1,0.28),
+    var(--shadow);
+}
+
+/* Confetti layer: absolute, clipped by the card's overflow. */
+.job-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: var(--radius);
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0.9;
+  animation: confettiFall 4s linear infinite;
+}
+
+.confetti-piece.c1 { left: 6%;  background: #f5b301; animation-delay: 0s;   animation-duration: 3.6s; }
+.confetti-piece.c2 { left: 20%; background: #8b6cff; animation-delay: 0.7s; animation-duration: 4.3s; }
+.confetti-piece.c3 { left: 36%; background: #10b981; animation-delay: 1.4s; animation-duration: 3.9s; }
+.confetti-piece.c4 { left: 52%; background: #ef4444; animation-delay: 0.4s; animation-duration: 4.6s; }
+.confetti-piece.c5 { left: 68%; background: #f5b301; animation-delay: 1.8s; animation-duration: 3.7s; }
+.confetti-piece.c6 { left: 82%; background: #b975ff; animation-delay: 1.1s; animation-duration: 4.2s; }
+.confetti-piece.c7 { left: 93%; background: #10b981; animation-delay: 2.2s; animation-duration: 4.0s; }
+
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translateY(620px) rotate(720deg); opacity: 0; }
+}
+
+/* Make sure the card content sits above the confetti. */
+.job.offer-confirmed .job-header,
+.job.offer-confirmed .workflow,
+.job.offer-confirmed .badge,
+.job.offer-confirmed .congrats-banner,
+.job.offer-confirmed .job-notas,
+.job.offer-confirmed .job-refs,
+.job.offer-confirmed .step-note,
+.job.offer-confirmed .drag-handle {
+  position: relative;
+  z-index: 1;
+}
+
+/* Congrats banner inside the card. */
+.congrats-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold-soft), rgba(16,185,129,0.08));
+  border: 1px solid var(--gold-border);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.congrats-emoji {
+  font-size: 1.4rem;
+  animation: congratsBounce 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes congratsBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-4px) scale(1.1); }
+}
+
+.congrats-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.congrats-text strong {
+  color: var(--gold);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+}
+
+.congrats-text span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Confirmed badge: subtle difference from the raw Oferta badge. */
+.badge.badge-confirmed {
+  background: linear-gradient(135deg, var(--gold-soft), rgba(16,185,129,0.12));
+  color: var(--gold);
+  border-color: var(--gold-border);
+}
+
+[data-theme="dark"] .badge.badge-confirmed {
+  color: #f5b301;
+}
+
+/* Static "Offer confirmed" pill (replaces the workflow CTA). */
+.offer-confirmed-pill {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.9rem 1.35rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), #d99500);
+  color: #1a1407;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(245,179,1,0.4);
+}
+
+.offer-confirmed-pill .pill-emoji {
+  font-size: 1.05rem;
 }
 
 /* Drag & drop */

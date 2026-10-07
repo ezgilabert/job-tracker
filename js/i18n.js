@@ -146,6 +146,13 @@ const translations = {
     'job.refChipTitle': 'Ver referido: {name}',
     'job.offerRibbon': '🏆 Oferta',
 
+    // Offer confirmed (festive state)
+    'job.offerConfirmed.title': '¡Felicitaciones!',
+    'job.offerConfirmed.subtitle': 'Confirmaste la oferta de {empresa}. ¡A festejar!',
+    'job.offerConfirmed.label': 'Oferta',
+    'job.offerConfirmed.status': 'Oferta confirmada',
+    'job.unconfirmOffer': 'Desmarcar oferta',
+
     'ref.link': 'Link',
     'ref.goToJob': 'Ir a la postulación en {empresa}',
     'ref.reopen': 'Reabrir',
@@ -325,6 +332,7 @@ const translations = {
     'toast.orderUpdated': 'Orden actualizado',
     'toast.needReason': 'Escribí o elegí un motivo',
     'toast.closedAs': 'Cerrada como {estado}',
+    'toast.offerUnconfirmed': 'Oferta desmarcada',
     'toast.refAdded': 'Referido agregado',
     'toast.refDeleted': 'Referido borrado',
     'toast.refUpdated': 'Referido actualizado',
@@ -528,6 +536,13 @@ const translations = {
     'job.refChipTitle': 'View referral: {name}',
     'job.offerRibbon': '🏆 Offer',
 
+    // Offer confirmed (festive state)
+    'job.offerConfirmed.title': 'Congratulations!',
+    'job.offerConfirmed.subtitle': 'You confirmed the offer from {empresa}. Celebrate!',
+    'job.offerConfirmed.label': 'Offer',
+    'job.offerConfirmed.status': 'Offer confirmed',
+    'job.unconfirmOffer': 'Unmark offer',
+
     'ref.link': 'Link',
     'ref.goToJob': 'Go to application at {empresa}',
     'ref.reopen': 'Reopen',
@@ -707,6 +722,7 @@ const translations = {
     'toast.orderUpdated': 'Order updated',
     'toast.needReason': 'Write or pick a reason',
     'toast.closedAs': 'Closed as {estado}',
+    'toast.offerUnconfirmed': 'Offer unmarked',
     'toast.refAdded': 'Referral added',
     'toast.refDeleted': 'Referral deleted',
     'toast.refUpdated': 'Referral updated',

@@ -177,18 +177,22 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
 
     const { id, estado } = pendingClose;
 
-    // Necesitamos el puesto/empresa para el motivo del historial del referido
+    // We need the role/company for the referral history entry.
     const closedJob = jobsStore.get().find(x => x.id === id);
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
       const history = cloneArray(j.history);
       history.push({ estado, fecha: new Date().toISOString(), motivo: reason });
-      return { ...j, estado, history };
+      const patch = { ...j, estado, history };
+      // Confirming the offer sets a flag so the card renders the
+      // festive "offer confirmed" state (confetti + banner + lock).
+      if (estado === 'Oferta') patch.offerConfirmed = true;
+      return patch;
     }));
 
-    // Si la postulación se cierra como Oferta, sincronizamos el referido
-    // vinculado: lo movemos a "Contratado" si todavía no está ahí.
+    // If the job closes as Offer, sync the linked referral:
+    // move it to "Hired" if it isn't there yet.
     if (estado === 'Oferta') {
       syncLinkedRefToContratado(id, closedJob);
     }
@@ -201,7 +205,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   function syncLinkedRefToContratado(jobId, job) {
     refsStore.update(refs => refs.map(r => {
       if (r.linkedJobId !== jobId) return r;
-      // Si el referido fue cerrado explícitamente (No aplica), lo respetamos.
+      // If the referral was explicitly closed (Not applicable), respect it.
       if (r.estado === 'No aplica') return r;
       if (r.estado === 'Contratado') return r;
 
@@ -212,7 +216,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       history.push({
         estado: 'Contratado',
         fecha: new Date().toISOString(),
-        motivo: `Oferta aceptada: ${label}`,
+        motivo: `Offer accepted: ${label}`,
       });
       return { ...r, estado: 'Contratado', history };
     }));

@@ -57,9 +57,24 @@ export function renderJobCard(job, ctx = {}) {
   const currentIdx = stepIndex(job.estado);
   const pct = progressPct(job.estado);
 
-  // Golden diagonal ribbon for the final stage (Offer)
-  const offerRibbon = job.estado === 'Oferta'
+  // "Offer confirmed" = user clicked "Confirm Offer" on an offer-state card.
+  const offerConfirmed = job.estado === 'Oferta' && job.offerConfirmed === true;
+
+  // Golden diagonal ribbon: only on the raw offer state, before confirmation.
+  const offerRibbon = (job.estado === 'Oferta' && !offerConfirmed)
     ? `<span class="job-offer-ribbon" aria-hidden="true">${escapeHtml(t('job.offerRibbon'))}</span>`
+    : '';
+
+  // Confetti pieces + congrats banner: only when the offer is confirmed.
+  const confettiHtml = offerConfirmed ? renderConfetti() : '';
+  const congratsBannerHtml = offerConfirmed
+    ? `<div class="congrats-banner">
+         <span class="congrats-emoji">🎉</span>
+         <div class="congrats-text">
+           <strong>${escapeHtml(t('job.offerConfirmed.title'))}</strong>
+           <span>${escapeHtml(t('job.offerConfirmed.subtitle', { empresa: job.empresa }))}</span>
+         </div>
+       </div>`
     : '';
 
   const stepsHtml = closed ? '' : renderSteps(
@@ -79,7 +94,7 @@ export function renderJobCard(job, ctx = {}) {
 
   const workflowActions = closed
     ? renderClosedActions(job)
-    : renderOpenActions(job, currentIdx);
+    : renderOpenActions(job, currentIdx, offerConfirmed);
 
   const statusBlock = closed ? '' : `
     <div class="workflow-status">
@@ -93,13 +108,18 @@ export function renderJobCard(job, ctx = {}) {
     </div>
   `;
 
+  const badgeHtml = offerConfirmed
+    ? `<span class="badge badge-confirmed" data-estado="Oferta">✓ ${escapeHtml(tState(job.estado))}</span>`
+    : `<span class="badge" data-estado="${escapeHtml(job.estado)}">${escapeHtml(tState(job.estado))}</span>`;
+
   return `
-    <div class="job"
+    <div class="job ${offerConfirmed ? 'offer-confirmed' : ''}"
          data-estado="${escapeHtml(job.estado)}"
          data-id="${job.id}"
          draggable="true"
          style="animation-delay:${Math.min(index * 40, 400)}ms">
 
+      ${confettiHtml}
       <div class="drag-handle" title="${escapeHtml(t('job.dragHandle'))}">⠿</div>
       ${offerRibbon}
 
@@ -116,7 +136,8 @@ export function renderJobCard(job, ctx = {}) {
 
       ${notesTxt}
       ${linkTxt}
-      <span class="badge" data-estado="${escapeHtml(job.estado)}">${escapeHtml(tState(job.estado))}</span>
+      ${congratsBannerHtml}
+      ${badgeHtml}
       ${refsHtml}
       ${pendingNoteHtml}
 
@@ -130,9 +151,46 @@ export function renderJobCard(job, ctx = {}) {
 }
 
 // ------------------------------------------------------------
+// Confetti: 7 looping pieces with staggered positions
+// ------------------------------------------------------------
+function renderConfetti() {
+  return `
+    <div class="job-confetti" aria-hidden="true">
+      <span class="confetti-piece c1"></span>
+      <span class="confetti-piece c2"></span>
+      <span class="confetti-piece c3"></span>
+      <span class="confetti-piece c4"></span>
+      <span class="confetti-piece c5"></span>
+      <span class="confetti-piece c6"></span>
+      <span class="confetti-piece c7"></span>
+    </div>
+  `;
+}
+
+// ------------------------------------------------------------
 // Open-job actions
 // ------------------------------------------------------------
-function renderOpenActions(job, currentIdx) {
+function renderOpenActions(job, currentIdx, offerConfirmed = false) {
+  // Offer confirmed: lock the workflow, keep only "unmark" + no close options
+  if (offerConfirmed) {
+    return `
+      <div class="wf-section">
+        <div class="wf-section-label">${escapeHtml(t('job.offerConfirmed.label'))}</div>
+        <div class="wf-main-actions">
+          <div class="offer-confirmed-pill">
+            <span class="pill-emoji">🏆</span>
+            <span>${escapeHtml(t('job.offerConfirmed.status'))}</span>
+          </div>
+        </div>
+        <div class="wf-close-actions">
+          <button class="wf-close-btn" data-action="unconfirm-offer">
+            ↺ ${escapeHtml(t('job.unconfirmOffer'))}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
   const canBack = currentIdx > 0;
   const canNext = currentIdx < WORKFLOW_STEPS.length - 1;
   const prevStep = canBack ? WORKFLOW_STEPS[currentIdx - 1] : null;

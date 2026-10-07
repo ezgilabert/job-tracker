@@ -213,16 +213,17 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const estado = actionEl.dataset.estado;
 
     switch (action) {
-      case 'edit':         modals.onOpenEdit(id); break;
-      case 'delete':       confirmDelete(id);     break;
-      case 'history':      modals.onOpenHistory(id); break;
-      case 'move-next':    modals.onAdvance(id, { direction: 'next' }); break;
-      case 'move-prev':    modals.onAdvance(id, { direction: 'prev' }); break;
-      case 'skip-step':    modals.onAdvance(id, { direction: 'next', skipCurrent: true }); break;
-      case 'close':        if (estado) modals.onClose(id, estado); break;
-      case 'close-offer':  modals.onClose(id, 'Oferta'); break;
-      case 'reopen':       reopenJob(id); break;
-      case 'scroll-to-ref': scrollToRef(Number(actionEl.dataset.refId)); break;
+      case 'edit':              modals.onOpenEdit(id); break;
+      case 'delete':            confirmDelete(id);     break;
+      case 'history':           modals.onOpenHistory(id); break;
+      case 'move-next':         modals.onAdvance(id, { direction: 'next' }); break;
+      case 'move-prev':         modals.onAdvance(id, { direction: 'prev' }); break;
+      case 'skip-step':         modals.onAdvance(id, { direction: 'next', skipCurrent: true }); break;
+      case 'close':             if (estado) modals.onClose(id, estado); break;
+      case 'close-offer':       modals.onClose(id, 'Oferta'); break;
+      case 'unconfirm-offer':   unconfirmOffer(id); break;
+      case 'reopen':            reopenJob(id); break;
+      case 'scroll-to-ref':     scrollToRef(Number(actionEl.dataset.refId)); break;
     }
   });
 
@@ -236,8 +237,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     if (!confirmed) return;
     jobsStore.update(jobs => jobs.filter(j => j.id !== id));
 
-    // Si algún referido apuntaba a esta postulación, limpiamos el vínculo
-    // para que el botón "volver atrás" del referido se destrabe.
+    // If a referral pointed to this application, clear the link so the
+    // referral's "go back" button is no longer locked.
     refsStore.update(refs => refs.map(r => {
       if (r.linkedJobId !== id) return r;
       return { ...r, linkedJobId: null };
@@ -251,9 +252,19 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       if (j.id !== id) return j;
       const history = cloneArray(j.history);
       history.push({ estado: 'Aplicado', fecha: new Date().toISOString() });
-      return { ...j, estado: 'Aplicado', history };
+      return { ...j, estado: 'Aplicado', history, offerConfirmed: false };
     }));
     showToast(t('toast.jobReopened'), '↻');
+  }
+
+  // "Unmark" the confirmed offer: clear the flag so the user can edit
+  // or continue the workflow again.
+  function unconfirmOffer(id) {
+    jobsStore.update(jobs => jobs.map(j => {
+      if (j.id !== id) return j;
+      return { ...j, offerConfirmed: false };
+    }));
+    showToast(t('toast.offerUnconfirmed'), '↺');
   }
 
   function scrollToRef(refId) {
