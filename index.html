@@ -4,13 +4,195 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Job Tracker · Mi búsqueda laboral</title>
+
+<!-- Aplica el tema guardado antes de pintar (evita flash de color) -->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('jobTrackerTheme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/styles.css">
+
+<!-- ============================================================
+     Loading overlay (versión 3)
+     - Animación de textos rotativos: ciclo de 3s (1s por mensaje)
+     - Barra de progreso: ciclo de 1.5s
+     - Mínimo 3s = un ciclo completo de la animación
+     ============================================================ -->
+<style>
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    background: var(--bg-1, #f6f7fb);
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+
+  [data-theme="dark"] .loading-overlay {
+    background: var(--bg-1, #0a0c18);
+  }
+
+  .loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* ===== Contenido del loader ===== */
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+    padding: 0 1.5rem;
+  }
+
+  .loading-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .loading-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent, #7c5cff), var(--accent-2, #a855f7));
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 18px var(--accent-glow, rgba(124,92,255,0.3));
+    flex-shrink: 0;
+  }
+
+  .loading-logo svg {
+    width: 18px;
+    height: 18px;
+    color: #ffffff;
+    display: block;
+  }
+
+  .loading-brand {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text, #16182a);
+  }
+
+  /* ===== Textos rotativos (ciclo de 3 segundos) ===== */
+  .loading-rotating {
+    position: relative;
+    height: 20px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .loading-rotating span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-muted, #5c6279);
+    opacity: 0;
+    animation: loadingRotateText 3s linear infinite;
+    font-weight: 500;
+  }
+
+  .loading-rotating span:nth-child(1) { animation-delay: 0s; }
+  .loading-rotating span:nth-child(2) { animation-delay: 1s; }
+  .loading-rotating span:nth-child(3) { animation-delay: 2s; }
+
+  @keyframes loadingRotateText {
+    0%   { opacity: 0; transform: translateY(8px); }
+    5%   { opacity: 1; transform: translateY(0); }
+    30%  { opacity: 1; transform: translateY(0); }
+    35%  { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 0; transform: translateY(-8px); }
+  }
+
+  /* ===== Barra indeterminada (ciclo de 1.5 segundos) ===== */
+  .loading-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border, #e7e9f3);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  [data-theme="dark"] .loading-bar {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .loading-bar-fill {
+    position: absolute;
+    top: 0;
+    left: -40%;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--accent, #7c5cff),
+      var(--accent-2, #a855f7),
+      transparent
+    );
+    border-radius: 4px;
+    animation: loadingBarSlide 1.5s ease-in-out infinite;
+  }
+
+  @keyframes loadingBarSlide {
+    0%   { left: -40%; }
+    100% { left: 100%; }
+  }
+</style>
 </head>
 <body>
+
+<!-- Overlay de carga (versión 3) -->
+<div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+  <div class="loading-content">
+
+    <div class="loading-logo-row">
+      <div class="loading-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="5"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+          <path d="M12 3 L19 10"/>
+          <path d="M15 4 L20 9 L19 10 L14 5 Z" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <div class="loading-brand">Job Tracker</div>
+    </div>
+
+    <div class="loading-rotating">
+      <span data-loading-text="jobs">Cargando postulaciones…</span>
+      <span data-loading-text="refs">Sincronizando referidos…</span>
+      <span data-loading-text="panel">Preparando tu panel…</span>
+    </div>
+
+    <div class="loading-bar">
+      <div class="loading-bar-fill"></div>
+    </div>
+
+  </div>
+</div>
+
 <div class="container">
   <header>
     <div class="brand">
@@ -841,5 +1023,104 @@
 <div class="toast-container" id="toasts"></div>
 
 <script type="module" src="./js/main.js"></script>
+
+<!-- ============================================================
+     Loading overlay (versión 3)
+     - Muestra SIEMPRE un ciclo completo de la animación (3s):
+       * 0-1s: "Cargando postulaciones…"
+       * 1-2s: "Sincronizando referidos…"
+       * 2-3s: "Preparando tu panel…"
+     - Si la página ya cargó, espera a que termine el ciclo y se oculta.
+     - Si la página todavía no cargó, la animación sigue en loop
+       hasta que termine.
+     ============================================================ -->
+<script>
+  (function () {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+
+    // La animación de textos tiene un ciclo de 3s (1s por mensaje).
+    // El mínimo tiene que ser igual para que se vea entera.
+    const MIN_DISPLAY = 3000;
+    const startTime = Date.now();
+    let pageLoaded = false;
+    let hidden = false;
+
+    // ---------- Traducción según el idioma guardado ----------
+    (function translateOverlay() {
+      let lang = 'es';
+      try {
+        const raw = localStorage.getItem('jobTrackerConfig');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const cfg = parsed && typeof parsed === 'object' && 'data' in parsed
+            ? parsed.data
+            : parsed;
+          if (cfg && cfg.lang) lang = cfg.lang;
+        }
+      } catch (e) {}
+
+      const dict = {
+        es: {
+          jobs:  'Cargando postulaciones…',
+          refs:  'Sincronizando referidos…',
+          panel: 'Preparando tu panel…',
+        },
+        en: {
+          jobs:  'Loading applications…',
+          refs:  'Syncing referrals…',
+          panel: 'Preparing your dashboard…',
+        },
+      };
+
+      const map = dict[lang] || dict.es;
+      overlay.querySelectorAll('[data-loading-text]').forEach(el => {
+        const key = el.getAttribute('data-loading-text');
+        if (map[key]) el.textContent = map[key];
+      });
+      document.documentElement.lang = lang;
+    })();
+
+    // ---------- Ocultar respetando SIEMPRE un ciclo completo ----------
+    function hideOverlay() {
+      if (hidden) return;
+      hidden = true;
+      overlay.classList.add('hidden');
+      setTimeout(() => overlay.remove(), 600);
+    }
+
+    function scheduleHide() {
+      if (!pageLoaded || hidden) return;
+
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, MIN_DISPLAY - elapsed);
+
+      setTimeout(hideOverlay, remaining);
+    }
+
+    // 1) Cuando la página termina de cargar, programamos el ocultado.
+    //    Si ya pasaron los 3s, se oculta ya mismo. Si no, espera lo
+    //    que falta para completar el ciclo entero.
+    window.addEventListener('load', () => {
+      pageLoaded = true;
+      scheduleHide();
+    });
+
+    // 2) Si el script corre tarde y la página ya estaba cargada,
+    //    igual respetamos el ciclo completo.
+    if (document.readyState === 'complete') {
+      pageLoaded = true;
+      scheduleHide();
+    }
+
+    // 3) Fallback de seguridad: nunca dejar el overlay colgado
+    setTimeout(() => {
+      if (!hidden) {
+        pageLoaded = true;
+        hideOverlay();
+      }
+    }, 15000);
+  })();
+</script>
 </body>
 </html>
