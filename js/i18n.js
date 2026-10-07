@@ -161,6 +161,7 @@ const translations = {
     'ref.editTitle': 'Editar',
     'ref.deleteTitle': 'Borrar',
     'ref.historyTitle': 'Ver historial',
+    'ref.lockedBackTitle': 'No se puede volver atrás: la postulación ya fue creada',
 
     'empty.jobs.title': 'Todavía no cargaste postulaciones',
     'empty.jobs.subtitle': 'Empezá agregando una arriba ☝️',
@@ -533,6 +534,7 @@ const translations = {
     'ref.editTitle': 'Edit',
     'ref.deleteTitle': 'Delete',
     'ref.historyTitle': 'View history',
+    'ref.lockedBackTitle': "Can't go back: the application was already created",
 
     'empty.jobs.title': "You haven't added any applications yet",
     'empty.jobs.subtitle': 'Start by adding one above ☝️',

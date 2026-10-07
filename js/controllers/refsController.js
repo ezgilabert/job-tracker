@@ -98,6 +98,7 @@ export function mountRefsController(jobsStore, refsStore, modals) {
       relacion: relacionChips?.getValue() || 'Conocido',
       estado: initialState,
       empresasVinculadas: [...selectedCompanies],
+      linkedJobId: null,
       notas: valueOf('refNotas'),
       volvioAtras: false,
       createdAt: now,
@@ -262,10 +263,30 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     showToast(t('toast.advanceTo', { name: r.nombre, estado: tRefState(nextState) }), '→');
 
+    // Al llegar a "Contratado" sincronizamos la postulación vinculada:
+    // la movemos a "Oferta" si todavía no está ahí.
+    if (nextState === 'Contratado' && r.linkedJobId) {
+      syncLinkedJobToOffer(r.linkedJobId, r.nombre);
+    }
+
     // Al entrar en "En proceso" ofrecemos mover el referido a postulaciones.
     if (nextState === 'En proceso' && prevState !== 'En proceso') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
+  }
+
+  function syncLinkedJobToOffer(jobId, refName) {
+    jobsStore.update(jobs => jobs.map(j => {
+      if (j.id !== jobId) return j;
+      if (j.estado === 'Oferta') return j;
+      const history = cloneArray(j.history);
+      history.push({
+        estado: 'Oferta',
+        fecha: new Date().toISOString(),
+        motivo: `Referido contratado: ${refName}`,
+      });
+      return { ...j, estado: 'Oferta', history };
+    }));
   }
 
   function hideRefNote() {
@@ -298,6 +319,13 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   async function requestMovePrev(id) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r || isRefClosed(r.estado)) return;
+
+    // Si ya hay una postulación creada/vinculada desde este referido,
+    // no permitimos retroceder: el vínculo quedaría inconsistente.
+    if (r.linkedJobId) {
+      showToast(t('ref.lockedBackTitle'), '🔒');
+      return;
+    }
 
     if (r.volvioAtras) {
       showToast(t('toast.alreadyWentBackRef'), '!');

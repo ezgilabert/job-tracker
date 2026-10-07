@@ -235,6 +235,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     });
     if (!confirmed) return;
     jobsStore.update(jobs => jobs.filter(j => j.id !== id));
+
+    // Si algún referido apuntaba a esta postulación, limpiamos el vínculo
+    // para que el botón "volver atrás" del referido se destrabe.
+    refsStore.update(refs => refs.map(r => {
+      if (r.linkedJobId !== id) return r;
+      return { ...r, linkedJobId: null };
+    }));
+
     showToast(t('toast.jobDeleted'), '🗑️');
   }
 

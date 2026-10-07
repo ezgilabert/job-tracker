@@ -106,16 +106,24 @@ function renderRefActions(ref, currentIdx) {
   const prevStep = canBack ? REF_WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? REF_WORKFLOW_STEPS[currentIdx + 1] : null;
   const alreadyWentBack = Boolean(ref.volvioAtras);
+  const hasLinkedJob = Boolean(ref.linkedJobId);
+  const backLocked = alreadyWentBack || hasLinkedJob;
 
   const nextBtn = nextStep
     ? `<button class="ref-wf-btn primary" data-action="move-ref-next" title="${escapeHtml(t('ref.nextTitle', { step: tRefStateShort(nextStep.id) }))}">${escapeHtml(t('ref.next'))} ${escapeHtml(tRefStateShort(nextStep.id))}</button>`
     : `<button class="ref-wf-btn success" disabled title="${escapeHtml(t('ref.contratadoTitle'))}">✓ ${escapeHtml(t('ref.contratado'))}</button>`;
 
   let prevBtn = '';
-  if (prevStep && !alreadyWentBack) {
-    prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="${escapeHtml(t('ref.prevTitle', { step: tRefStateShort(prevStep.id) }))}">${escapeHtml(t('ref.prev'))} ${escapeHtml(tRefStateShort(prevStep.id))}</button>`;
-  } else if (prevStep && alreadyWentBack) {
-    prevBtn = `<button class="ref-wf-btn" disabled title="${escapeHtml(t('toast.alreadyWentBackRef'))}">${escapeHtml(t('ref.prev'))} ${escapeHtml(tRefStateShort(prevStep.id))}</button>`;
+  if (prevStep) {
+    const label = `${escapeHtml(t('ref.prev'))} ${escapeHtml(tRefStateShort(prevStep.id))}`;
+    if (!backLocked) {
+      prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="${escapeHtml(t('ref.prevTitle', { step: tRefStateShort(prevStep.id) }))}">${label}</button>`;
+    } else {
+      const lockTitle = hasLinkedJob
+        ? t('ref.lockedBackTitle')
+        : t('toast.alreadyWentBackRef');
+      prevBtn = `<button class="ref-wf-btn" disabled title="${escapeHtml(lockTitle)}">🔒 ${label}</button>`;
+    }
   }
 
   return `

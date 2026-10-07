@@ -176,6 +176,10 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }
 
     const { id, estado } = pendingClose;
+
+    // Necesitamos el puesto/empresa para el motivo del historial del referido
+    const closedJob = jobsStore.get().find(x => x.id === id);
+
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
       const history = cloneArray(j.history);
@@ -183,10 +187,36 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       return { ...j, estado, history };
     }));
 
+    // Si la postulación se cierra como Oferta, sincronizamos el referido
+    // vinculado: lo movemos a "Contratado" si todavía no está ahí.
+    if (estado === 'Oferta') {
+      syncLinkedRefToContratado(id, closedJob);
+    }
+
     hideClose();
     const icons = { 'Rechazado': '✕', 'Ghosted': '👻', 'Descartado': '🚫', 'Oferta': '🎉' };
     showToast(t('toast.closedAs', { estado: tState(estado) }), icons[estado] || '✓');
   });
+
+  function syncLinkedRefToContratado(jobId, job) {
+    refsStore.update(refs => refs.map(r => {
+      if (r.linkedJobId !== jobId) return r;
+      // Si el referido fue cerrado explícitamente (No aplica), lo respetamos.
+      if (r.estado === 'No aplica') return r;
+      if (r.estado === 'Contratado') return r;
+
+      const history = cloneArray(r.history);
+      const label = job
+        ? `${job.puesto || '—'} · ${job.empresa || '—'}`
+        : '—';
+      history.push({
+        estado: 'Contratado',
+        fecha: new Date().toISOString(),
+        motivo: `Oferta aceptada: ${label}`,
+      });
+      return { ...r, estado: 'Contratado', history };
+    }));
+  }
 
   // ----------------------------------------------------------
   // History (jobs)
@@ -617,7 +647,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       if (r.id !== refToJobPending) return r;
       const linked = cloneArray(r.empresasVinculadas);
       if (!linked.includes(j.empresa)) linked.push(j.empresa);
-      return { ...r, empresasVinculadas: linked };
+      return { ...r, empresasVinculadas: linked, linkedJobId: j.id };
     }));
 
     closeRefToJob();
@@ -639,7 +669,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
           if (x.id !== r.id) return x;
           const linked = cloneArray(x.empresasVinculadas);
           if (!linked.includes(existing.empresa)) linked.push(existing.empresa);
-          return { ...x, empresasVinculadas: linked };
+          return { ...x, empresasVinculadas: linked, linkedJobId: existing.id };
         }));
         closeRefToJob();
         showToast(t('toast.alreadyExisted', { empresa: existing.empresa }), '🔗');
@@ -674,7 +704,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       if (x.id !== r.id) return x;
       const linked = cloneArray(x.empresasVinculadas);
       if (newJob.empresa && !linked.includes(newJob.empresa)) linked.push(newJob.empresa);
-      return { ...x, empresasVinculadas: linked };
+      return { ...x, empresasVinculadas: linked, linkedJobId: newId };
     }));
 
     closeRefToJob();
