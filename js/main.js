@@ -159,20 +159,44 @@ function boot() {
     },
   });
 
+  // 🆕 Mapa de estados legacy de referidos que ya no existen en
+  // REF_WORKFLOW_STEPS. Se aplica tanto al `estado` actual como a
+  // cada entrada del historial, para que ninguna card quede fuera
+  // de rango ni muestre un label sin traducción.
+  const LEGACY_REF_STATE_MAP = {
+    'Me va a referir': 'Contactado',   // era el paso previo a "Referido hecho"
+  };
+
+  function migrateRefState(estado) {
+    return LEGACY_REF_STATE_MAP[estado] || estado;
+  }
+
   const refsStore = new Store(STORAGE_KEYS.REFS, [], {
     version: STORAGE_VERSION,
     migrate: (data) => {
       if (Array.isArray(data)) {
-        return data.map(r => ({
-          ...r,
-          estado: r.estado || 'Pendiente',
-          link: r.link ?? r.linkedin ?? '',
-          empresasVinculadas: ensureArray(r.empresasVinculadas),
-          volvioAtras: Boolean(r.volvioAtras),
-          history: Array.isArray(r.history) && r.history.length
-            ? r.history
-            : [{ estado: r.estado || 'Pendiente', fecha: r.createdAt || new Date().toISOString() }],
-        }));
+        return data.map(r => {
+          const normalizedEstado = migrateRefState(r.estado || 'Pendiente');
+
+          const history = Array.isArray(r.history) && r.history.length
+            ? r.history.map(entry => ({
+                ...entry,
+                estado: migrateRefState(entry.estado),
+              }))
+            : [{
+                estado: normalizedEstado,
+                fecha: r.createdAt || new Date().toISOString(),
+              }];
+
+          return {
+            ...r,
+            estado: normalizedEstado,
+            link: r.link ?? r.linkedin ?? '',
+            empresasVinculadas: ensureArray(r.empresasVinculadas),
+            volvioAtras: Boolean(r.volvioAtras),
+            history,
+          };
+        });
       }
       return data;
     },

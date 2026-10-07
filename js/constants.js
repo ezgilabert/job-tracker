@@ -45,12 +45,11 @@ export function getStateIcon(estado) {
 }
 
 export const REF_WORKFLOW_STEPS = [
-  { id: 'Pendiente',       short: 'Pendiente' },
-  { id: 'Contactado',      short: 'Contactado' },
-  { id: 'Me va a referir', short: 'Va a referir' },
-  { id: 'Referido hecho',  short: 'Referido' },
-  { id: 'En proceso',      short: 'En proceso' },
-  { id: 'Contratado',      short: 'Contratado' },
+  { id: 'Pendiente',      short: 'Pendiente' },
+  { id: 'Contactado',     short: 'Contactado' },
+  { id: 'Referido hecho', short: 'Referido' },
+  { id: 'En proceso',     short: 'En proceso' },
+  { id: 'Contratado',     short: 'Contratado' },
 ];
 
 export const REF_CLOSED_STATES = ['No aplica'];
@@ -59,7 +58,6 @@ export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOS
 export const REF_STATE_ICONS = {
   'Pendiente':       '⏳',
   'Contactado':      '💬',
-  'Me va a referir': '🤝',
   'Referido hecho':  '✅',
   'En proceso':      '⏱️',
   'Contratado':      '🎉',
@@ -267,7 +265,9 @@ export const STORAGE_KEYS = {
   CONFIG: 'jobTrackerConfig',
 };
 
-export const STORAGE_VERSION = 2;
+// ⚠️ Bumped de 2 → 3 para forzar la migración que elimina el
+// estado legacy 'Me va a referir' de los referidos existentes.
+export const STORAGE_VERSION = 3;
 export const CONFIG_VERSION = 1;
 
 export const SAMPLE_JOBS = [

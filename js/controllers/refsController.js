@@ -262,7 +262,8 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     showToast(t('toast.advanceTo', { name: r.nombre, estado: tRefState(nextState) }), '→');
 
-    if (nextState === 'Referido hecho' && prevState !== 'Referido hecho') {
+    // Al entrar en "En proceso" ofrecemos mover el referido a postulaciones.
+    if (nextState === 'En proceso' && prevState !== 'En proceso') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
   }

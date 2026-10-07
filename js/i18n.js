@@ -102,7 +102,6 @@ const translations = {
     'refFilter.all': 'Todos',
     'refFilter.Pendiente': 'Pendiente',
     'refFilter.Contactado': 'Contactado',
-    'refFilter.Me va a referir': 'Va a referir',
     'refFilter.Referido hecho': 'Referido',
     'refFilter.En proceso': 'En proceso',
     'refFilter.Contratado': 'Contratado',
@@ -369,7 +368,6 @@ const translations = {
 
     'refState.Pendiente': 'Pendiente',
     'refState.Contactado': 'Contactado',
-    'refState.Me va a referir': 'Me va a referir',
     'refState.Referido hecho': 'Referido hecho',
     'refState.En proceso': 'En proceso',
     'refState.Contratado': 'Contratado',
@@ -377,7 +375,6 @@ const translations = {
 
     'refStateShort.Pendiente': 'Pendiente',
     'refStateShort.Contactado': 'Contactado',
-    'refStateShort.Me va a referir': 'Va a referir',
     'refStateShort.Referido hecho': 'Referido',
     'refStateShort.En proceso': 'En proceso',
     'refStateShort.Contratado': 'Contratado',
@@ -477,7 +474,6 @@ const translations = {
     'refFilter.all': 'All',
     'refFilter.Pendiente': 'Pending',
     'refFilter.Contactado': 'Contacted',
-    'refFilter.Me va a referir': 'Will refer',
     'refFilter.Referido hecho': 'Referred',
     'refFilter.En proceso': 'In process',
     'refFilter.Contratado': 'Hired',
@@ -744,7 +740,6 @@ const translations = {
 
     'refState.Pendiente': 'Pending',
     'refState.Contactado': 'Contacted',
-    'refState.Me va a referir': 'Will refer me',
     'refState.Referido hecho': 'Referral done',
     'refState.En proceso': 'In process',
     'refState.Contratado': 'Hired',
@@ -752,7 +747,6 @@ const translations = {
 
     'refStateShort.Pendiente': 'Pending',
     'refStateShort.Contactado': 'Contacted',
-    'refStateShort.Me va a referir': 'Will refer',
     'refStateShort.Referido hecho': 'Referral',
     'refStateShort.En proceso': 'In process',
     'refStateShort.Contratado': 'Hired',

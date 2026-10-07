@@ -33,6 +33,11 @@ export function mountConfigController(configStore) {
   // ----------------------------------------------------------
   let draft = null;
 
+  // Recordamos la elección explícita del usuario para el estado
+  // por defecto, incluso si temporalmente queda fuera del set de
+  // estados activos (uncheck → recheck debe restaurarlo).
+  let preferredDefaultState = null;
+
   function cloneConfig(cfg) {
     return JSON.parse(JSON.stringify(cfg));
   }
@@ -59,13 +64,59 @@ export function mountConfigController(configStore) {
     return true;
   }
 
+  // ----------------------------------------------------------
+  // Dirty check
+  // ----------------------------------------------------------
+  // Los arrays de tags/puestos/estados se comportan como sets:
+  // un toggle-off + toggle-on cambia el orden de inserción pero
+  // la selección es la misma. Los normalizamos (sort) antes de
+  // comparar para no marcar cambios inexistentes.
+  //
+  // Los `filtros` SÍ son order-sensitive (se reordenan a propósito),
+  // por eso no se normalizan.
+  function normalizeForDirtyCheck(cfg) {
+    const copy = cloneConfig(cfg || {});
+    if (copy.puestos) {
+      if (Array.isArray(copy.puestos.activeTags)) {
+        copy.puestos.activeTags = [...copy.puestos.activeTags].sort();
+      }
+      if (Array.isArray(copy.puestos.hidden)) {
+        copy.puestos.hidden = [...copy.puestos.hidden].sort();
+      }
+      if (Array.isArray(copy.puestos.custom)) {
+        copy.puestos.custom = [...copy.puestos.custom].sort();
+      }
+    }
+    if (Array.isArray(copy.estadosIniciales)) {
+      copy.estadosIniciales = [...copy.estadosIniciales].sort();
+    }
+    return copy;
+  }
+
   function isDraftDirty() {
     if (!draft) return false;
-    return !deepEqual(draft, configStore.get());
+    return !deepEqual(
+      normalizeForDirtyCheck(draft),
+      normalizeForDirtyCheck(configStore.get()),
+    );
   }
 
   function updateBadge() {
     unsavedBadge.classList.toggle('visible', isDraftDirty());
+  }
+
+  // ----------------------------------------------------------
+  // Brand logo helper (para revertir preview al descartar)
+  // ----------------------------------------------------------
+  // Replica la lógica que main.js/login.js tienen inline.
+  // Se usa en closeDirect() para restaurar el logo guardado cuando
+  // se descartan cambios (hoy el logo no se preview-ea en vivo,
+  // pero dejamos el revert listo para cuando se agregue).
+  function applyLogoToBrand(logoId) {
+    const el = document.getElementById('brandLogo');
+    if (!el) return;
+    const option = LOGO_OPTIONS.find(o => o.id === logoId) || LOGO_OPTIONS[0];
+    el.innerHTML = option.svg;
   }
 
   // ----------------------------------------------------------
@@ -83,15 +134,22 @@ export function mountConfigController(configStore) {
 
     if (!draft.lang) draft.lang = DEFAULT_LANG;
     if (!draft.background) draft.background = DEFAULT_BACKGROUND;
+
+    // Inicializamos la preferencia de default con la guardada.
+    preferredDefaultState = draft.estadoInicialDefault || null;
+
     modal.classList.add('open');
     renderAll();
   }
 
   function closeDirect() {
-    // Si quedó un preview de fondo sin guardar, lo revertimos
-    const saved = configStore.get().background || DEFAULT_BACKGROUND;
-    applyBackground(saved);
+    // Si quedó un preview sin guardar, revertimos al estado guardado.
+    const saved = configStore.get();
+    applyBackground(saved.background || DEFAULT_BACKGROUND);
+    applyLogoToBrand(saved.logo || DEFAULT_LOGO);
+
     draft = null;
+    preferredDefaultState = null;
     modal.classList.remove('open');
     unsavedBadge.classList.remove('visible');
   }
@@ -174,6 +232,7 @@ export function mountConfigController(configStore) {
     });
     if (!ok) return;
     draft = getDefaultConfig();
+    preferredDefaultState = draft.estadoInicialDefault || null;
     renderAll();
     showToast(t('toast.resetConfig'), '↺');
   });
@@ -363,11 +422,22 @@ export function mountConfigController(configStore) {
     const estado = input.dataset.estado;
     const stateSet = new Set(draft.estadosIniciales || []);
 
-    if (input.checked) stateSet.add(estado);
-    else stateSet.delete(estado);
+    if (input.checked) {
+      stateSet.add(estado);
+      // Si el usuario re-tilda el estado que había elegido como
+      // default (y que se perdió al destildarlo), lo restauramos.
+      if (estado === preferredDefaultState) {
+        draft.estadoInicialDefault = estado;
+      }
+    } else {
+      stateSet.delete(estado);
+    }
 
     draft.estadosIniciales = [...stateSet];
 
+    // Fallback: si el default actual ya no está en el set, elegimos
+    // el primero disponible. La preferencia real queda guardada en
+    // preferredDefaultState para cuando el usuario lo re-active.
     if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
       draft.estadoInicialDefault = [...stateSet][0];
     }
@@ -402,6 +472,8 @@ export function mountConfigController(configStore) {
     const btn = e.target.closest('.config-default-btn');
     if (!btn) return;
     draft.estadoInicialDefault = btn.dataset.estado;
+    // Elección explícita del usuario: la recordamos.
+    preferredDefaultState = btn.dataset.estado;
     renderAll();
   });
 
