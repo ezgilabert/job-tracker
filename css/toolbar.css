@@ -1,5 +1,5 @@
 /* ============================================================
-   Toolbar: application filters + search
+   Toolbar: application filters + search (dot indicator style)
    ============================================================ */
 
 .toolbar {
@@ -59,7 +59,9 @@
   border: none;
 }
 
-/* ===== Filter chips ===== */
+/* ============================================================
+   Filter chips (with dot indicator)
+   ============================================================ */
 .filters {
   display: flex;
   gap: 0.3rem;
@@ -88,14 +90,133 @@
   transition: all 0.2s ease;
   font-family: inherit;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
-.filters button:hover { color: var(--text); background: var(--surface-soft); }
+/* Dot indicator to the left of the label */
+.filters button::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
 
+.filters button:hover {
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+.filters button:hover::before {
+  transform: scale(1.15);
+}
+
+/* Active: soft background + accent border + tinted text and dot */
 .filters button.active {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 14px var(--accent-glow);
+  background: var(--surface-soft);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--accent-border);
 }
+
+.filters button.active::before {
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* ============================================================
+   Dot color per filter
+   ============================================================ */
+
+/* Built-in */
+.filters button[data-filter="all"]::before       { background: var(--accent); }
+.filters button[data-filter="active"]::before    { background: var(--accent); }
+.filters button[data-filter="closed"]::before    { background: #94a3b8; }
+
+/* Workflow states */
+.filters button[data-filter="Guardado"]::before                { background: #94a3b8; }
+.filters button[data-filter="Aplicado"]::before                { background: var(--info); }
+.filters button[data-filter="Contacto"]::before                { background: var(--info); }
+.filters button[data-filter="Entrevista RRHH"]::before         { background: var(--warning); }
+.filters button[data-filter="Challenge técnico"]::before       { background: var(--warning); }
+.filters button[data-filter="Live coding"]::before             { background: var(--success); }
+.filters button[data-filter="Entrevista Técnica"]::before      { background: var(--warning); }
+.filters button[data-filter="Entrevista con cliente"]::before  { background: var(--warning); }
+.filters button[data-filter="Charla con cliente"]::before      { background: var(--warning); }
+.filters button[data-filter="Entrevista Final"]::before        { background: var(--warning); }
+.filters button[data-filter="Referencias"]::before             { background: var(--accent); }
+.filters button[data-filter="Negociación"]::before             { background: var(--success); }
+.filters button[data-filter="Oferta"]::before                  { background: var(--success); }
+
+/* Closed states */
+.filters button[data-filter="Rechazado"]::before   { background: var(--danger); }
+.filters button[data-filter="Ghosted"]::before     { background: var(--danger); }
+.filters button[data-filter="Descartado"]::before  { background: #94a3b8; }
+
+/* ============================================================
+   Text color when a filter is active
+   ============================================================ */
+
+.filters button.active[data-filter="all"]       { color: var(--accent); }
+.filters button.active[data-filter="active"]    { color: var(--accent); }
+.filters button.active[data-filter="closed"]    { color: #64748b; }
+
+.filters button.active[data-filter="Guardado"]               { color: #64748b; }
+.filters button.active[data-filter="Aplicado"]               { color: var(--info-2); }
+.filters button.active[data-filter="Contacto"]               { color: var(--info-2); }
+.filters button.active[data-filter="Entrevista RRHH"]        { color: var(--warning-2); }
+.filters button.active[data-filter="Challenge técnico"]      { color: var(--warning-2); }
+.filters button.active[data-filter="Live coding"]            { color: var(--success-2); }
+.filters button.active[data-filter="Entrevista Técnica"]     { color: var(--warning-2); }
+.filters button.active[data-filter="Entrevista con cliente"] { color: var(--warning-2); }
+.filters button.active[data-filter="Charla con cliente"]     { color: var(--warning-2); }
+.filters button.active[data-filter="Entrevista Final"]       { color: var(--warning-2); }
+.filters button.active[data-filter="Referencias"]            { color: var(--accent); }
+.filters button.active[data-filter="Negociación"]            { color: var(--success-2); }
+.filters button.active[data-filter="Oferta"]                 { color: var(--success-2); }
+
+.filters button.active[data-filter="Rechazado"]   { color: var(--danger-2); }
+.filters button.active[data-filter="Ghosted"]     { color: var(--danger-2); }
+.filters button.active[data-filter="Descartado"]  { color: #64748b; }
+
+/* Dark mode overrides: dark tones become unreadable on dark bg */
+[data-theme="dark"] .filters button.active[data-filter="closed"]     { color: #94a3b8; }
+[data-theme="dark"] .filters button.active[data-filter="Guardado"]   { color: #94a3b8; }
+[data-theme="dark"] .filters button.active[data-filter="Descartado"] { color: #94a3b8; }
+[data-theme="dark"] .filters button.active[data-filter="Aplicado"]   { color: var(--info); }
+[data-theme="dark"] .filters button.active[data-filter="Contacto"]   { color: var(--info); }
+[data-theme="dark"] .filters button.active[data-filter="Entrevista RRHH"]        { color: var(--warning); }
+[data-theme="dark"] .filters button.active[data-filter="Challenge técnico"]      { color: var(--warning); }
+[data-theme="dark"] .filters button.active[data-filter="Entrevista Técnica"]     { color: var(--warning); }
+[data-theme="dark"] .filters button.active[data-filter="Entrevista con cliente"] { color: var(--warning); }
+[data-theme="dark"] .filters button.active[data-filter="Charla con cliente"]     { color: var(--warning); }
+[data-theme="dark"] .filters button.active[data-filter="Entrevista Final"]       { color: var(--warning); }
+[data-theme="dark"] .filters button.active[data-filter="Live coding"]            { color: var(--success); }
+[data-theme="dark"] .filters button.active[data-filter="Negociación"]            { color: var(--success); }
+[data-theme="dark"] .filters button.active[data-filter="Oferta"]                 { color: var(--success); }
+[data-theme="dark"] .filters button.active[data-filter="Rechazado"]              { color: var(--danger); }
+[data-theme="dark"] .filters button.active[data-filter="Ghosted"]                { color: var(--danger); }
 
 .toolbar-actions { display: flex; gap: 0.5rem; }
+
+/* ============================================================
+   Mobile: slightly larger dots so they don't get lost
+   ============================================================ */
+@media (max-width: 720px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .jobs-search { max-width: 100%; }
+
+  .filters button::before {
+    width: 8px;
+    height: 8px;
+  }
+  .filters button {
+    padding: 0.5rem 0.8rem;
+    gap: 0.5rem;
+  }
+}

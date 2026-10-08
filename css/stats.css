@@ -1,5 +1,7 @@
 /* ============================================================
-   Stats: tarjetas de estadísticas
+   Stats: statistics cards
+   Palette: accent (Total, Active), warning (In progress),
+            success (Offers), slate (Closed)
    ============================================================ */
 
 .stats {
@@ -25,6 +27,7 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
+/* Top color bar (clean semantics) */
 .stat::before {
   content: '';
   position: absolute;
@@ -34,6 +37,7 @@
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 
+/* Soft halo behind the number */
 .stat::after {
   content: '';
   position: absolute;
@@ -43,14 +47,46 @@
   opacity: 0.6;
 }
 
-.stat[data-color="success"]::before { background: linear-gradient(90deg, var(--success), var(--teal)); }
-.stat[data-color="success"]::after { background: radial-gradient(circle at 100% 0%, var(--success-soft), transparent 60%); }
-.stat[data-color="warning"]::before { background: linear-gradient(90deg, var(--warning), #f97316); }
-.stat[data-color="warning"]::after { background: radial-gradient(circle at 100% 0%, var(--warning-soft), transparent 60%); }
-.stat[data-color="danger"]::before { background: linear-gradient(90deg, var(--danger), var(--accent-2)); }
-.stat[data-color="danger"]::after { background: radial-gradient(circle at 100% 0%, var(--danger-soft), transparent 60%); }
-.stat[data-color="info"]::before { background: linear-gradient(90deg, var(--info), var(--accent)); }
-.stat[data-color="info"]::after { background: radial-gradient(circle at 100% 0%, var(--info-soft), transparent 60%); }
+/* ===== Colors by category ===== */
+
+/* info → accent (Total, Active) */
+.stat[data-color="info"]::before {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+.stat[data-color="info"]::after {
+  background: radial-gradient(circle at 100% 0%, var(--accent-soft), transparent 60%);
+}
+
+/* warning → orange (In progress) */
+.stat[data-color="warning"]::before {
+  background: linear-gradient(90deg, var(--warning), #f97316);
+}
+.stat[data-color="warning"]::after {
+  background: radial-gradient(circle at 100% 0%, var(--warning-soft), transparent 60%);
+}
+
+/* success → green (Offers) */
+.stat[data-color="success"]::before {
+  background: linear-gradient(90deg, var(--success), var(--teal));
+}
+.stat[data-color="success"]::after {
+  background: radial-gradient(circle at 100% 0%, var(--success-soft), transparent 60%);
+}
+
+/* danger → slate neutral (Closed). Not an error, so no red. */
+.stat[data-color="danger"]::before {
+  background: linear-gradient(90deg, #cbd5e1, #94a3b8);
+}
+.stat[data-color="danger"]::after {
+  background: radial-gradient(circle at 100% 0%, rgba(148,163,184,0.12), transparent 60%);
+}
+
+[data-theme="dark"] .stat[data-color="danger"]::before {
+  background: linear-gradient(90deg, #64748b, #475569);
+}
+[data-theme="dark"] .stat[data-color="danger"]::after {
+  background: radial-gradient(circle at 100% 0%, rgba(100,116,139,0.18), transparent 60%);
+}
 
 .stat:hover {
   transform: translateY(-3px);
@@ -77,4 +113,18 @@
   letter-spacing: 0.06em;
   position: relative;
   z-index: 1;
+}
+
+/* ============================================================
+   Mobile: the last card takes full width so it doesn't hang
+   when the grid stacks into two columns
+   ============================================================ */
+@media (max-width: 640px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stats .stat:last-child {
+    grid-column: 1 / -1;
+  }
+  .stat .num { font-size: 1.6rem; }
 }
