@@ -34,7 +34,7 @@ const CREDENTIALS = [
   {
     username: 'egarcia',
     salt: 'a7f3d9e2c4b8a1f6',
-    passwordHash: 'REEMPLAZAR_CON_HASH_SHA256',
+    passwordHash: 'e7212870e33e35acd935ab00bd42e36c919caff49d2e69e2fd85d6a0b9465d8f',
     name: 'E. García',
     email: 'egarcia@jobtracker.local',
   },
