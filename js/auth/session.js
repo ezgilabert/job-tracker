@@ -1,8 +1,45 @@
 // ============================================================
-// Session: lightweight auth state (backend will validate later)
+// Session: mocked auth (single valid user).
+// NOTE: this is a client-side gate only — it stops casual access
+// but anyone with devtools can bypass it. Replace with a real
+// backend call when the API is ready.
 // ============================================================
 
 const SESSION_KEY = 'jobTrackerSession';
+
+// ------------------------------------------------------------
+// Mocked credentials — the ONLY way to get a valid session.
+// Change these values to rotate the login.
+// ------------------------------------------------------------
+const VALID_USERS = [
+  {
+    username: 'egarcia',
+    password: 'bonito',
+    name: 'E. García',
+    email: 'egarcia@jobtracker.local',
+  },
+];
+
+/**
+ * Validate a user/password pair against the mocked list.
+ * @param {string} identifier  username or email (case-insensitive)
+ * @param {string} password
+ * @returns {{username:string,name:string,email:string}|null}
+ */
+export function validateCredentials(identifier, password) {
+  const id = String(identifier || '').trim().toLowerCase();
+  const pw = String(password || '');
+  if (!id || !pw) return null;
+
+  const found = VALID_USERS.find(u =>
+    (u.username.toLowerCase() === id || u.email.toLowerCase() === id) &&
+    u.password === pw
+  );
+
+  return found
+    ? { username: found.username, name: found.name, email: found.email }
+    : null;
+}
 
 // ------------------------------------------------------------
 // Read current session
@@ -16,28 +53,34 @@ export function getSession() {
   }
 }
 
+/**
+ * A session is only "logged in" when it was minted by login() with
+ * valid credentials (valid === true). Hand-crafted JSON or leftovers
+ * from previous guest sessions are rejected.
+ */
+export function isValidSession(s = getSession()) {
+  return !!(s && s.valid === true && s.username);
+}
+
 export function isLoggedIn() {
-  return getSession() !== null;
+  return isValidSession();
 }
 
-// ------------------------------------------------------------
-// Guest helpers
-// ------------------------------------------------------------
+// Kept for backwards compatibility; guests are no longer supported.
 export function isGuest() {
-  const s = getSession();
-  return s !== null && s.guest === true;
+  return false;
 }
 
 // ------------------------------------------------------------
-// Create a session (no credential validation yet)
-//   - guest: true → "Continue without an account"
+// Create a session — only call this AFTER validateCredentials().
 // ------------------------------------------------------------
-export function login({ email = '', name = '', remember = false, guest = false } = {}) {
+export function login({ username = '', email = '', name = '', remember = false } = {}) {
   const session = {
+    username,
     email,
     name,
     remember,
-    guest,
+    valid: true, // marker required by isValidSession()
     startedAt: new Date().toISOString(),
   };
 

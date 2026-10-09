@@ -18,16 +18,18 @@ import { mountChips } from './ui/chips.js';
 import { mountInputLimits } from './ui/inputLimits.js';
 import { ensureArray } from './utils.js';
 import { applyI18n, setLanguage, getLanguage } from './i18n.js';
-import { logout, getSession } from './auth/session.js';
+import { logout, getSession, requireSession } from './auth/session.js';
 
 // ------------------------------------------------------------
-// La app ya no exige sesión para entrar: se puede usar como
-// invitado. El menú de usuario contiene Configuración, Tema,
-// y Login/Logout según corresponda.
+// La app exige sesión válida. Si el usuario no está logueado,
+// requireSession() redirige a login.html y cortamos el boot.
 // ------------------------------------------------------------
 boot();
 
 function boot() {
+  // ---- Guard ----
+  if (!requireSession('./login.html')) return;
+
   // ----------------------------------------------------------
   // Theme (vive dentro del menú de usuario)
   // ----------------------------------------------------------
@@ -78,9 +80,7 @@ function boot() {
       if (logged) {
         const displayName = session.name
           || (session.email ? session.email.split('@')[0] : 'User');
-        const displayEmail = session.guest
-          ? 'Guest session'
-          : (session.email || '');
+        const displayEmail = session.email || '';
 
         if (nameEl) nameEl.textContent = displayName;
         if (emailEl) emailEl.textContent = displayEmail;
@@ -124,7 +124,7 @@ function boot() {
       logoutBtn.addEventListener('click', () => {
         logout();
         menu.classList.remove('open');
-        refresh();
+        window.location.href = './login.html';
       });
     }
 
@@ -159,12 +159,9 @@ function boot() {
     },
   });
 
-  // 🆕 Mapa de estados legacy de referidos que ya no existen en
-  // REF_WORKFLOW_STEPS. Se aplica tanto al `estado` actual como a
-  // cada entrada del historial, para que ninguna card quede fuera
-  // de rango ni muestre un label sin traducción.
+  // Mapa de estados legacy de referidos que ya no existen.
   const LEGACY_REF_STATE_MAP = {
-    'Me va a referir': 'Contactado',   // era el paso previo a "Referido hecho"
+    'Me va a referir': 'Contactado',
   };
 
   function migrateRefState(estado) {
@@ -213,7 +210,6 @@ function boot() {
   setLanguage(configStore.get().lang || DEFAULT_LANG);
   applyI18n(document);
 
-  // React to config changes (logo + language + background)
   configStore.subscribe(cfg => {
     applyLogo(cfg.logo || DEFAULT_LOGO);
     applyBackground(cfg.background || DEFAULT_BACKGROUND);
@@ -242,7 +238,7 @@ function boot() {
   const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 
   // ----------------------------------------------------------
-  // Input limits: maxlength counters + paste sanitizer
+  // Input limits
   // ----------------------------------------------------------
   mountInputLimits(document);
 

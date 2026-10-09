@@ -1,13 +1,15 @@
 // ============================================================
-// Entry point for the login / register screen (Option 1 layout)
+// Entry point for the login screen (mocked single-user auth)
 // ============================================================
 
-import { applyI18n, setLanguage } from '../i18n.js';
+import { applyI18n, setLanguage, t } from '../i18n.js';
 import {
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG, STORAGE_KEYS,
   DEFAULT_BACKGROUND, applyBackground,
 } from '../constants.js';
-import { login, redirectIfAuthenticated } from './session.js';
+import {
+  login, redirectIfAuthenticated, validateCredentials,
+} from './session.js';
 import { mountInputLimits } from '../ui/inputLimits.js';
 
 // ------------------------------------------------------------
@@ -34,7 +36,10 @@ function mountTheme() {
   const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
   document.documentElement.setAttribute('data-theme', saved);
 
-  document.getElementById('themeToggle').addEventListener('click', () => {
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
@@ -95,8 +100,29 @@ function mountPasswordToggles() {
 }
 
 // ------------------------------------------------------------
-// Forms: create a local session and hand off to the app.
-// NOTE: no credential validation yet — backend will handle it.
+// Inline error box helpers
+// ------------------------------------------------------------
+function showError(form, message) {
+  let box = form.querySelector('.auth-error');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'auth-error';
+    box.setAttribute('role', 'alert');
+    const submit = form.querySelector('button[type="submit"]');
+    if (submit) form.insertBefore(box, submit);
+    else form.appendChild(box);
+  }
+  box.textContent = message;
+}
+
+function clearError(form) {
+  const box = form.querySelector('.auth-error');
+  if (box) box.remove();
+}
+
+// ------------------------------------------------------------
+// Forms: validate against the mocked credentials, then create
+// a local session and hand off to the app.
 // ------------------------------------------------------------
 function mountForms() {
   const loginForm = document.getElementById('loginForm');
@@ -104,31 +130,37 @@ function mountForms() {
 
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const remember = document.getElementById('loginRemember').checked;
-    login({ email, remember });
+    clearError(loginForm);
+
+    const identifier = document.getElementById('loginEmail').value.trim();
+    const password   = document.getElementById('loginPassword').value;
+    const remember   = document.getElementById('loginRemember').checked;
+
+    const user = validateCredentials(identifier, password);
+    if (!user) {
+      showError(loginForm, t('auth.error.invalid'));
+      const pwInput = document.getElementById('loginPassword');
+      if (pwInput) {
+        pwInput.value = '';
+        pwInput.focus();
+      }
+      return;
+    }
+
+    login({
+      username: user.username,
+      email: user.email,
+      name: user.name,
+      remember,
+    });
     window.location.href = './index.html';
   });
 
+  // Registration is disabled in the mocked build.
   registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    login({ email, name, remember: true });
-    window.location.href = './index.html';
-  });
-}
-
-// ------------------------------------------------------------
-// Guest: continue without an account.
-// Creates a session with guest:true — same guards, no credentials.
-// ------------------------------------------------------------
-function mountGuest() {
-  const btn = document.getElementById('guestBtn');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    login({ name: 'Guest', guest: true, remember: true });
-    window.location.href = './index.html';
+    clearError(registerForm);
+    showError(registerForm, t('auth.error.registerDisabled'));
   });
 }
 
@@ -161,10 +193,8 @@ function boot() {
   mountTabs();
   mountPasswordToggles();
   mountForms();
-  mountGuest();
   mountSocials();
 
-  // Límites en los campos del login / registro
   mountInputLimits(document);
 }
 
