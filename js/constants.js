@@ -275,6 +275,14 @@ export const STORAGE_KEYS = {
 export const STORAGE_VERSION = 3;
 export const CONFIG_VERSION = 1;
 
+// ============================================================
+// Backup / Import
+// ============================================================
+// Identificador y versión del formato de backup. Cambiar
+// BACKUP_VERSION cuando el shape cambie de forma incompatible.
+export const BACKUP_APP_ID = 'jobTracker';
+export const BACKUP_VERSION = 1;
+
 export const SAMPLE_JOBS = [
   // ... (unchanged)
 ];

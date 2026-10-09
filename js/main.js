@@ -246,7 +246,7 @@ async function boot() {
   // ----------------------------------------------------------
   // Controllers
   // ----------------------------------------------------------
-  mountConfigController(configStore);
+  mountConfigController(configStore, jobsStore, refsStore);
   const modals = mountModalsController(jobsStore, refsStore, configStore);
   const jobsCtrl = mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore);
   const refsCtrl = mountRefsController(jobsStore, refsStore, modals);

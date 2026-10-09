@@ -823,6 +823,44 @@
         </div>
 
         <div class="config-panel" data-panel="advanced">
+
+          <!-- ===== Data & Backup ===== -->
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.backup.title">💾 Datos y respaldo</h3>
+              <p data-i18n="config.backup.desc">Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.</p>
+            </div>
+
+            <div class="config-backup-card">
+              <div class="config-backup-icon">📦</div>
+              <div class="config-backup-info">
+                <strong data-i18n="config.backup.exportTitle">Exportar datos</strong>
+                <span data-i18n="config.backup.exportDesc">Descargá un archivo JSON con todas tus postulaciones, referidos, configuración y tema.</span>
+                <div class="config-backup-stats" id="configBackupStats"></div>
+              </div>
+              <div class="config-backup-actions">
+                <button type="button" class="btn btn-primary" id="exportDataBtn">
+                  ⬇ <span data-i18n="config.backup.export">Exportar</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="config-backup-card">
+              <div class="config-backup-icon danger">📥</div>
+              <div class="config-backup-info">
+                <strong data-i18n="config.backup.importTitle">Importar datos</strong>
+                <span data-i18n="config.backup.importDesc">Restaurá desde un archivo JSON. Reemplaza toda tu información actual (no se puede deshacer).</span>
+              </div>
+              <div class="config-backup-actions">
+                <button type="button" class="btn btn-ghost" id="importDataBtn">
+                  ⬆ <span data-i18n="config.backup.import">Importar</span>
+                </button>
+                <input type="file" id="importDataInput" accept="application/json,.json" style="display:none;">
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== Danger zone ===== -->
           <div class="config-section config-section-danger">
             <div class="config-section-head">
               <h3 data-i18n="config.danger.title">⚠️ Zona de peligro</h3>

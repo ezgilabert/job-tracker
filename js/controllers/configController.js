@@ -12,6 +12,8 @@ import {
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
   NO_PUESTO_VALUE,
+  BACKUP_APP_ID, BACKUP_VERSION,
+  STORAGE_KEYS,
 } from '../constants.js';
 import { escapeHtml, cloneArray } from '../utils.js';
 import {
@@ -20,8 +22,10 @@ import {
 
 /**
  * @param {import('../store.js').Store} configStore
+ * @param {import('../store.js').Store} jobsStore
+ * @param {import('../store.js').Store} refsStore
  */
-export function mountConfigController(configStore) {
+export function mountConfigController(configStore, jobsStore, refsStore) {
   const modal = document.getElementById('configModal');
   const unsavedModal = document.getElementById('unsavedModal');
   const unsavedBadge = document.getElementById('configUnsavedBadge');
@@ -241,6 +245,7 @@ export function mountConfigController(configStore) {
       const target = tab.dataset.tab;
       tabs.forEach(t => t.classList.toggle('active', t === tab));
       panels.forEach(p => p.classList.toggle('active', p.dataset.panel === target));
+      if (target === 'advanced') renderBackupStats();
     });
   });
 
@@ -259,6 +264,7 @@ export function mountConfigController(configStore) {
     renderBackgrounds();
     renderLangs();
     renderPerfil();
+    renderBackupStats();
     updateBadge();
   }
 
@@ -749,6 +755,149 @@ export function mountConfigController(configStore) {
       draft.profile.avatar = '';
       renderPerfil();
       updateBadge();
+    });
+  }
+
+  // ------------------------------------------------------------
+  // Panel: Data & Backup (Advanced)
+  // ------------------------------------------------------------
+  function renderBackupStats() {
+    const container = document.getElementById('configBackupStats');
+    if (!container) return;
+
+    const jobs = jobsStore ? jobsStore.get() : [];
+    const refs = refsStore ? refsStore.get() : [];
+    const jobsCount = Array.isArray(jobs) ? jobs.length : 0;
+    const refsCount = Array.isArray(refs) ? refs.length : 0;
+
+    container.innerHTML = `
+      <span class="config-backup-stat">📋 ${jobsCount} ${escapeHtml(t('config.backup.jobs'))}</span>
+      <span class="config-backup-stat">🤝 ${refsCount} ${escapeHtml(t('config.backup.refs'))}</span>
+    `;
+  }
+
+  function buildBackupPayload() {
+    const theme = (() => {
+      try { return localStorage.getItem(STORAGE_KEYS.THEME) || 'light'; }
+      catch { return 'light'; }
+    })();
+
+    return {
+      app: BACKUP_APP_ID,
+      version: BACKUP_VERSION,
+      exportedAt: new Date().toISOString(),
+      data: {
+        jobs: jobsStore ? jobsStore.get() : [],
+        refs: refsStore ? refsStore.get() : [],
+        config: configStore.get(),
+        theme,
+      },
+    };
+  }
+
+  function exportBackup() {
+    const payload = buildBackupPayload();
+    const json = JSON.stringify(payload, null, 2);
+
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const date = new Date().toISOString().slice(0, 10);
+    const filename = `job-tracker-backup-${date}.json`;
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast(t('toast.backupExported'), '⬇');
+  }
+
+  function validateBackup(parsed) {
+    if (!parsed || typeof parsed !== 'object') return false;
+    if (parsed.app !== BACKUP_APP_ID) return false;
+    if (!parsed.data || typeof parsed.data !== 'object') return false;
+    return true;
+  }
+
+  async function importBackupFromFile(file) {
+    let text;
+    try {
+      text = await file.text();
+    } catch {
+      showToast(t('toast.backupInvalid'), '⚠️');
+      return;
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      showToast(t('toast.backupInvalid'), '⚠️');
+      return;
+    }
+
+    if (!validateBackup(parsed)) {
+      showToast(t('toast.backupInvalid'), '⚠️');
+      return;
+    }
+
+    const data = parsed.data || {};
+    const jobsCount = Array.isArray(data.jobs) ? data.jobs.length : 0;
+    const refsCount = Array.isArray(data.refs) ? data.refs.length : 0;
+
+    const ok = await showConfirm({
+      title: t('confirm.importBackup.title'),
+      message: t('confirm.importBackup.message', {
+        jobs: jobsCount,
+        refs: refsCount,
+      }),
+      confirmText: t('confirm.importBackup.confirm'),
+      danger: true,
+    });
+    if (!ok) return;
+
+    // Apply. Order: config → refs → jobs. Each store.update()
+    // triggers its subscribers, so every controller re-renders
+    // automatically (no reload needed).
+    if (data.config && typeof data.config === 'object') {
+      configStore.update(() => data.config);
+    }
+    if (Array.isArray(data.refs)) {
+      refsStore.update(() => data.refs);
+    }
+    if (Array.isArray(data.jobs)) {
+      jobsStore.update(() => data.jobs);
+    }
+    if (data.theme === 'light' || data.theme === 'dark') {
+      try { localStorage.setItem(STORAGE_KEYS.THEME, data.theme); } catch {}
+      document.documentElement.setAttribute('data-theme', data.theme);
+    }
+
+    // Close the modal without touching the (now stale) draft.
+    closeDirect();
+
+    showToast(
+      t('toast.backupImported', { jobs: jobsCount, refs: refsCount }),
+      '⬆'
+    );
+  }
+
+  const exportBtn = document.getElementById('exportDataBtn');
+  if (exportBtn) exportBtn.addEventListener('click', exportBackup);
+
+  const importBtn = document.getElementById('importDataBtn');
+  const importInput = document.getElementById('importDataInput');
+  if (importBtn && importInput) {
+    importBtn.addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', () => {
+      const file = importInput.files?.[0];
+      if (!file) return;
+      importBackupFromFile(file);
+      // Reset so the same file can be picked again if needed.
+      importInput.value = '';
     });
   }
 

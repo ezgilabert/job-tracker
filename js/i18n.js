@@ -263,6 +263,18 @@ const translations = {
     'config.danger.reset.desc': 'Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
     'config.danger.reset.button': 'Restablecer',
 
+    // Data & Backup (Advanced panel)
+    'config.backup.title': '💾 Datos y respaldo',
+    'config.backup.desc': 'Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.',
+    'config.backup.exportTitle': 'Exportar datos',
+    'config.backup.exportDesc': 'Descargá un archivo JSON con todas tus postulaciones, referidos, configuración y tema.',
+    'config.backup.export': 'Exportar',
+    'config.backup.importTitle': 'Importar datos',
+    'config.backup.importDesc': 'Restaurá desde un archivo JSON. Reemplaza toda tu información actual (no se puede deshacer).',
+    'config.backup.import': 'Importar',
+    'config.backup.jobs': 'postulaciones',
+    'config.backup.refs': 'referidos',
+
     // Profile
     'profile.title': '👤 Editar perfil',
     'profile.subtitle': 'Actualizá tu información personal',
@@ -328,6 +340,9 @@ const translations = {
     'confirm.prevRef.title': '¿Volver a la etapa anterior?',
     'confirm.prevRef.message': 'Vas a retroceder a <strong>{name}</strong> de <strong>{from}</strong> a <strong>{to}</strong>.<br><span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">⚠️ Solo podés volver atrás una vez por referido.</span>',
     'confirm.prevRef.confirm': 'Sí, volver',
+    'confirm.importBackup.title': '¿Importar respaldo?',
+    'confirm.importBackup.message': 'Vas a reemplazar TODA tu información actual con el archivo.<br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
+    'confirm.importBackup.confirm': 'Sí, reemplazar',
 
     'toast.savedConfig': 'Configuración guardada',
     'toast.discardedChanges': 'Cambios descartados',
@@ -342,6 +357,9 @@ const translations = {
     'toast.closedAs': 'Cerrada como {estado}',
     'toast.offerUnconfirmed': 'Oferta desmarcada',
     'toast.puestoRequired': 'Elegí un puesto o usá "Guardado" como estado inicial',
+    'toast.backupExported': 'Backup descargado',
+    'toast.backupImported': 'Backup importado · {jobs} postulaciones · {refs} referidos',
+    'toast.backupInvalid': 'El archivo no es un backup válido de Job Tracker',
     'toast.refAdded': 'Referido agregado',
     'toast.refDeleted': 'Referido borrado',
     'toast.refUpdated': 'Referido actualizado',
@@ -662,6 +680,18 @@ const translations = {
     'config.danger.reset.desc': 'Restore roles, states, filters and appearance to their defaults. Not applied until you save.',
     'config.danger.reset.button': 'Reset',
 
+    // Data & Backup (Advanced panel)
+    'config.backup.title': '💾 Data & backup',
+    'config.backup.desc': 'Export a full backup or restore from a file. Useful when switching devices or preventing data loss.',
+    'config.backup.exportTitle': 'Export data',
+    'config.backup.exportDesc': 'Download a JSON file with all your applications, referrals, settings and theme.',
+    'config.backup.export': 'Export',
+    'config.backup.importTitle': 'Import data',
+    'config.backup.importDesc': 'Restore from a JSON file. Replaces all your current information (cannot be undone).',
+    'config.backup.import': 'Import',
+    'config.backup.jobs': 'applications',
+    'config.backup.refs': 'referrals',
+
     // Profile
     'profile.title': '👤 Edit profile',
     'profile.subtitle': 'Update your personal information',
@@ -727,6 +757,9 @@ const translations = {
     'confirm.prevRef.title': 'Go back to previous stage?',
     'confirm.prevRef.message': 'You will move <strong>{name}</strong> from <strong>{from}</strong> back to <strong>{to}</strong>.<br><span style="color:var(--danger-2);font-size:0.82rem;font-weight:600;">⚠️ You can only go back once per referral.</span>',
     'confirm.prevRef.confirm': 'Yes, go back',
+    'confirm.importBackup.title': 'Import backup?',
+    'confirm.importBackup.message': 'You will replace ALL your current information with the file.<br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
+    'confirm.importBackup.confirm': 'Yes, replace',
 
     'toast.savedConfig': 'Settings saved',
     'toast.discardedChanges': 'Changes discarded',
@@ -741,6 +774,9 @@ const translations = {
     'toast.closedAs': 'Closed as {estado}',
     'toast.offerUnconfirmed': 'Offer unmarked',
     'toast.puestoRequired': 'Pick a role or use "Saved" as the initial status',
+    'toast.backupExported': 'Backup downloaded',
+    'toast.backupImported': 'Backup imported · {jobs} applications · {refs} referrals',
+    'toast.backupInvalid': 'The file is not a valid Job Tracker backup',
     'toast.refAdded': 'Referral added',
     'toast.refDeleted': 'Referral deleted',
     'toast.refUpdated': 'Referral updated',
