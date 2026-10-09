@@ -2,12 +2,13 @@
 // PuestoCombo: filterable role dropdown
 // ============================================================
 
-import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS } from '../constants.js';
+import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS, NO_PUESTO_VALUE } from '../constants.js';
 import { escapeHtml } from '../utils.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
 
 function getRoleIcon(role) {
+  if (role === NO_PUESTO_VALUE) return '❔';
   for (const key in ROLE_ICONS) {
     if (role.toLowerCase().includes(key.toLowerCase())) return ROLE_ICONS[key];
   }
@@ -16,6 +17,8 @@ function getRoleIcon(role) {
 
 /**
  * Builds the list of roles according to user config.
+ * "No especificado" siempre está disponible salvo que el usuario
+ * lo haya ocultado explícitamente desde Configuración.
  */
 export function getAvailableRoles(config) {
   if (!config || !config.puestos) return [...DEFAULT_ROLES];
@@ -26,6 +29,8 @@ export function getAvailableRoles(config) {
 
   const filteredDefaults = DEFAULT_ROLES.filter(p => {
     if (hiddenSet.has(p)) return false;
+    // "No especificado" se ignora el filtro por tags.
+    if (p === NO_PUESTO_VALUE) return true;
     if (activeSet.size === 0) return true;
     const tags = ROLE_TAGS[p] || [];
     return tags.some(t => activeSet.has(t));
@@ -57,8 +62,12 @@ function getOptions(jobsRoles, query, config) {
       return a.localeCompare(b);
     });
   } else {
+    // "No especificado" va primero (si está disponible), después
+    // los usados recientemente, después el resto.
     const recent = used.filter(p => !available.includes(p));
-    filtered = [...recent, ...available];
+    const noPuesto = available.filter(p => p === NO_PUESTO_VALUE);
+    const rest = available.filter(p => p !== NO_PUESTO_VALUE);
+    filtered = [...noPuesto, ...recent, ...rest];
   }
 
   return filtered.slice(0, 40);
@@ -154,16 +163,20 @@ export class PuestoCombo {
     let html = '';
 
     roles.forEach((p, idx) => {
-      const isRecent = used.has(p) && !available.has(p);
+      const isNoPuesto = p === NO_PUESTO_VALUE;
+      const isRecent = !isNoPuesto && used.has(p) && !available.has(p);
       const icon = getRoleIcon(p);
       const isSelected = this.input.value === p;
       const isHighlighted = idx === this.highlightedIdx;
-      const tag = isRecent ? 'Reciente' : '';
+
+      let tag = '';
+      if (isNoPuesto) tag = 'Genérico';
+      else if (isRecent) tag = 'Reciente';
 
       if (isRecent && idx === 0) {
         html += `<div class="combo-section-label">Usados recientemente</div>`;
       } else if (
-        !isRecent && idx > 0 &&
+        !isRecent && !isNoPuesto && idx > 0 &&
         used.has(roles[idx - 1]) && !available.has(roles[idx - 1])
       ) {
         html += `<div class="combo-section-label">Sugeridos</div>`;
@@ -171,7 +184,7 @@ export class PuestoCombo {
 
       html += `
         <button type="button"
-                class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isRecent ? 'recent' : ''}"
+                class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isRecent ? 'recent' : ''} ${isNoPuesto ? 'generic' : ''}"
                 data-value="${escapeHtml(p)}"
                 data-idx="${idx}">
           <span class="combo-option-icon">${icon}</span>

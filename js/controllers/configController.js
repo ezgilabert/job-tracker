@@ -11,6 +11,7 @@ import {
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
+  NO_PUESTO_VALUE,
 } from '../constants.js';
 import { escapeHtml, cloneArray } from '../utils.js';
 import {
@@ -298,6 +299,8 @@ export function mountConfigController(configStore) {
 
     const defaults = DEFAULT_ROLES.filter(p => {
       if (hidden.has(p)) return false;
+      // "No especificado" se ignora el filtro por tags.
+      if (p === NO_PUESTO_VALUE) return true;
       if (active.size === 0) return true;
       const tags = ROLE_TAGS[p] || [];
       return tags.some(tg => active.has(tg));

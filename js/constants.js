@@ -150,7 +150,12 @@ export const ROLE_TAGS_LIST = [
   { id: 'gamedev',     label: 'Game Dev',    icon: '🎮' },
 ];
 
+// Valor reservado para "sin puesto". Se usa como placeholder en
+// el combo y como fallback en las tarjetas.
+export const NO_PUESTO_VALUE = 'No especificado';
+
 export const DEFAULT_ROLES = [
+  NO_PUESTO_VALUE,
   'Software Engineer', 'Software Developer',
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
   'Web Developer', 'Mobile Developer', 'iOS Developer', 'Android Developer',

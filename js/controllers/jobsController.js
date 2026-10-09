@@ -163,15 +163,42 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     salaryHourlyCheckbox
   );
 
+  // Visual hint: cuando el estado es "Guardado", el puesto deja de
+  // ser obligatorio. Se refleja en el label agregando "(opcional)".
+  const estadoSelect = document.getElementById('estado');
+  const puestoLabel = document.querySelector('label[for="puesto"]');
+  const puestoInput = document.getElementById('puesto');
+  const puestoOriginalLabel = puestoLabel ? puestoLabel.textContent : '';
+
+  function refreshPuestoOptionalHint() {
+    if (!puestoLabel || !estadoSelect) return;
+    const isGuardado = estadoSelect.value === 'Guardado';
+    puestoLabel.dataset.optional = isGuardado ? 'true' : 'false';
+    puestoLabel.textContent = isGuardado
+      ? `${puestoOriginalLabel} (${t('form.puesto.optional')})`
+      : puestoOriginalLabel;
+  }
+
+  estadoSelect.addEventListener('change', refreshPuestoOptionalHint);
+  refreshPuestoOptionalHint();
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const initialState = document.getElementById('estado').value;
+    const puestoValue = valueOf('puesto');
+
+    // El puesto sólo es obligatorio cuando NO estamos en "Guardado".
+    if (!puestoValue && initialState !== 'Guardado') {
+      showToast(t('toast.puestoRequired'), '!');
+      if (puestoInput) puestoInput.focus();
+      return;
+    }
 
     const newJob = {
       id: uid(),
       empresa: valueOf('empresa'),
-      puesto: valueOf('puesto'),
+      puesto: puestoValue,
       fecha: datePicker?.getValue() || '',
       estado: initialState,
       link: valueOf('link'),
@@ -190,6 +217,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     updateSalaryPlaceholder();
     datePicker?.setValue('');
     renderInitialStates();
+    refreshPuestoOptionalHint();
 
     expandJobs();
     showToast(t('toast.jobAdded'), '✓');
@@ -363,6 +391,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   document.addEventListener('i18n-changed', () => {
     renderFilters();
     renderInitialStates();
+    refreshPuestoOptionalHint();
     renderList();
   });
 

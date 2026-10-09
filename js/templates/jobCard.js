@@ -35,6 +35,9 @@ export function renderJobCard(job, ctx = {}) {
     ? `<div class="job-notas">${escapeHtml(job.notas)}</div>`
     : '';
 
+  // Fallback cuando el puesto quedó vacío (permitido sólo en "Guardado").
+  const puestoDisplay = job.puesto || t('job.noPuesto');
+
   const linkedRefs = refsForCompany(referidos, job.empresa);
   const refsHtml = linkedRefs.length
     ? `<div class="job-refs">
@@ -125,7 +128,7 @@ export function renderJobCard(job, ctx = {}) {
 
       <div class="job-header">
         <div class="job-info">
-          <h3>${escapeHtml(job.puesto)} <span class="company">· ${escapeHtml(job.empresa)}</span></h3>
+          <h3>${escapeHtml(puestoDisplay)} <span class="company">· ${escapeHtml(job.empresa)}</span></h3>
           <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${contactTxt}</div>
         </div>
         <div class="job-actions">

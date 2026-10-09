@@ -57,6 +57,7 @@ const translations = {
     'form.empresa': 'Empresa',
     'form.empresa.placeholder': 'Ej: Google',
     'form.puesto': 'Puesto',
+    'form.puesto.optional': 'opcional',
     'form.puesto.placeholder': 'Elegí o escribí un rol',
     'form.fecha': 'Fecha',
     'form.estado': 'Estado inicial',
@@ -151,6 +152,7 @@ const translations = {
     'job.deleteTitle': 'Borrar',
     'job.refChipTitle': 'Ver referido: {name}',
     'job.offerRibbon': '🏆 Oferta',
+    'job.noPuesto': 'No especificado',
 
     // Offer confirmed (festive state)
     'job.offerConfirmed.title': '¡Felicitaciones!',
@@ -339,6 +341,7 @@ const translations = {
     'toast.needReason': 'Escribí o elegí un motivo',
     'toast.closedAs': 'Cerrada como {estado}',
     'toast.offerUnconfirmed': 'Oferta desmarcada',
+    'toast.puestoRequired': 'Elegí un puesto o usá "Guardado" como estado inicial',
     'toast.refAdded': 'Referido agregado',
     'toast.refDeleted': 'Referido borrado',
     'toast.refUpdated': 'Referido actualizado',
@@ -453,6 +456,7 @@ const translations = {
     'form.empresa': 'Company',
     'form.empresa.placeholder': 'Ex: Google',
     'form.puesto': 'Role',
+    'form.puesto.optional': 'optional',
     'form.puesto.placeholder': 'Choose or type a role',
     'form.fecha': 'Date',
     'form.estado': 'Initial status',
@@ -547,6 +551,7 @@ const translations = {
     'job.deleteTitle': 'Delete',
     'job.refChipTitle': 'View referral: {name}',
     'job.offerRibbon': '🏆 Offer',
+    'job.noPuesto': 'Not specified',
 
     // Offer confirmed (festive state)
     'job.offerConfirmed.title': 'Congratulations!',
@@ -735,6 +740,7 @@ const translations = {
     'toast.needReason': 'Write or pick a reason',
     'toast.closedAs': 'Closed as {estado}',
     'toast.offerUnconfirmed': 'Offer unmarked',
+    'toast.puestoRequired': 'Pick a role or use "Saved" as the initial status',
     'toast.refAdded': 'Referral added',
     'toast.refDeleted': 'Referral deleted',
     'toast.refUpdated': 'Referral updated',
