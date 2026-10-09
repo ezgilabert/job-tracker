@@ -3,6 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Seguridad: CSP + metas defensivas -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' 'unsafe-inline';
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               font-src 'self' https://fonts.gstatic.com;
+               img-src 'self' data: https:;
+               connect-src 'self';
+               object-src 'none';
+               base-uri 'self';
+               form-action 'self';
+               frame-ancestors 'none';">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+
 <title>Job Tracker · Sign in</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +42,15 @@
   [data-theme="dark"] .auth-error {
     background: rgba(239, 68, 68, 0.15);
     color: #fca5a5;
+  }
+  .auth-error + .btn,
+  .auth-error ~ .btn {
+    margin-top: 0;
+  }
+  button[disabled],
+  input[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 </style>
 </head>

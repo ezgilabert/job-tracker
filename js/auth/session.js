@@ -1,128 +1,256 @@
 // ============================================================
 // Session: mocked auth (single valid user).
-// NOTE: this is a client-side gate only — it stops casual access
-// but anyone with devtools can bypass it. Replace with a real
-// backend call when the API is ready.
+//
+// CLIENT-SIDE ONLY. Esto NO es seguridad real: alguien con
+// devtools puede saltarlo. Es "raising the bar" mientras no
+// exista backend. Cuando haya API:
+//   - validateCredentials() → POST /auth/login
+//   - login()               → guardar httpOnly cookie del server
+//   - requireSession()      → GET /auth/me
 // ============================================================
 
-const SESSION_KEY = 'jobTrackerSession';
+const SESSION_KEY         = 'jobTrackerSession';
+const FRESH_LOGIN_FLAG    = 'jobTrackerFreshLogin';
+const RATE_KEY            = 'jobTrackerLoginRate';
+const INSTALL_SECRET_KEY  = 'jobTrackerInstallSecret';
+
+// Políticas
+const MAX_ATTEMPTS    = 5;                 // intentos antes del lockout
+const LOCKOUT_MS      = 5 * 60 * 1000;     // 5 min de bloqueo
+const SESSION_TTL_MS  = 30 * 60 * 1000;    // 30 min de inactividad
 
 // ------------------------------------------------------------
-// Mocked credentials — the ONLY way to get a valid session.
-// Change these values to rotate the login.
+// Credenciales (hash SHA-256 de `${salt}:${password}`)
+//
+// ⚠️ REEMPLAZAR `passwordHash` con el hash real. Para generarlo:
+//   1. Abrí login.html en el navegador.
+//   2. En la consola:
+//        const m = await import('./js/auth/session.js');
+//        await m.computeHash('a7f3d9e2c4b8a1f6', 'TU_PASSWORD');
+//   3. Pegá el hex resultante en passwordHash y NO dejes la
+//      contraseña en texto plano en ningún lado del repo.
 // ------------------------------------------------------------
-const VALID_USERS = [
+const CREDENTIALS = [
   {
     username: 'egarcia',
-    password: 'bonito',
+    salt: 'a7f3d9e2c4b8a1f6',
+    passwordHash: 'REEMPLAZAR_CON_HASH_SHA256',
     name: 'E. García',
     email: 'egarcia@jobtracker.local',
   },
 ];
 
+// ------------------------------------------------------------
+// Cripto helpers
+// ------------------------------------------------------------
+async function sha256Hex(text) {
+  const buf = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', buf);
+  return [...new Uint8Array(digest)]
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/** Expuesto para que puedas generar el hash desde la consola. */
+export async function computeHash(salt, password) {
+  return sha256Hex(`${salt}:${password}`);
+}
+
 /**
- * Validate a user/password pair against the mocked list.
- * @param {string} identifier  username or email (case-insensitive)
- * @param {string} password
- * @returns {{username:string,name:string,email:string}|null}
+ * Secreto por instalación (no por usuario). Se genera una sola vez
+ * y se guarda en localStorage. Sirve para firmar la sesión: sin
+ * este valor, editar el JSON del sessionStorage no alcanza para
+ * forjar una sesión válida.
  */
-export function validateCredentials(identifier, password) {
-  const id = String(identifier || '').trim().toLowerCase();
-  const pw = String(password || '');
-  if (!id || !pw) return null;
+function getInstallSecret() {
+  let s = localStorage.getItem(INSTALL_SECRET_KEY);
+  if (!s) {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    s = [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+    localStorage.setItem(INSTALL_SECRET_KEY, s);
+  }
+  return s;
+}
 
-  const found = VALID_USERS.find(u =>
-    (u.username.toLowerCase() === id || u.email.toLowerCase() === id) &&
-    u.password === pw
-  );
-
-  return found
-    ? { username: found.username, name: found.name, email: found.email }
-    : null;
+async function signSession(session) {
+  const secret = getInstallSecret();
+  const payload = `${session.username}|${session.startedAt}|${session.expiresAt}`;
+  return sha256Hex(`${secret}:${payload}`);
 }
 
 // ------------------------------------------------------------
-// Read current session
+// Rate limiting (persistido en localStorage)
+// ------------------------------------------------------------
+function readRate() {
+  try {
+    const r = JSON.parse(localStorage.getItem(RATE_KEY) || '{}');
+    return {
+      failures: Number(r.failures) || 0,
+      lockedUntil: Number(r.lockedUntil) || 0,
+    };
+  } catch {
+    return { failures: 0, lockedUntil: 0 };
+  }
+}
+
+function writeRate(r) {
+  try { localStorage.setItem(RATE_KEY, JSON.stringify(r)); } catch {}
+}
+
+export function getLockoutRemainingMs() {
+  const r = readRate();
+  return Math.max(0, r.lockedUntil - Date.now());
+}
+
+function registerFailure() {
+  const r = readRate();
+  r.failures += 1;
+  if (r.failures >= MAX_ATTEMPTS) {
+    r.lockedUntil = Date.now() + LOCKOUT_MS;
+    r.failures = 0;
+  }
+  writeRate(r);
+}
+
+function clearRate() {
+  writeRate({ failures: 0, lockedUntil: 0 });
+}
+
+// ------------------------------------------------------------
+// Validación de credenciales (async por el hash)
+// ------------------------------------------------------------
+/**
+ * @returns {Promise<
+ *   | {locked:true}
+ *   | {username:string,name:string,email:string}
+ *   | null
+ * >}
+ */
+export async function validateCredentials(identifier, password) {
+  if (getLockoutRemainingMs() > 0) return { locked: true };
+
+  const id = String(identifier || '').trim().toLowerCase();
+  const pw = String(password || '');
+  if (!id || !pw) {
+    registerFailure();
+    return null;
+  }
+
+  for (const u of CREDENTIALS) {
+    if (u.username.toLowerCase() !== id && u.email.toLowerCase() !== id) continue;
+    const hash = await computeHash(u.salt, pw);
+    if (hash === u.passwordHash) {
+      clearRate();
+      return { username: u.username, name: u.name, email: u.email };
+    }
+  }
+
+  registerFailure();
+  return null;
+}
+
+// ------------------------------------------------------------
+// Sesión
 // ------------------------------------------------------------
 export function getSession() {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || typeof s !== 'object') return null;
+    if (s.expiresAt && Date.now() > s.expiresAt) return null;
+    return s;
   } catch {
     return null;
   }
 }
 
-/**
- * A session is only "logged in" when it was minted by login() with
- * valid credentials (valid === true). Hand-crafted JSON or leftovers
- * from previous guest sessions are rejected.
- */
-export function isValidSession(s = getSession()) {
-  return !!(s && s.valid === true && s.username);
+export async function isValidSession(s = getSession()) {
+  if (!s || s.valid !== true || !s.username || !s.sig) return false;
+  if (s.expiresAt && Date.now() > s.expiresAt) return false;
+  const expected = await signSession(s);
+  return expected === s.sig;
 }
 
-export function isLoggedIn() {
+export async function isLoggedIn() {
   return isValidSession();
 }
 
-// Kept for backwards compatibility; guests are no longer supported.
 export function isGuest() {
   return false;
 }
 
-// ------------------------------------------------------------
-// Create a session — only call this AFTER validateCredentials().
-// ------------------------------------------------------------
-export function login({ username = '', email = '', name = '', remember = false } = {}) {
-  const session = {
-    username,
-    email,
-    name,
-    remember,
-    valid: true, // marker required by isValidSession()
-    startedAt: new Date().toISOString(),
-  };
+export async function login({ username = '', email = '', name = '' } = {}) {
+  const startedAt = new Date().toISOString();
+  const expiresAt = Date.now() + SESSION_TTL_MS;
+  const base = { username, email, name, valid: true, startedAt, expiresAt };
+  const sig = await signSession(base);
+  const session = { ...base, sig };
 
-  const target = remember ? localStorage : sessionStorage;
   try {
-    // Only one storage should hold the session at a time.
     localStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(SESSION_KEY);
-    target.setItem(SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem(FRESH_LOGIN_FLAG, '1');
   } catch (e) {
     console.error('[Session] persist failed', e);
   }
   return session;
 }
 
-// ------------------------------------------------------------
-// Clear session from both storages
-// ------------------------------------------------------------
 export function logout() {
   try {
     localStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(FRESH_LOGIN_FLAG);
   } catch (e) {
     console.error('[Session] logout failed', e);
   }
 }
 
 // ------------------------------------------------------------
-// Guard: called from the app entry. Redirects when unauthenticated.
-// Returns true when the app should keep booting.
+// Guards
 // ------------------------------------------------------------
-export function requireSession(redirectTo = './login.html') {
-  if (isLoggedIn()) return true;
+export async function requireSession(redirectTo = './login.html') {
+  const session = getSession();
+  const fresh = sessionStorage.getItem(FRESH_LOGIN_FLAG) === '1';
+  const valid = await isValidSession(session);
+
+  if (session && valid && fresh) {
+    sessionStorage.removeItem(FRESH_LOGIN_FLAG);
+    return true;
+  }
+
+  logout();
   window.location.replace(redirectTo);
   return false;
 }
 
+export function redirectIfAuthenticated(/* redirectTo */) {
+  // El login es siempre obligatorio: nunca salteamos la pantalla.
+  return false;
+}
+
 // ------------------------------------------------------------
-// Guard for the login page. Returns true when a redirect happened.
+// Heartbeat de inactividad (llamar desde main.js)
 // ------------------------------------------------------------
-export function redirectIfAuthenticated(redirectTo = './index.html') {
-  if (!isLoggedIn()) return false;
-  window.location.replace(redirectTo);
-  return true;
+export function startSessionHeartbeat(onExpire) {
+  let last = Date.now();
+  const bump = () => { last = Date.now(); };
+
+  ['click', 'keydown', 'mousemove', 'touchstart', 'scroll'].forEach(ev =>
+    document.addEventListener(ev, bump, { passive: true })
+  );
+
+  setInterval(async () => {
+    const s = getSession();
+    if (!s) return;
+    const expired = Date.now() - last > SESSION_TTL_MS;
+    const valid = await isValidSession(s);
+    if (expired || !valid) {
+      logout();
+      if (typeof onExpire === 'function') onExpire();
+      else window.location.replace('./login.html');
+    }
+  }, 30_000);
 }

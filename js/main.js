@@ -18,17 +18,18 @@ import { mountChips } from './ui/chips.js';
 import { mountInputLimits } from './ui/inputLimits.js';
 import { ensureArray } from './utils.js';
 import { applyI18n, setLanguage, getLanguage } from './i18n.js';
-import { logout, getSession, requireSession } from './auth/session.js';
+import {
+  logout, getSession, requireSession, startSessionHeartbeat,
+} from './auth/session.js';
 
 // ------------------------------------------------------------
-// La app exige sesión válida. Si el usuario no está logueado,
-// requireSession() redirige a login.html y cortamos el boot.
+// La app exige sesión válida. requireSession es async ahora.
 // ------------------------------------------------------------
 boot();
 
-function boot() {
+async function boot() {
   // ---- Guard ----
-  if (!requireSession('./login.html')) return;
+  if (!(await requireSession('./login.html'))) return;
 
   // ----------------------------------------------------------
   // Theme (vive dentro del menú de usuario)
@@ -254,6 +255,21 @@ function boot() {
 
   mountTheme();
   mountUserMenu();
+
+  // ----------------------------------------------------------
+  // Heartbeat: cierra la sesión tras 30 min de inactividad
+  // (y también si la firma fue manipulada).
+  // ----------------------------------------------------------
+  startSessionHeartbeat(() => {
+    window.location.replace('./login.html');
+  });
+
+  // ----------------------------------------------------------
+  // Limpieza al cerrar la pestaña
+  // ----------------------------------------------------------
+  window.addEventListener('pagehide', () => {
+    try { sessionStorage.removeItem('jobTrackerFreshLogin'); } catch {}
+  });
 
   // ----------------------------------------------------------
   // Re-render dynamic controllers on language change

@@ -8,13 +8,13 @@ import {
   DEFAULT_BACKGROUND, applyBackground,
 } from '../constants.js';
 import {
-  login, redirectIfAuthenticated, validateCredentials,
+  logout, login, redirectIfAuthenticated, validateCredentials,
+  getLockoutRemainingMs,
 } from './session.js';
 import { mountInputLimits } from '../ui/inputLimits.js';
 
 // ------------------------------------------------------------
 // Read persisted config (logo + language + background)
-// without side effects
 // ------------------------------------------------------------
 function readConfig() {
   try {
@@ -47,9 +47,6 @@ function mountTheme() {
   });
 }
 
-// ------------------------------------------------------------
-// Render the app logo (same source as the main app)
-// ------------------------------------------------------------
 function applyLogo(logoId) {
   const el = document.getElementById('brandLogo');
   if (!el) return;
@@ -58,7 +55,7 @@ function applyLogo(logoId) {
 }
 
 // ------------------------------------------------------------
-// Tabs: switch between sign-in and sign-up forms
+// Tabs
 // ------------------------------------------------------------
 function mountTabs() {
   const tabs = document.querySelectorAll('.auth-tab');
@@ -67,7 +64,6 @@ function mountTabs() {
 
   function switchTab(target) {
     tabs.forEach(t => t.classList.toggle('active', t.dataset.authTab === target));
-
     if (target === 'login') {
       loginForm.style.display = 'block';
       registerForm.style.display = 'none';
@@ -85,7 +81,7 @@ function mountTabs() {
 }
 
 // ------------------------------------------------------------
-// Show / hide password toggle
+// Password toggle
 // ------------------------------------------------------------
 function mountPasswordToggles() {
   document.querySelectorAll('.pw-toggle').forEach(btn => {
@@ -100,7 +96,7 @@ function mountPasswordToggles() {
 }
 
 // ------------------------------------------------------------
-// Inline error box helpers
+// Error / lockout helpers
 // ------------------------------------------------------------
 function showError(form, message) {
   let box = form.querySelector('.auth-error');
@@ -120,15 +116,29 @@ function clearError(form) {
   if (box) box.remove();
 }
 
+function setLoginDisabled(disabled, reason = '') {
+  const form = document.getElementById('loginForm');
+  const submit = form?.querySelector('button[type="submit"]');
+  const email  = document.getElementById('loginEmail');
+  const pass   = document.getElementById('loginPassword');
+  [submit, email, pass].forEach(el => { if (el) el.disabled = disabled; });
+  if (disabled && reason) showError(form, reason);
+}
+
 // ------------------------------------------------------------
-// Forms: validate against the mocked credentials, then create
-// a local session and hand off to the app.
+// Forms
 // ------------------------------------------------------------
 function mountForms() {
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
 
-  loginForm.addEventListener('submit', (e) => {
+  // Estado inicial: si ya está bloqueado, mostrarlo.
+  if (getLockoutRemainingMs() > 0) {
+    const mins = Math.ceil(getLockoutRemainingMs() / 60000);
+    setLoginDisabled(true, t('auth.error.locked', { min: mins }));
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearError(loginForm);
 
@@ -136,18 +146,28 @@ function mountForms() {
     const password   = document.getElementById('loginPassword').value;
     const remember   = document.getElementById('loginRemember').checked;
 
-    const user = validateCredentials(identifier, password);
+    const user = await validateCredentials(identifier, password);
+
+    if (user && user.locked) {
+      const mins = Math.ceil(getLockoutRemainingMs() / 60000);
+      setLoginDisabled(true, t('auth.error.locked', { min: mins }));
+      return;
+    }
+
     if (!user) {
-      showError(loginForm, t('auth.error.invalid'));
-      const pwInput = document.getElementById('loginPassword');
-      if (pwInput) {
-        pwInput.value = '';
-        pwInput.focus();
+      const remaining = getLockoutRemainingMs();
+      if (remaining > 0) {
+        const mins = Math.ceil(remaining / 60000);
+        setLoginDisabled(true, t('auth.error.locked', { min: mins }));
+      } else {
+        showError(loginForm, t('auth.error.invalid'));
+        const pwInput = document.getElementById('loginPassword');
+        if (pwInput) { pwInput.value = ''; pwInput.focus(); }
       }
       return;
     }
 
-    login({
+    await login({
       username: user.username,
       email: user.email,
       name: user.name,
@@ -156,7 +176,6 @@ function mountForms() {
     window.location.href = './index.html';
   });
 
-  // Registration is disabled in the mocked build.
   registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     clearError(registerForm);
@@ -165,7 +184,7 @@ function mountForms() {
 }
 
 // ------------------------------------------------------------
-// Social providers: UI stubs for now
+// Socials (stubs)
 // ------------------------------------------------------------
 function mountSocials() {
   document.querySelectorAll('.btn-social').forEach(btn => {
@@ -179,8 +198,9 @@ function mountSocials() {
 // ------------------------------------------------------------
 // Boot
 // ------------------------------------------------------------
-function boot() {
-  // Already signed in → skip the login screen entirely
+async function boot() {
+  // El login es siempre obligatorio: limpiamos cualquier sesión vieja.
+  logout();
   if (redirectIfAuthenticated('./index.html')) return;
 
   const config = readConfig();

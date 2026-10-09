@@ -43,6 +43,7 @@ const translations = {
     'auth.account': 'Cuenta',
     'auth.error.invalid': 'Usuario o contraseña incorrectos.',
     'auth.error.registerDisabled': 'El registro está deshabilitado. Pedí acceso al administrador.',
+    'auth.error.locked': 'Demasiados intentos fallidos. Probá de nuevo en {min} min.',
 
     'stats.total': 'Total',
     'stats.active': 'Activas',
@@ -438,6 +439,7 @@ const translations = {
     'auth.account': 'Account',
     'auth.error.invalid': 'Invalid username or password.',
     'auth.error.registerDisabled': 'Registration is disabled. Ask the administrator for access.',
+    'auth.error.locked': 'Too many failed attempts. Try again in {min} min.',
 
     'stats.total': 'Total',
     'stats.active': 'Active',

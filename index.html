@@ -3,6 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Seguridad: CSP + metas defensivas -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' 'unsafe-inline';
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               font-src 'self' https://fonts.gstatic.com;
+               img-src 'self' data: https:;
+               connect-src 'self';
+               object-src 'none';
+               base-uri 'self';
+               form-action 'self';
+               frame-ancestors 'none';">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+
 <title>Job Tracker · Mi búsqueda laboral</title>
 
 <!-- Aplica el tema guardado antes de pintar (evita flash de color) -->
@@ -1026,21 +1042,12 @@
 
 <!-- ============================================================
      Loading overlay (versión 3)
-     - Muestra SIEMPRE un ciclo completo de la animación (3s):
-       * 0-1s: "Cargando postulaciones…"
-       * 1-2s: "Sincronizando referidos…"
-       * 2-3s: "Preparando tu panel…"
-     - Si la página ya cargó, espera a que termine el ciclo y se oculta.
-     - Si la página todavía no cargó, la animación sigue en loop
-       hasta que termine.
      ============================================================ -->
 <script>
   (function () {
     const overlay = document.getElementById('loadingOverlay');
     if (!overlay) return;
 
-    // La animación de textos tiene un ciclo de 3s (1s por mensaje).
-    // El mínimo tiene que ser igual para que se vea entera.
     const MIN_DISPLAY = 3000;
     const startTime = Date.now();
     let pageLoaded = false;
@@ -1098,22 +1105,16 @@
       setTimeout(hideOverlay, remaining);
     }
 
-    // 1) Cuando la página termina de cargar, programamos el ocultado.
-    //    Si ya pasaron los 3s, se oculta ya mismo. Si no, espera lo
-    //    que falta para completar el ciclo entero.
     window.addEventListener('load', () => {
       pageLoaded = true;
       scheduleHide();
     });
 
-    // 2) Si el script corre tarde y la página ya estaba cargada,
-    //    igual respetamos el ciclo completo.
     if (document.readyState === 'complete') {
       pageLoaded = true;
       scheduleHide();
     }
 
-    // 3) Fallback de seguridad: nunca dejar el overlay colgado
     setTimeout(() => {
       if (!hidden) {
         pageLoaded = true;
