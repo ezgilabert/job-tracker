@@ -907,3 +907,72 @@ textarea:invalid:not(:placeholder-shown):focus {
   padding: 0.1rem 0.4rem;
   border-radius: 6px;
 }
+
+/* ============================================================
+   EstadoCombo · trigger estilo input (para Estado inicial)
+   ============================================================ */
+
+input[type="hidden"] {
+  display: none;
+}
+
+.combo-trigger {
+  width: 100%;
+  padding: 0.75rem 2.4rem 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+  text-align: left;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .combo-trigger {
+  background: var(--bg-1);
+}
+
+.combo-trigger:hover {
+  border-color: var(--border-strong);
+}
+
+.combo-trigger:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.combo.open .combo-trigger {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.combo-trigger-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.combo-trigger-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Variante readonly (para el edit modal, donde el estado no se edita) */
+.combo-trigger-readonly {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.combo-trigger-readonly:hover {
+  border-color: var(--border);
+}

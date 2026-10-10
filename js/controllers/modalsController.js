@@ -37,12 +37,22 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   // Edit job
   // ----------------------------------------------------------
   const editModal = document.getElementById('editModal');
-  const editEstado = document.getElementById('editEstado');
-  const editSalaryHourlyCheckbox = document.getElementById('editSalarioPorHora');
 
-  editEstado.innerHTML = ALL_STATES
-    .map(s => `<option value="${escapeHtml(s)}">${escapeHtml(tState(s))}</option>`)
-    .join('');
+  // Display readonly del estado (ahora es un div, no un <select>)
+  const editEstadoEl = document.getElementById('editEstado');
+  const editEstadoIcon = editEstadoEl
+    ? editEstadoEl.querySelector('[data-estado-icon]')
+    : null;
+  const editEstadoText = editEstadoEl
+    ? editEstadoEl.querySelector('[data-estado-text]')
+    : null;
+
+  function updateEditEstadoDisplay(estado) {
+    if (editEstadoIcon) editEstadoIcon.textContent = getStateIcon(estado);
+    if (editEstadoText) editEstadoText.textContent = tState(estado);
+  }
+
+  const editSalaryHourlyCheckbox = document.getElementById('editSalarioPorHora');
 
   let editingId = null;
   const editFecha = new DatePicker(document.getElementById('editFechaPicker'));
@@ -63,7 +73,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     { value: 'usd' }
   );
 
-  // Encontrar el span del label del salario dentro del edit modal
   const editSalaryLabelEl = document.querySelector('#editModal .field [data-salary-label]');
 
   const editSalaryMode = new SalaryModeChip(
@@ -92,7 +101,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     setVal('editEmpresa', j.empresa);
     setVal('editPuesto', j.puesto);
     editFecha.setValue(j.fecha || '');
-    editEstado.value = j.estado;
+    updateEditEstadoDisplay(j.estado);
     setVal('editLink', j.link || '');
     setVal('editSalario', j.salario || '');
     editSalaryHourlyCheckbox.checked = Boolean(j.salarioPorHora);
@@ -777,6 +786,14 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       void target.offsetWidth;
       target.classList.add('highlighted');
       setTimeout(() => target.classList.remove('highlighted'), 1800);
+    }
+  });
+
+  // i18n: si el edit modal está abierto, refrescamos el display del estado
+  document.addEventListener('i18n-changed', () => {
+    if (editModal.classList.contains('open') && editingId) {
+      const j = jobsStore.get().find(x => x.id === editingId);
+      if (j) updateEditEstadoDisplay(j.estado);
     }
   });
 

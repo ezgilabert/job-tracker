@@ -317,10 +317,21 @@
               <label data-i18n="form.fecha">Fecha</label>
               <div class="date-picker" id="fechaPicker"></div>
             </div>
-            <div class="field third">
-              <label for="estado" data-i18n="form.estado">Estado inicial</label>
-              <select id="estado"></select>
+          <div class="field third">
+          <label for="estado" data-i18n="form.estado">Estado inicial</label>
+          <div class="combo combo-estado" id="estadoCombo">
+            <input type="hidden" id="estado" value="">
+            <div class="combo-input-wrap">
+              <button type="button" class="combo-trigger" id="estadoTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                <span class="combo-trigger-icon" id="estadoTriggerIcon">🔖</span>
+                <span class="combo-trigger-text" id="estadoTriggerText">Guardado</span>
+              </button>
+              <span class="combo-chevron">▾</span>
             </div>
+            <div class="combo-dropdown" id="estadoDropdown" role="listbox"></div>
+          </div>
+        </div>
             <div class="field third">
               <label for="link" data-i18n="form.link">Link de la oferta</label>
               <input type="url" id="link" maxlength="500" placeholder="https://...">
@@ -572,10 +583,13 @@
           <label data-i18n="form.fecha">Fecha</label>
           <div class="date-picker" id="editFechaPicker"></div>
         </div>
-        <div class="field third">
-          <label data-i18n="form.estado">Estado</label>
-          <select id="editEstado" disabled></select>
-        </div>
+   <div class="field third">
+    <label data-i18n="form.estado">Estado</label>
+    <div class="combo-trigger combo-trigger-readonly" id="editEstado">
+      <span class="combo-trigger-icon" data-estado-icon>🔖</span>
+      <span class="combo-trigger-text" data-estado-text>Guardado</span>
+    </div>
+  </div>
         <div class="field third">
           <label data-i18n="form.link">Link</label>
           <input type="url" id="editLink" maxlength="500">

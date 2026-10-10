@@ -5,6 +5,7 @@
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { PuestoCombo } from '../ui/combo.js';
+import { EstadoCombo } from '../ui/estadoCombo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
@@ -56,6 +57,23 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       jobsToggleBtn.classList.remove('collapsed');
     }
   }
+
+  // ----------------------------------------------------------
+  // EstadoCombo (dropdown custom para el estado inicial)
+  // ----------------------------------------------------------
+  const estadoCombo = new EstadoCombo(
+    document.getElementById('estadoCombo'),
+    {
+      getStates: () => {
+        const cfg = configStore.get();
+        return cfg.estadosIniciales && cfg.estadosIniciales.length
+          ? cfg.estadosIniciales
+          : WORKFLOW_STEPS.map(s => s.id);
+      },
+      getDefault: () => configStore.get().estadoInicialDefault || 'Aplicado',
+      onChange: () => refreshPuestoOptionalHint(),
+    }
+  );
 
   // ----------------------------------------------------------
   // Main render
@@ -125,20 +143,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   // Dynamic initial state
   // ----------------------------------------------------------
   function renderInitialStates() {
-    const cfg = configStore.get();
-    const states = cfg.estadosIniciales && cfg.estadosIniciales.length
-      ? cfg.estadosIniciales
-      : WORKFLOW_STEPS.map(s => s.id);
-
-    const defaultState = cfg.estadoInicialDefault || 'Aplicado';
-    const select = document.getElementById('estado');
-
-    select.innerHTML = states.map(id => {
-      const step = WORKFLOW_STEPS.find(s => s.id === id);
-      const icon = step ? step.icon : '•';
-      const isSelected = id === defaultState ? 'selected' : '';
-      return `<option value="${escapeHtml(id)}" ${isSelected}>${icon} ${escapeHtml(tState(id))}</option>`;
-    }).join('');
+    const def = configStore.get().estadoInicialDefault || 'Aplicado';
+    estadoCombo.setValue(def, { silent: true });
   }
 
   configStore.subscribe(renderInitialStates);
@@ -171,7 +177,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     { value: 'usd' }
   );
 
-  // Encontrar el span del label del campo salario (el del form nuevo)
   const salarioLabelEl = document.querySelector('#jobForm .field [data-salary-label]');
 
   const salaryModeChip = new SalaryModeChip(
@@ -197,27 +202,25 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   currencyPicker.onChange = () => updateSalaryPlaceholder();
   salaryModeChip.onChange = () => updateSalaryPlaceholder();
 
-  const estadoSelect = document.getElementById('estado');
   const puestoLabel = document.querySelector('label[for="puesto"]');
   const puestoInput = document.getElementById('puesto');
   const puestoOriginalLabel = puestoLabel ? puestoLabel.textContent : '';
 
   function refreshPuestoOptionalHint() {
-    if (!puestoLabel || !estadoSelect) return;
-    const isGuardado = estadoSelect.value === 'Guardado';
+    if (!puestoLabel) return;
+    const isGuardado = estadoCombo.getValue() === 'Guardado';
     puestoLabel.dataset.optional = isGuardado ? 'true' : 'false';
     puestoLabel.textContent = isGuardado
       ? `${puestoOriginalLabel} (${t('form.puesto.optional')})`
       : puestoOriginalLabel;
   }
 
-  estadoSelect.addEventListener('change', refreshPuestoOptionalHint);
   refreshPuestoOptionalHint();
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const initialState = document.getElementById('estado').value;
+    const initialState = estadoCombo.getValue();
     const puestoValue = valueOf('puesto');
 
     if (!puestoValue && initialState !== 'Guardado') {
@@ -428,6 +431,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   document.addEventListener('i18n-changed', () => {
     renderFilters();
     renderInitialStates();
+    estadoCombo.refresh();
     refreshPuestoOptionalHint();
     renderList();
   });
