@@ -9,14 +9,16 @@ import { EstadoCombo } from '../ui/estadoCombo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
+import { SalaryInput } from '../ui/salaryInput.js';
+import { renderDashboard, buildWeeklyTrend } from '../ui/dashboard.js';
 import {
-  computeStats, filterJobs, sortJobs,
+  computeStats, filterJobs, sortJobs, isClosed,
 } from '../selectors.js';
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
 import { renderStats } from '../templates/stats.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
-  uid, cloneArray, bindHourlySalaryPlaceholder, escapeHtml,
+  uid, cloneArray, escapeHtml,
 } from '../utils.js';
 import { t, tState, tStateShort } from '../i18n.js';
 
@@ -59,7 +61,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   }
 
   // ----------------------------------------------------------
-  // EstadoCombo (dropdown custom para el estado inicial)
+  // EstadoCombo
   // ----------------------------------------------------------
   const estadoCombo = new EstadoCombo(
     document.getElementById('estadoCombo'),
@@ -76,6 +78,76 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   );
 
   // ----------------------------------------------------------
+  // Dashboard
+  // ----------------------------------------------------------
+  function renderJobsDash() {
+    const container = document.getElementById('jobsDashboard');
+    if (!container) return;
+
+    const jobs = jobsStore.get();
+    const cfg = configStore.get();
+    const style = cfg.dashboardStyle || 'sparklines';
+
+    const stats = computeStats(jobs);
+    const ofertas = stats.ofertas;
+    const activas = stats.activos;
+    const cerradas = stats.cerradas;
+    const enProceso = stats.enProceso;
+    const total = stats.total;
+    const tasaExito = total ? Math.round((ofertas / total) * 100) : 0;
+
+    const empresaCount = {};
+    jobs.forEach(j => {
+      if (!j.empresa) return;
+      empresaCount[j.empresa] = (empresaCount[j.empresa] || 0) + 1;
+    });
+    const top = Object.entries(empresaCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const getDate = j => j.fecha || j.createdAt || '';
+    const trendTotal = buildWeeklyTrend(jobs, getDate);
+    const trendActive = buildWeeklyTrend(jobs.filter(j => !isClosed(j.estado)), getDate);
+    const trendHighlight = buildWeeklyTrend(jobs.filter(j => j.estado === 'Oferta'), getDate);
+    const trendClosed = buildWeeklyTrend(jobs.filter(j => isClosed(j.estado)), getDate);
+
+    renderDashboard(container, {
+      style,
+      total,
+      active: activas,
+      inProcess: enProceso,
+      closed: cerradas,
+      highlight: ofertas,
+      highlightIcon: '🏆',
+      highlightLabel: t('dash.jobs.highlight'),
+      highlightSub: t('dash.jobs.highlightSub', { pct: tasaExito }),
+      labels: {
+        total: t('dash.jobs.total'),
+        active: t('dash.jobs.active'),
+        inProcess: t('dash.jobs.inProcess'),
+        closed: t('dash.jobs.closed'),
+      },
+      trend: {
+        total: trendTotal,
+        active: trendActive,
+        highlight: trendHighlight,
+        closed: trendClosed,
+      },
+      topLabel: t('dash.jobs.top'),
+      topIcon: '🏢',
+      top,
+      summary: t('dash.jobs.summary', {
+        total,
+        active: activas,
+        highlight: ofertas,
+        plural: ofertas === 1 ? '' : 's',
+      }),
+    });
+  }
+
+  configStore.subscribe(renderJobsDash);
+
+  // ----------------------------------------------------------
   // Main render
   // ----------------------------------------------------------
   function renderList() {
@@ -86,6 +158,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       renderStats(computeStats(jobs));
 
     document.getElementById('jobCounter').textContent = jobs.length;
+
+    renderJobsDash();
 
     const filtered = sortJobs(filterJobs(jobs, currentFilter, searchTerm));
     const list = document.getElementById('list');
@@ -153,7 +227,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   renderInitialStates();
 
   // ----------------------------------------------------------
-  // Search input
+  // Search
   // ----------------------------------------------------------
   const searchInput = document.getElementById('jobSearch');
   searchInput.addEventListener('input', (e) => {
@@ -162,7 +236,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
-  // Modalidad + Currency + SalaryModeChip
+  // Modalidad + Currency + SalaryModeChip + SalaryInput
   // ----------------------------------------------------------
   const modalidadPicker = new ModalidadPicker(
     document.getElementById('modalidadPicker'),
@@ -187,20 +261,26 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
   );
 
+  const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
+
+  const salaryInput = new SalaryInput(
+    document.getElementById('salario'),
+    document.getElementById('salarioHint'),
+    {
+      getMode: () => salaryModeChip.getValue(),
+      getCurrency: () => currencyPicker.getValue(),
+      getHourly: () => salaryHourlyCheckbox.checked,
+    }
+  );
+
+  currencyPicker.onChange = () => salaryInput.refresh();
+  salaryModeChip.onChange = () => salaryInput.refresh();
+  salaryHourlyCheckbox.addEventListener('change', () => salaryInput.refresh());
+
   // ----------------------------------------------------------
   // Form
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
-  const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
-  const updateSalaryPlaceholder = bindHourlySalaryPlaceholder(
-    document.getElementById('salario'),
-    salaryHourlyCheckbox,
-    () => currencyPicker.getValue(),
-    () => salaryModeChip.getValue(),
-  );
-
-  currencyPicker.onChange = () => updateSalaryPlaceholder();
-  salaryModeChip.onChange = () => updateSalaryPlaceholder();
 
   const puestoLabel = document.querySelector('label[for="puesto"]');
   const puestoInput = document.getElementById('puesto');
@@ -239,7 +319,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       fecha: datePicker?.getValue() || '',
       estado: initialState,
       link: valueOf('link'),
-      salario: valueOf('salario'),
+      salario: salaryInput.getValue(),
       salarioPorHora: salaryHourlyCheckbox.checked,
       salarioEsRango: salarioMode === 'range',
       moneda: currencyPicker.getValue(),
@@ -255,11 +335,11 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     jobsStore.update(jobs => [newJob, ...jobs]);
 
     form.reset();
-    updateSalaryPlaceholder();
     datePicker?.setValue('');
     modalidadPicker.setValue('');
     currencyPicker.setValue('usd');
     salaryModeChip.setValue('range');
+    salaryInput.reset();
     renderInitialStates();
     refreshPuestoOptionalHint();
 
@@ -432,7 +512,9 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     renderFilters();
     renderInitialStates();
     estadoCombo.refresh();
+    salaryInput.refresh();
     refreshPuestoOptionalHint();
+    renderJobsDash();
     renderList();
   });
 

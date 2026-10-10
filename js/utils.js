@@ -13,41 +13,6 @@ export function escapeHtml(str) {
   }[c]));
 }
 
-/**
- * Actualiza el placeholder del input de salario según:
- *   - moneda (ars / usd)
- *   - modo (range / single)
- *   - si el checkbox "es por hora" está tildado
- */
-export function bindHourlySalaryPlaceholder(
-  input,
-  checkbox,
-  getCurrency = () => 'usd',
-  getMode = () => 'range',
-) {
-  const update = () => {
-    const cur = String(getCurrency() || 'usd').toLowerCase();
-    const isHourly = checkbox.checked;
-    const isRange = getMode() === 'range';
-
-    let ph;
-    if (cur === 'ars') {
-      ph = isHourly
-        ? (isRange ? 'Ej: 15.000–25.000' : 'Ej: 20.000')
-        : (isRange ? 'Ej: 2.000.000–2.500.000' : 'Ej: 2.200.000');
-    } else {
-      ph = isHourly
-        ? (isRange ? 'Ej: 20–30' : 'Ej: 25')
-        : (isRange ? 'Ej: 3.000–4.000' : 'Ej: 3.500');
-    }
-    input.placeholder = ph;
-  };
-
-  checkbox.addEventListener('change', update);
-  update();
-  return update;
-}
-
 export function daysSince(fecha) {
   if (!fecha) return null;
   const iso = fecha.length === 10 ? fecha + 'T00:00:00' : fecha;

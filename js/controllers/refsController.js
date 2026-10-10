@@ -9,6 +9,7 @@ import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import { uid, highlightAndScroll, escapeHtml, cloneArray } from '../utils.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
+import { renderDashboard, buildWeeklyTrend } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n.js';
 
 /**
@@ -19,8 +20,9 @@ import { t, tRefState, tRefStateShort } from '../i18n.js';
  *   onRefToJob:     (refId:number)=>void,
  *   onOpenRefHistory: (id:number)=>void,
  * }} modals
+ * @param {import('../store.js').Store} configStore
  */
-export function mountRefsController(jobsStore, refsStore, modals) {
+export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   // Local UI state
   // ----------------------------------------------------------
@@ -32,6 +34,75 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   let estadoChips = null;
 
   // ----------------------------------------------------------
+  // Dashboard
+  // ----------------------------------------------------------
+  function renderRefsDash() {
+    const container = document.getElementById('refsDashboard');
+    if (!container) return;
+
+    const refs = refsStore.get();
+    const cfg = configStore.get();
+    const style = cfg.dashboardStyle || 'sparklines';
+
+    const total = refs.length;
+    const activos = refs.filter(r => !isRefClosed(r.estado)).length;
+    const contratados = refs.filter(r => r.estado === 'Contratado').length;
+    const noAplica = refs.filter(r => r.estado === 'No aplica').length;
+    const enProceso = refs.filter(r => r.estado === 'En proceso').length;
+    const tasaConv = total ? Math.round((contratados / total) * 100) : 0;
+
+    const relCount = {};
+    refs.forEach(r => {
+      if (!r.relacion) return;
+      relCount[r.relacion] = (relCount[r.relacion] || 0) + 1;
+    });
+    const top = Object.entries(relCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const getDate = r => r.createdAt || r.fecha || '';
+    const trendTotal = buildWeeklyTrend(refs, getDate);
+    const trendActive = buildWeeklyTrend(refs.filter(r => !isRefClosed(r.estado)), getDate);
+    const trendHighlight = buildWeeklyTrend(refs.filter(r => r.estado === 'Contratado'), getDate);
+    const trendClosed = buildWeeklyTrend(refs.filter(r => r.estado === 'No aplica'), getDate);
+
+    renderDashboard(container, {
+      style,
+      total,
+      active: activos,
+      inProcess: enProceso,
+      closed: noAplica,
+      highlight: contratados,
+      highlightIcon: '🎉',
+      highlightLabel: t('dash.refs.highlight'),
+      highlightSub: t('dash.refs.highlightSub', { pct: tasaConv }),
+      labels: {
+        total: t('dash.refs.total'),
+        active: t('dash.refs.active'),
+        inProcess: t('dash.refs.inProcess'),
+        closed: t('dash.refs.closed'),
+      },
+      trend: {
+        total: trendTotal,
+        active: trendActive,
+        highlight: trendHighlight,
+        closed: trendClosed,
+      },
+      topLabel: t('dash.refs.top'),
+      topIcon: '🤝',
+      top,
+      summary: t('dash.refs.summary', {
+        total,
+        active: activos,
+        highlight: contratados,
+        plural: contratados === 1 ? '' : 's',
+      }),
+    });
+  }
+
+  configStore.subscribe(renderRefsDash);
+
+  // ----------------------------------------------------------
   // Render
   // ----------------------------------------------------------
   function renderRefs() {
@@ -39,6 +110,8 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const jobs = jobsStore.get();
 
     document.getElementById('refCounter').textContent = refs.length;
+
+    renderRefsDash();
 
     const filtered = filterRefs(refs, currentFilter, searchTerm);
     const list = document.getElementById('refList');
@@ -263,13 +336,10 @@ export function mountRefsController(jobsStore, refsStore, modals) {
 
     showToast(t('toast.advanceTo', { name: r.nombre, estado: tRefState(nextState) }), '→');
 
-    // Al llegar a "Contratado" sincronizamos la postulación vinculada:
-    // la movemos a "Oferta" si todavía no está ahí.
     if (nextState === 'Contratado' && r.linkedJobId) {
       syncLinkedJobToOffer(r.linkedJobId, r.nombre);
     }
 
-    // Al entrar en "En proceso" ofrecemos mover el referido a postulaciones.
     if (nextState === 'En proceso' && prevState !== 'En proceso') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
@@ -320,8 +390,6 @@ export function mountRefsController(jobsStore, refsStore, modals) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r || isRefClosed(r.estado)) return;
 
-    // Si ya hay una postulación creada/vinculada desde este referido,
-    // no permitimos retroceder: el vínculo quedaría inconsistente.
     if (r.linkedJobId) {
       showToast(t('ref.lockedBackTitle'), '🔒');
       return;
@@ -457,9 +525,12 @@ export function mountRefsController(jobsStore, refsStore, modals) {
   });
 
   // ----------------------------------------------------------
-  // i18n: re-render on language change
+  // i18n
   // ----------------------------------------------------------
-  document.addEventListener('i18n-changed', renderRefs);
+  document.addEventListener('i18n-changed', () => {
+    renderRefsDash();
+    renderRefs();
+  });
 
   // ----------------------------------------------------------
   // Helpers

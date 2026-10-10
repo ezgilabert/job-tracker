@@ -132,6 +132,17 @@ export function applyBackground(bgId) {
   }
 }
 
+// ============================================================
+// Dashboard styles
+// ============================================================
+
+export const DASHBOARD_STYLES = ['sparklines', 'modular'];
+export const DEFAULT_DASHBOARD_STYLE = 'sparklines';
+
+// ============================================================
+// Roles
+// ============================================================
+
 export const ROLE_TAGS_LIST = [
   { id: 'programador', label: 'Programador', icon: '💻' },
   { id: 'frontend',    label: 'Frontend',    icon: '🎨' },
@@ -146,8 +157,6 @@ export const ROLE_TAGS_LIST = [
   { id: 'gamedev',     label: 'Game Dev',    icon: '🎮' },
 ];
 
-// Valor reservado para "sin puesto". Se usa como placeholder en
-// el combo y como fallback en las tarjetas.
 export const NO_PUESTO_VALUE = 'No especificado';
 
 export const DEFAULT_ROLES = [
@@ -225,6 +234,7 @@ export function getDefaultConfig() {
     lang: DEFAULT_LANG,
     logo: DEFAULT_LOGO,
     background: DEFAULT_BACKGROUND,
+    dashboardStyle: DEFAULT_DASHBOARD_STYLE,
     profile: {
       nombre: '',
       apellido: '',
@@ -237,8 +247,6 @@ export function getDefaultConfig() {
       activeTags: ROLE_TAGS_LIST.map(t => t.id),
       hidden: [],
       custom: [],
-      // Mapa nombre de puesto custom → array de tags de categoría.
-      // Ej: { 'Rust Developer': ['backend'] }
       customTags: {},
     },
     estadosIniciales: WORKFLOW_STEPS.map(s => s.id),
@@ -269,8 +277,6 @@ export const STORAGE_KEYS = {
   CONFIG: 'jobTrackerConfig',
 };
 
-// ⚠️ Bumped de 2 → 3 para forzar la migración que elimina el
-// estado legacy 'Me va a referir' de los referidos existentes.
 export const STORAGE_VERSION = 3;
 export const CONFIG_VERSION = 1;
 

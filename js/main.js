@@ -143,7 +143,6 @@ async function boot() {
           ...j,
           contacto: j.contacto ?? '',
           moneda: j.moneda ?? '',
-          // Compat: si no tenía el flag, asumimos rango (era el único modo).
           salarioEsRango: j.salarioEsRango === undefined ? true : Boolean(j.salarioEsRango),
           skipped: ensureArray(j.skipped),
           volvioAtras: Boolean(j.volvioAtras),
@@ -237,7 +236,7 @@ async function boot() {
   const jobsCtrl = mountJobsController(
     jobsStore, refsStore, modals, fechaPicker, configStore, createPuestoCtrl
   );
-  const refsCtrl = mountRefsController(jobsStore, refsStore, modals);
+  const refsCtrl = mountRefsController(jobsStore, refsStore, modals, configStore);
 
   refsCtrl.initChips(refRelacionChips, refEstadoChips);
 

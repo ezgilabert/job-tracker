@@ -976,3 +976,48 @@ input[type="hidden"] {
 .combo-trigger-readonly:hover {
   border-color: var(--border);
 }
+
+/* ============================================================
+   SalaryInput: máscara auto-formato con hint del formato esperado
+   ============================================================ */
+
+.salary-input-wrap {
+  position: relative;
+}
+
+.salary-input-wrap input[type="text"] {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.salary-hint {
+  position: absolute;
+  top: 50%;
+  left: 6rem;
+  right: 6rem;
+  transform: translateY(-50%);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  opacity: 0.55;
+  display: none;
+}
+
+.salary-hint.visible {
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .salary-hint {
+    left: 5.5rem;
+    right: 5.5rem;
+  }
+}

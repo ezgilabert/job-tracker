@@ -18,7 +18,6 @@ const translations = {
     'action.config': 'Configuración',
     'action.theme': 'Cambiar tema',
 
-    // Auth
     'auth.documentTitle': 'Job Tracker · Acceso',
     'auth.tab.login': 'Iniciar sesión',
     'auth.tab.register': 'Crear cuenta',
@@ -162,7 +161,6 @@ const translations = {
     'job.offerRibbon': '🏆 Oferta',
     'job.noPuesto': 'No especificado',
 
-    // Offer confirmed (festive state)
     'job.offerConfirmed.title': '¡Felicitaciones!',
     'job.offerConfirmed.subtitle': 'Confirmaste la oferta de {empresa}. ¡A festejar!',
     'job.offerConfirmed.label': 'Oferta',
@@ -249,6 +247,12 @@ const translations = {
     'config.logo.desc': 'Elegí cómo querés que se vea el ícono de Job Tracker.',
     'config.bg.title': 'Fondo de la app',
     'config.bg.desc': 'Elegí el estilo de fondo que más te guste.',
+    'config.dashboard.title': 'Estilo del dashboard',
+    'config.dashboard.desc': 'Elegí cómo querés que se muestre el panel de estadísticas arriba de cada lista.',
+    'config.dashboard.sparklines': 'Tendencia',
+    'config.dashboard.sparklinesDesc': 'Cards con mini-gráficos de evolución',
+    'config.dashboard.modular': 'Destacado',
+    'config.dashboard.modularDesc': 'Card grande + métricas + panel lateral',
     'config.lang.title': 'Idioma de la interfaz',
     'config.lang.desc': 'Elegí el idioma de los textos de la app. Los datos guardados no se modifican.',
     'config.reset': '↺ Restablecer',
@@ -264,14 +268,12 @@ const translations = {
     'config.noPuestos': 'No hay puestos con las categorías activas. Activá alguna o agregá uno custom.',
     'config.noStates': 'Activá al menos un estado arriba.',
 
-    // Danger zone (Advanced panel)
     'config.danger.title': '⚠️ Zona de peligro',
     'config.danger.desc': 'Estas acciones no se pueden deshacer.',
     'config.danger.reset.title': 'Restablecer toda la configuración',
     'config.danger.reset.desc': 'Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
     'config.danger.reset.button': 'Restablecer',
 
-    // Data & Backup (Advanced panel)
     'config.backup.title': '💾 Datos y respaldo',
     'config.backup.desc': 'Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.',
     'config.backup.exportTitle': 'Exportar datos',
@@ -283,7 +285,6 @@ const translations = {
     'config.backup.jobs': 'postulaciones',
     'config.backup.refs': 'referidos',
 
-    // Profile
     'profile.title': '👤 Editar perfil',
     'profile.subtitle': 'Actualizá tu información personal',
     'profile.nombre': 'Nombre',
@@ -456,6 +457,23 @@ const translations = {
     'createPuesto.categories': 'Categorías',
     'createPuesto.categoriesHint': 'Ayuda a que aparezca en los filtros correctos',
     'createPuesto.categoriesOptional': 'opcional',
+
+    'dash.jobs.total': 'Total',
+    'dash.jobs.active': 'Activas',
+    'dash.jobs.inProcess': 'En proceso',
+    'dash.jobs.closed': 'Cerradas',
+    'dash.jobs.highlight': 'Ofertas',
+    'dash.jobs.highlightSub': '{pct}% de tasa de éxito',
+    'dash.jobs.top': 'Top empresas',
+    'dash.jobs.summary': 'Esta semana cargaste <strong>{total} postulaciones</strong>. Tenés <strong>{active} activas</strong> y <strong>{highlight} oferta{plural}</strong>.',
+    'dash.refs.total': 'Total',
+    'dash.refs.active': 'Activos',
+    'dash.refs.inProcess': 'En proceso',
+    'dash.refs.closed': 'No aplica',
+    'dash.refs.highlight': 'Contratados',
+    'dash.refs.highlightSub': '{pct}% de tasa de conversión',
+    'dash.refs.top': 'Top relaciones',
+    'dash.refs.summary': 'Tenés <strong>{total} referidos</strong>. <strong>{active} activos</strong> y <strong>{highlight} contratado{plural}</strong>.',
   },
 
   // ============================================================
@@ -697,6 +715,12 @@ const translations = {
     'config.logo.desc': 'Choose how the Job Tracker icon looks.',
     'config.bg.title': 'App background',
     'config.bg.desc': 'Pick the background style you like the most.',
+    'config.dashboard.title': 'Dashboard style',
+    'config.dashboard.desc': 'Choose how the stats panel looks above each list.',
+    'config.dashboard.sparklines': 'Trend',
+    'config.dashboard.sparklinesDesc': 'Cards with mini trend graphs',
+    'config.dashboard.modular': 'Featured',
+    'config.dashboard.modularDesc': 'Big card + metrics + side panel',
     'config.lang.title': 'Interface language',
     'config.lang.desc': 'Choose the language of the app texts. Saved data is not modified.',
     'config.reset': '↺ Reset',
@@ -901,6 +925,23 @@ const translations = {
     'createPuesto.categories': 'Categories',
     'createPuesto.categoriesHint': 'Helps it show up in the right filters',
     'createPuesto.categoriesOptional': 'optional',
+
+    'dash.jobs.total': 'Total',
+    'dash.jobs.active': 'Active',
+    'dash.jobs.inProcess': 'In process',
+    'dash.jobs.closed': 'Closed',
+    'dash.jobs.highlight': 'Offers',
+    'dash.jobs.highlightSub': '{pct}% success rate',
+    'dash.jobs.top': 'Top companies',
+    'dash.jobs.summary': 'This week you added <strong>{total} applications</strong>. You have <strong>{active} active</strong> and <strong>{highlight} offer{plural}</strong>.',
+    'dash.refs.total': 'Total',
+    'dash.refs.active': 'Active',
+    'dash.refs.inProcess': 'In process',
+    'dash.refs.closed': 'Not applicable',
+    'dash.refs.highlight': 'Hired',
+    'dash.refs.highlightSub': '{pct}% conversion rate',
+    'dash.refs.top': 'Top relationships',
+    'dash.refs.summary': 'You have <strong>{total} referrals</strong>. <strong>{active} active</strong> and <strong>{highlight} hired</strong>.',
   },
 };
 

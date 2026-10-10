@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Seguridad: CSP + metas defensivas -->
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'self';
                script-src 'self' 'unsafe-inline';
@@ -21,7 +20,6 @@
 
 <title>Job Tracker · Mi búsqueda laboral</title>
 
-<!-- Aplica el tema guardado antes de pintar (evita flash de color) -->
 <script>
   (function () {
     try {
@@ -37,9 +35,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/styles.css">
 
-<!-- ============================================================
-     Loading overlay (versión 3)
-     ============================================================ -->
 <style>
   .loading-overlay {
     position: fixed;
@@ -173,7 +168,7 @@
 </head>
 <body>
 
-<!-- Overlay de carga (versión 3) -->
+<!-- Overlay de carga -->
 <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
   <div class="loading-content">
 
@@ -278,6 +273,9 @@
 
   <div class="stats" id="stats"></div>
 
+  <!-- Dashboard de postulaciones -->
+  <div class="dash-container" id="jobsDashboard"></div>
+
   <!-- ===== FORM NUEVA POSTULACIÓN ===== -->
   <div class="form-card v3">
     <div class="form-card-header">
@@ -295,7 +293,6 @@
     <div class="collapsible-body" id="jobFormBody">
       <form id="jobForm">
 
-        <!-- Sección 1: Datos del puesto -->
         <div class="v3-section">
           <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
           <div class="v3-grid">
@@ -317,21 +314,21 @@
               <label data-i18n="form.fecha">Fecha</label>
               <div class="date-picker" id="fechaPicker"></div>
             </div>
-          <div class="field third">
-          <label for="estado" data-i18n="form.estado">Estado inicial</label>
-          <div class="combo combo-estado" id="estadoCombo">
-            <input type="hidden" id="estado" value="">
-            <div class="combo-input-wrap">
-              <button type="button" class="combo-trigger" id="estadoTrigger"
-                      aria-haspopup="listbox" aria-expanded="false">
-                <span class="combo-trigger-icon" id="estadoTriggerIcon">🔖</span>
-                <span class="combo-trigger-text" id="estadoTriggerText">Guardado</span>
-              </button>
-              <span class="combo-chevron">▾</span>
+            <div class="field third">
+              <label for="estado" data-i18n="form.estado">Estado inicial</label>
+              <div class="combo combo-estado" id="estadoCombo">
+                <input type="hidden" id="estado" value="">
+                <div class="combo-input-wrap">
+                  <button type="button" class="combo-trigger" id="estadoTrigger"
+                          aria-haspopup="listbox" aria-expanded="false">
+                    <span class="combo-trigger-icon" id="estadoTriggerIcon">🔖</span>
+                    <span class="combo-trigger-text" id="estadoTriggerText">Guardado</span>
+                  </button>
+                  <span class="combo-chevron">▾</span>
+                </div>
+                <div class="combo-dropdown" id="estadoDropdown" role="listbox"></div>
+              </div>
             </div>
-            <div class="combo-dropdown" id="estadoDropdown" role="listbox"></div>
-          </div>
-        </div>
             <div class="field third">
               <label for="link" data-i18n="form.link">Link de la oferta</label>
               <input type="url" id="link" maxlength="500" placeholder="https://...">
@@ -339,7 +336,6 @@
           </div>
         </div>
 
-        <!-- Sección 2: Salario y modalidad -->
         <div class="v3-section">
           <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
           <div class="v3-grid">
@@ -347,12 +343,13 @@
               <label for="salario">
                 <span class="lbl-text" data-salary-label>Rango salarial</span>
               </label>
-              <div class="icon-input-wrap">
+              <div class="icon-input-wrap salary-input-wrap">
                 <button type="button" class="mode-chip" id="salarioModeChip" data-mode="range" title="Cambiar a valor único">
                   <span class="dot"></span>
                   <span data-chip-label>Rango</span>
                 </button>
-                <input type="text" id="salario" maxlength="80" placeholder="Ej: 3.000–4.000">
+                <span class="salary-hint" id="salarioHint" aria-hidden="true"></span>
+                <input type="text" id="salario" maxlength="80" autocomplete="off" spellcheck="false" inputmode="numeric">
                 <div class="cur-chip" id="salarioCurrencyChip">
                   <button type="button" data-cur="ars" aria-label="ARS">ARS</button>
                   <button type="button" data-cur="usd" class="active" aria-label="USD">USD</button>
@@ -395,7 +392,6 @@
           </div>
         </div>
 
-        <!-- Sección 3: Contacto y notas -->
         <div class="v3-section">
           <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
           <div class="v3-grid">
@@ -468,6 +464,10 @@
     </div>
 
     <div class="referidos-body" id="referidosBody">
+
+      <!-- Dashboard de referidos -->
+      <div class="dash-container" id="refsDashboard"></div>
+
       <div class="form-card ref-form-card">
         <h3 data-i18n="refs.new">➕ Nuevo referido</h3>
         <form id="refForm">
@@ -561,7 +561,6 @@
   <div class="modal modal-v3">
     <h2 data-i18n="modal.edit.title">✏️ Editar postulación</h2>
 
-    <!-- Sección 1: Datos del puesto -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
       <div class="v3-grid">
@@ -583,13 +582,13 @@
           <label data-i18n="form.fecha">Fecha</label>
           <div class="date-picker" id="editFechaPicker"></div>
         </div>
-   <div class="field third">
-    <label data-i18n="form.estado">Estado</label>
-    <div class="combo-trigger combo-trigger-readonly" id="editEstado">
-      <span class="combo-trigger-icon" data-estado-icon>🔖</span>
-      <span class="combo-trigger-text" data-estado-text>Guardado</span>
-    </div>
-  </div>
+        <div class="field third">
+          <label data-i18n="form.estado">Estado</label>
+          <div class="combo-trigger combo-trigger-readonly" id="editEstado">
+            <span class="combo-trigger-icon" data-estado-icon>🔖</span>
+            <span class="combo-trigger-text" data-estado-text>Guardado</span>
+          </div>
+        </div>
         <div class="field third">
           <label data-i18n="form.link">Link</label>
           <input type="url" id="editLink" maxlength="500">
@@ -597,7 +596,6 @@
       </div>
     </div>
 
-    <!-- Sección 2: Salario y modalidad -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
       <div class="v3-grid">
@@ -605,12 +603,13 @@
           <label for="editSalario">
             <span class="lbl-text" data-salary-label>Rango salarial</span>
           </label>
-          <div class="icon-input-wrap">
+          <div class="icon-input-wrap salary-input-wrap">
             <button type="button" class="mode-chip" id="editSalarioModeChip" data-mode="range" title="Cambiar a valor único">
               <span class="dot"></span>
               <span data-chip-label>Rango</span>
             </button>
-            <input type="text" id="editSalario" maxlength="80" placeholder="Ej: 3.000–4.000">
+            <span class="salary-hint" id="editSalarioHint" aria-hidden="true"></span>
+            <input type="text" id="editSalario" maxlength="80" autocomplete="off" spellcheck="false" inputmode="numeric">
             <div class="cur-chip" id="editSalarioCurrencyChip">
               <button type="button" data-cur="ars" aria-label="ARS">ARS</button>
               <button type="button" data-cur="usd" class="active" aria-label="USD">USD</button>
@@ -653,7 +652,6 @@
       </div>
     </div>
 
-    <!-- Sección 3: Contacto y notas -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
       <div class="v3-grid">
@@ -891,6 +889,14 @@
             </div>
             <div class="config-bgs" id="configBgs"></div>
           </div>
+
+          <div class="config-section">
+            <div class="config-section-head">
+              <h3 data-i18n="config.dashboard.title">Estilo del dashboard</h3>
+              <p data-i18n="config.dashboard.desc">Elegí cómo querés que se muestre el panel de estadísticas arriba de cada lista.</p>
+            </div>
+            <div class="config-dash-grid" id="configDash"></div>
+          </div>
         </div>
 
         <div class="config-panel" data-panel="perfil">
@@ -957,8 +963,6 @@
         </div>
 
         <div class="config-panel" data-panel="advanced">
-
-          <!-- ===== Data & Backup ===== -->
           <div class="config-section">
             <div class="config-section-head">
               <h3 data-i18n="config.backup.title">💾 Datos y respaldo</h3>
@@ -994,7 +998,6 @@
             </div>
           </div>
 
-          <!-- ===== Danger zone ===== -->
           <div class="config-section config-section-danger">
             <div class="config-section-head">
               <h3 data-i18n="config.danger.title">⚠️ Zona de peligro</h3>
@@ -1251,9 +1254,6 @@
 
 <script type="module" src="./js/main.js"></script>
 
-<!-- ============================================================
-     Loading overlay (versión 3)
-     ============================================================ -->
 <script>
   (function () {
     const overlay = document.getElementById('loadingOverlay');

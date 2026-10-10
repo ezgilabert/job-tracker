@@ -10,6 +10,7 @@ import {
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
+  DASHBOARD_STYLES, DEFAULT_DASHBOARD_STYLE,
   NO_PUESTO_VALUE,
   BACKUP_APP_ID, BACKUP_VERSION,
   STORAGE_KEYS,
@@ -32,7 +33,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   const tabs = [...modal.querySelectorAll('.config-tab')];
   const panels = [...modal.querySelectorAll('.config-panel')];
 
-  // Reset animation
   const resetOverlay = document.getElementById('resetOverlay');
   const resetContent = document.getElementById('resetContent');
   const resetAnim = (resetOverlay && resetContent)
@@ -125,6 +125,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     if (!draft.lang) draft.lang = DEFAULT_LANG;
     if (!draft.background) draft.background = DEFAULT_BACKGROUND;
+    if (!draft.dashboardStyle) draft.dashboardStyle = DEFAULT_DASHBOARD_STYLE;
 
     preferredDefaultState = draft.estadoInicialDefault || null;
 
@@ -153,6 +154,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (!next.logo) next.logo = DEFAULT_LOGO;
     if (!next.lang) next.lang = DEFAULT_LANG;
     if (!next.background) next.background = DEFAULT_BACKGROUND;
+    if (!next.dashboardStyle) next.dashboardStyle = DEFAULT_DASHBOARD_STYLE;
     configStore.update(() => next);
     draft = cloneConfig(configStore.get());
     unsavedBadge.classList.remove('visible');
@@ -185,7 +187,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    // Bloquear ESC si la animación de reset está corriendo.
     if (resetOverlay && resetOverlay.classList.contains('active')) return;
 
     if (unsavedModal.classList.contains('open')) {
@@ -225,23 +226,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // 1) Resetear el draft
     draft = getDefaultConfig();
     preferredDefaultState = draft.estadoInicialDefault || null;
     renderAll();
 
-    // 2) Persistir el reset
     saveDraft();
-
-    // 3) Cerrar el modal de config directo (sin preguntar)
     closeDirect();
-
-    // 4) Cerrar cualquier modal abierto (unsaved, etc.)
     unsavedModal.classList.remove('open');
 
-    // 5) Correr la animación y, al terminar, recargar la app.
-    //    El overlay queda visible hasta que la nueva página
-    //    arranca, evitando cualquier flash.
     if (resetAnim) {
       await resetAnim.run(2400);
       window.location.reload();
@@ -269,6 +261,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     renderFilters();
     renderLogos();
     renderBackgrounds();
+    renderDashboards();
     renderLangs();
     renderPerfil();
     renderBackupStats();
@@ -459,7 +452,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     draft.estadosIniciales = [...stateSet];
 
-    if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefinitivo)) {
+    if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
       draft.estadoInicialDefault = [...stateSet][0];
     }
 
@@ -637,6 +630,61 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       draft.background = id;
       applyBackground(id);
       renderBackgrounds();
+      updateBadge();
+    }
+  });
+
+  // ------------------------------------------------------------
+  // Panel: Appearance (dashboard style)
+  // ------------------------------------------------------------
+  function renderDashboards() {
+    const current = draft.dashboardStyle || DEFAULT_DASHBOARD_STYLE;
+    const container = document.getElementById('configDash');
+    if (!container) return;
+
+    const options = [
+      {
+        id: 'sparklines',
+        label: t('config.dashboard.sparklines'),
+        desc: t('config.dashboard.sparklinesDesc'),
+        preview: 'dash-prev-spark',
+      },
+      {
+        id: 'modular',
+        label: t('config.dashboard.modular'),
+        desc: t('config.dashboard.modularDesc'),
+        preview: 'dash-prev-mod',
+      },
+    ];
+
+    container.innerHTML = options.map(opt => {
+      const isSelected = opt.id === current;
+      const inner = opt.id === 'modular'
+        ? `<div class="dash-prev-side"></div>`
+        : '';
+      return `
+        <button type="button"
+                class="config-dash-option ${isSelected ? 'selected' : ''}"
+                data-dash="${escapeHtml(opt.id)}">
+          <div class="config-dash-preview ${opt.preview}">${inner}</div>
+          <div class="config-dash-info">
+            <strong>${escapeHtml(opt.label)}</strong>
+            <span>${escapeHtml(opt.desc)}</span>
+          </div>
+          <div class="config-dash-check"></div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('configDash').addEventListener('click', (e) => {
+    const btn = e.target.closest('.config-dash-option');
+    if (!btn) return;
+    const id = btn.dataset.dash;
+    if (!DASHBOARD_STYLES.includes(id)) return;
+    if ((draft.dashboardStyle || DEFAULT_DASHBOARD_STYLE) !== id) {
+      draft.dashboardStyle = id;
+      renderDashboards();
       updateBadge();
     }
   });

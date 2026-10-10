@@ -9,6 +9,7 @@ import { PuestoCombo } from '../ui/combo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip } from '../ui/salaryModeChip.js';
+import { SalaryInput } from '../ui/salaryInput.js';
 import { mountChips } from '../ui/chips.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
@@ -19,7 +20,7 @@ import {
   stepIndex, isClosed,
 } from '../selectors.js';
 import {
-  escapeHtml, todayISO, cloneArray, ensureArray, bindHourlySalaryPlaceholder,
+  escapeHtml, todayISO, cloneArray, ensureArray,
   formatDateTime,
 } from '../utils.js';
 import {
@@ -38,7 +39,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   // ----------------------------------------------------------
   const editModal = document.getElementById('editModal');
 
-  // Display readonly del estado (ahora es un div, no un <select>)
   const editEstadoEl = document.getElementById('editEstado');
   const editEstadoIcon = editEstadoEl
     ? editEstadoEl.querySelector('[data-estado-icon]')
@@ -83,15 +83,19 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     }
   );
 
-  const updateEditSalaryPlaceholder = bindHourlySalaryPlaceholder(
+  const editSalaryInput = new SalaryInput(
     document.getElementById('editSalario'),
-    editSalaryHourlyCheckbox,
-    () => editCurrency.getValue(),
-    () => editSalaryMode.getValue(),
+    document.getElementById('editSalarioHint'),
+    {
+      getMode: () => editSalaryMode.getValue(),
+      getCurrency: () => editCurrency.getValue(),
+      getHourly: () => editSalaryHourlyCheckbox.checked,
+    }
   );
 
-  editCurrency.onChange = () => updateEditSalaryPlaceholder();
-  editSalaryMode.onChange = () => updateEditSalaryPlaceholder();
+  editCurrency.onChange = () => editSalaryInput.refresh();
+  editSalaryMode.onChange = () => editSalaryInput.refresh();
+  editSalaryHourlyCheckbox.addEventListener('change', () => editSalaryInput.refresh());
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -103,11 +107,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     editFecha.setValue(j.fecha || '');
     updateEditEstadoDisplay(j.estado);
     setVal('editLink', j.link || '');
-    setVal('editSalario', j.salario || '');
     editSalaryHourlyCheckbox.checked = Boolean(j.salarioPorHora);
     editCurrency.setValue(j.moneda || 'usd');
     editSalaryMode.setValue(j.salarioEsRango === false ? 'single' : 'range');
-    updateEditSalaryPlaceholder();
+    editSalaryInput.setValue(j.salario || '');
     setVal('editContacto', j.contacto || '');
     setVal('editNotas', j.notas || '');
     editModalidad.setValue(j.modalidad || '', j.hybridOfficeDays || 3);
@@ -139,7 +142,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         puesto:    valueOf('editPuesto'),
         fecha:     editFecha.getValue(),
         link:      valueOf('editLink'),
-        salario:   valueOf('editSalario'),
+        salario:   editSalaryInput.getValue(),
         salarioPorHora: editSalaryHourlyCheckbox.checked,
         salarioEsRango: salarioMode === 'range',
         moneda:    editCurrency.getValue(),
@@ -789,7 +792,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     }
   });
 
-  // i18n: si el edit modal está abierto, refrescamos el display del estado
   document.addEventListener('i18n-changed', () => {
     if (editModal.classList.contains('open') && editingId) {
       const j = jobsStore.get().find(x => x.id === editingId);
