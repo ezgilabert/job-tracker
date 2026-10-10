@@ -7,6 +7,7 @@ import { showConfirm } from '../ui/confirmModal.js';
 import { PuestoCombo } from '../ui/combo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
+import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import {
   computeStats, filterJobs, sortJobs,
 } from '../selectors.js';
@@ -155,7 +156,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
-  // Modalidad picker + Currency picker
+  // Modalidad + Currency + SalaryModeChip
   // ----------------------------------------------------------
   const modalidadPicker = new ModalidadPicker(
     document.getElementById('modalidadPicker'),
@@ -170,6 +171,17 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     { value: 'usd' }
   );
 
+  // Encontrar el span del label del campo salario (el del form nuevo)
+  const salarioLabelEl = document.querySelector('#jobForm .field [data-salary-label]');
+
+  const salaryModeChip = new SalaryModeChip(
+    document.getElementById('salarioModeChip'),
+    {
+      value: DEFAULT_SALARY_MODE,
+      fieldLabelEl: salarioLabelEl,
+    }
+  );
+
   // ----------------------------------------------------------
   // Form
   // ----------------------------------------------------------
@@ -178,10 +190,12 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   const updateSalaryPlaceholder = bindHourlySalaryPlaceholder(
     document.getElementById('salario'),
     salaryHourlyCheckbox,
-    () => currencyPicker.getValue()
+    () => currencyPicker.getValue(),
+    () => salaryModeChip.getValue(),
   );
 
   currencyPicker.onChange = () => updateSalaryPlaceholder();
+  salaryModeChip.onChange = () => updateSalaryPlaceholder();
 
   const estadoSelect = document.getElementById('estado');
   const puestoLabel = document.querySelector('label[for="puesto"]');
@@ -213,6 +227,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
 
     const modal = modalidadPicker.getValue();
+    const salarioMode = salaryModeChip.getValue();
 
     const newJob = {
       id: uid(),
@@ -223,6 +238,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       link: valueOf('link'),
       salario: valueOf('salario'),
       salarioPorHora: salaryHourlyCheckbox.checked,
+      salarioEsRango: salarioMode === 'range',
       moneda: currencyPicker.getValue(),
       modalidad: modal.modalidad,
       hybridOfficeDays: modal.hybridOfficeDays,
@@ -240,6 +256,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     datePicker?.setValue('');
     modalidadPicker.setValue('');
     currencyPicker.setValue('usd');
+    salaryModeChip.setValue('range');
     renderInitialStates();
     refreshPuestoOptionalHint();
 
@@ -424,7 +441,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   }
 
   // ----------------------------------------------------------
-  // Puesto combo — con "crear nuevo" (V1)
+  // Puesto combo
   // ----------------------------------------------------------
   const puestoCombo = new PuestoCombo(
     document.getElementById('puestoCombo'),

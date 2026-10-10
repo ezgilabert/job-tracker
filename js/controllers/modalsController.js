@@ -8,6 +8,7 @@ import { DatePicker } from '../ui/datePicker.js';
 import { PuestoCombo } from '../ui/combo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
+import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { mountChips } from '../ui/chips.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
@@ -62,13 +63,26 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     { value: 'usd' }
   );
 
+  // Encontrar el span del label del salario dentro del edit modal
+  const editSalaryLabelEl = document.querySelector('#editModal .field [data-salary-label]');
+
+  const editSalaryMode = new SalaryModeChip(
+    document.getElementById('editSalarioModeChip'),
+    {
+      value: 'range',
+      fieldLabelEl: editSalaryLabelEl,
+    }
+  );
+
   const updateEditSalaryPlaceholder = bindHourlySalaryPlaceholder(
     document.getElementById('editSalario'),
     editSalaryHourlyCheckbox,
-    () => editCurrency.getValue()
+    () => editCurrency.getValue(),
+    () => editSalaryMode.getValue(),
   );
 
   editCurrency.onChange = () => updateEditSalaryPlaceholder();
+  editSalaryMode.onChange = () => updateEditSalaryPlaceholder();
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -83,6 +97,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     setVal('editSalario', j.salario || '');
     editSalaryHourlyCheckbox.checked = Boolean(j.salarioPorHora);
     editCurrency.setValue(j.moneda || 'usd');
+    editSalaryMode.setValue(j.salarioEsRango === false ? 'single' : 'range');
     updateEditSalaryPlaceholder();
     setVal('editContacto', j.contacto || '');
     setVal('editNotas', j.notas || '');
@@ -105,6 +120,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     if (!editingId) return;
 
     const modal = editModalidad.getValue();
+    const salarioMode = editSalaryMode.getValue();
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
@@ -116,6 +132,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         link:      valueOf('editLink'),
         salario:   valueOf('editSalario'),
         salarioPorHora: editSalaryHourlyCheckbox.checked,
+        salarioEsRango: salarioMode === 'range',
         moneda:    editCurrency.getValue(),
         modalidad: modal.modalidad,
         hybridOfficeDays: modal.hybridOfficeDays,
@@ -703,6 +720,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       estado: 'Contacto',
       link: '',
       salario: '',
+      salarioEsRango: true,
       moneda: 'usd',
       modalidad: '',
       hybridOfficeDays: null,

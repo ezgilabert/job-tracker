@@ -18,7 +18,6 @@ const translations = {
     'action.config': 'Configuración',
     'action.theme': 'Cambiar tema',
 
-    // Auth
     'auth.documentTitle': 'Job Tracker · Acceso',
     'auth.tab.login': 'Iniciar sesión',
     'auth.tab.register': 'Crear cuenta',
@@ -66,8 +65,13 @@ const translations = {
     'form.estado': 'Estado inicial',
     'form.link': 'Link de la oferta',
     'form.salario': 'Rango salarial',
+    'form.salario.single': 'Salario único',
     'form.salario.placeholder': 'Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h',
     'form.salarioPorHora': 'Es por hora',
+    'form.salario.mode.range': 'Rango',
+    'form.salario.mode.single': 'Único',
+    'form.salario.toggleToSingle': 'Cambiar a valor único',
+    'form.salario.toggleToRange': 'Cambiar a rango',
     'form.contacto': 'Contacto',
     'form.contacto.placeholder': 'Ej: María López (Recruiter)',
     'form.notas': 'Notas',
@@ -157,7 +161,6 @@ const translations = {
     'job.offerRibbon': '🏆 Oferta',
     'job.noPuesto': 'No especificado',
 
-    // Offer confirmed (festive state)
     'job.offerConfirmed.title': '¡Felicitaciones!',
     'job.offerConfirmed.subtitle': 'Confirmaste la oferta de {empresa}. ¡A festejar!',
     'job.offerConfirmed.label': 'Oferta',
@@ -259,14 +262,12 @@ const translations = {
     'config.noPuestos': 'No hay puestos con las categorías activas. Activá alguna o agregá uno custom.',
     'config.noStates': 'Activá al menos un estado arriba.',
 
-    // Danger zone (Advanced panel)
     'config.danger.title': '⚠️ Zona de peligro',
     'config.danger.desc': 'Estas acciones no se pueden deshacer.',
     'config.danger.reset.title': 'Restablecer toda la configuración',
     'config.danger.reset.desc': 'Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
     'config.danger.reset.button': 'Restablecer',
 
-    // Data & Backup (Advanced panel)
     'config.backup.title': '💾 Datos y respaldo',
     'config.backup.desc': 'Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.',
     'config.backup.exportTitle': 'Exportar datos',
@@ -278,7 +279,6 @@ const translations = {
     'config.backup.jobs': 'postulaciones',
     'config.backup.refs': 'referidos',
 
-    // Profile
     'profile.title': '👤 Editar perfil',
     'profile.subtitle': 'Actualizá tu información personal',
     'profile.nombre': 'Nombre',
@@ -507,8 +507,13 @@ const translations = {
     'form.estado': 'Initial status',
     'form.link': 'Job link',
     'form.salario': 'Salary range',
+    'form.salario.single': 'Single salary',
     'form.salario.placeholder': 'Ex: USD 3,000–4,000/month or USD 20–30/h',
     'form.salarioPorHora': 'Per hour',
+    'form.salario.mode.range': 'Range',
+    'form.salario.mode.single': 'Single',
+    'form.salario.toggleToSingle': 'Switch to single value',
+    'form.salario.toggleToRange': 'Switch to range',
     'form.contacto': 'Contact',
     'form.contacto.placeholder': 'Ex: Mary Smith (Recruiter)',
     'form.notas': 'Notes',
@@ -598,7 +603,6 @@ const translations = {
     'job.offerRibbon': '🏆 Offer',
     'job.noPuesto': 'Not specified',
 
-    // Offer confirmed (festive state)
     'job.offerConfirmed.title': 'Congratulations!',
     'job.offerConfirmed.subtitle': 'You confirmed the offer from {empresa}. Celebrate!',
     'job.offerConfirmed.label': 'Offer',

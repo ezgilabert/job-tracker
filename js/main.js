@@ -143,6 +143,8 @@ async function boot() {
           ...j,
           contacto: j.contacto ?? '',
           moneda: j.moneda ?? '',
+          // Compat: si no tenía el flag, asumimos rango (era el único modo).
+          salarioEsRango: j.salarioEsRango === undefined ? true : Boolean(j.salarioEsRango),
           skipped: ensureArray(j.skipped),
           volvioAtras: Boolean(j.volvioAtras),
           history: Array.isArray(j.history) && j.history.length
@@ -228,7 +230,6 @@ async function boot() {
 
   mountInputLimits(document);
 
-  // Controller de creación de puestos (compartido entre combos)
   const createPuestoCtrl = mountCreatePuestoController(configStore);
 
   mountConfigController(configStore, jobsStore, refsStore);
@@ -243,9 +244,6 @@ async function boot() {
   mountTheme();
   mountUserMenu();
 
-  // ----------------------------------------------------------
-  // Heartbeat
-  // ----------------------------------------------------------
   startSessionHeartbeat(() => {
     window.location.replace('./login.html');
   });
