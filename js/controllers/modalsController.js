@@ -1,12 +1,5 @@
 // ============================================================
 // Controller: modals
-// - Edit job
-// - Close job (with reason)
-// - History (jobs)
-// - History (referrals)
-// - Edit referral
-// - Move referral → job
-// - Note on advance
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -36,8 +29,9 @@ import {
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
  * @param {import('../store.js').Store} configStore
+ * @param {{ requestNewPuesto: (suggested:string)=>Promise<string|null> }} createPuestoCtrl
  */
-export function mountModalsController(jobsStore, refsStore, configStore) {
+export function mountModalsController(jobsStore, refsStore, configStore, createPuestoCtrl) {
   // ----------------------------------------------------------
   // Edit job
   // ----------------------------------------------------------
@@ -54,6 +48,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   const editPuesto = new PuestoCombo(document.getElementById('editPuestoCombo'), {
     getJobPuestos: () => jobsStore.get().map(j => j.puesto),
     getConfig: () => configStore.get(),
+    onCreateRequested: (suggested) => createPuestoCtrl.requestNewPuesto(suggested),
   });
   const editModalidad = new ModalidadPicker(
     document.getElementById('editModalidadPicker'),

@@ -2,7 +2,6 @@
    Config: settings modal with tabs + unsaved changes
    ============================================================ */
 
-/* ===== Main modal ===== */
 .config-modal {
   max-width: 780px;
   position: relative;
@@ -45,7 +44,6 @@
   color: var(--text-muted);
 }
 
-/* ===== "Unsaved" badge ===== */
 .unsaved-badge {
   display: none;
   align-items: center;
@@ -78,9 +76,6 @@
   50% { opacity: 0.65; }
 }
 
-/* ============================================================
-   Layout: sidebar + body
-   ============================================================ */
 .config-layout {
   display: grid;
   grid-template-columns: 190px 1fr;
@@ -89,9 +84,6 @@
   margin-bottom: 1rem;
 }
 
-/* ============================================================
-   Sidebar nav
-   ============================================================ */
 .config-nav {
   display: flex;
   flex-direction: column;
@@ -148,9 +140,6 @@
   text-overflow: ellipsis;
 }
 
-/* ============================================================
-   Divider between sidebar groups
-   ============================================================ */
 .config-nav-sep {
   height: 1px;
   background: var(--border);
@@ -158,9 +147,6 @@
   flex-shrink: 0;
 }
 
-/* ============================================================
-   Body (panels)
-   ============================================================ */
 .config-body {
   min-width: 0;
   margin-bottom: 0;
@@ -208,7 +194,6 @@
   border: 1px solid var(--border);
 }
 
-/* ===== Tags ===== */
 .config-tags {
   display: flex;
   flex-wrap: wrap;
@@ -244,7 +229,6 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* ===== Add row ===== */
 .config-add-row {
   display: flex;
   gap: 0.5rem;
@@ -274,7 +258,6 @@
   white-space: nowrap;
 }
 
-/* ===== Roles list ===== */
 .config-puestos-list {
   display: flex;
   flex-wrap: wrap;
@@ -343,7 +326,6 @@
   width: 100%;
 }
 
-/* ===== State checkboxes ===== */
 .config-checks {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -388,7 +370,6 @@
 
 .config-check .icon { font-size: 1rem; flex-shrink: 0; }
 
-/* ===== Default state ===== */
 .config-default-estado {
   display: flex;
   flex-wrap: wrap;
@@ -424,7 +405,6 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* ===== Filters ===== */
 .config-filtros {
   display: flex;
   flex-direction: column;
@@ -514,9 +494,6 @@
   background: var(--accent-soft);
 }
 
-/* ============================================================
-   Footer actions
-   ============================================================ */
 .config-actions {
   display: flex;
   gap: 0.75rem;
@@ -526,10 +503,6 @@
   border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }
-
-/* ============================================================
-   Danger section (Advanced tab)
-   ============================================================ */
 
 .config-section-danger {
   border-bottom: none;
@@ -692,9 +665,6 @@
   }
 }
 
-/* ============================================================
-   Unsaved changes modal
-   ============================================================ */
 .modal-overlay.nested { z-index: 110; }
 
 .unsaved-actions {
@@ -1026,7 +996,6 @@
   color: var(--text-dim);
 }
 
-/* Input with @ prefix */
 .input-prefix {
   display: flex;
   align-items: stretch;

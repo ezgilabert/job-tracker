@@ -4,6 +4,7 @@
 
 import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS, NO_PUESTO_VALUE } from '../constants.js';
 import { escapeHtml } from '../utils.js';
+import { t } from '../i18n.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
 
@@ -17,26 +18,36 @@ function getRoleIcon(role) {
 
 /**
  * Builds the list of roles according to user config.
+ * Los puestos custom pueden tener sus propios tags en config.puestos.customTags.
  * "No especificado" siempre está disponible salvo que el usuario
  * lo haya ocultado explícitamente desde Configuración.
  */
 export function getAvailableRoles(config) {
   if (!config || !config.puestos) return [...DEFAULT_ROLES];
 
-  const { activeTags = [], hidden = [], custom = [] } = config.puestos;
+  const { activeTags = [], hidden = [], custom = [], customTags = {} } = config.puestos;
   const activeSet = new Set(activeTags);
   const hiddenSet = new Set(hidden);
 
+  function tagsFor(role) {
+    return ROLE_TAGS[role] || customTags[role] || [];
+  }
+
   const filteredDefaults = DEFAULT_ROLES.filter(p => {
     if (hiddenSet.has(p)) return false;
-    // "No especificado" se ignora el filtro por tags.
     if (p === NO_PUESTO_VALUE) return true;
     if (activeSet.size === 0) return true;
-    const tags = ROLE_TAGS[p] || [];
-    return tags.some(t => activeSet.has(t));
+    return tagsFor(p).some(t => activeSet.has(t));
   });
 
-  const filteredCustoms = custom.filter(p => !hiddenSet.has(p));
+  const filteredCustoms = custom.filter(p => {
+    if (hiddenSet.has(p)) return false;
+    // Puestos custom sin tags: siempre visibles.
+    const tags = tagsFor(p);
+    if (tags.length === 0) return true;
+    if (activeSet.size === 0) return true;
+    return tags.some(t => activeSet.has(t));
+  });
 
   return [...filteredCustoms, ...filteredDefaults];
 }
@@ -62,8 +73,6 @@ function getOptions(jobsRoles, query, config) {
       return a.localeCompare(b);
     });
   } else {
-    // "No especificado" va primero (si está disponible), después
-    // los usados recientemente, después el resto.
     const recent = used.filter(p => !available.includes(p));
     const noPuesto = available.filter(p => p === NO_PUESTO_VALUE);
     const rest = available.filter(p => p !== NO_PUESTO_VALUE);
@@ -80,6 +89,7 @@ export class PuestoCombo {
    *   getJobPuestos?: () => string[],
    *   getConfig?: () => object,
    *   onSelect?: (value:string) => void,
+   *   onCreateRequested?: (suggestedName:string) => Promise<string|null>,
    * }} opts
    */
   constructor(comboEl, opts = {}) {
@@ -89,6 +99,9 @@ export class PuestoCombo {
     this.getJobPuestos = opts.getJobPuestos || (() => []);
     this.getConfig = opts.getConfig || (() => null);
     this.onSelect = opts.onSelect || (() => {});
+    this.onCreateRequested = typeof opts.onCreateRequested === 'function'
+      ? opts.onCreateRequested
+      : null;
 
     this.open = false;
     this.highlightedIdx = -1;
@@ -110,12 +123,42 @@ export class PuestoCombo {
     };
     document.addEventListener('click', this._outsideClick);
 
-    this.dropdown.addEventListener('mousedown', (e) => e.preventDefault());
-    this.dropdown.addEventListener('click', (e) => {
-      const opt = e.target.closest('.combo-option');
-      if (!opt) return;
-      this.selectValue(opt.dataset.value);
+    this.dropdown.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.combo-create-option')) return;
+      e.preventDefault();
     });
+
+    this.dropdown.addEventListener('click', (e) => this._onDropdownClick(e));
+  }
+
+  async _onDropdownClick(e) {
+    const createBtn = e.target.closest('.combo-create-option');
+    if (createBtn && this.onCreateRequested) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const suggested = this.input.value.trim();
+      this.hide();
+
+      let newName = null;
+      try {
+        newName = await this.onCreateRequested(suggested);
+      } catch (err) {
+        console.error('[PuestoCombo] create failed', err);
+      }
+
+      if (newName) {
+        this.selectValue(newName);
+        setTimeout(() => this.input.focus(), 0);
+      } else {
+        this.input.focus();
+      }
+      return;
+    }
+
+    const opt = e.target.closest('.combo-option');
+    if (!opt) return;
+    this.selectValue(opt.dataset.value);
   }
 
   destroy() {
@@ -148,51 +191,67 @@ export class PuestoCombo {
     const config = this.getConfig();
     const roles = getOptions(this.getJobPuestos(), query, config);
 
-    if (roles.length === 0) {
-      this.dropdown.innerHTML = `
-        <div class="combo-empty">
-          No hay coincidencias.<br>
-          <strong>Enter</strong> para usar "${escapeHtml(query)}"
-        </div>
-      `;
-      return;
-    }
-
-    const used = new Set(this.getJobPuestos());
-    const available = new Set(getAvailableRoles(config));
     let html = '';
 
-    roles.forEach((p, idx) => {
-      const isNoPuesto = p === NO_PUESTO_VALUE;
-      const isRecent = !isNoPuesto && used.has(p) && !available.has(p);
-      const icon = getRoleIcon(p);
-      const isSelected = this.input.value === p;
-      const isHighlighted = idx === this.highlightedIdx;
+    if (roles.length === 0) {
+      html += `
+        <div class="combo-empty">
+          No hay coincidencias.
+        </div>
+      `;
+    } else {
+      const used = new Set(this.getJobPuestos());
+      const available = new Set(getAvailableRoles(config));
 
-      let tag = '';
-      if (isNoPuesto) tag = 'Genérico';
-      else if (isRecent) tag = 'Reciente';
+      roles.forEach((p, idx) => {
+        const isNoPuesto = p === NO_PUESTO_VALUE;
+        const isRecent = !isNoPuesto && used.has(p) && !available.has(p);
+        const icon = getRoleIcon(p);
+        const isSelected = this.input.value === p;
+        const isHighlighted = idx === this.highlightedIdx;
 
-      if (isRecent && idx === 0) {
-        html += `<div class="combo-section-label">Usados recientemente</div>`;
-      } else if (
-        !isRecent && !isNoPuesto && idx > 0 &&
-        used.has(roles[idx - 1]) && !available.has(roles[idx - 1])
-      ) {
-        html += `<div class="combo-section-label">Sugeridos</div>`;
-      }
+        let tag = '';
+        if (isNoPuesto) tag = 'Genérico';
+        else if (isRecent) tag = 'Reciente';
+
+        if (isRecent && idx === 0) {
+          html += `<div class="combo-section-label">Usados recientemente</div>`;
+        } else if (
+          !isRecent && !isNoPuesto && idx > 0 &&
+          used.has(roles[idx - 1]) && !available.has(roles[idx - 1])
+        ) {
+          html += `<div class="combo-section-label">Sugeridos</div>`;
+        }
+
+        html += `
+          <button type="button"
+                  class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isRecent ? 'recent' : ''} ${isNoPuesto ? 'generic' : ''}"
+                  data-value="${escapeHtml(p)}"
+                  data-idx="${idx}">
+            <span class="combo-option-icon">${icon}</span>
+            <span class="combo-option-text">${escapeHtml(p)}</span>
+            ${tag ? `<span class="combo-option-tag">${tag}</span>` : ''}
+          </button>
+        `;
+      });
+    }
+
+    if (this.onCreateRequested) {
+      const hasExactMatch = roles.some(
+        r => r.toLowerCase() === query.toLowerCase()
+      );
+      const showNamed = query && !hasExactMatch;
+      const label = showNamed
+        ? t('combo.createNamed', { name: query })
+        : t('combo.create');
 
       html += `
-        <button type="button"
-                class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isRecent ? 'recent' : ''} ${isNoPuesto ? 'generic' : ''}"
-                data-value="${escapeHtml(p)}"
-                data-idx="${idx}">
-          <span class="combo-option-icon">${icon}</span>
-          <span class="combo-option-text">${escapeHtml(p)}</span>
-          ${tag ? `<span class="combo-option-tag">${tag}</span>` : ''}
+        <button type="button" class="combo-create-option" data-create>
+          <span class="combo-create-icon">+</span>
+          <span>${escapeHtml(label)}</span>
         </button>
       `;
-    });
+    }
 
     this.dropdown.innerHTML = html;
   }

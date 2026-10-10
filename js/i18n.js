@@ -352,6 +352,7 @@ const translations = {
     'toast.resetConfig': 'Configuración restablecida (recordá guardar)',
     'toast.roleExists': 'Ese puesto ya existe',
     'toast.roleAdded': 'Puesto agregado',
+    'toast.puestoCreated': 'Puesto "{name}" creado',
     'toast.jobAdded': 'Postulación agregada',
     'toast.jobDeleted': 'Postulación borrada',
     'toast.jobReopened': 'Postulación reabierta',
@@ -436,6 +437,17 @@ const translations = {
     'modalidad.hybridShort': 'Híbrido · {n}d oficina',
     'modalidad.officeDays': 'Días en oficina',
     'modalidad.officeDaysHint': 'El resto es home',
+
+    'combo.create': 'Crear nuevo puesto',
+    'combo.createNamed': 'Crear "{name}"',
+    'createPuesto.title': '➕ Nuevo puesto',
+    'createPuesto.subtitle': 'Agregá un puesto a tu lista. Se va a sugerir en el buscador.',
+    'createPuesto.name': 'Nombre del puesto',
+    'createPuesto.name.placeholder': 'Ej: Rust Developer',
+    'createPuesto.create': 'Crear puesto',
+    'createPuesto.categories': 'Categorías',
+    'createPuesto.categoriesHint': 'Ayuda a que aparezca en los filtros correctos',
+    'createPuesto.categoriesOptional': 'opcional',
   },
 
   // ============================================================
@@ -688,14 +700,12 @@ const translations = {
     'config.noPuestos': 'No roles with active categories. Enable one or add a custom role.',
     'config.noStates': 'Enable at least one status above.',
 
-    // Danger zone (Advanced panel)
     'config.danger.title': '⚠️ Danger zone',
     'config.danger.desc': "These actions can't be undone.",
     'config.danger.reset.title': 'Reset all settings',
     'config.danger.reset.desc': 'Restore roles, states, filters and appearance to their defaults. Not applied until you save.',
     'config.danger.reset.button': 'Reset',
 
-    // Data & Backup (Advanced panel)
     'config.backup.title': '💾 Data & backup',
     'config.backup.desc': 'Export a full backup or restore from a file. Useful when switching devices or preventing data loss.',
     'config.backup.exportTitle': 'Export data',
@@ -707,7 +717,6 @@ const translations = {
     'config.backup.jobs': 'applications',
     'config.backup.refs': 'referrals',
 
-    // Profile
     'profile.title': '👤 Edit profile',
     'profile.subtitle': 'Update your personal information',
     'profile.nombre': 'First name',
@@ -781,6 +790,7 @@ const translations = {
     'toast.resetConfig': 'Settings reset (remember to save)',
     'toast.roleExists': 'That role already exists',
     'toast.roleAdded': 'Role added',
+    'toast.puestoCreated': 'Role "{name}" created',
     'toast.jobAdded': 'Application added',
     'toast.jobDeleted': 'Application deleted',
     'toast.jobReopened': 'Application reopened',
@@ -865,6 +875,17 @@ const translations = {
     'modalidad.hybridShort': 'Hybrid · {n}d office',
     'modalidad.officeDays': 'Office days',
     'modalidad.officeDaysHint': 'The rest is remote',
+
+    'combo.create': 'Create new role',
+    'combo.createNamed': 'Create "{name}"',
+    'createPuesto.title': '➕ New role',
+    'createPuesto.subtitle': 'Add a role to your list. It will be suggested in the picker.',
+    'createPuesto.name': 'Role name',
+    'createPuesto.name.placeholder': 'Ex: Rust Developer',
+    'createPuesto.create': 'Create role',
+    'createPuesto.categories': 'Categories',
+    'createPuesto.categoriesHint': 'Helps it show up in the right filters',
+    'createPuesto.categoriesOptional': 'optional',
   },
 };
 

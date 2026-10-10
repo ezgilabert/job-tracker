@@ -12,8 +12,8 @@ import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
 import { mountModalsController } from './controllers/modalsController.js';
 import { mountConfigController } from './controllers/configController.js';
+import { mountCreatePuestoController } from './controllers/createPuestoController.js';
 import { DatePicker } from './ui/datePicker.js';
-import { PuestoCombo } from './ui/combo.js';
 import { mountChips } from './ui/chips.js';
 import { mountInputLimits } from './ui/inputLimits.js';
 import { ensureArray } from './utils.js';
@@ -223,19 +223,19 @@ async function boot() {
     onChange: () => {},
   });
 
-  const puestoCombo = new PuestoCombo(document.getElementById('puestoCombo'), {
-    getJobPuestos: () => jobsStore.get().map(j => j.puesto),
-    getConfig: () => configStore.get(),
-  });
-
   const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
   const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 
   mountInputLimits(document);
 
+  // Controller de creación de puestos (compartido entre combos)
+  const createPuestoCtrl = mountCreatePuestoController(configStore);
+
   mountConfigController(configStore, jobsStore, refsStore);
-  const modals = mountModalsController(jobsStore, refsStore, configStore);
-  const jobsCtrl = mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore);
+  const modals = mountModalsController(jobsStore, refsStore, configStore, createPuestoCtrl);
+  const jobsCtrl = mountJobsController(
+    jobsStore, refsStore, modals, fechaPicker, configStore, createPuestoCtrl
+  );
   const refsCtrl = mountRefsController(jobsStore, refsStore, modals);
 
   refsCtrl.initChips(refRelacionChips, refEstadoChips);

@@ -1,7 +1,5 @@
 // ============================================================
 // Controller: config
-// Modal with tabs (roles, initial states, filters, appearance,
-// profile, language, advanced). Draft in memory. Warns if unsaved.
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -33,14 +31,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   const tabs = [...modal.querySelectorAll('.config-tab')];
   const panels = [...modal.querySelectorAll('.config-panel')];
 
-  // ----------------------------------------------------------
-  // Draft state
-  // ----------------------------------------------------------
   let draft = null;
-
-  // Remember the user's explicit choice for the default state,
-  // even if it temporarily falls outside the active states set
-  // (uncheck → recheck should restore it).
   let preferredDefaultState = null;
 
   function cloneConfig(cfg) {
@@ -69,14 +60,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     return true;
   }
 
-  // ----------------------------------------------------------
-  // Dirty check
-  // ----------------------------------------------------------
-  // Tag/role/state arrays behave like sets: toggle-off + toggle-on
-  // changes insertion order but the selection is the same. We
-  // normalize (sort) before comparing to avoid false positives.
-  // Filters ARE order-sensitive (reordered on purpose), so they
-  // aren't normalized.
   function normalizeForDirtyCheck(cfg) {
     const copy = cloneConfig(cfg || {});
     if (copy.puestos) {
@@ -88,6 +71,13 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       }
       if (Array.isArray(copy.puestos.custom)) {
         copy.puestos.custom = [...copy.puestos.custom].sort();
+      }
+      if (copy.puestos.customTags && typeof copy.puestos.customTags === 'object') {
+        const sorted = {};
+        Object.keys(copy.puestos.customTags).sort().forEach(k => {
+          sorted[k] = [...copy.puestos.customTags[k]].sort();
+        });
+        copy.puestos.customTags = sorted;
       }
     }
     if (Array.isArray(copy.estadosIniciales)) {
@@ -108,12 +98,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     unsavedBadge.classList.toggle('visible', isDraftDirty());
   }
 
-  // ----------------------------------------------------------
-  // Brand logo helper (to revert preview when discarding)
-  // ----------------------------------------------------------
-  // Mirrors the inline logic from main.js/login.js. Used in
-  // closeDirect() to restore the saved logo when discarding
-  // changes.
   function applyLogoToBrand(logoId) {
     const el = document.getElementById('brandLogo');
     if (!el) return;
@@ -121,9 +105,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     el.innerHTML = option.svg;
   }
 
-  // ----------------------------------------------------------
-  // Open / close
-  // ----------------------------------------------------------
   function open() {
     const stored = configStore.get();
     const defaults = getDefaultConfig();
@@ -137,7 +118,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (!draft.lang) draft.lang = DEFAULT_LANG;
     if (!draft.background) draft.background = DEFAULT_BACKGROUND;
 
-    // Initialize the default preference from the saved value.
     preferredDefaultState = draft.estadoInicialDefault || null;
 
     modal.classList.add('open');
@@ -145,7 +125,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   }
 
   function closeDirect() {
-    // If an unsaved preview is left, revert to the saved state.
     const saved = configStore.get();
     applyBackground(saved.background || DEFAULT_BACKGROUND);
     applyLogoToBrand(saved.logo || DEFAULT_LOGO);
@@ -205,7 +184,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (modal.classList.contains('open')) tryClose();
   });
 
-  // Unsaved changes modal
   document.getElementById('unsavedCloseBtn').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
   });
@@ -224,7 +202,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (e.target === unsavedModal) unsavedModal.classList.remove('open');
   });
 
-  // Reset (lives in the "Advanced" panel → Danger zone)
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
       title: t('confirm.resetConfig.title'),
@@ -239,7 +216,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     showToast(t('toast.resetConfig'), '↺');
   });
 
-  // Tabs
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const target = tab.dataset.tab;
@@ -249,9 +225,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
   });
 
-  // ============================================================
-  // Render
-  // ============================================================
   function renderAll() {
     if (!draft) return;
     renderTags();
@@ -300,12 +273,22 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const active = new Set(draft.puestos.activeTags || []);
     const hidden = new Set(draft.puestos.hidden || []);
     const custom = draft.puestos.custom || [];
+    const customTags = draft.puestos.customTags || {};
 
-    const customs = custom.filter(p => !hidden.has(p));
+    function tagsFor(role) {
+      return ROLE_TAGS[role] || customTags[role] || [];
+    }
+
+    const customs = custom.filter(p => {
+      if (hidden.has(p)) return false;
+      const tags = tagsFor(p);
+      if (tags.length === 0) return true;
+      if (active.size === 0) return true;
+      return tags.some(tg => active.has(tg));
+    });
 
     const defaults = DEFAULT_ROLES.filter(p => {
       if (hidden.has(p)) return false;
-      // "No especificado" se ignora el filtro por tags.
       if (p === NO_PUESTO_VALUE) return true;
       if (active.size === 0) return true;
       const tags = ROLE_TAGS[p] || [];
@@ -348,6 +331,10 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     if (isCustom) {
       draft.puestos.custom = (draft.puestos.custom || []).filter(p => p !== puesto);
+      // También borramos sus tags.
+      if (draft.puestos.customTags) {
+        delete draft.puestos.customTags[puesto];
+      }
     } else {
       const hidden = new Set(draft.puestos.hidden || []);
       hidden.add(puesto);
@@ -430,8 +417,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     if (input.checked) {
       stateSet.add(estado);
-      // If the user re-checks the state they had chosen as default
-      // (and was lost when unchecked), restore it.
       if (estado === preferredDefaultState) {
         draft.estadoInicialDefault = estado;
       }
@@ -441,9 +426,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     draft.estadosIniciales = [...stateSet];
 
-    // Fallback: if the current default is no longer in the set,
-    // pick the first available. The real preference stays in
-    // preferredDefaultState for when the user re-enables it.
     if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
       draft.estadoInicialDefault = [...stateSet][0];
     }
@@ -478,7 +460,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const btn = e.target.closest('.config-default-btn');
     if (!btn) return;
     draft.estadoInicialDefault = btn.dataset.estado;
-    // Explicit user choice: remember it.
     preferredDefaultState = btn.dataset.estado;
     renderAll();
   });
@@ -621,7 +602,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const id = btn.dataset.bg;
     if ((draft.background || DEFAULT_BACKGROUND) !== id) {
       draft.background = id;
-      applyBackground(id);   // live preview
+      applyBackground(id);
       renderBackgrounds();
       updateBadge();
     }
@@ -698,7 +679,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     }
   }
 
-  // Profile inputs: update the draft without re-rendering everything
   const profileFields = {
     configProfileNombre:   'nombre',
     configProfileApellido: 'apellido',
@@ -718,7 +698,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
   });
 
-  // Upload photo
   const profileFileInput = document.getElementById('configProfileFileInput');
   const profileUploadBtn = document.getElementById('configProfileUpload');
 
@@ -746,7 +725,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
   }
 
-  // Remove photo
   const profileRemoveBtn = document.getElementById('configProfileRemove');
   if (profileRemoveBtn) {
     profileRemoveBtn.addEventListener('click', () => {
@@ -859,9 +837,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // Apply. Order: config → refs → jobs. Each store.update()
-    // triggers its subscribers, so every controller re-renders
-    // automatically (no reload needed).
     if (data.config && typeof data.config === 'object') {
       configStore.update(() => data.config);
     }
@@ -876,7 +851,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       document.documentElement.setAttribute('data-theme', data.theme);
     }
 
-    // Close the modal without touching the (now stale) draft.
     closeDirect();
 
     showToast(
@@ -896,20 +870,13 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       const file = importInput.files?.[0];
       if (!file) return;
       importBackupFromFile(file);
-      // Reset so the same file can be picked again if needed.
       importInput.value = '';
     });
   }
 
-  // ------------------------------------------------------------
-  // Re-render the panel labels on language change
-  // ------------------------------------------------------------
   document.addEventListener('i18n-changed', () => {
     if (modal.classList.contains('open') && draft) renderAll();
   });
 
-  // ------------------------------------------------------------
-  // Public API
-  // ------------------------------------------------------------
   return { open, close: closeDirect };
 }

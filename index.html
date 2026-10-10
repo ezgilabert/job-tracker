@@ -21,6 +21,7 @@
 
 <title>Job Tracker · Mi búsqueda laboral</title>
 
+<!-- Aplica el tema guardado antes de pintar (evita flash de color) -->
 <script>
   (function () {
     try {
@@ -36,6 +37,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/styles.css">
 
+<!-- ============================================================
+     Loading overlay (versión 3)
+     - Animación de textos rotativos: ciclo de 3s (1s por mensaje)
+     - Barra de progreso: ciclo de 1.5s
+     - Mínimo 3s = un ciclo completo de la animación
+     ============================================================ -->
 <style>
   .loading-overlay {
     position: fixed;
@@ -57,6 +64,7 @@
     pointer-events: none;
   }
 
+  /* ===== Contenido del loader ===== */
   .loading-content {
     display: flex;
     flex-direction: column;
@@ -99,6 +107,7 @@
     color: var(--text, #16182a);
   }
 
+  /* ===== Textos rotativos (ciclo de 3 segundos) ===== */
   .loading-rotating {
     position: relative;
     height: 20px;
@@ -131,6 +140,7 @@
     100% { opacity: 0; transform: translateY(-8px); }
   }
 
+  /* ===== Barra indeterminada (ciclo de 1.5 segundos) ===== */
   .loading-bar {
     width: 100%;
     height: 4px;
@@ -169,7 +179,7 @@
 </head>
 <body>
 
-<!-- Overlay de carga -->
+<!-- Overlay de carga (versión 3) -->
 <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
   <div class="loading-content">
 
@@ -928,7 +938,7 @@
 
         <div class="config-panel" data-panel="advanced">
 
-          <!-- Data & Backup -->
+          <!-- ===== Data & Backup ===== -->
           <div class="config-section">
             <div class="config-section-head">
               <h3 data-i18n="config.backup.title">💾 Datos y respaldo</h3>
@@ -964,7 +974,7 @@
             </div>
           </div>
 
-          <!-- Danger zone -->
+          <!-- ===== Danger zone ===== -->
           <div class="config-section config-section-danger">
             <div class="config-section-head">
               <h3 data-i18n="config.danger.title">⚠️ Zona de peligro</h3>
@@ -1178,10 +1188,47 @@
   </div>
 </div>
 
+<!-- Create puesto modal (V1 con categorías) -->
+<div class="modal-overlay" id="createPuestoModal">
+  <div class="modal" style="max-width: 480px;">
+    <h2 data-i18n="createPuesto.title">➕ Nuevo puesto</h2>
+    <p class="modal-subtitle" data-i18n="createPuesto.subtitle">
+      Agregá un puesto a tu lista. Se va a sugerir en el buscador.
+    </p>
+
+    <div class="field">
+      <label for="createPuestoName" data-i18n="createPuesto.name">Nombre del puesto</label>
+      <input type="text" id="createPuestoName" maxlength="80"
+             placeholder="Ej: Rust Developer"
+             data-i18n-placeholder="createPuesto.name.placeholder"
+             autocomplete="off">
+    </div>
+
+    <div class="field" style="margin-top: 1rem;">
+      <label style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+        <span data-i18n="createPuesto.categories">Categorías</span>
+        <span class="create-cat-optional" data-i18n="createPuesto.categoriesOptional">opcional</span>
+      </label>
+      <div class="create-cat-chips" id="createPuestoCats"></div>
+      <div class="create-cat-hint" data-i18n="createPuesto.categoriesHint">
+        Ayuda a que aparezca en los filtros correctos
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="cancelCreatePuesto" data-i18n="modal.cancel">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="saveCreatePuesto" data-i18n="createPuesto.create">Crear puesto</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toasts"></div>
 
 <script type="module" src="./js/main.js"></script>
 
+<!-- ============================================================
+     Loading overlay (versión 3)
+     ============================================================ -->
 <script>
   (function () {
     const overlay = document.getElementById('loadingOverlay');
@@ -1192,6 +1239,7 @@
     let pageLoaded = false;
     let hidden = false;
 
+    // ---------- Traducción según el idioma guardado ----------
     (function translateOverlay() {
       let lang = 'es';
       try {
@@ -1226,6 +1274,7 @@
       document.documentElement.lang = lang;
     })();
 
+    // ---------- Ocultar respetando SIEMPRE un ciclo completo ----------
     function hideOverlay() {
       if (hidden) return;
       hidden = true;
@@ -1235,8 +1284,10 @@
 
     function scheduleHide() {
       if (!pageLoaded || hidden) return;
+
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, MIN_DISPLAY - elapsed);
+
       setTimeout(hideOverlay, remaining);
     }
 

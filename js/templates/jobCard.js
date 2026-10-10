@@ -24,9 +24,7 @@ export function renderJobCard(job, ctx = {}) {
     ? `<span>⏱️ ${t(days === 1 ? 'job.daysAgoOne' : 'job.daysAgoMany', { n: days })}</span>`
     : '';
   const dateTxt = job.fecha ? `<span>📅 ${formatDate(job.fecha)}</span>` : '';
-  const salaryTxt = job.salario
-    ? `<span>💰 ${escapeHtml(job.salario)}${job.salarioPorHora ? ' · ' + t('job.perHour') : ''}</span>`
-    : '';
+  const salaryTxt = renderSalaryTag(job);
   const modalidadTxt = renderModalidadTag(job);
   const contactTxt = job.contacto ? `<span>👤 ${escapeHtml(job.contacto)}</span>` : '';
   const linkTxt = job.link
@@ -36,7 +34,6 @@ export function renderJobCard(job, ctx = {}) {
     ? `<div class="job-notas">${escapeHtml(job.notas)}</div>`
     : '';
 
-  // Fallback cuando el puesto quedó vacío (permitido sólo en "Guardado").
   const puestoDisplay = job.puesto || t('job.noPuesto');
 
   const linkedRefs = refsForCompany(referidos, job.empresa);
@@ -61,15 +58,12 @@ export function renderJobCard(job, ctx = {}) {
   const currentIdx = stepIndex(job.estado);
   const pct = progressPct(job.estado);
 
-  // "Offer confirmed" = user clicked "Confirm Offer" on an offer-state card.
   const offerConfirmed = job.estado === 'Oferta' && job.offerConfirmed === true;
 
-  // Golden diagonal ribbon: only on the raw offer state, before confirmation.
   const offerRibbon = (job.estado === 'Oferta' && !offerConfirmed)
     ? `<span class="job-offer-ribbon" aria-hidden="true">${escapeHtml(t('job.offerRibbon'))}</span>`
     : '';
 
-  // Confetti pieces + congrats banner: only when the offer is confirmed.
   const confettiHtml = offerConfirmed ? renderConfetti() : '';
   const congratsBannerHtml = offerConfirmed
     ? `<div class="congrats-banner">
@@ -155,7 +149,27 @@ export function renderJobCard(job, ctx = {}) {
 }
 
 // ------------------------------------------------------------
-// Modalidad tag (presencial / home / hybrid · Nd oficina)
+// Salario: "💰 USD 3.000–4.000 · por hora"
+// Soporta datos viejos donde el salario ya incluye la moneda.
+// ------------------------------------------------------------
+function renderSalaryTag(job) {
+  if (!job.salario) return '';
+
+  const raw = String(job.salario).trim();
+  if (!raw) return '';
+
+  const hasCode = /^(ars|usd)\b/i.test(raw);
+  const codePrefix = (job.moneda && !hasCode)
+    ? escapeHtml(String(job.moneda).toUpperCase()) + ' '
+    : '';
+
+  const hourlyTxt = job.salarioPorHora ? ' · ' + t('job.perHour') : '';
+
+  return `<span>💰 ${codePrefix}${escapeHtml(raw)}${hourlyTxt}</span>`;
+}
+
+// ------------------------------------------------------------
+// Modalidad: "🏢 Presencial" / "🏠 Home" / "🔄 Híbrido · 3d"
 // ------------------------------------------------------------
 function renderModalidadTag(job) {
   if (job.modalidad === 'presencial') {
@@ -171,9 +185,6 @@ function renderModalidadTag(job) {
   return '';
 }
 
-// ------------------------------------------------------------
-// Confetti: 7 looping pieces with staggered positions
-// ------------------------------------------------------------
 function renderConfetti() {
   return `
     <div class="job-confetti" aria-hidden="true">
@@ -188,11 +199,7 @@ function renderConfetti() {
   `;
 }
 
-// ------------------------------------------------------------
-// Open-job actions
-// ------------------------------------------------------------
 function renderOpenActions(job, currentIdx, offerConfirmed = false) {
-  // Offer confirmed: lock the workflow, keep only "unmark" + no close options
   if (offerConfirmed) {
     return `
       <div class="wf-section">
@@ -263,9 +270,6 @@ function renderOpenActions(job, currentIdx, offerConfirmed = false) {
   `;
 }
 
-// ------------------------------------------------------------
-// Closed-job actions
-// ------------------------------------------------------------
 function renderClosedActions(job) {
   const last = lastHistoryEntry(job);
   const reasonTxt = last && last.motivo

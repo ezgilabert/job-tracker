@@ -124,10 +124,6 @@ export const BACKGROUND_OPTIONS = [
 
 export const DEFAULT_BACKGROUND = 'aurora';
 
-/**
- * Aplica el fondo al <body>. Se llama en boot y cada vez que
- * cambia la config.
- */
 export function applyBackground(bgId) {
   const allClasses = BACKGROUND_OPTIONS.map(o => `bg-${o.id}`);
   document.body.classList.remove(...allClasses);
@@ -241,6 +237,9 @@ export function getDefaultConfig() {
       activeTags: ROLE_TAGS_LIST.map(t => t.id),
       hidden: [],
       custom: [],
+      // Mapa nombre de puesto custom → array de tags de categoría.
+      // Ej: { 'Rust Developer': ['backend'] }
+      customTags: {},
     },
     estadosIniciales: WORKFLOW_STEPS.map(s => s.id),
     estadoInicialDefault: 'Aplicado',
@@ -278,8 +277,6 @@ export const CONFIG_VERSION = 1;
 // ============================================================
 // Backup / Import
 // ============================================================
-// Identificador y versión del formato de backup. Cambiar
-// BACKUP_VERSION cuando el shape cambie de forma incompatible.
 export const BACKUP_APP_ID = 'jobTracker';
 export const BACKUP_VERSION = 1;
 

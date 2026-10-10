@@ -4,6 +4,7 @@
 
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
+import { PuestoCombo } from '../ui/combo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import {
@@ -23,8 +24,9 @@ import { t, tState, tStateShort } from '../i18n.js';
  * @param {{ onOpenEdit, onClose, onAdvance, onOpenHistory }} modals
  * @param {import('../ui/datePicker.js').DatePicker} fechaPicker
  * @param {import('../store.js').Store} configStore
+ * @param {{ requestNewPuesto: (suggested:string)=>Promise<string|null> }} createPuestoCtrl
  */
-export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore) {
+export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore, createPuestoCtrl) {
   let currentFilter = 'all';
   let searchTerm = '';
   const datePicker = fechaPicker;
@@ -179,7 +181,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     () => currencyPicker.getValue()
   );
 
-  // Cuando cambia la moneda, refrescamos el placeholder
   currencyPicker.onChange = () => updateSalaryPlaceholder();
 
   const estadoSelect = document.getElementById('estado');
@@ -422,7 +423,19 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     return el ? el.value.trim() : '';
   }
 
-  return { renderList, getFilter: () => currentFilter };
+  // ----------------------------------------------------------
+  // Puesto combo — con "crear nuevo" (V1)
+  // ----------------------------------------------------------
+  const puestoCombo = new PuestoCombo(
+    document.getElementById('puestoCombo'),
+    {
+      getJobPuestos: () => jobsStore.get().map(j => j.puesto),
+      getConfig: () => configStore.get(),
+      onCreateRequested: (suggested) => createPuestoCtrl.requestNewPuesto(suggested),
+    }
+  );
+
+  return { renderList, getFilter: () => currentFilter, puestoCombo };
 }
 
 function getDragAfterElement(container, y) {
