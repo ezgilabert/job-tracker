@@ -27,6 +27,7 @@ export function renderJobCard(job, ctx = {}) {
   const salaryTxt = job.salario
     ? `<span>💰 ${escapeHtml(job.salario)}${job.salarioPorHora ? ' · ' + t('job.perHour') : ''}</span>`
     : '';
+  const modalidadTxt = renderModalidadTag(job);
   const contactTxt = job.contacto ? `<span>👤 ${escapeHtml(job.contacto)}</span>` : '';
   const linkTxt = job.link
     ? `<a href="${escapeHtml(job.link)}" target="_blank" rel="noopener">${escapeHtml(t('job.viewOffer'))} ↗</a>`
@@ -129,7 +130,7 @@ export function renderJobCard(job, ctx = {}) {
       <div class="job-header">
         <div class="job-info">
           <h3>${escapeHtml(puestoDisplay)} <span class="company">· ${escapeHtml(job.empresa)}</span></h3>
-          <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${contactTxt}</div>
+          <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${modalidadTxt}${contactTxt}</div>
         </div>
         <div class="job-actions">
           <button class="action-btn" title="${escapeHtml(t('job.editTitle'))}" data-action="edit">✏️</button>
@@ -151,6 +152,23 @@ export function renderJobCard(job, ctx = {}) {
       </div>
     </div>
   `;
+}
+
+// ------------------------------------------------------------
+// Modalidad tag (presencial / home / hybrid · Nd oficina)
+// ------------------------------------------------------------
+function renderModalidadTag(job) {
+  if (job.modalidad === 'presencial') {
+    return `<span>🏢 ${escapeHtml(t('modalidad.presencial'))}</span>`;
+  }
+  if (job.modalidad === 'home') {
+    return `<span>🏠 ${escapeHtml(t('modalidad.home'))}</span>`;
+  }
+  if (job.modalidad === 'hybrid') {
+    const days = Number(job.hybridOfficeDays) || 3;
+    return `<span>🔄 ${escapeHtml(t('modalidad.hybridShort', { n: days }))}</span>`;
+  }
+  return '';
 }
 
 // ------------------------------------------------------------

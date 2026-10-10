@@ -21,7 +21,6 @@
 
 <title>Job Tracker · Mi búsqueda laboral</title>
 
-<!-- Aplica el tema guardado antes de pintar (evita flash de color) -->
 <script>
   (function () {
     try {
@@ -37,12 +36,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/styles.css">
 
-<!-- ============================================================
-     Loading overlay (versión 3)
-     - Animación de textos rotativos: ciclo de 3s (1s por mensaje)
-     - Barra de progreso: ciclo de 1.5s
-     - Mínimo 3s = un ciclo completo de la animación
-     ============================================================ -->
 <style>
   .loading-overlay {
     position: fixed;
@@ -64,7 +57,6 @@
     pointer-events: none;
   }
 
-  /* ===== Contenido del loader ===== */
   .loading-content {
     display: flex;
     flex-direction: column;
@@ -107,7 +99,6 @@
     color: var(--text, #16182a);
   }
 
-  /* ===== Textos rotativos (ciclo de 3 segundos) ===== */
   .loading-rotating {
     position: relative;
     height: 20px;
@@ -140,7 +131,6 @@
     100% { opacity: 0; transform: translateY(-8px); }
   }
 
-  /* ===== Barra indeterminada (ciclo de 1.5 segundos) ===== */
   .loading-bar {
     width: 100%;
     height: 4px;
@@ -179,7 +169,7 @@
 </head>
 <body>
 
-<!-- Overlay de carga (versión 3) -->
+<!-- Overlay de carga -->
 <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
   <div class="loading-content">
 
@@ -284,7 +274,8 @@
 
   <div class="stats" id="stats"></div>
 
-  <div class="form-card">
+  <!-- ===== FORM NUEVA POSTULACIÓN (V3) ===== -->
+  <div class="form-card v3">
     <div class="form-card-header">
       <div>
         <h2 data-i18n="form.title">✨ Nueva postulación</h2>
@@ -299,48 +290,99 @@
 
     <div class="collapsible-body" id="jobFormBody">
       <form id="jobForm">
-        <div class="field">
-          <label for="empresa" data-i18n="form.empresa">Empresa</label>
-          <input type="text" id="empresa" maxlength="100" placeholder="Ej: Google" data-i18n-placeholder="form.empresa.placeholder" required>
-        </div>
-        <div class="field">
-          <label for="puesto" data-i18n="form.puesto">Puesto</label>
-          <div class="combo" id="puestoCombo">
-            <div class="combo-input-wrap">
-              <input type="text" id="puesto" maxlength="100" placeholder="Elegí o escribí un rol" data-i18n-placeholder="form.puesto.placeholder" autocomplete="off">
-              <span class="combo-chevron">▾</span>
+
+        <!-- Sección 1: Datos del puesto -->
+        <div class="v3-section">
+          <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
+          <div class="v3-grid">
+            <div class="field half">
+              <label for="empresa" data-i18n="form.empresa">Empresa</label>
+              <input type="text" id="empresa" maxlength="100" placeholder="Ej: Google" data-i18n-placeholder="form.empresa.placeholder" required>
             </div>
-            <div class="combo-dropdown" id="puestoDropdown"></div>
+            <div class="field half">
+              <label for="puesto" data-i18n="form.puesto">Puesto</label>
+              <div class="combo" id="puestoCombo">
+                <div class="combo-input-wrap">
+                  <input type="text" id="puesto" maxlength="100" placeholder="Elegí o escribí un rol" data-i18n-placeholder="form.puesto.placeholder" autocomplete="off">
+                  <span class="combo-chevron">▾</span>
+                </div>
+                <div class="combo-dropdown" id="puestoDropdown"></div>
+              </div>
+            </div>
+            <div class="field third">
+              <label data-i18n="form.fecha">Fecha</label>
+              <div class="date-picker" id="fechaPicker"></div>
+            </div>
+            <div class="field third">
+              <label for="estado" data-i18n="form.estado">Estado inicial</label>
+              <select id="estado"></select>
+            </div>
+            <div class="field third">
+              <label for="link" data-i18n="form.link">Link de la oferta</label>
+              <input type="url" id="link" maxlength="500" placeholder="https://...">
+            </div>
           </div>
         </div>
-        <div class="field">
-          <label data-i18n="form.fecha">Fecha</label>
-          <div class="date-picker" id="fechaPicker"></div>
+
+        <!-- Sección 2: Salario y modalidad -->
+        <div class="v3-section">
+          <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
+          <div class="v3-grid">
+            <div class="field half">
+              <label for="salario" data-i18n="form.salario">Rango salarial</label>
+              <input type="text" id="salario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+              <label class="hora-switch">
+                <input type="checkbox" id="salarioPorHora">
+                <span class="track"></span>
+                <span class="lbl-text" data-i18n="form.salarioPorHora">Es por hora</span>
+              </label>
+            </div>
+
+            <div class="field half">
+              <label data-i18n="modalidad.label">Modalidad</label>
+              <div class="modalidad-seg" id="modalidadPicker">
+                <button type="button" class="seg-btn modalidad-btn" data-value="">
+                  <span data-i18n="modalidad.none">Sin definir</span>
+                </button>
+                <button type="button" class="seg-btn modalidad-btn" data-value="presencial">
+                  <span>🏢</span> <span data-i18n="modalidad.presencial">Presencial</span>
+                </button>
+                <button type="button" class="seg-btn modalidad-btn" data-value="home">
+                  <span>🏠</span> <span data-i18n="modalidad.home">Home</span>
+                </button>
+                <button type="button" class="seg-btn modalidad-btn" data-value="hybrid">
+                  <span>🔄</span> <span data-i18n="modalidad.hybrid">Híbrido</span>
+                </button>
+              </div>
+              <div class="hybrid-days" id="hybridDaysWrap">
+                <label for="hybridOfficeDays" data-i18n="modalidad.officeDays">Días en oficina</label>
+                <select id="hybridOfficeDays">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3" selected>3</option>
+                  <option value="4">4</option>
+                </select>
+                <span class="hybrid-days-hint" data-i18n="modalidad.officeDaysHint">El resto es home</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="field">
-          <label for="estado" data-i18n="form.estado">Estado inicial</label>
-          <select id="estado"></select>
+
+        <!-- Sección 3: Contacto y notas -->
+        <div class="v3-section">
+          <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
+          <div class="v3-grid">
+            <div class="field half">
+              <label for="contacto" data-i18n="form.contacto">Contacto</label>
+              <input type="text" id="contacto" maxlength="120" placeholder="Ej: María López (Recruiter)" data-i18n-placeholder="form.contacto.placeholder">
+            </div>
+            <div class="field half">
+              <label for="notas" data-i18n="form.notas">Notas</label>
+              <textarea id="notas" maxlength="2000" placeholder="Contacto, próxima instancia, referidos..." data-i18n-placeholder="form.notas.placeholder"></textarea>
+            </div>
+          </div>
         </div>
-        <div class="field">
-          <label for="link" data-i18n="form.link">Link de la oferta</label>
-          <input type="url" id="link" maxlength="500" placeholder="https://...">
-        </div>
-        <div class="field">
-          <label for="salario" data-i18n="form.salario">Rango salarial</label>
-          <input type="text" id="salario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
-          <label class="hourly-checkbox">
-            <input type="checkbox" id="salarioPorHora">
-            <span data-i18n="form.salarioPorHora">Es por hora</span>
-          </label>
-        </div>
-        <div class="field">
-          <label for="contacto" data-i18n="form.contacto">Contacto</label>
-          <input type="text" id="contacto" maxlength="120" placeholder="Ej: María López (Recruiter)" data-i18n-placeholder="form.contacto.placeholder">
-        </div>
-        <div class="field" style="grid-column: 1 / -1;">
-          <label for="notas" data-i18n="form.notas">Notas</label>
-          <textarea id="notas" maxlength="2000" placeholder="Contacto, próxima instancia, referidos..." data-i18n-placeholder="form.notas.placeholder"></textarea>
-        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" data-i18n="form.submit">Agregar postulación</button>
         </div>
@@ -485,57 +527,103 @@
   </section>
 </div>
 
-<!-- Edit job modal -->
+<!-- ===== EDIT MODAL (V3) ===== -->
 <div class="modal-overlay" id="editModal">
-  <div class="modal">
+  <div class="modal modal-v3">
     <h2 data-i18n="modal.edit.title">✏️ Editar postulación</h2>
-    <div class="form-grid">
-      <div class="field">
-        <label data-i18n="form.empresa">Empresa</label>
-        <input type="text" id="editEmpresa" maxlength="100">
-      </div>
-      <div class="field">
-        <label data-i18n="form.puesto">Puesto</label>
-        <div class="combo" id="editPuestoCombo">
-          <div class="combo-input-wrap">
-            <input type="text" id="editPuesto" maxlength="100" autocomplete="off">
-            <span class="combo-chevron">▾</span>
+
+    <!-- Sección 1: Datos del puesto -->
+    <div class="v3-section">
+      <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
+      <div class="v3-grid">
+        <div class="field half">
+          <label data-i18n="form.empresa">Empresa</label>
+          <input type="text" id="editEmpresa" maxlength="100">
+        </div>
+        <div class="field half">
+          <label data-i18n="form.puesto">Puesto</label>
+          <div class="combo" id="editPuestoCombo">
+            <div class="combo-input-wrap">
+              <input type="text" id="editPuesto" maxlength="100" autocomplete="off">
+              <span class="combo-chevron">▾</span>
+            </div>
+            <div class="combo-dropdown" id="editPuestoDropdown"></div>
           </div>
-          <div class="combo-dropdown" id="editPuestoDropdown"></div>
+        </div>
+        <div class="field third">
+          <label data-i18n="form.fecha">Fecha</label>
+          <div class="date-picker" id="editFechaPicker"></div>
+        </div>
+        <div class="field third">
+          <label data-i18n="form.estado">Estado</label>
+          <select id="editEstado" disabled></select>
+        </div>
+        <div class="field third">
+          <label data-i18n="form.link">Link</label>
+          <input type="url" id="editLink" maxlength="500">
         </div>
       </div>
-      <div class="field">
-        <label data-i18n="form.fecha">Fecha</label>
-        <div class="date-picker" id="editFechaPicker"></div>
-      </div>
-      <div class="field">
-        <label data-i18n="form.estado">Estado</label>
-        <select id="editEstado" disabled></select>
-        <small style="display:block;margin-top:0.35rem;font-size:0.72rem;color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:normal;" data-i18n="modal.edit.estadoNote">
-          El estado se cambia desde los botones del workflow de la tarjeta.
-        </small>
-      </div>
-      <div class="field">
-        <label data-i18n="form.link">Link</label>
-        <input type="url" id="editLink" maxlength="500">
-      </div>
-      <div class="field">
-        <label for="editSalario" data-i18n="form.salario">Rango salarial</label>
-        <input type="text" id="editSalario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
-        <label class="hourly-checkbox">
-          <input type="checkbox" id="editSalarioPorHora">
-          <span data-i18n="form.salarioPorHora">Es por hora</span>
-        </label>
-      </div>
-      <div class="field">
-        <label data-i18n="form.contacto">Contacto</label>
-        <input type="text" id="editContacto" maxlength="120" placeholder="Nombre y rol">
-      </div>
-      <div class="field full">
-        <label data-i18n="form.notas">Notas</label>
-        <textarea id="editNotas" maxlength="2000" style="min-height:70px"></textarea>
+    </div>
+
+    <!-- Sección 2: Salario y modalidad -->
+    <div class="v3-section">
+      <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
+      <div class="v3-grid">
+        <div class="field half">
+          <label for="editSalario" data-i18n="form.salario">Rango salarial</label>
+          <input type="text" id="editSalario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+          <label class="hora-switch">
+            <input type="checkbox" id="editSalarioPorHora">
+            <span class="track"></span>
+            <span class="lbl-text" data-i18n="form.salarioPorHora">Es por hora</span>
+          </label>
+        </div>
+
+        <div class="field half">
+          <label data-i18n="modalidad.label">Modalidad</label>
+          <div class="modalidad-seg" id="editModalidadPicker">
+            <button type="button" class="seg-btn modalidad-btn" data-value="">
+              <span data-i18n="modalidad.none">Sin definir</span>
+            </button>
+            <button type="button" class="seg-btn modalidad-btn" data-value="presencial">
+              <span>🏢</span> <span data-i18n="modalidad.presencial">Presencial</span>
+            </button>
+            <button type="button" class="seg-btn modalidad-btn" data-value="home">
+              <span>🏠</span> <span data-i18n="modalidad.home">Home</span>
+            </button>
+            <button type="button" class="seg-btn modalidad-btn" data-value="hybrid">
+              <span>🔄</span> <span data-i18n="modalidad.hybrid">Híbrido</span>
+            </button>
+          </div>
+          <div class="hybrid-days" id="editHybridDaysWrap">
+            <label for="editHybridOfficeDays" data-i18n="modalidad.officeDays">Días en oficina</label>
+            <select id="editHybridOfficeDays">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+            </select>
+            <span class="hybrid-days-hint" data-i18n="modalidad.officeDaysHint">El resto es home</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Sección 3: Contacto y notas -->
+    <div class="v3-section">
+      <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
+      <div class="v3-grid">
+        <div class="field half">
+          <label data-i18n="form.contacto">Contacto</label>
+          <input type="text" id="editContacto" maxlength="120" placeholder="Nombre y rol">
+        </div>
+        <div class="field half">
+          <label data-i18n="form.notas">Notas</label>
+          <textarea id="editNotas" maxlength="2000" style="min-height:70px"></textarea>
+        </div>
+      </div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelEdit" data-i18n="modal.cancel">Cancelar</button>
       <button class="btn btn-primary" id="saveEdit" data-i18n="modal.saveChanges">Guardar cambios</button>
@@ -1078,9 +1166,6 @@
 
 <script type="module" src="./js/main.js"></script>
 
-<!-- ============================================================
-     Loading overlay (versión 3)
-     ============================================================ -->
 <script>
   (function () {
     const overlay = document.getElementById('loadingOverlay');
@@ -1091,7 +1176,6 @@
     let pageLoaded = false;
     let hidden = false;
 
-    // ---------- Traducción según el idioma guardado ----------
     (function translateOverlay() {
       let lang = 'es';
       try {
@@ -1126,7 +1210,6 @@
       document.documentElement.lang = lang;
     })();
 
-    // ---------- Ocultar respetando SIEMPRE un ciclo completo ----------
     function hideOverlay() {
       if (hidden) return;
       hidden = true;
@@ -1136,10 +1219,8 @@
 
     function scheduleHide() {
       if (!pageLoaded || hidden) return;
-
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, MIN_DISPLAY - elapsed);
-
       setTimeout(hideOverlay, remaining);
     }
 

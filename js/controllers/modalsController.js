@@ -13,6 +13,7 @@ import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { PuestoCombo } from '../ui/combo.js';
+import { ModalidadPicker } from '../ui/modalidad.js';
 import { mountChips } from '../ui/chips.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
@@ -57,6 +58,13 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     getJobPuestos: () => jobsStore.get().map(j => j.puesto),
     getConfig: () => configStore.get(),
   });
+  const editModalidad = new ModalidadPicker(
+    document.getElementById('editModalidadPicker'),
+    {
+      hybridWrap: document.getElementById('editHybridDaysWrap'),
+      hybridSelect: document.getElementById('editHybridOfficeDays'),
+    }
+  );
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -73,6 +81,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     updateEditSalaryPlaceholder();
     setVal('editContacto', j.contacto || '');
     setVal('editNotas', j.notas || '');
+    editModalidad.setValue(j.modalidad || '', j.hybridOfficeDays || 3);
 
     editModal.classList.add('open');
   }
@@ -90,6 +99,8 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
 
+    const modal = editModalidad.getValue();
+
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
       return {
@@ -100,6 +111,8 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
         link:      valueOf('editLink'),
         salario:   valueOf('editSalario'),
         salarioPorHora: editSalaryHourlyCheckbox.checked,
+        modalidad: modal.modalidad,
+        hybridOfficeDays: modal.hybridOfficeDays,
         contacto:  valueOf('editContacto'),
         notas:     valueOf('editNotas'),
       };
@@ -691,6 +704,8 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       estado: 'Contacto',
       link: '',
       salario: '',
+      modalidad: '',
+      hybridOfficeDays: null,
       contacto: r.nombre + (r.rol ? ` (${r.rol})` : ''),
       notas: `Referido por ${r.nombre}${r.notas ? '. ' + r.notas : ''}`,
       skipped: [],

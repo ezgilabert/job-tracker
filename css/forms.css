@@ -100,25 +100,100 @@ form {
   margin-bottom: 0.4rem;
 }
 
-.field label.hourly-checkbox {
-  display: flex;
+/* ============================================================
+   Hourly salary — switch estilo V3
+   Con especificidad alta para ganarle a `.field label`
+   ============================================================ */
+
+.field label.hora-switch,
+label.hora-switch {
+  display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  margin: 0.55rem 0 0;
-  color: var(--text-muted);
-  font-size: 0.78rem;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: 0.8rem;
   font-weight: 500;
+  color: var(--text-muted);
   text-transform: none;
   letter-spacing: normal;
-  cursor: pointer;
+  line-height: 1.2;
+  background: transparent;
+  border: none;
 }
 
-.hourly-checkbox input {
-  width: auto;
+.field label.hora-switch:hover,
+label.hora-switch:hover {
+  color: var(--text);
+}
+
+.field label.hora-switch input[type="checkbox"],
+label.hora-switch input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
   margin: 0;
-  accent-color: var(--accent);
 }
 
+.field label.hora-switch .track,
+label.hora-switch .track {
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  border-radius: 20px;
+  background: var(--border-strong);
+  position: relative;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.field label.hora-switch .track::after,
+label.hora-switch .track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+
+.field label.hora-switch input:checked ~ .track,
+label.hora-switch input:checked ~ .track {
+  background: var(--accent);
+}
+
+.field label.hora-switch input:checked ~ .track::after,
+label.hora-switch input:checked ~ .track::after {
+  transform: translateX(16px);
+}
+
+.field label.hora-switch input:checked ~ .lbl-text,
+label.hora-switch input:checked ~ .lbl-text {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Fallback: si el texto no tiene clase .lbl-text sino un <span> plano */
+.field label.hora-switch input:checked ~ span:not(.track),
+label.hora-switch input:checked ~ span:not(.track) {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ============================================================
+   Inputs genéricos
+   ============================================================ */
 input, select, textarea {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -353,4 +428,217 @@ textarea:invalid:not(:placeholder-shown) {
 input:invalid:not(:placeholder-shown):focus,
 textarea:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 3px rgba(239,68,68,0.18);
+}
+
+/* ============================================================
+   V3 · Form-card con secciones outlined
+   ============================================================ */
+
+.form-card.v3 {
+  padding: 0;
+  overflow: hidden;
+}
+
+.form-card.v3 .form-card-header {
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 0;
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.form-card.v3 .form-card-header h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.15rem;
+}
+
+.form-card.v3 form {
+  display: block;
+  padding: 1.5rem 1.75rem 1.75rem;
+  gap: 0;
+}
+
+/* ============================================================
+   Secciones (reutilizables: form-card + modal)
+   ============================================================ */
+
+.v3-section {
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.v3-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.v3-section-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.v3-section-title::before {
+  content: '';
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* Grid interno de cada sección */
+.v3-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.85rem 1rem;
+}
+
+.v3-grid .field { grid-column: span 3; }
+.v3-grid .field.half { grid-column: span 3; }
+.v3-grid .field.third { grid-column: span 2; }
+.v3-grid .field.full { grid-column: 1 / -1; }
+
+@media (max-width: 720px) {
+  .v3-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .v3-grid .field,
+  .v3-grid .field.half,
+  .v3-grid .field.third,
+  .v3-grid .field.full {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ============================================================
+   Modalidad picker: segmented control (estilo V3)
+   ============================================================ */
+
+.modalidad-seg {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 0.6rem 0.5rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.seg-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.seg-btn.selected {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 3px 8px var(--accent-glow);
+}
+
+@media (max-width: 520px) {
+  .seg-btn {
+    font-size: 0.72rem;
+    padding: 0.5rem 0.3rem;
+    gap: 0.25rem;
+  }
+}
+
+/* ============================================================
+   Fila de días híbridos
+   ============================================================ */
+
+.hybrid-days {
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: 9px;
+  font-size: 0.78rem;
+  color: var(--text);
+  flex-wrap: wrap;
+}
+
+.hybrid-days.visible {
+  display: flex;
+  animation: fadeInRow 0.2s ease;
+}
+
+@keyframes fadeInRow {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field .hybrid-days > label {
+  display: inline;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: none;
+  letter-spacing: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.hybrid-days select {
+  width: auto;
+  min-width: 62px;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.82rem;
+  border-radius: 7px;
+  border: 1px solid var(--accent-border);
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.hybrid-days-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Modal con estructura V3
+   ============================================================ */
+
+.modal.modal-v3 {
+  max-width: 620px;
+}
+
+.modal.modal-v3 h2 {
+  margin-bottom: 1.5rem;
+}
+
+.modal.modal-v3 .v3-section {
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
 }

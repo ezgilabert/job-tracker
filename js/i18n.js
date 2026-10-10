@@ -54,6 +54,9 @@ const translations = {
     'form.title': '✨ Nueva postulación',
     'form.subtitle': 'Cargá una nueva oportunidad',
     'form.toggle': 'Mostrar/ocultar',
+    'form.section.job': 'Datos del puesto',
+    'form.section.salary': 'Salario y modalidad',
+    'form.section.notes': 'Contacto y notas',
     'form.empresa': 'Empresa',
     'form.empresa.placeholder': 'Ej: Google',
     'form.puesto': 'Puesto',
@@ -424,6 +427,15 @@ const translations = {
     'refStateShort.En proceso': 'En proceso',
     'refStateShort.Contratado': 'Contratado',
     'refStateShort.No aplica': 'No aplica',
+
+    'modalidad.label': 'Modalidad',
+    'modalidad.none': 'Sin definir',
+    'modalidad.presencial': 'Presencial',
+    'modalidad.home': 'Home office',
+    'modalidad.hybrid': 'Híbrido',
+    'modalidad.hybridShort': 'Híbrido · {n}d oficina',
+    'modalidad.officeDays': 'Días en oficina',
+    'modalidad.officeDaysHint': 'El resto es home',
   },
 
   // ============================================================
@@ -471,6 +483,9 @@ const translations = {
     'form.title': '✨ New application',
     'form.subtitle': 'Add a new opportunity',
     'form.toggle': 'Show/hide',
+    'form.section.job': 'Job details',
+    'form.section.salary': 'Salary & work mode',
+    'form.section.notes': 'Contact & notes',
     'form.empresa': 'Company',
     'form.empresa.placeholder': 'Ex: Google',
     'form.puesto': 'Role',
@@ -841,6 +856,15 @@ const translations = {
     'refStateShort.En proceso': 'In process',
     'refStateShort.Contratado': 'Hired',
     'refStateShort.No aplica': 'N/A',
+
+    'modalidad.label': 'Work mode',
+    'modalidad.none': 'Undefined',
+    'modalidad.presencial': 'On-site',
+    'modalidad.home': 'Remote',
+    'modalidad.hybrid': 'Hybrid',
+    'modalidad.hybridShort': 'Hybrid · {n}d office',
+    'modalidad.officeDays': 'Office days',
+    'modalidad.officeDaysHint': 'The rest is remote',
   },
 };
 

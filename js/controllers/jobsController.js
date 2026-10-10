@@ -4,6 +4,7 @@
 
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
+import { ModalidadPicker } from '../ui/modalidad.js';
 import {
   computeStats, filterJobs, sortJobs,
 } from '../selectors.js';
@@ -154,6 +155,17 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
+  // Modalidad picker
+  // ----------------------------------------------------------
+  const modalidadPicker = new ModalidadPicker(
+    document.getElementById('modalidadPicker'),
+    {
+      hybridWrap: document.getElementById('hybridDaysWrap'),
+      hybridSelect: document.getElementById('hybridOfficeDays'),
+    }
+  );
+
+  // ----------------------------------------------------------
   // Form: create application
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
@@ -195,6 +207,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       return;
     }
 
+    const modal = modalidadPicker.getValue();
+
     const newJob = {
       id: uid(),
       empresa: valueOf('empresa'),
@@ -204,6 +218,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       link: valueOf('link'),
       salario: valueOf('salario'),
       salarioPorHora: document.getElementById('salarioPorHora').checked,
+      modalidad: modal.modalidad,
+      hybridOfficeDays: modal.hybridOfficeDays,
       contacto: valueOf('contacto'),
       notas: valueOf('notas'),
       skipped: [],
@@ -216,6 +232,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     form.reset();
     updateSalaryPlaceholder();
     datePicker?.setValue('');
+    modalidadPicker.setValue('');
     renderInitialStates();
     refreshPuestoOptionalHint();
 
