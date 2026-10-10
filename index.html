@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Seguridad: CSP + metas defensivas -->
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'self';
                script-src 'self' 'unsafe-inline';
@@ -293,8 +294,12 @@
     <div class="collapsible-body" id="jobFormBody">
       <form id="jobForm">
 
+        <!-- Sección 1: Datos del puesto -->
         <div class="v3-section">
-          <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
+          <div class="sec-head">
+            <div class="sec-icon">💼</div>
+            <div class="sec-title" data-i18n="form.section.job">Datos del puesto</div>
+          </div>
           <div class="v3-grid">
             <div class="field half">
               <label for="empresa" data-i18n="form.empresa">Empresa</label>
@@ -336,8 +341,12 @@
           </div>
         </div>
 
+        <!-- Sección 2: Salario y modalidad -->
         <div class="v3-section">
-          <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
+          <div class="sec-head">
+            <div class="sec-icon">💰</div>
+            <div class="sec-title" data-i18n="form.section.salary">Salario y modalidad</div>
+          </div>
           <div class="v3-grid">
             <div class="field half">
               <label for="salario">
@@ -392,8 +401,12 @@
           </div>
         </div>
 
+        <!-- Sección 3: Contacto y notas -->
         <div class="v3-section">
-          <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
+          <div class="sec-head">
+            <div class="sec-icon">📝</div>
+            <div class="sec-title" data-i18n="form.section.notes">Contacto y notas</div>
+          </div>
           <div class="v3-grid">
             <div class="field full">
               <label for="contacto" data-i18n="form.contacto">Contacto</label>
@@ -561,8 +574,12 @@
   <div class="modal modal-v3">
     <h2 data-i18n="modal.edit.title">✏️ Editar postulación</h2>
 
+    <!-- Sección 1: Datos del puesto -->
     <div class="v3-section">
-      <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
+      <div class="sec-head">
+        <div class="sec-icon">💼</div>
+        <div class="sec-title" data-i18n="form.section.job">Datos del puesto</div>
+      </div>
       <div class="v3-grid">
         <div class="field half">
           <label data-i18n="form.empresa">Empresa</label>
@@ -596,8 +613,12 @@
       </div>
     </div>
 
+    <!-- Sección 2: Salario y modalidad -->
     <div class="v3-section">
-      <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
+      <div class="sec-head">
+        <div class="sec-icon">💰</div>
+        <div class="sec-title" data-i18n="form.section.salary">Salario y modalidad</div>
+      </div>
       <div class="v3-grid">
         <div class="field half">
           <label for="editSalario">
@@ -652,8 +673,12 @@
       </div>
     </div>
 
+    <!-- Sección 3: Contacto y notas -->
     <div class="v3-section">
-      <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
+      <div class="sec-head">
+        <div class="sec-icon">📝</div>
+        <div class="sec-title" data-i18n="form.section.notes">Contacto y notas</div>
+      </div>
       <div class="v3-grid">
         <div class="field full">
           <label data-i18n="form.contacto">Contacto</label>
@@ -963,6 +988,7 @@
         </div>
 
         <div class="config-panel" data-panel="advanced">
+
           <div class="config-section">
             <div class="config-section-head">
               <h3 data-i18n="config.backup.title">💾 Datos y respaldo</h3>

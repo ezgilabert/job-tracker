@@ -177,9 +177,6 @@ label.hora-switch input:checked ~ .lbl-text {
   font-weight: 700;
 }
 
-/* ============================================================
-   Inputs genéricos
-   ============================================================ */
 input, select, textarea {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -211,7 +208,6 @@ textarea {
   font-family: inherit;
 }
 
-/* ===== Role combo ===== */
 .combo { position: relative; }
 
 .combo-input-wrap { position: relative; }
@@ -455,25 +451,41 @@ textarea:invalid:not(:placeholder-shown):focus {
   margin-bottom: 0;
 }
 
-.v3-section-title {
-  font-size: 0.68rem;
-  font-weight: 800;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.85rem;
+/* ============================================================
+   V2 · Section header: ícono + título grande
+   ============================================================ */
+
+.sec-head {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
 }
 
-.v3-section-title::before {
-  content: '';
-  width: 3px;
-  height: 12px;
-  background: var(--accent);
-  border-radius: 2px;
+.sec-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
+
+.sec-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* ============================================================
+   Grid interno de cada sección
+   ============================================================ */
 
 .v3-grid {
   display: grid;
@@ -608,7 +620,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Salario · Chip de moneda (ARS/USD) + Chip de modo (Rango/Único)
+   Salary input: wrapper con chip de modo + chip de moneda
    ============================================================ */
 
 .icon-input-wrap {
@@ -630,6 +642,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   outline: none;
 }
 
+[data-theme="dark"] .icon-input-wrap input[type="text"] {
+  background: var(--surface-soft);
+}
+
 .icon-input-wrap input[type="text"]:focus {
   border-color: var(--accent);
   background: var(--surface);
@@ -645,7 +661,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   }
 }
 
-/* Chip toggle (Rango / Único) — SOLO violeta, sin cambio de color */
+/* ============================================================
+   Chip de modo (Rango / Único) — izquierda del input
+   ============================================================ */
+
 .mode-chip {
   position: absolute;
   top: 50%;
@@ -671,6 +690,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   line-height: 1;
   cursor: pointer;
   transition: all 0.18s ease;
+  white-space: nowrap;
 }
 
 .mode-chip:hover {
@@ -688,14 +708,17 @@ textarea:invalid:not(:placeholder-shown):focus {
   flex-shrink: 0;
 }
 
-/* Chip de moneda (ARS / USD) — a la derecha */
+/* ============================================================
+   Chip de moneda (ARS / USD) — derecha del input
+   ============================================================ */
+
 .cur-chip {
   position: absolute;
   top: 50%;
   right: 0.4rem;
   transform: translateY(-50%);
   display: inline-flex;
-  gap: 0.1rem;
+  gap: 0.15rem;
   padding: 0.15rem;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -726,22 +749,53 @@ textarea:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 1px 3px var(--accent-glow);
 }
 
-/* Animación del label dinámico (arriba) */
-.field label .lbl-text {
-  display: inline-block;
+/* ============================================================
+   SalaryInput: hint del formato esperado
+   ============================================================ */
+
+.salary-input-wrap {
+  position: relative;
 }
 
-.field.label-changing > label .lbl-text {
-  animation: labelSwap 0.32s ease;
+.salary-input-wrap input[type="text"] {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
-@keyframes labelSwap {
-  0%   { opacity: 0; transform: translateY(-4px); }
-  100% { opacity: 1; transform: translateY(0); }
+.salary-hint {
+  position: absolute;
+  top: 50%;
+  left: 6rem;
+  right: 6rem;
+  transform: translateY(-50%);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  opacity: 0.55;
+  display: none;
+}
+
+.salary-hint.visible {
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .salary-hint {
+    left: 5.5rem;
+    right: 5.5rem;
+  }
 }
 
 /* ============================================================
-   V4 · Notas destacada
+   Notas destacada (borde acentuado + gradiente suave)
    ============================================================ */
 
 .notas-highlight {
@@ -967,7 +1021,6 @@ input[type="hidden"] {
   text-overflow: ellipsis;
 }
 
-/* Variante readonly (para el edit modal, donde el estado no se edita) */
 .combo-trigger-readonly {
   cursor: default;
   opacity: 0.9;
@@ -975,49 +1028,4 @@ input[type="hidden"] {
 
 .combo-trigger-readonly:hover {
   border-color: var(--border);
-}
-
-/* ============================================================
-   SalaryInput: máscara auto-formato con hint del formato esperado
-   ============================================================ */
-
-.salary-input-wrap {
-  position: relative;
-}
-
-.salary-input-wrap input[type="text"] {
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-}
-
-.salary-hint {
-  position: absolute;
-  top: 50%;
-  left: 6rem;
-  right: 6rem;
-  transform: translateY(-50%);
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  pointer-events: none;
-  user-select: none;
-  z-index: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-dim);
-  opacity: 0.55;
-  display: none;
-}
-
-.salary-hint.visible {
-  display: block;
-}
-
-@media (max-width: 520px) {
-  .salary-hint {
-    left: 5.5rem;
-    right: 5.5rem;
-  }
 }
