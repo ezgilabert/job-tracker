@@ -14,6 +14,7 @@ import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { PuestoCombo } from '../ui/combo.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
+import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { mountChips } from '../ui/chips.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
@@ -43,10 +44,6 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   const editModal = document.getElementById('editModal');
   const editEstado = document.getElementById('editEstado');
   const editSalaryHourlyCheckbox = document.getElementById('editSalarioPorHora');
-  const updateEditSalaryPlaceholder = bindHourlySalaryPlaceholder(
-    document.getElementById('editSalario'),
-    editSalaryHourlyCheckbox
-  );
 
   editEstado.innerHTML = ALL_STATES
     .map(s => `<option value="${escapeHtml(s)}">${escapeHtml(tState(s))}</option>`)
@@ -65,6 +62,18 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       hybridSelect: document.getElementById('editHybridOfficeDays'),
     }
   );
+  const editCurrency = new CurrencyPicker(
+    document.getElementById('editSalarioCurrencyChip'),
+    { value: 'usd' }
+  );
+
+  const updateEditSalaryPlaceholder = bindHourlySalaryPlaceholder(
+    document.getElementById('editSalario'),
+    editSalaryHourlyCheckbox,
+    () => editCurrency.getValue()
+  );
+
+  editCurrency.onChange = () => updateEditSalaryPlaceholder();
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -78,6 +87,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     setVal('editLink', j.link || '');
     setVal('editSalario', j.salario || '');
     editSalaryHourlyCheckbox.checked = Boolean(j.salarioPorHora);
+    editCurrency.setValue(j.moneda || 'usd');
     updateEditSalaryPlaceholder();
     setVal('editContacto', j.contacto || '');
     setVal('editNotas', j.notas || '');
@@ -111,6 +121,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
         link:      valueOf('editLink'),
         salario:   valueOf('editSalario'),
         salarioPorHora: editSalaryHourlyCheckbox.checked,
+        moneda:    editCurrency.getValue(),
         modalidad: modal.modalidad,
         hybridOfficeDays: modal.hybridOfficeDays,
         contacto:  valueOf('editContacto'),
@@ -189,8 +200,6 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
     }
 
     const { id, estado } = pendingClose;
-
-    // We need the role/company for the referral history entry.
     const closedJob = jobsStore.get().find(x => x.id === id);
 
     jobsStore.update(jobs => jobs.map(j => {
@@ -198,14 +207,10 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       const history = cloneArray(j.history);
       history.push({ estado, fecha: new Date().toISOString(), motivo: reason });
       const patch = { ...j, estado, history };
-      // Confirming the offer sets a flag so the card renders the
-      // festive "offer confirmed" state (confetti + banner + lock).
       if (estado === 'Oferta') patch.offerConfirmed = true;
       return patch;
     }));
 
-    // If the job closes as Offer, sync the linked referral:
-    // move it to "Hired" if it isn't there yet.
     if (estado === 'Oferta') {
       syncLinkedRefToContratado(id, closedJob);
     }
@@ -218,7 +223,6 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
   function syncLinkedRefToContratado(jobId, job) {
     refsStore.update(refs => refs.map(r => {
       if (r.linkedJobId !== jobId) return r;
-      // If the referral was explicitly closed (Not applicable), respect it.
       if (r.estado === 'No aplica') return r;
       if (r.estado === 'Contratado') return r;
 
@@ -704,6 +708,7 @@ export function mountModalsController(jobsStore, refsStore, configStore) {
       estado: 'Contacto',
       link: '',
       salario: '',
+      moneda: 'usd',
       modalidad: '',
       hybridOfficeDays: null,
       contacto: r.nombre + (r.rol ? ` (${r.rol})` : ''),

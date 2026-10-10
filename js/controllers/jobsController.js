@@ -5,6 +5,7 @@
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { ModalidadPicker } from '../ui/modalidad.js';
+import { CurrencyPicker } from '../ui/currencyPicker.js';
 import {
   computeStats, filterJobs, sortJobs,
 } from '../selectors.js';
@@ -69,8 +70,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const list = document.getElementById('list');
 
     if (filtered.length === 0) {
-      // Different empty states: no jobs at all, or no match for the
-      // current filter/search combination.
       const noJobsAtAll = jobs.length === 0;
       list.innerHTML = `
         <div class="empty">
@@ -141,12 +140,11 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
   configStore.subscribe(renderInitialStates);
 
-  // Initial render
   renderFilters();
   renderInitialStates();
 
   // ----------------------------------------------------------
-  // Search input: live filtering
+  // Search input
   // ----------------------------------------------------------
   const searchInput = document.getElementById('jobSearch');
   searchInput.addEventListener('input', (e) => {
@@ -155,7 +153,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
-  // Modalidad picker
+  // Modalidad picker + Currency picker
   // ----------------------------------------------------------
   const modalidadPicker = new ModalidadPicker(
     document.getElementById('modalidadPicker'),
@@ -165,18 +163,25 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
   );
 
+  const currencyPicker = new CurrencyPicker(
+    document.getElementById('salarioCurrencyChip'),
+    { value: 'usd' }
+  );
+
   // ----------------------------------------------------------
-  // Form: create application
+  // Form
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
   const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
   const updateSalaryPlaceholder = bindHourlySalaryPlaceholder(
     document.getElementById('salario'),
-    salaryHourlyCheckbox
+    salaryHourlyCheckbox,
+    () => currencyPicker.getValue()
   );
 
-  // Visual hint: cuando el estado es "Guardado", el puesto deja de
-  // ser obligatorio. Se refleja en el label agregando "(opcional)".
+  // Cuando cambia la moneda, refrescamos el placeholder
+  currencyPicker.onChange = () => updateSalaryPlaceholder();
+
   const estadoSelect = document.getElementById('estado');
   const puestoLabel = document.querySelector('label[for="puesto"]');
   const puestoInput = document.getElementById('puesto');
@@ -200,7 +205,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const initialState = document.getElementById('estado').value;
     const puestoValue = valueOf('puesto');
 
-    // El puesto sólo es obligatorio cuando NO estamos en "Guardado".
     if (!puestoValue && initialState !== 'Guardado') {
       showToast(t('toast.puestoRequired'), '!');
       if (puestoInput) puestoInput.focus();
@@ -217,7 +221,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       estado: initialState,
       link: valueOf('link'),
       salario: valueOf('salario'),
-      salarioPorHora: document.getElementById('salarioPorHora').checked,
+      salarioPorHora: salaryHourlyCheckbox.checked,
+      moneda: currencyPicker.getValue(),
       modalidad: modal.modalidad,
       hybridOfficeDays: modal.hybridOfficeDays,
       contacto: valueOf('contacto'),
@@ -233,6 +238,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     updateSalaryPlaceholder();
     datePicker?.setValue('');
     modalidadPicker.setValue('');
+    currencyPicker.setValue('usd');
     renderInitialStates();
     refreshPuestoOptionalHint();
 
@@ -295,8 +301,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     if (!confirmed) return;
     jobsStore.update(jobs => jobs.filter(j => j.id !== id));
 
-    // If a referral pointed to this application, clear the link so the
-    // referral's "go back" button is no longer locked.
     refsStore.update(refs => refs.map(r => {
       if (r.linkedJobId !== id) return r;
       return { ...r, linkedJobId: null };
@@ -315,8 +319,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     showToast(t('toast.jobReopened'), '↻');
   }
 
-  // "Unmark" the confirmed offer: clear the flag so the user can edit
-  // or continue the workflow again.
   function unconfirmOffer(id) {
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
@@ -396,14 +398,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
-  // scroll-to-job: expand section if collapsed
+  // scroll-to-job
   // ----------------------------------------------------------
   document.addEventListener('scroll-to-job', () => {
     expandJobs();
   });
 
   // ----------------------------------------------------------
-  // i18n: re-render on language change
+  // i18n
   // ----------------------------------------------------------
   document.addEventListener('i18n-changed', () => {
     renderFilters();

@@ -274,7 +274,7 @@
 
   <div class="stats" id="stats"></div>
 
-  <!-- ===== FORM NUEVA POSTULACIÓN (V3) ===== -->
+  <!-- ===== FORM NUEVA POSTULACIÓN (V3 + chip moneda + notas destacada) ===== -->
   <div class="form-card v3">
     <div class="form-card-header">
       <div>
@@ -324,13 +324,19 @@
           </div>
         </div>
 
-        <!-- Sección 2: Salario y modalidad -->
+        <!-- Sección 2: Salario y modalidad (V4) -->
         <div class="v3-section">
           <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
           <div class="v3-grid">
             <div class="field half">
               <label for="salario" data-i18n="form.salario">Rango salarial</label>
-              <input type="text" id="salario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+              <div class="sal-chip-group">
+                <input type="text" id="salario" maxlength="80" placeholder="Ej: 3.000–4.000">
+                <div class="cur-chip" id="salarioCurrencyChip">
+                  <button type="button" data-cur="ars" aria-label="ARS">ARS</button>
+                  <button type="button" data-cur="usd" class="active" aria-label="USD">USD</button>
+                </div>
+              </div>
               <label class="hora-switch">
                 <input type="checkbox" id="salarioPorHora">
                 <span class="track"></span>
@@ -368,17 +374,19 @@
           </div>
         </div>
 
-        <!-- Sección 3: Contacto y notas -->
+        <!-- Sección 3: Contacto y notas (V4) -->
         <div class="v3-section">
           <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
           <div class="v3-grid">
-            <div class="field half">
+            <div class="field full">
               <label for="contacto" data-i18n="form.contacto">Contacto</label>
               <input type="text" id="contacto" maxlength="120" placeholder="Ej: María López (Recruiter)" data-i18n-placeholder="form.contacto.placeholder">
             </div>
-            <div class="field half">
+            <div class="field full">
               <label for="notas" data-i18n="form.notas">Notas</label>
-              <textarea id="notas" maxlength="2000" placeholder="Contacto, próxima instancia, referidos..." data-i18n-placeholder="form.notas.placeholder"></textarea>
+              <div class="notas-highlight">
+                <textarea id="notas" maxlength="2000" placeholder="Contacto, próxima instancia, referidos... ¿algo que quieras recordar de esta postulación?" data-i18n-placeholder="form.notas.placeholder"></textarea>
+              </div>
             </div>
           </div>
         </div>
@@ -527,7 +535,7 @@
   </section>
 </div>
 
-<!-- ===== EDIT MODAL (V3) ===== -->
+<!-- ===== EDIT MODAL (V3 + chip moneda + notas destacada) ===== -->
 <div class="modal-overlay" id="editModal">
   <div class="modal modal-v3">
     <h2 data-i18n="modal.edit.title">✏️ Editar postulación</h2>
@@ -565,13 +573,19 @@
       </div>
     </div>
 
-    <!-- Sección 2: Salario y modalidad -->
+    <!-- Sección 2: Salario y modalidad (V4) -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
       <div class="v3-grid">
         <div class="field half">
           <label for="editSalario" data-i18n="form.salario">Rango salarial</label>
-          <input type="text" id="editSalario" maxlength="80" placeholder="Ej: USD 3.000–4.000/mes, ARS 2.000.000–2.500.000 o USD 20–30/h" data-i18n-placeholder="form.salario.placeholder">
+          <div class="sal-chip-group">
+            <input type="text" id="editSalario" maxlength="80" placeholder="Ej: 3.000–4.000">
+            <div class="cur-chip" id="editSalarioCurrencyChip">
+              <button type="button" data-cur="ars" aria-label="ARS">ARS</button>
+              <button type="button" data-cur="usd" class="active" aria-label="USD">USD</button>
+            </div>
+          </div>
           <label class="hora-switch">
             <input type="checkbox" id="editSalarioPorHora">
             <span class="track"></span>
@@ -609,17 +623,19 @@
       </div>
     </div>
 
-    <!-- Sección 3: Contacto y notas -->
+    <!-- Sección 3: Contacto y notas (V4) -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
       <div class="v3-grid">
-        <div class="field half">
+        <div class="field full">
           <label data-i18n="form.contacto">Contacto</label>
           <input type="text" id="editContacto" maxlength="120" placeholder="Nombre y rol">
         </div>
-        <div class="field half">
+        <div class="field full">
           <label data-i18n="form.notas">Notas</label>
-          <textarea id="editNotas" maxlength="2000" style="min-height:70px"></textarea>
+          <div class="notas-highlight">
+            <textarea id="editNotas" maxlength="2000" placeholder="Contacto, próxima instancia, referidos..."></textarea>
+          </div>
         </div>
       </div>
     </div>
@@ -912,7 +928,7 @@
 
         <div class="config-panel" data-panel="advanced">
 
-          <!-- ===== Data & Backup ===== -->
+          <!-- Data & Backup -->
           <div class="config-section">
             <div class="config-section-head">
               <h3 data-i18n="config.backup.title">💾 Datos y respaldo</h3>
@@ -948,7 +964,7 @@
             </div>
           </div>
 
-          <!-- ===== Danger zone ===== -->
+          <!-- Danger zone -->
           <div class="config-section config-section-danger">
             <div class="config-section-head">
               <h3 data-i18n="config.danger.title">⚠️ Zona de peligro</h3>

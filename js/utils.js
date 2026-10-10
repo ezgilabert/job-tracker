@@ -13,12 +13,30 @@ export function escapeHtml(str) {
   }[c]));
 }
 
-export function bindHourlySalaryPlaceholder(input, checkbox) {
+/**
+ * Actualiza el placeholder del input de salario según:
+ *   - moneda (ars / usd)
+ *   - si el checkbox "es por hora" está tildado
+ *
+ * @param {HTMLInputElement} input
+ * @param {HTMLInputElement} checkbox
+ * @param {() => string} getCurrency  opcional; default 'usd'
+ * @returns {() => void}  función para forzar el update manualmente
+ */
+export function bindHourlySalaryPlaceholder(input, checkbox, getCurrency = () => 'usd') {
   const update = () => {
-    input.placeholder = checkbox.checked
-      ? 'Ej: USD 20–30/h o ARS 15.000–25.000/h'
-      : 'Ej: USD 3.000–4.000/mes o ARS 2.000.000–2.500.000/mes';
+    const cur = String(getCurrency() || 'usd').toLowerCase();
+    const isHourly = checkbox.checked;
+
+    let ph;
+    if (cur === 'ars') {
+      ph = isHourly ? 'Ej: 15.000–25.000' : 'Ej: 2.000.000–2.500.000';
+    } else {
+      ph = isHourly ? 'Ej: 20–30' : 'Ej: 3.000–4.000';
+    }
+    input.placeholder = ph;
   };
+
   checkbox.addEventListener('change', update);
   update();
   return update;
@@ -73,7 +91,7 @@ export function highlightAndScroll(el, duration = 1800) {
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   el.classList.remove('highlighted');
-  void el.offsetWidth; // force reflow so the highlight animation restarts
+  void el.offsetWidth;
   el.classList.add('highlighted');
   setTimeout(() => el.classList.remove('highlighted'), duration);
 }

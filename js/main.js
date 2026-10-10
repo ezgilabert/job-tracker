@@ -22,17 +22,13 @@ import {
   logout, getSession, requireSession, startSessionHeartbeat,
 } from './auth/session.js';
 
-// ------------------------------------------------------------
-// La app exige sesión válida. requireSession es async ahora.
-// ------------------------------------------------------------
 boot();
 
 async function boot() {
-  // ---- Guard ----
   if (!(await requireSession('./login.html'))) return;
 
   // ----------------------------------------------------------
-  // Theme (vive dentro del menú de usuario)
+  // Theme
   // ----------------------------------------------------------
   function mountTheme() {
     const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
@@ -49,9 +45,6 @@ async function boot() {
     });
   }
 
-  // ----------------------------------------------------------
-  // Logo (appearance)
-  // ----------------------------------------------------------
   function applyLogo(logoId) {
     const el = document.getElementById('brandLogo');
     if (!el) return;
@@ -149,6 +142,7 @@ async function boot() {
         return data.map(j => ({
           ...j,
           contacto: j.contacto ?? '',
+          moneda: j.moneda ?? '',
           skipped: ensureArray(j.skipped),
           volvioAtras: Boolean(j.volvioAtras),
           history: Array.isArray(j.history) && j.history.length
@@ -160,7 +154,6 @@ async function boot() {
     },
   });
 
-  // Mapa de estados legacy de referidos que ya no existen.
   const LEGACY_REF_STATE_MAP = {
     'Me va a referir': 'Contactado',
   };
@@ -206,7 +199,7 @@ async function boot() {
   });
 
   // ----------------------------------------------------------
-  // i18n: apply language at boot
+  // i18n
   // ----------------------------------------------------------
   setLanguage(configStore.get().lang || DEFAULT_LANG);
   applyI18n(document);
@@ -224,7 +217,7 @@ async function boot() {
   });
 
   // ----------------------------------------------------------
-  // UI: date picker, role combo, referral chips
+  // UI wiring
   // ----------------------------------------------------------
   const fechaPicker = new DatePicker(document.getElementById('fechaPicker'), {
     onChange: () => {},
@@ -238,14 +231,8 @@ async function boot() {
   const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
   const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 
-  // ----------------------------------------------------------
-  // Input limits
-  // ----------------------------------------------------------
   mountInputLimits(document);
 
-  // ----------------------------------------------------------
-  // Controllers
-  // ----------------------------------------------------------
   mountConfigController(configStore, jobsStore, refsStore);
   const modals = mountModalsController(jobsStore, refsStore, configStore);
   const jobsCtrl = mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore);
@@ -257,23 +244,16 @@ async function boot() {
   mountUserMenu();
 
   // ----------------------------------------------------------
-  // Heartbeat: cierra la sesión tras 30 min de inactividad
-  // (y también si la firma fue manipulada).
+  // Heartbeat
   // ----------------------------------------------------------
   startSessionHeartbeat(() => {
     window.location.replace('./login.html');
   });
 
-  // ----------------------------------------------------------
-  // Limpieza al cerrar la pestaña
-  // ----------------------------------------------------------
   window.addEventListener('pagehide', () => {
     try { sessionStorage.removeItem('jobTrackerFreshLogin'); } catch {}
   });
 
-  // ----------------------------------------------------------
-  // Re-render dynamic controllers on language change
-  // ----------------------------------------------------------
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();

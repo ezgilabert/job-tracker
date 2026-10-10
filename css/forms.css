@@ -101,8 +101,7 @@ form {
 }
 
 /* ============================================================
-   Hourly salary — switch estilo V3
-   Con especificidad alta para ganarle a `.field label`
+   Hourly salary — switch estilo V3 (con especificidad alta)
    ============================================================ */
 
 .field label.hora-switch,
@@ -127,9 +126,7 @@ label.hora-switch {
 }
 
 .field label.hora-switch:hover,
-label.hora-switch:hover {
-  color: var(--text);
-}
+label.hora-switch:hover { color: var(--text); }
 
 .field label.hora-switch input[type="checkbox"],
 label.hora-switch input[type="checkbox"] {
@@ -180,13 +177,6 @@ label.hora-switch input:checked ~ .track::after {
 
 .field label.hora-switch input:checked ~ .lbl-text,
 label.hora-switch input:checked ~ .lbl-text {
-  color: var(--accent);
-  font-weight: 700;
-}
-
-/* Fallback: si el texto no tiene clase .lbl-text sino un <span> plano */
-.field label.hora-switch input:checked ~ span:not(.track),
-label.hora-switch input:checked ~ span:not(.track) {
   color: var(--accent);
   font-weight: 700;
 }
@@ -625,6 +615,90 @@ textarea:invalid:not(:placeholder-shown):focus {
   color: var(--text-muted);
   font-weight: 500;
 }
+
+/* ============================================================
+   V4 · Chip de moneda dentro del input de salario
+   ============================================================ */
+
+.sal-chip-group {
+  position: relative;
+}
+
+.sal-chip-group input {
+  padding-right: 6rem;
+}
+
+.cur-chip {
+  position: absolute;
+  top: 50%;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  gap: 0.15rem;
+  padding: 0.15rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  z-index: 2;
+}
+
+.cur-chip button {
+  padding: 0.3rem 0.55rem;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.cur-chip button:hover { color: var(--text); }
+
+.cur-chip button.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 1px 3px var(--accent-glow);
+}
+
+/* ============================================================
+   V4 · Notas destacada (borde acentuado + gradiente suave)
+   ============================================================ */
+
+.notas-highlight {
+  position: relative;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent-border);
+  background: linear-gradient(135deg, var(--accent-soft) 0%, transparent 60%);
+  transition: all 0.2s ease;
+}
+
+.notas-highlight:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.notas-highlight textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  min-height: 130px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+
+.notas-highlight textarea::placeholder { color: var(--text-dim); }
 
 /* ============================================================
    Modal con estructura V3
