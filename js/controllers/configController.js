@@ -4,6 +4,7 @@
 
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
+import { ResetAnimation } from '../ui/resetAnimation.js';
 import {
   ROLE_TAGS_LIST, ROLE_TAGS, DEFAULT_ROLES,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
@@ -30,6 +31,13 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   const tabs = [...modal.querySelectorAll('.config-tab')];
   const panels = [...modal.querySelectorAll('.config-panel')];
+
+  // Reset animation
+  const resetOverlay = document.getElementById('resetOverlay');
+  const resetContent = document.getElementById('resetContent');
+  const resetAnim = (resetOverlay && resetContent)
+    ? new ResetAnimation(resetOverlay, resetContent)
+    : null;
 
   let draft = null;
   let preferredDefaultState = null;
@@ -177,6 +185,9 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    // Bloquear ESC si la animación de reset está corriendo.
+    if (resetOverlay && resetOverlay.classList.contains('active')) return;
+
     if (unsavedModal.classList.contains('open')) {
       unsavedModal.classList.remove('open');
       return;
@@ -202,6 +213,9 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (e.target === unsavedModal) unsavedModal.classList.remove('open');
   });
 
+  // ----------------------------------------------------------
+  // Reset config → animación + vuelta al inicio
+  // ----------------------------------------------------------
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
       title: t('confirm.resetConfig.title'),
@@ -210,10 +224,30 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       danger: true,
     });
     if (!ok) return;
+
+    // 1) Resetear el draft
     draft = getDefaultConfig();
     preferredDefaultState = draft.estadoInicialDefault || null;
     renderAll();
-    showToast(t('toast.resetConfig'), '↺');
+
+    // 2) Persistir el reset
+    saveDraft();
+
+    // 3) Cerrar el modal de config directo (sin preguntar)
+    closeDirect();
+
+    // 4) Cerrar cualquier modal abierto (unsaved, etc.)
+    unsavedModal.classList.remove('open');
+
+    // 5) Correr la animación y, al terminar, recargar la app.
+    //    El overlay queda visible hasta que la nueva página
+    //    arranca, evitando cualquier flash.
+    if (resetAnim) {
+      await resetAnim.run(2400);
+      window.location.reload();
+    } else {
+      window.location.reload();
+    }
   });
 
   tabs.forEach(tab => {
@@ -331,7 +365,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     if (isCustom) {
       draft.puestos.custom = (draft.puestos.custom || []).filter(p => p !== puesto);
-      // También borramos sus tags.
       if (draft.puestos.customTags) {
         delete draft.puestos.customTags[puesto];
       }
@@ -426,7 +459,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     draft.estadosIniciales = [...stateSet];
 
-    if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
+    if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefinitivo)) {
       draft.estadoInicialDefault = [...stateSet][0];
     }
 

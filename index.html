@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Seguridad: CSP + metas defensivas -->
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'self';
                script-src 'self' 'unsafe-inline';
@@ -20,6 +21,7 @@
 
 <title>Job Tracker · Mi búsqueda laboral</title>
 
+<!-- Aplica el tema guardado antes de pintar (evita flash de color) -->
 <script>
   (function () {
     try {
@@ -35,6 +37,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/styles.css">
 
+<!-- ============================================================
+     Loading overlay (versión 3)
+     ============================================================ -->
 <style>
   .loading-overlay {
     position: fixed;
@@ -168,7 +173,7 @@
 </head>
 <body>
 
-<!-- Overlay de carga -->
+<!-- Overlay de carga (versión 3) -->
 <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
   <div class="loading-content">
 
@@ -545,6 +550,7 @@
   <div class="modal modal-v3">
     <h2 data-i18n="modal.edit.title">✏️ Editar postulación</h2>
 
+    <!-- Sección 1: Datos del puesto -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.job">Datos del puesto</div>
       <div class="v3-grid">
@@ -577,6 +583,7 @@
       </div>
     </div>
 
+    <!-- Sección 2: Salario y modalidad -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.salary">Salario y modalidad</div>
       <div class="v3-grid">
@@ -632,6 +639,7 @@
       </div>
     </div>
 
+    <!-- Sección 3: Contacto y notas -->
     <div class="v3-section">
       <div class="v3-section-title" data-i18n="form.section.notes">Contacto y notas</div>
       <div class="v3-grid">
@@ -935,6 +943,8 @@
         </div>
 
         <div class="config-panel" data-panel="advanced">
+
+          <!-- ===== Data & Backup ===== -->
           <div class="config-section">
             <div class="config-section-head">
               <h3 data-i18n="config.backup.title">💾 Datos y respaldo</h3>
@@ -970,6 +980,7 @@
             </div>
           </div>
 
+          <!-- ===== Danger zone ===== -->
           <div class="config-section config-section-danger">
             <div class="config-section-head">
               <h3 data-i18n="config.danger.title">⚠️ Zona de peligro</h3>
@@ -1217,10 +1228,18 @@
   </div>
 </div>
 
+<!-- Reset animation overlay -->
+<div class="reset-overlay" id="resetOverlay" aria-hidden="true">
+  <div class="reset-content" id="resetContent"></div>
+</div>
+
 <div class="toast-container" id="toasts"></div>
 
 <script type="module" src="./js/main.js"></script>
 
+<!-- ============================================================
+     Loading overlay (versión 3)
+     ============================================================ -->
 <script>
   (function () {
     const overlay = document.getElementById('loadingOverlay');

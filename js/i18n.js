@@ -18,6 +18,7 @@ const translations = {
     'action.config': 'Configuración',
     'action.theme': 'Cambiar tema',
 
+    // Auth
     'auth.documentTitle': 'Job Tracker · Acceso',
     'auth.tab.login': 'Iniciar sesión',
     'auth.tab.register': 'Crear cuenta',
@@ -161,6 +162,7 @@ const translations = {
     'job.offerRibbon': '🏆 Oferta',
     'job.noPuesto': 'No especificado',
 
+    // Offer confirmed (festive state)
     'job.offerConfirmed.title': '¡Felicitaciones!',
     'job.offerConfirmed.subtitle': 'Confirmaste la oferta de {empresa}. ¡A festejar!',
     'job.offerConfirmed.label': 'Oferta',
@@ -262,12 +264,14 @@ const translations = {
     'config.noPuestos': 'No hay puestos con las categorías activas. Activá alguna o agregá uno custom.',
     'config.noStates': 'Activá al menos un estado arriba.',
 
+    // Danger zone (Advanced panel)
     'config.danger.title': '⚠️ Zona de peligro',
     'config.danger.desc': 'Estas acciones no se pueden deshacer.',
     'config.danger.reset.title': 'Restablecer toda la configuración',
     'config.danger.reset.desc': 'Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
     'config.danger.reset.button': 'Restablecer',
 
+    // Data & Backup (Advanced panel)
     'config.backup.title': '💾 Datos y respaldo',
     'config.backup.desc': 'Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.',
     'config.backup.exportTitle': 'Exportar datos',
@@ -279,6 +283,7 @@ const translations = {
     'config.backup.jobs': 'postulaciones',
     'config.backup.refs': 'referidos',
 
+    // Profile
     'profile.title': '👤 Editar perfil',
     'profile.subtitle': 'Actualizá tu información personal',
     'profile.nombre': 'Nombre',
@@ -378,6 +383,9 @@ const translations = {
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
     'toast.profileImageTooBig': 'La imagen supera los 2 MB',
+
+    'reset.running': 'Reiniciando…',
+    'reset.sub': 'Aplicando valores por defecto',
 
     'refEmpresa.empty': 'Agregá postulaciones primero para poder vincularlas',
 
@@ -820,6 +828,9 @@ const translations = {
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
     'toast.profileImageTooBig': 'Image is larger than 2 MB',
+
+    'reset.running': 'Restarting…',
+    'reset.sub': 'Applying default values',
 
     'refEmpresa.empty': 'Add applications first to link them',
 
