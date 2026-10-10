@@ -15,7 +15,6 @@ import {
   computeStats, filterJobs, sortJobs, isClosed,
 } from '../selectors.js';
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
-import { renderStats } from '../templates/stats.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
   uid, cloneArray, escapeHtml,
@@ -153,9 +152,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   function renderList() {
     const jobs = jobsStore.get();
     const refs = refsStore.get();
-
-    document.getElementById('stats').innerHTML =
-      renderStats(computeStats(jobs));
 
     document.getElementById('jobCounter').textContent = jobs.length;
 
