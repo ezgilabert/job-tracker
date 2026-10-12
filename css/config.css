@@ -512,49 +512,142 @@
   color: var(--danger-2);
 }
 
-.config-danger-zone {
-  border: 1px solid var(--danger-border);
+/* ============================================================
+   Zona de peligro · 2 tarjetas + reset total
+   ============================================================ */
+
+.config-danger-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .config-danger-cards { grid-template-columns: 1fr; }
+}
+
+.config-danger-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
   border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s ease;
+}
+
+.config-danger-card.prefs {
+  border-color: var(--warning-border);
+}
+
+.config-danger-card.data {
+  border-color: var(--danger-border);
+}
+
+.danger-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.config-danger-card.prefs .danger-card-icon {
+  background: var(--warning-soft);
+  color: var(--warning-2);
+}
+
+.config-danger-card.data .danger-card-icon {
   background: var(--danger-soft);
-  padding: 0.25rem;
+  color: var(--danger-2);
 }
 
-[data-theme="dark"] .config-danger-zone {
-  background: rgba(239, 68, 68, 0.06);
+.config-danger-card h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
 }
 
-.config-danger-item {
+.config-danger-card p {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  flex: 1;
+  margin: 0;
+}
+
+.config-danger-card .btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.config-danger-all {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px dashed var(--danger-border);
+  background: transparent;
   flex-wrap: wrap;
 }
 
-.config-danger-info {
+.config-danger-all-info {
   flex: 1;
   min-width: 200px;
 }
 
-.config-danger-info strong {
+.config-danger-all-info strong {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.25rem;
+  color: var(--danger-2);
+  margin-bottom: 0.15rem;
 }
 
-.config-danger-info span {
-  display: block;
-  font-size: 0.78rem;
+.config-danger-all-info span {
+  font-size: 0.75rem;
   color: var(--text-muted);
   line-height: 1.4;
 }
 
-.config-danger-item .btn {
-  flex-shrink: 0;
-  white-space: nowrap;
+/* ============================================================
+   Botón variants adicionales
+   ============================================================ */
+
+.btn-warning-ghost {
+  background: var(--warning-soft);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-2);
+}
+
+.btn-warning-ghost:hover {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: white;
+  box-shadow: 0 6px 16px rgba(245,158,11,0.35);
+}
+
+.btn-danger-solid {
+  background: var(--danger);
+  border: 1px solid var(--danger);
+  color: white;
+}
+
+.btn-danger-solid:hover {
+  background: var(--danger-2);
+  border-color: var(--danger-2);
+  color: white;
+  box-shadow: 0 6px 18px rgba(239,68,68,0.45);
+  transform: translateY(-1px);
 }
 
 /* ============================================================

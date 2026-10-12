@@ -215,7 +215,8 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Reset config → animación + vuelta al inicio
+  // ⭐ CAMBIO: Restablecer preferencias
+  //   Solo toca la config. NO borra datos.
   // ----------------------------------------------------------
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
@@ -231,6 +232,72 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     renderAll();
 
     saveDraft();
+    closeDirect();
+    unsavedModal.classList.remove('open');
+
+    if (resetAnim) {
+      await resetAnim.run(2400);
+      window.location.reload();
+    } else {
+      window.location.reload();
+    }
+  });
+
+  // ----------------------------------------------------------
+  // ⭐ NUEVO: Borrar datos (jobs + refs). NO toca la config.
+  // ----------------------------------------------------------
+  document.getElementById('resetDataBtn').addEventListener('click', async () => {
+    const jobsCount = (jobsStore.get() || []).length;
+    const refsCount = (refsStore.get() || []).length;
+
+    if (jobsCount === 0 && refsCount === 0) {
+      showToast(t('toast.dataResetEmpty'), '—');
+      return;
+    }
+
+    const ok = await showConfirm({
+      title: t('confirm.resetData.title'),
+      message: t('confirm.resetData.message', { jobs: jobsCount, refs: refsCount }),
+      confirmText: t('confirm.resetData.confirm'),
+      danger: true,
+    });
+    if (!ok) return;
+
+    jobsStore.update(() => []);
+    refsStore.update(() => []);
+
+    showToast(
+      t('toast.dataReset', { jobs: jobsCount, refs: refsCount }),
+      '🗑️'
+    );
+  });
+
+  // ----------------------------------------------------------
+  // ⭐ NUEVO: Restablecer TODO (config + datos + tema).
+  // ----------------------------------------------------------
+  document.getElementById('resetAllBtn').addEventListener('click', async () => {
+    const jobsCount = (jobsStore.get() || []).length;
+    const refsCount = (refsStore.get() || []).length;
+
+    const ok = await showConfirm({
+      title: t('confirm.resetAll.title'),
+      message: t('confirm.resetAll.message', { jobs: jobsCount, refs: refsCount }),
+      confirmText: t('confirm.resetAll.confirm'),
+      danger: true,
+    });
+    if (!ok) return;
+
+    // Limpiamos las keys del Job Tracker. NO tocamos:
+    // - jobTrackerSession / install secret (los maneja session.js)
+    try {
+      localStorage.removeItem(STORAGE_KEYS.JOBS);
+      localStorage.removeItem(STORAGE_KEYS.REFS);
+      localStorage.removeItem(STORAGE_KEYS.CONFIG);
+      localStorage.removeItem(STORAGE_KEYS.THEME);
+    } catch (_) { /* noop */ }
+
+    // Reseteamos el draft local por las dudas (aunque vamos a hacer reload)
+    draft = getDefaultConfig();
     closeDirect();
     unsavedModal.classList.remove('open');
 

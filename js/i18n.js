@@ -284,9 +284,21 @@ const translations = {
 
     'config.danger.title': '⚠️ Zona de peligro',
     'config.danger.desc': 'Estas acciones no se pueden deshacer.',
-    'config.danger.reset.title': 'Restablecer toda la configuración',
-    'config.danger.reset.desc': 'Restaura los puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
+
+    // ⭐ CAMBIO: textos del reset de preferencias (antes "toda la configuración")
+    'config.danger.reset.title': 'Restablecer preferencias',
+    'config.danger.reset.desc': 'Vuelve puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
     'config.danger.reset.button': 'Restablecer',
+
+    // ⭐ NUEVO: borrar datos
+    'config.danger.data.title': 'Borrar datos',
+    'config.danger.data.desc': 'Elimina permanentemente postulaciones y referidos. Esta acción no se puede deshacer.',
+    'config.danger.data.button': 'Borrar datos',
+
+    // ⭐ NUEVO: reset total
+    'config.danger.all.title': '⚠️ Empezar de cero',
+    'config.danger.all.desc': 'Borra todas las preferencias y todos los datos. Deja la app como recién instalada.',
+    'config.danger.all.button': 'Restablecer todo',
 
     'config.backup.title': '💾 Datos y respaldo',
     'config.backup.desc': 'Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.',
@@ -351,8 +363,8 @@ const translations = {
     'confirm.deleteRef.title': '¿Borrar a {name}?',
     'confirm.deleteRef.message': 'Se eliminará de tu lista de referidos.',
     'confirm.deleteRef.confirm': 'Borrar',
-    'confirm.resetConfig.title': '¿Restablecer configuración?',
-    'confirm.resetConfig.message': 'Se van a borrar tus preferencias de puestos, estados, filtros y apariencia.<br>Esto <strong>no</strong> se aplica hasta que guardes.',
+    'confirm.resetConfig.title': '¿Restablecer preferencias?',
+    'confirm.resetConfig.message': 'Se van a restablecer tus preferencias de puestos, estados, filtros y apariencia.<br><strong>Tus datos no se tocan.</strong><br><br>Los cambios se van a aplicar cuando guardes.',
     'confirm.resetConfig.confirm': 'Restablecer',
     'confirm.closeRef.title': '¿Marcar a {name} como "No aplica"?',
     'confirm.closeRef.message': 'Este referido ya no aplica para tu búsqueda.',
@@ -366,6 +378,16 @@ const translations = {
     'confirm.importBackup.title': '¿Importar respaldo?',
     'confirm.importBackup.message': 'Vas a reemplazar TODA tu información actual con el archivo.<br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
     'confirm.importBackup.confirm': 'Sí, reemplazar',
+
+    // ⭐ NUEVO: confirm de borrar datos
+    'confirm.resetData.title': '¿Borrar todos los datos?',
+    'confirm.resetData.message': 'Vas a eliminar permanentemente tus postulaciones y referidos.<br><strong>Tu configuración no se toca.</strong><br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
+    'confirm.resetData.confirm': 'Sí, borrar',
+
+    // ⭐ NUEVO: confirm de restablecer todo
+    'confirm.resetAll.title': '¿Restablecer todo?',
+    'confirm.resetAll.message': 'Vas a borrar TODA tu información: preferencias, postulaciones, referidos y tema.<br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
+    'confirm.resetAll.confirm': 'Sí, restablecer todo',
 
     'toast.savedConfig': 'Configuración guardada',
     'toast.discardedChanges': 'Cambios descartados',
@@ -398,6 +420,10 @@ const translations = {
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
     'toast.profileImageTooBig': 'La imagen supera los 2 MB',
+
+    // ⭐ NUEVO: toasts de reset
+    'toast.dataReset': 'Datos eliminados · {jobs} postulaciones · {refs} referidos',
+    'toast.dataResetEmpty': 'No hay datos para eliminar',
 
     'reset.running': 'Reiniciando…',
     'reset.sub': 'Aplicando valores por defecto',
@@ -766,9 +792,18 @@ const translations = {
 
     'config.danger.title': '⚠️ Danger zone',
     'config.danger.desc': "These actions can't be undone.",
-    'config.danger.reset.title': 'Reset all settings',
-    'config.danger.reset.desc': 'Restore roles, states, filters and appearance to their defaults. Not applied until you save.',
+
+    'config.danger.reset.title': 'Reset preferences',
+    'config.danger.reset.desc': 'Restores roles, states, filters and appearance to their defaults. Not applied until you save.',
     'config.danger.reset.button': 'Reset',
+
+    'config.danger.data.title': 'Delete data',
+    'config.danger.data.desc': 'Permanently deletes your applications and referrals. This action cannot be undone.',
+    'config.danger.data.button': 'Delete data',
+
+    'config.danger.all.title': '⚠️ Start over',
+    'config.danger.all.desc': 'Deletes all preferences and all data. Leaves the app as freshly installed.',
+    'config.danger.all.button': 'Reset everything',
 
     'config.backup.title': '💾 Data & backup',
     'config.backup.desc': 'Export a full backup or restore from a file. Useful when switching devices or preventing data loss.',
@@ -833,8 +868,8 @@ const translations = {
     'confirm.deleteRef.title': 'Delete {name}?',
     'confirm.deleteRef.message': 'It will be removed from your referral list.',
     'confirm.deleteRef.confirm': 'Delete',
-    'confirm.resetConfig.title': 'Reset settings?',
-    'confirm.resetConfig.message': 'Your preferences for roles, statuses, filters, and appearance will be cleared.<br>This is <strong>not</strong> applied until you save.',
+    'confirm.resetConfig.title': 'Reset preferences?',
+    'confirm.resetConfig.message': 'Your preferences for roles, statuses, filters and appearance will be reset.<br><strong>Your data will not be touched.</strong><br><br>Changes will apply once you save.',
     'confirm.resetConfig.confirm': 'Reset',
     'confirm.closeRef.title': 'Mark {name} as "Not applicable"?',
     'confirm.closeRef.message': 'This referral no longer applies to your search.',
@@ -848,6 +883,14 @@ const translations = {
     'confirm.importBackup.title': 'Import backup?',
     'confirm.importBackup.message': 'You will replace ALL your current information with the file.<br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
     'confirm.importBackup.confirm': 'Yes, replace',
+
+    'confirm.resetData.title': 'Delete all data?',
+    'confirm.resetData.message': 'You will permanently delete your applications and referrals.<br><strong>Your settings will not be touched.</strong><br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
+    'confirm.resetData.confirm': 'Yes, delete',
+
+    'confirm.resetAll.title': 'Reset everything?',
+    'confirm.resetAll.message': 'You will delete ALL your information: preferences, applications, referrals and theme.<br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
+    'confirm.resetAll.confirm': 'Yes, reset everything',
 
     'toast.savedConfig': 'Settings saved',
     'toast.discardedChanges': 'Changes discarded',
@@ -880,6 +923,9 @@ const translations = {
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
     'toast.profileImageTooBig': 'Image is larger than 2 MB',
+
+    'toast.dataReset': 'Data deleted · {jobs} applications · {refs} referrals',
+    'toast.dataResetEmpty': 'No data to delete',
 
     'reset.running': 'Restarting…',
     'reset.sub': 'Applying default values',
