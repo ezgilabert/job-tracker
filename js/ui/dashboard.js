@@ -2,17 +2,22 @@
 // Dashboard: panel de stats que aparece arriba de las listas
 // de postulaciones y referidos.
 //
-// Soporta 2 estilos configurables:
-//   - 'sparklines'  → 4 cards con mini-gráficos de tendencia
-//   - 'modular'     → card destacada + 4 mini-métricas + panel lateral
+// Soporta 6 estilos configurables:
+//   - 'sparklines' → 4 cards con mini-gráficos de tendencia
+//   - 'modular'    → card destacada + mini-métricas + panel lateral
+//   - 'minimal'    → solo números grandes con label, sin gráficos
+//   - 'compact'    → chips horizontales + barra de distribución
+//   - 'circular'   → anillos de progreso SVG
+//   - 'heatmap'    → calendario de actividad tipo GitHub
 //
 // Uso:
 //   renderDashboard(container, {
-//     style: 'sparklines' | 'modular',
+//     style: 'sparklines' | 'modular' | ... ,
 //     total, active, closed, inProcess, highlight,
 //     highlightLabel, highlightIcon,
 //     trend: { total, active, highlight, closed },
 //     topLabel, topIcon, top: [{ name, count }],
+//     heatmap: [n, n, n, ...],  // 60 números, actividad por día
 //     summary,
 //   });
 // ============================================================
@@ -70,35 +75,37 @@ export function buildWeeklyTrend(items, getDate, weeks = 4) {
   return points;
 }
 
-// ------------------------------------------------------------
-// V3 · Sparklines
-// ------------------------------------------------------------
+/**
+ * Actividad por día para el heatmap. Devuelve un array de N números
+ * (uno por día, empezando por el más viejo).
+ */
+export function buildDailyActivity(items, getDate, days = 60) {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const buckets = new Array(days).fill(0);
+  for (const it of items) {
+    const d = getDate(it);
+    if (!d) continue;
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) continue;
+    dt.setHours(0, 0, 0, 0);
+    const diffDays = Math.floor((now - dt) / 86400000);
+    if (diffDays >= 0 && diffDays < days) {
+      buckets[days - 1 - diffDays]++;
+    }
+  }
+  return buckets;
+}
+
+// ============================================================
+// ESTILO 1 · Sparklines
+// ============================================================
 function renderSparklines(container, data) {
   const cards = [
-    {
-      label: '📋 ' + data.labels.total,
-      num: data.total,
-      values: data.trend.total,
-      color: '#7c5cff', grad: '#a855f7',
-    },
-    {
-      label: '🔥 ' + data.labels.active,
-      num: data.active,
-      values: data.trend.active,
-      color: '#f59e0b', grad: '#f97316',
-    },
-    {
-      label: data.highlightIcon + ' ' + data.highlightLabel,
-      num: data.highlight,
-      values: data.trend.highlight,
-      color: '#10b981', grad: '#14b8a6',
-    },
-    {
-      label: '❌ ' + data.labels.closed,
-      num: data.closed,
-      values: data.trend.closed,
-      color: '#ef4444', grad: '#f87171',
-    },
+    { label: '📋 ' + data.labels.total, num: data.total, values: data.trend.total, color: '#7c5cff', grad: '#a855f7' },
+    { label: '🔥 ' + data.labels.active, num: data.active, values: data.trend.active, color: '#f59e0b', grad: '#f97316' },
+    { label: data.highlightIcon + ' ' + data.highlightLabel, num: data.highlight, values: data.trend.highlight, color: '#10b981', grad: '#14b8a6' },
+    { label: '❌ ' + data.labels.closed, num: data.closed, values: data.trend.closed, color: '#ef4444', grad: '#f87171' },
   ];
 
   const grid = document.createElement('div');
@@ -131,8 +138,7 @@ function renderSparklines(container, data) {
             </linearGradient>
           </defs>
           <path d="${fillPath}" fill="url(#${gid})" opacity="0.18"/>
-          <path d="${path}" fill="none" stroke="${c.color}" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="${path}" fill="none" stroke="${c.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
     `;
@@ -143,17 +149,14 @@ function renderSparklines(container, data) {
   if (data.summary) {
     const strip = document.createElement('div');
     strip.className = 'dash-strip';
-    strip.innerHTML = `
-      <span class="dash-strip-icon">📈</span>
-      <span class="dash-strip-text">${data.summary}</span>
-    `;
+    strip.innerHTML = `<span class="dash-strip-icon">📈</span><span class="dash-strip-text">${data.summary}</span>`;
     container.appendChild(strip);
   }
 }
 
-// ------------------------------------------------------------
-// V4 · Modular (card destacada + mini-stats + panel lateral)
-// ------------------------------------------------------------
+// ============================================================
+// ESTILO 2 · Modular
+// ============================================================
 function renderModular(container, data) {
   const ranks = ['top1', 'top2', 'top3', '', ''];
 
@@ -197,9 +200,7 @@ function renderModular(container, data) {
       </div>
 
       <div class="dash-mod-side">
-        <div class="dash-mod-side-title">
-          ${escapeHtml(data.topIcon)} ${escapeHtml(data.topLabel)}
-        </div>
+        <div class="dash-mod-side-title">${escapeHtml(data.topIcon)} ${escapeHtml(data.topLabel)}</div>
         <div class="dash-mod-empresas">
           ${topItems || `<div class="dash-mod-empty">—</div>`}
         </div>
@@ -208,15 +209,195 @@ function renderModular(container, data) {
   `;
 }
 
-// ------------------------------------------------------------
+// ============================================================
+// ESTILO 3 · Minimal
+// ============================================================
+function renderMinimal(container, data) {
+  const items = [
+    { num: data.total,     label: data.labels.total,     cls: 'total'   },
+    { num: data.active,    label: data.labels.active,    cls: 'active'  },
+    { num: data.inProcess, label: data.labels.inProcess, cls: 'warning' },
+    { num: data.highlight, label: data.highlightLabel,   cls: 'success' },
+    { num: data.closed,    label: data.labels.closed,    cls: 'neutral' },
+  ];
+
+  const el = document.createElement('div');
+  el.className = 'dash-minimal';
+  el.innerHTML = items.map(it => `
+    <div class="dash-minimal-item">
+      <div class="dash-minimal-num ${it.cls}">${it.num}</div>
+      <div class="dash-minimal-label">${escapeHtml(it.label)}</div>
+    </div>
+  `).join('');
+
+  container.appendChild(el);
+}
+
+// ============================================================
+// ESTILO 4 · Compact
+// ============================================================
+function renderCompact(container, data) {
+  const total = data.total || 0;
+
+  const segments = [
+    { key: 'active',    num: data.active,           cls: 's1', label: data.labels.active,    color: 'accent' },
+    { key: 'inProcess', num: data.inProcess,        cls: 's2', label: data.labels.inProcess, color: 'warning' },
+    { key: 'highlight', num: data.highlight,        cls: 's3', label: data.highlightLabel,   color: 'success' },
+    { key: 'closed',    num: data.closed,           cls: 's4', label: data.labels.closed,    color: 'neutral' },
+  ];
+
+  const pct = n => total > 0 ? Math.round((n / total) * 100) : 0;
+
+  const chipsHtml = [
+    { num: data.total, label: data.labels.total, color: '' },
+    { num: data.active, label: data.labels.active, color: 'accent' },
+    { num: data.inProcess, label: data.labels.inProcess, color: 'warning' },
+    { num: data.highlight, label: data.highlightLabel, color: 'success' },
+    { num: data.closed, label: data.labels.closed, color: 'neutral' },
+  ].map(c => `
+    <div class="dash-compact-chip ${c.color}">
+      <span class="num">${c.num}</span> ${escapeHtml(c.label)}
+    </div>
+  `).join('');
+
+  const barHtml = segments
+    .filter(s => s.num > 0)
+    .map(s => `<div class="dash-compact-bar-seg ${s.cls}" style="width: ${pct(s.num)}%;"></div>`)
+    .join('');
+
+  const legendHtml = segments
+    .filter(s => s.num > 0)
+    .map(s => `<span><span class="dot ${s.cls}"></span>${escapeHtml(s.label)} ${pct(s.num)}%</span>`)
+    .join('');
+
+  const el = document.createElement('div');
+  el.className = 'dash-compact';
+  el.innerHTML = `
+    <div class="dash-compact-chips">${chipsHtml}</div>
+    <div class="dash-compact-bar">${barHtml}</div>
+    <div class="dash-compact-legend">${legendHtml}</div>
+  `;
+
+  container.appendChild(el);
+}
+
+// ============================================================
+// ESTILO 5 · Circular
+// ============================================================
+function renderCircular(container, data) {
+  const total = data.total || 0;
+  const RADIUS = 30;
+  const CIRC = 2 * Math.PI * RADIUS; // ≈ 188.5
+
+  const rings = [
+    { num: total,            label: data.labels.total,     color: 'accent',  showPct: false },
+    { num: data.active,      label: data.labels.active,    color: 'accent',  showPct: true },
+    { num: data.inProcess,   label: data.labels.inProcess, color: 'warning', showPct: true },
+    { num: data.highlight,   label: data.highlightLabel,   color: 'success', showPct: true },
+    { num: data.closed,      label: data.labels.closed,    color: 'neutral', showPct: true },
+  ];
+
+  const el = document.createElement('div');
+  el.className = 'dash-circular';
+
+  el.innerHTML = rings.map(r => {
+    const pct = total > 0 ? Math.round((r.num / total) * 100) : 0;
+    // Cuando es "Total", mostramos el anillo completo
+    const fillPct = r.showPct ? pct : 100;
+    const offset = CIRC * (1 - fillPct / 100);
+
+    return `
+      <div class="dash-ring">
+        <div class="dash-ring-svg-wrap">
+          <svg class="dash-ring-svg" viewBox="0 0 70 70">
+            <circle class="dash-ring-bg" cx="35" cy="35" r="${RADIUS}"/>
+            <circle class="dash-ring-fg ${r.color}" cx="35" cy="35" r="${RADIUS}"
+                    style="stroke-dashoffset: ${offset};"/>
+          </svg>
+          <div class="dash-ring-center">
+            ${r.num}
+            <small>${r.showPct ? pct + '%' : escapeHtml(data.labels.total)}</small>
+          </div>
+        </div>
+        <div class="dash-ring-label">${escapeHtml(r.label)}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.appendChild(el);
+}
+
+// ============================================================
+// ESTILO 6 · Heatmap
+// ============================================================
+function renderHeatmap(container, data) {
+  const days = Array.isArray(data.heatmap) ? data.heatmap : [];
+  const max = Math.max(...days, 1);
+
+  const level = n => {
+    if (n <= 0) return 0;
+    const p = n / max;
+    if (p <= 0.25) return 1;
+    if (p <= 0.50) return 2;
+    if (p <= 0.75) return 3;
+    return 4;
+  };
+
+  const cells = days.map(n => `<div class="dash-heatmap-cell l${level(n)}"></div>`).join('');
+
+  const el = document.createElement('div');
+  el.className = 'dash-heatmap';
+
+  el.innerHTML = `
+    <div class="dash-heatmap-top">
+      <div class="dash-heatmap-stats">
+        <div class="dash-heatmap-stat">
+          <div class="num">${data.total}</div>
+          <div class="lbl">${escapeHtml(data.labels.total)}</div>
+        </div>
+        <div class="dash-heatmap-stat">
+          <div class="num accent">${data.active}</div>
+          <div class="lbl">${escapeHtml(data.labels.active)}</div>
+        </div>
+        <div class="dash-heatmap-stat">
+          <div class="num success">${data.highlight}</div>
+          <div class="lbl">${escapeHtml(data.highlightLabel)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-heatmap-grid">${cells}</div>
+
+    <div class="dash-heatmap-legend">
+      <span>—</span>
+      <span class="cell l0"></span>
+      <span class="cell l1"></span>
+      <span class="cell l2"></span>
+      <span class="cell l3"></span>
+      <span class="cell l4"></span>
+      <span>+</span>
+    </div>
+  `;
+
+  container.appendChild(el);
+}
+
+// ============================================================
 // Entry point
-// ------------------------------------------------------------
+// ============================================================
 export function renderDashboard(container, data) {
   if (!container) return;
   container.innerHTML = '';
-  if (data.style === 'modular') {
-    renderModular(container, data);
-  } else {
-    renderSparklines(container, data);
+
+  switch (data.style) {
+    case 'modular':  renderModular(container, data);  break;
+    case 'minimal':  renderMinimal(container, data);  break;
+    case 'compact':  renderCompact(container, data);  break;
+    case 'circular': renderCircular(container, data); break;
+    case 'heatmap':  renderHeatmap(container, data);  break;
+    case 'sparklines':
+    default:
+      renderSparklines(container, data);
+      break;
   }
 }

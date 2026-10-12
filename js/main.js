@@ -7,6 +7,7 @@ import {
   STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
   SAMPLE_JOBS, getDefaultConfig, LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
+  DEFAULT_DASHBOARD_STYLE,
 } from './constants.js';
 import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
@@ -27,10 +28,10 @@ boot();
 async function boot() {
   if (!(await requireSession('./login.html'))) return;
 
+  let lastLang = getLanguage();
+
   // ----------------------------------------------------------
   // Stagger de textos al cambiar idioma.
-  // Se llama SÍNCRONAMENTE después de aplicar el nuevo idioma,
-  // cuando el DOM ya tiene los textos actualizados.
   // ----------------------------------------------------------
   function staggerI18nTexts() {
     const all = document.querySelectorAll('.container [data-i18n]');
@@ -43,7 +44,6 @@ async function boot() {
 
     if (!visible.length) return;
 
-    // 1) Cancelar cualquier animación previa (evita estados pegados)
     visible.forEach(el => {
       el.classList.remove('i18n-stagger');
       if (typeof el.getAnimations === 'function') {
@@ -53,17 +53,13 @@ async function boot() {
       }
     });
 
-    // 2) Un solo reflow global antes de reanimar.
-    //    Esto garantiza que el navegador registre el estado "sin animación".
     void document.body.offsetWidth;
 
-    // 3) Aplicar delays y la clase de animación.
     visible.forEach((el, i) => {
       el.style.animationDelay = Math.min(i * 15, 400) + 'ms';
       el.classList.add('i18n-stagger');
     });
 
-    // 4) Limpieza después de que terminen todas las animaciones.
     const maxDelay = Math.min((visible.length - 1) * 15, 400);
     const totalMs = 350 + maxDelay + 120;
 
@@ -220,9 +216,6 @@ async function boot() {
       });
     }
 
-    // ⭐ CAMBIO: el stagger se dispara acá, síncronamente después del update.
-    // Como configStore.update() corre el subscriber que hace applyI18n() +
-    // dispatchEvent('i18n-changed'), cuando retorna el DOM ya está actualizado.
     if (langBtn) {
       langBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -299,9 +292,30 @@ async function boot() {
     },
   });
 
+  // ⭐ CAMBIO: configStore con migrate para dashboardStyle → dashboardStyleJobs/Refs
   const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
     version: CONFIG_VERSION,
     seed: () => getDefaultConfig(),
+    migrate: (data) => {
+      if (!data || typeof data !== 'object') return getDefaultConfig();
+
+      const defaults = getDefaultConfig();
+      const out = { ...defaults, ...data };
+      out.profile = { ...defaults.profile, ...(data.profile || {}) };
+
+      // Migración: si venía del modelo viejo (una sola key `dashboardStyle`),
+      // la usamos como base para ambos.
+      if (data.dashboardStyle && !data.dashboardStyleJobs && !data.dashboardStyleRefs) {
+        out.dashboardStyleJobs = data.dashboardStyle;
+        out.dashboardStyleRefs = data.dashboardStyle;
+      }
+      if (!out.dashboardStyleJobs) out.dashboardStyleJobs = DEFAULT_DASHBOARD_STYLE;
+      if (!out.dashboardStyleRefs) out.dashboardStyleRefs = DEFAULT_DASHBOARD_STYLE;
+
+      delete out.dashboardStyle;
+
+      return out;
+    },
   });
 
   // ----------------------------------------------------------
@@ -356,9 +370,14 @@ async function boot() {
     try { sessionStorage.removeItem('jobTrackerFreshLogin'); } catch {}
   });
 
-  // Listener final: solo re-renders. El stagger lo maneja langToggle.
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
+
+    const current = getLanguage();
+    if (lastLang !== null && lastLang !== current) {
+      // El stagger ya se dispara desde langToggle, así que no lo repetimos acá.
+    }
+    lastLang = current;
   });
 }

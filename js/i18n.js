@@ -238,6 +238,7 @@ const translations = {
     'config.tab.estados': 'Estados iniciales',
     'config.tab.filtros': 'Filtros',
     'config.tab.apariencia': 'Apariencia',
+    'config.tab.dashboard': 'Dashboard',
     'config.tab.perfil': 'Perfil',
     'config.tab.idioma': 'Idioma',
     'config.tab.advanced': 'Avanzado',
@@ -263,10 +264,23 @@ const translations = {
     'config.bg.desc': 'Elegí el estilo de fondo que más te guste.',
     'config.dashboard.title': 'Estilo del dashboard',
     'config.dashboard.desc': 'Elegí cómo querés que se muestre el panel de estadísticas arriba de cada lista.',
+    'config.dashboard.jobs.title': 'Postulaciones',
+    'config.dashboard.jobs.desc': 'Estilo del panel que aparece arriba de la lista de postulaciones.',
+    'config.dashboard.refs.title': 'Referidos',
+    'config.dashboard.refs.desc': 'Estilo del panel que aparece arriba de la lista de referidos. Puede ser distinto al de postulaciones.',
+    'config.dashboard.new': 'Nuevo',
     'config.dashboard.sparklines': 'Tendencia',
     'config.dashboard.sparklinesDesc': 'Cards con mini-gráficos de evolución',
     'config.dashboard.modular': 'Destacado',
     'config.dashboard.modularDesc': 'Card grande + métricas + panel lateral',
+    'config.dashboard.minimal': 'Minimal',
+    'config.dashboard.minimalDesc': 'Solo números, sin gráficos',
+    'config.dashboard.compact': 'Compacto',
+    'config.dashboard.compactDesc': 'Chips + barra de progreso',
+    'config.dashboard.circular': 'Circular',
+    'config.dashboard.circularDesc': 'Anillos de progreso',
+    'config.dashboard.heatmap': 'Heatmap',
+    'config.dashboard.heatmapDesc': 'Calendario de actividad',
     'config.lang.title': 'Idioma de la interfaz',
     'config.lang.desc': 'Elegí el idioma de los textos de la app. Los datos guardados no se modifican.',
     'config.reset': '↺ Restablecer',
@@ -284,18 +298,12 @@ const translations = {
 
     'config.danger.title': '⚠️ Zona de peligro',
     'config.danger.desc': 'Estas acciones no se pueden deshacer.',
-
-    // ⭐ CAMBIO: textos del reset de preferencias (antes "toda la configuración")
     'config.danger.reset.title': 'Restablecer preferencias',
     'config.danger.reset.desc': 'Vuelve puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
     'config.danger.reset.button': 'Restablecer',
-
-    // ⭐ NUEVO: borrar datos
     'config.danger.data.title': 'Borrar datos',
     'config.danger.data.desc': 'Elimina permanentemente postulaciones y referidos. Esta acción no se puede deshacer.',
     'config.danger.data.button': 'Borrar datos',
-
-    // ⭐ NUEVO: reset total
     'config.danger.all.title': '⚠️ Empezar de cero',
     'config.danger.all.desc': 'Borra todas las preferencias y todos los datos. Deja la app como recién instalada.',
     'config.danger.all.button': 'Restablecer todo',
@@ -378,13 +386,9 @@ const translations = {
     'confirm.importBackup.title': '¿Importar respaldo?',
     'confirm.importBackup.message': 'Vas a reemplazar TODA tu información actual con el archivo.<br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
     'confirm.importBackup.confirm': 'Sí, reemplazar',
-
-    // ⭐ NUEVO: confirm de borrar datos
     'confirm.resetData.title': '¿Borrar todos los datos?',
     'confirm.resetData.message': 'Vas a eliminar permanentemente tus postulaciones y referidos.<br><strong>Tu configuración no se toca.</strong><br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
     'confirm.resetData.confirm': 'Sí, borrar',
-
-    // ⭐ NUEVO: confirm de restablecer todo
     'confirm.resetAll.title': '¿Restablecer todo?',
     'confirm.resetAll.message': 'Vas a borrar TODA tu información: preferencias, postulaciones, referidos y tema.<br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
     'confirm.resetAll.confirm': 'Sí, restablecer todo',
@@ -420,8 +424,6 @@ const translations = {
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
     'toast.profileImageTooBig': 'La imagen supera los 2 MB',
-
-    // ⭐ NUEVO: toasts de reset
     'toast.dataReset': 'Datos eliminados · {jobs} postulaciones · {refs} referidos',
     'toast.dataResetEmpty': 'No hay datos para eliminar',
 
@@ -746,6 +748,7 @@ const translations = {
     'config.tab.estados': 'Initial statuses',
     'config.tab.filtros': 'Filters',
     'config.tab.apariencia': 'Appearance',
+    'config.tab.dashboard': 'Dashboard',
     'config.tab.perfil': 'Profile',
     'config.tab.idioma': 'Language',
     'config.tab.advanced': 'Advanced',
@@ -771,10 +774,23 @@ const translations = {
     'config.bg.desc': 'Pick the background style you like the most.',
     'config.dashboard.title': 'Dashboard style',
     'config.dashboard.desc': 'Choose how the stats panel looks above each list.',
+    'config.dashboard.jobs.title': 'Applications',
+    'config.dashboard.jobs.desc': 'Style of the panel shown above the applications list.',
+    'config.dashboard.refs.title': 'Referrals',
+    'config.dashboard.refs.desc': 'Style of the panel shown above the referrals list. Can be different from applications.',
+    'config.dashboard.new': 'New',
     'config.dashboard.sparklines': 'Trend',
     'config.dashboard.sparklinesDesc': 'Cards with mini trend graphs',
     'config.dashboard.modular': 'Featured',
     'config.dashboard.modularDesc': 'Big card + metrics + side panel',
+    'config.dashboard.minimal': 'Minimal',
+    'config.dashboard.minimalDesc': 'Just numbers, no graphs',
+    'config.dashboard.compact': 'Compact',
+    'config.dashboard.compactDesc': 'Chips + progress bar',
+    'config.dashboard.circular': 'Circular',
+    'config.dashboard.circularDesc': 'Progress rings',
+    'config.dashboard.heatmap': 'Heatmap',
+    'config.dashboard.heatmapDesc': 'Activity calendar',
     'config.lang.title': 'Interface language',
     'config.lang.desc': 'Choose the language of the app texts. Saved data is not modified.',
     'config.reset': '↺ Reset',
@@ -792,15 +808,12 @@ const translations = {
 
     'config.danger.title': '⚠️ Danger zone',
     'config.danger.desc': "These actions can't be undone.",
-
     'config.danger.reset.title': 'Reset preferences',
     'config.danger.reset.desc': 'Restores roles, states, filters and appearance to their defaults. Not applied until you save.',
     'config.danger.reset.button': 'Reset',
-
     'config.danger.data.title': 'Delete data',
     'config.danger.data.desc': 'Permanently deletes your applications and referrals. This action cannot be undone.',
     'config.danger.data.button': 'Delete data',
-
     'config.danger.all.title': '⚠️ Start over',
     'config.danger.all.desc': 'Deletes all preferences and all data. Leaves the app as freshly installed.',
     'config.danger.all.button': 'Reset everything',
@@ -883,11 +896,9 @@ const translations = {
     'confirm.importBackup.title': 'Import backup?',
     'confirm.importBackup.message': 'You will replace ALL your current information with the file.<br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
     'confirm.importBackup.confirm': 'Yes, replace',
-
     'confirm.resetData.title': 'Delete all data?',
     'confirm.resetData.message': 'You will permanently delete your applications and referrals.<br><strong>Your settings will not be touched.</strong><br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
     'confirm.resetData.confirm': 'Yes, delete',
-
     'confirm.resetAll.title': 'Reset everything?',
     'confirm.resetAll.message': 'You will delete ALL your information: preferences, applications, referrals and theme.<br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
     'confirm.resetAll.confirm': 'Yes, reset everything',
@@ -923,7 +934,6 @@ const translations = {
     'toast.advanceTo': '{name}: {estado}',
     'toast.backTo': '{name}: {estado}',
     'toast.profileImageTooBig': 'Image is larger than 2 MB',
-
     'toast.dataReset': 'Data deleted · {jobs} applications · {refs} referrals',
     'toast.dataResetEmpty': 'No data to delete',
 

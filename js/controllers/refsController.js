@@ -9,7 +9,7 @@ import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import { uid, highlightAndScroll, escapeHtml, cloneArray } from '../utils.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
-import { renderDashboard, buildWeeklyTrend } from '../ui/dashboard.js';
+import { renderDashboard, buildWeeklyTrend, buildDailyActivity } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n.js';
 
 /**
@@ -42,7 +42,8 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
     const refs = refsStore.get();
     const cfg = configStore.get();
-    const style = cfg.dashboardStyle || 'sparklines';
+    // ⭐ CAMBIO: leer la nueva key con fallback a la vieja
+    const style = cfg.dashboardStyleRefs || cfg.dashboardStyle || 'sparklines';
 
     const total = refs.length;
     const activos = refs.filter(r => !isRefClosed(r.estado)).length;
@@ -66,6 +67,9 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const trendHighlight = buildWeeklyTrend(refs.filter(r => r.estado === 'Contratado'), getDate);
     const trendClosed = buildWeeklyTrend(refs.filter(r => r.estado === 'No aplica'), getDate);
 
+    // ⭐ NUEVO: datos para heatmap
+    const heatmap = buildDailyActivity(refs, getDate, 60);
+
     renderDashboard(container, {
       style,
       total,
@@ -88,6 +92,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
         highlight: trendHighlight,
         closed: trendClosed,
       },
+      heatmap,
       topLabel: t('dash.refs.top'),
       topIcon: '🤝',
       top,

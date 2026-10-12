@@ -133,11 +133,60 @@ export function applyBackground(bgId) {
 }
 
 // ============================================================
-// Dashboard styles
+// ⭐ CAMBIO: Dashboard styles — ahora 6 opciones
 // ============================================================
 
-export const DASHBOARD_STYLES = ['sparklines', 'modular'];
+export const DASHBOARD_STYLES = [
+  'sparklines',
+  'modular',
+  'minimal',
+  'compact',
+  'circular',
+  'heatmap',
+];
+
 export const DEFAULT_DASHBOARD_STYLE = 'sparklines';
+
+// Metadata para renderizar el selector en configuración.
+// Los `labelKey` y `descKey` apuntan a i18n.
+export const DASHBOARD_STYLE_META = [
+  {
+    id: 'sparklines',
+    labelKey: 'config.dashboard.sparklines',
+    descKey:  'config.dashboard.sparklinesDesc',
+    preview:  'dash-prev-spark',
+  },
+  {
+    id: 'modular',
+    labelKey: 'config.dashboard.modular',
+    descKey:  'config.dashboard.modularDesc',
+    preview:  'dash-prev-mod',
+  },
+  {
+    id: 'minimal',
+    labelKey: 'config.dashboard.minimal',
+    descKey:  'config.dashboard.minimalDesc',
+    preview:  'dash-prev-minimal',
+  },
+  {
+    id: 'compact',
+    labelKey: 'config.dashboard.compact',
+    descKey:  'config.dashboard.compactDesc',
+    preview:  'dash-prev-compact',
+  },
+  {
+    id: 'circular',
+    labelKey: 'config.dashboard.circular',
+    descKey:  'config.dashboard.circularDesc',
+    preview:  'dash-prev-circular',
+  },
+  {
+    id: 'heatmap',
+    labelKey: 'config.dashboard.heatmap',
+    descKey:  'config.dashboard.heatmapDesc',
+    preview:  'dash-prev-heatmap',
+  },
+];
 
 // ============================================================
 // Roles
@@ -234,7 +283,9 @@ export function getDefaultConfig() {
     lang: DEFAULT_LANG,
     logo: DEFAULT_LOGO,
     background: DEFAULT_BACKGROUND,
-    dashboardStyle: DEFAULT_DASHBOARD_STYLE,
+    // ⭐ CAMBIO: estilos de dashboard separados para jobs y refs
+    dashboardStyleJobs: DEFAULT_DASHBOARD_STYLE,
+    dashboardStyleRefs: DEFAULT_DASHBOARD_STYLE,
     profile: {
       nombre: '',
       apellido: '',
@@ -278,7 +329,8 @@ export const STORAGE_KEYS = {
 };
 
 export const STORAGE_VERSION = 3;
-export const CONFIG_VERSION = 1;
+// ⭐ CAMBIO: subimos la versión del config para forzar la migración
+export const CONFIG_VERSION = 2;
 
 // ============================================================
 // Backup / Import

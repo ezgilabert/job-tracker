@@ -10,7 +10,7 @@ import {
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
-  DASHBOARD_STYLES, DEFAULT_DASHBOARD_STYLE,
+  DASHBOARD_STYLES, DEFAULT_DASHBOARD_STYLE, DASHBOARD_STYLE_META,
   NO_PUESTO_VALUE,
   BACKUP_APP_ID, BACKUP_VERSION,
   STORAGE_KEYS,
@@ -125,7 +125,8 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     if (!draft.lang) draft.lang = DEFAULT_LANG;
     if (!draft.background) draft.background = DEFAULT_BACKGROUND;
-    if (!draft.dashboardStyle) draft.dashboardStyle = DEFAULT_DASHBOARD_STYLE;
+    if (!draft.dashboardStyleJobs) draft.dashboardStyleJobs = DEFAULT_DASHBOARD_STYLE;
+    if (!draft.dashboardStyleRefs) draft.dashboardStyleRefs = DEFAULT_DASHBOARD_STYLE;
 
     preferredDefaultState = draft.estadoInicialDefault || null;
 
@@ -154,7 +155,8 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (!next.logo) next.logo = DEFAULT_LOGO;
     if (!next.lang) next.lang = DEFAULT_LANG;
     if (!next.background) next.background = DEFAULT_BACKGROUND;
-    if (!next.dashboardStyle) next.dashboardStyle = DEFAULT_DASHBOARD_STYLE;
+    if (!next.dashboardStyleJobs) next.dashboardStyleJobs = DEFAULT_DASHBOARD_STYLE;
+    if (!next.dashboardStyleRefs) next.dashboardStyleRefs = DEFAULT_DASHBOARD_STYLE;
     configStore.update(() => next);
     draft = cloneConfig(configStore.get());
     unsavedBadge.classList.remove('visible');
@@ -215,8 +217,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // ⭐ CAMBIO: Restablecer preferencias
-  //   Solo toca la config. NO borra datos.
+  // Restablecer preferencias (solo config)
   // ----------------------------------------------------------
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
@@ -244,7 +245,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // ⭐ NUEVO: Borrar datos (jobs + refs). NO toca la config.
+  // Borrar datos (jobs + refs). NO toca la config.
   // ----------------------------------------------------------
   document.getElementById('resetDataBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -273,7 +274,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // ⭐ NUEVO: Restablecer TODO (config + datos + tema).
+  // Restablecer TODO (config + datos + tema).
   // ----------------------------------------------------------
   document.getElementById('resetAllBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -287,8 +288,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // Limpiamos las keys del Job Tracker. NO tocamos:
-    // - jobTrackerSession / install secret (los maneja session.js)
     try {
       localStorage.removeItem(STORAGE_KEYS.JOBS);
       localStorage.removeItem(STORAGE_KEYS.REFS);
@@ -296,7 +295,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       localStorage.removeItem(STORAGE_KEYS.THEME);
     } catch (_) { /* noop */ }
 
-    // Reseteamos el draft local por las dudas (aunque vamos a hacer reload)
     draft = getDefaultConfig();
     closeDirect();
     unsavedModal.classList.remove('open');
@@ -328,7 +326,8 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     renderFilters();
     renderLogos();
     renderBackgrounds();
-    renderDashboards();
+    renderDashboardsJobs();
+    renderDashboardsRefs();
     renderLangs();
     renderPerfil();
     renderBackupStats();
@@ -702,59 +701,63 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Appearance (dashboard style)
+  // Panel: Dashboard (jobs + refs)
   // ------------------------------------------------------------
-  function renderDashboards() {
-    const current = draft.dashboardStyle || DEFAULT_DASHBOARD_STYLE;
-    const container = document.getElementById('configDash');
+  const NEW_STYLES = ['minimal', 'compact', 'circular', 'heatmap'];
+
+  function renderDashboardsJobs() {
+    const container = document.getElementById('configDashJobs');
     if (!container) return;
+    renderDashGrid(container, 'dashboardStyleJobs', draft.dashboardStyleJobs || DEFAULT_DASHBOARD_STYLE);
+  }
 
-    const options = [
-      {
-        id: 'sparklines',
-        label: t('config.dashboard.sparklines'),
-        desc: t('config.dashboard.sparklinesDesc'),
-        preview: 'dash-prev-spark',
-      },
-      {
-        id: 'modular',
-        label: t('config.dashboard.modular'),
-        desc: t('config.dashboard.modularDesc'),
-        preview: 'dash-prev-mod',
-      },
-    ];
+  function renderDashboardsRefs() {
+    const container = document.getElementById('configDashRefs');
+    if (!container) return;
+    renderDashGrid(container, 'dashboardStyleRefs', draft.dashboardStyleRefs || DEFAULT_DASHBOARD_STYLE);
+  }
 
-    container.innerHTML = options.map(opt => {
+  function renderDashGrid(container, field, current) {
+    container.innerHTML = DASHBOARD_STYLE_META.map(opt => {
       const isSelected = opt.id === current;
-      const inner = opt.id === 'modular'
-        ? `<div class="dash-prev-side"></div>`
+      const badge = NEW_STYLES.includes(opt.id)
+        ? `<span class="config-dash-badge-new">${escapeHtml(t('config.dashboard.new'))}</span>`
         : '';
       return `
         <button type="button"
                 class="config-dash-option ${isSelected ? 'selected' : ''}"
+                data-field="${field}"
                 data-dash="${escapeHtml(opt.id)}">
-          <div class="config-dash-preview ${opt.preview}">${inner}</div>
+          <div class="config-dash-preview ${opt.preview}"></div>
           <div class="config-dash-info">
-            <strong>${escapeHtml(opt.label)}</strong>
-            <span>${escapeHtml(opt.desc)}</span>
+            <strong>${escapeHtml(t(opt.labelKey))}${badge}</strong>
+            <span>${escapeHtml(t(opt.descKey))}</span>
           </div>
-          <div class="config-dash-check"></div>
         </button>
       `;
     }).join('');
   }
 
-  document.getElementById('configDash').addEventListener('click', (e) => {
+  function handleDashClick(e) {
     const btn = e.target.closest('.config-dash-option');
     if (!btn) return;
     const id = btn.dataset.dash;
+    const field = btn.dataset.field;
     if (!DASHBOARD_STYLES.includes(id)) return;
-    if ((draft.dashboardStyle || DEFAULT_DASHBOARD_STYLE) !== id) {
-      draft.dashboardStyle = id;
-      renderDashboards();
-      updateBadge();
-    }
-  });
+    if (draft[field] === id) return;
+
+    draft[field] = id;
+
+    if (field === 'dashboardStyleJobs') renderDashboardsJobs();
+    else if (field === 'dashboardStyleRefs') renderDashboardsRefs();
+
+    updateBadge();
+  }
+
+  const dashJobsEl = document.getElementById('configDashJobs');
+  const dashRefsEl = document.getElementById('configDashRefs');
+  if (dashJobsEl) dashJobsEl.addEventListener('click', handleDashClick);
+  if (dashRefsEl) dashRefsEl.addEventListener('click', handleDashClick);
 
   // ------------------------------------------------------------
   // Panel: Language

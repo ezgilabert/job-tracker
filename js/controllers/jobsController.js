@@ -11,7 +11,7 @@ import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
 import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
-import { renderDashboard, buildWeeklyTrend } from '../ui/dashboard.js';
+import { renderDashboard, buildWeeklyTrend, buildDailyActivity } from '../ui/dashboard.js';
 import {
   computeStats, filterJobs, sortJobs, isClosed,
 } from '../selectors.js';
@@ -86,7 +86,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     const jobs = jobsStore.get();
     const cfg = configStore.get();
-    const style = cfg.dashboardStyle || 'sparklines';
+    // ⭐ CAMBIO: leer la nueva key con fallback a la vieja
+    const style = cfg.dashboardStyleJobs || cfg.dashboardStyle || 'sparklines';
 
     const stats = computeStats(jobs);
     const ofertas = stats.ofertas;
@@ -111,6 +112,9 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const trendHighlight = buildWeeklyTrend(jobs.filter(j => j.estado === 'Oferta'), getDate);
     const trendClosed = buildWeeklyTrend(jobs.filter(j => isClosed(j.estado)), getDate);
 
+    // ⭐ NUEVO: datos para heatmap
+    const heatmap = buildDailyActivity(jobs, getDate, 60);
+
     renderDashboard(container, {
       style,
       total,
@@ -133,6 +137,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
         highlight: trendHighlight,
         closed: trendClosed,
       },
+      heatmap,
       topLabel: t('dash.jobs.top'),
       topIcon: '🏢',
       top,
@@ -275,13 +280,12 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   salaryHourlyCheckbox.addEventListener('change', () => salaryInput.reset());
 
   // ----------------------------------------------------------
-  // ContactLinkPicker (chips + link de contacto + validación)
+  // ContactLinkPicker
   // ----------------------------------------------------------
   const contactoLinkPicker = new ContactLinkPicker(
     document.getElementById('contactoLinkPicker'),
     { value: { tipo: 'linkedin', link: '' } }
   );
-  // Inyectamos la función de traducción para los mensajes de error.
   contactoLinkPicker.translate = t;
 
   // ----------------------------------------------------------
@@ -316,7 +320,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       return;
     }
 
-    // ⭐ Validación del link de contacto
     const contactValidation = contactoLinkPicker.validate();
     if (!contactValidation.valid) {
       contactoLinkPicker.markTouched();
