@@ -27,49 +27,61 @@ boot();
 async function boot() {
   if (!(await requireSession('./login.html'))) return;
 
-  // Guardamos el idioma al arrancar para no animar en la carga inicial
-  let lastLang = getLanguage();
-
   // ----------------------------------------------------------
-  // Stagger de textos al cambiar idioma
+  // Stagger de textos al cambiar idioma.
+  // Se llama SÍNCRONAMENTE después de aplicar el nuevo idioma,
+  // cuando el DOM ya tiene los textos actualizados.
   // ----------------------------------------------------------
   function staggerI18nTexts() {
     const all = document.querySelectorAll('.container [data-i18n]');
     const visible = [];
 
     all.forEach(el => {
-      if (el.dataset.i18nAnimating === '1') return;
       const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) visible.push(el);
     });
 
     if (!visible.length) return;
 
-    visible.forEach((el, i) => {
-      el.dataset.i18nAnimating = '1';
-      el.style.animation = 'none';
-      void el.offsetWidth;
-      el.style.animation =
-        `i18nStagger 0.35s cubic-bezier(0.22, 1, 0.36, 1) ${Math.min(i * 15, 400)}ms both`;
+    // 1) Cancelar cualquier animación previa (evita estados pegados)
+    visible.forEach(el => {
+      el.classList.remove('i18n-stagger');
+      if (typeof el.getAnimations === 'function') {
+        el.getAnimations().forEach(a => {
+          try { a.cancel(); } catch (_) { /* noop */ }
+        });
+      }
     });
+
+    // 2) Un solo reflow global antes de reanimar.
+    //    Esto garantiza que el navegador registre el estado "sin animación".
+    void document.body.offsetWidth;
+
+    // 3) Aplicar delays y la clase de animación.
+    visible.forEach((el, i) => {
+      el.style.animationDelay = Math.min(i * 15, 400) + 'ms';
+      el.classList.add('i18n-stagger');
+    });
+
+    // 4) Limpieza después de que terminen todas las animaciones.
+    const maxDelay = Math.min((visible.length - 1) * 15, 400);
+    const totalMs = 350 + maxDelay + 120;
 
     setTimeout(() => {
       visible.forEach(el => {
-        el.style.animation = '';
-        delete el.dataset.i18nAnimating;
+        el.classList.remove('i18n-stagger');
+        el.style.animationDelay = '';
       });
-    }, 900);
+    }, totalMs);
   }
 
   // ----------------------------------------------------------
-  // ⭐ CAMBIO: ripple radial para el cambio de tema
-  // El degradé vive en el CSS (.theme-ripple).
+  // Ripple radial para el cambio de tema
   // ----------------------------------------------------------
   function triggerThemeRipple(x, y, nextTheme, onPeak) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    // Radio necesario para cubrir toda la pantalla desde (x, y)
     const dx = Math.max(x, vw - x);
     const dy = Math.max(y, vh - y);
     const radius = Math.sqrt(dx * dx + dy * dy) * 1.05;
@@ -86,12 +98,10 @@ async function boot() {
     void ripple.offsetWidth;
     ripple.classList.add('run');
 
-    // A ~45% de la animación (cuando el velo ya cubre bien), cambiamos el tema
     setTimeout(() => {
       if (typeof onPeak === 'function') onPeak();
     }, 380);
 
-    // Eliminamos el ripple cuando termina la animación
     setTimeout(() => {
       ripple.remove();
     }, 900);
@@ -111,7 +121,6 @@ async function boot() {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'light' ? 'dark' : 'light';
 
-      // Coordenadas del click. Fallback al centro del botón (para teclado/Enter)
       const rect = btn.getBoundingClientRect();
       const x = (typeof e.clientX === 'number' && e.clientX > 0)
         ? e.clientX
@@ -211,13 +220,16 @@ async function boot() {
       });
     }
 
-    // Toggle de idioma. El stagger se dispara desde i18n-changed.
+    // ⭐ CAMBIO: el stagger se dispara acá, síncronamente después del update.
+    // Como configStore.update() corre el subscriber que hace applyI18n() +
+    // dispatchEvent('i18n-changed'), cuando retorna el DOM ya está actualizado.
     if (langBtn) {
       langBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const current = getLanguage();
         const next = current === 'es' ? 'en' : 'es';
         configStore.update(c => ({ ...c, lang: next }));
+        staggerI18nTexts();
       });
     }
 
@@ -344,16 +356,9 @@ async function boot() {
     try { sessionStorage.removeItem('jobTrackerFreshLogin'); } catch {}
   });
 
-  // Listener final: rerender + stagger de textos.
+  // Listener final: solo re-renders. El stagger lo maneja langToggle.
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
-
-    // Animamos stagger solo si realmente cambió el idioma
-    const current = getLanguage();
-    if (lastLang !== null && lastLang !== current) {
-      requestAnimationFrame(() => staggerI18nTexts());
-    }
-    lastLang = current;
   });
 }

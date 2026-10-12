@@ -17,29 +17,71 @@
   .wf-btn-secondary, .wf-btn-skip { width: 100%; }
   .job .drag-handle { opacity: 0.6; }
 
-  /* Config modal: sidebar becomes horizontal scroll on top */
+  /* ==========================================================
+     Config modal: sidebar becomes a 4-column grid of icons
+     ========================================================== */
   .config-modal { padding: 1.25rem; }
   .config-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  .config-nav {
-    flex-direction: row;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    position: static;
-    padding: 0.35rem;
-  }
-  .config-nav::-webkit-scrollbar { display: none; }
-  .config-tab {
-    width: auto;
-    flex-shrink: 0;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.78rem;
-  }
-  .config-tab-icon { width: auto; }
 
+  /* Nav como grid de íconos */
+  .config-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(58px, auto);
+    gap: 0.35rem;
+    padding: 0.4rem;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: static;
+    align-self: auto;
+    overflow: visible;
+  }
+
+  /* Los separadores verticales del desktop no aplican en el grid */
+  .config-nav-sep { display: none; }
+
+  /* Tab en formato celda de grid: ícono arriba, label abajo */
+  .config-tab {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.5rem 0.25rem;
+    border-radius: 9px;
+    width: 100%;
+    height: 100%;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .config-tab-icon {
+    width: auto;
+    font-size: 1.05rem;
+    line-height: 1;
+    margin-bottom: 0.05rem;
+  }
+
+  .config-tab-label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 0.6rem;
+  }
+
+  .config-tab.active {
+    box-shadow: 0 3px 10px var(--accent-glow);
+  }
+
+  /* ==========================================================
+     Resto del config: sin cambios
+     ========================================================== */
   .config-checks { grid-template-columns: 1fr; }
   .config-actions { flex-direction: column-reverse; align-items: stretch; }
   .config-actions .btn { width: 100%; }
