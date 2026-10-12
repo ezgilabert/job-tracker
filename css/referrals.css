@@ -1,5 +1,5 @@
 /* ============================================================
-   Referrals: sección completa de referidos + tags en jobs
+   Referrals: cards + tags de referidos en jobs
    ============================================================ */
 
 .ref-counter {
@@ -15,29 +15,6 @@
   font-size: 0.85rem;
   font-weight: 700;
   border: 1px solid var(--accent-border);
-}
-
-.referidos-body {
-  max-height: 8000px;
-  overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-  opacity: 1;
-}
-
-.referidos-body.collapsed {
-  max-height: 0;
-  opacity: 0;
-}
-
-.ref-form-card {
-  margin-bottom: 1.5rem;
-}
-
-.ref-form-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 1.1rem;
-  color: var(--text);
 }
 
 .ref-chips {
@@ -72,6 +49,7 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
+/* Referral status chips */
 .ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
   background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
 }
@@ -477,7 +455,6 @@
   color: white;
 }
 
-/* Empresas vinculadas */
 .ref-empresas-wrap {
   display: flex;
   flex-wrap: wrap;
@@ -605,7 +582,7 @@
   .ref-search { max-width: 100%; }
 }
 
-/* Referral tags on jobs */
+/* ===== Referral tags on jobs ===== */
 .job-refs {
   display: flex;
   flex-wrap: wrap;
@@ -629,7 +606,10 @@
   gap: 0.3rem;
 }
 
-.job-refs-label::before { content: '🤝'; font-size: 0.85rem; }
+.job-refs-label::before {
+  content: '🤝';
+  font-size: 0.85rem;
+}
 
 .job-ref-chip {
   padding: 0.3rem 0.7rem;

@@ -2,6 +2,10 @@
 // Dashboard: panel de stats que aparece arriba de las listas
 // de postulaciones y referidos.
 //
+// Cada dashboard se envuelve en una card con header propio
+// (ícono + título) que lo identifica visualmente como
+// "Postulaciones" o "Referidos".
+//
 // Soporta 6 estilos configurables:
 //   - 'sparklines' → 4 cards con mini-gráficos de tendencia
 //   - 'modular'    → card destacada + mini-métricas + panel lateral
@@ -13,11 +17,14 @@
 // Uso:
 //   renderDashboard(container, {
 //     style: 'sparklines' | 'modular' | ... ,
+//     kind: 'jobs' | 'refs',           // ← determina color + clase
+//     icon: '📋',                      // ← ícono del header
+//     label: 'Postulaciones',          // ← título del header
 //     total, active, closed, inProcess, highlight,
 //     highlightLabel, highlightIcon,
 //     trend: { total, active, highlight, closed },
 //     topLabel, topIcon, top: [{ name, count }],
-//     heatmap: [n, n, n, ...],  // 60 números, actividad por día
+//     heatmap: [n, n, n, ...],
 //     summary,
 //   });
 // ============================================================
@@ -138,7 +145,8 @@ function renderSparklines(container, data) {
             </linearGradient>
           </defs>
           <path d="${fillPath}" fill="url(#${gid})" opacity="0.18"/>
-          <path d="${path}" fill="none" stroke="${c.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="${path}" fill="none" stroke="${c.color}" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
     `;
@@ -389,15 +397,37 @@ export function renderDashboard(container, data) {
   if (!container) return;
   container.innerHTML = '';
 
+  const kind = data.kind === 'refs' ? 'refs' : 'jobs';
+  const icon = data.icon || '📊';
+  const label = data.label || '';
+
+  // Wrapper con header propio
+  const wrapper = document.createElement('div');
+  wrapper.className = `dash-labeled ${kind}`;
+
+  const header = document.createElement('div');
+  header.className = 'dash-labeled-header';
+  header.innerHTML = `
+    <div class="dash-labeled-icon">${escapeHtml(icon)}</div>
+    <span class="dash-labeled-title">${escapeHtml(label)}</span>
+  `;
+  wrapper.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'dash-labeled-body';
+
   switch (data.style) {
-    case 'modular':  renderModular(container, data);  break;
-    case 'minimal':  renderMinimal(container, data);  break;
-    case 'compact':  renderCompact(container, data);  break;
-    case 'circular': renderCircular(container, data); break;
-    case 'heatmap':  renderHeatmap(container, data);  break;
+    case 'modular':  renderModular(body, data);  break;
+    case 'minimal':  renderMinimal(body, data);  break;
+    case 'compact':  renderCompact(body, data);  break;
+    case 'circular': renderCircular(body, data); break;
+    case 'heatmap':  renderHeatmap(body, data);  break;
     case 'sparklines':
     default:
-      renderSparklines(container, data);
+      renderSparklines(body, data);
       break;
   }
+
+  wrapper.appendChild(body);
+  container.appendChild(wrapper);
 }

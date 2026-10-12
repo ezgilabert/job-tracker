@@ -247,7 +247,6 @@
       <div class="section-card-body">
         <form id="jobForm">
 
-          <!-- Sección 1: Datos del puesto -->
           <div class="v3-section">
             <div class="sec-head">
               <div class="sec-icon">💼</div>
@@ -294,7 +293,6 @@
             </div>
           </div>
 
-          <!-- Sección 2: Salario y modalidad -->
           <div class="v3-section">
             <div class="sec-head">
               <div class="sec-icon">💰</div>
@@ -354,7 +352,6 @@
             </div>
           </div>
 
-          <!-- Sección 3: Contacto y notas -->
           <div class="v3-section">
             <div class="sec-head">
               <div class="sec-icon">📝</div>
@@ -459,6 +456,94 @@
     </div>
   </section>
 
+  <!-- ===== Dashboard de referidos ===== -->
+  <div class="dash-container" id="refsDashboard"></div>
+
+  <!-- ===== SECCIÓN: Nuevo referido ===== -->
+  <section class="section-card">
+    <div class="section-card-header">
+      <div class="section-head-left">
+        <div class="section-icon">✨</div>
+        <div class="section-head-text">
+          <h2 data-i18n="refs.new.title">Nuevo referido</h2>
+          <p class="section-card-subtitle" data-i18n="refs.new.subtitle">Agregá una persona a tu red</p>
+        </div>
+      </div>
+      <div class="section-card-actions">
+        <button class="icon-btn collapsed" id="refFormToggleBtn" title="Mostrar/ocultar" data-i18n-title="form.toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="collapsible-body collapsed" id="refFormBody">
+      <div class="section-card-body">
+        <form id="refForm">
+          <div class="field">
+            <label for="refNombre" data-i18n="refs.nombre">Nombre</label>
+            <input type="text" id="refNombre" maxlength="80" placeholder="Ej: Ana García" data-i18n-placeholder="refs.nombre.placeholder" required>
+          </div>
+          <div class="field">
+            <label for="refRol" data-i18n="refs.rol">Rol / Empresa</label>
+            <input type="text" id="refRol" maxlength="120" placeholder="Ej: Tech Lead @ Google" data-i18n-placeholder="refs.rol.placeholder">
+          </div>
+          <div class="field">
+            <label for="refContacto" data-i18n="refs.contacto">Contacto</label>
+            <input type="text" id="refContacto" maxlength="200" placeholder="Email, teléfono, @usuario..." data-i18n-placeholder="refs.contacto.placeholder">
+          </div>
+          <div class="field">
+            <label for="refLink" data-i18n="refs.link">Link</label>
+            <input type="url" id="refLink" maxlength="500" placeholder="https://...">
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label data-i18n="refs.relacion">Relación</label>
+            <div class="ref-chips" id="refRelacionChips">
+              <button type="button" class="ref-chip" data-value="Amigo"     data-i18n="rel.Amigo">Amigo</button>
+              <button type="button" class="ref-chip" data-value="Ex-colega" data-i18n="rel.Ex-colega">Ex-colega</button>
+              <button type="button" class="ref-chip" data-value="Familiar"  data-i18n="rel.Familiar">Familiar</button>
+              <button type="button" class="ref-chip" data-value="Conocido"  data-i18n="rel.Conocido">Conocido</button>
+              <button type="button" class="ref-chip" data-value="Recruiter" data-i18n="rel.Recruiter">Recruiter</button>
+              <button type="button" class="ref-chip" data-value="Mentor"    data-i18n="rel.Mentor">Mentor</button>
+            </div>
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label data-i18n="refs.estado">Estado del referido</label>
+            <div class="ref-chips ref-estado-chips" id="refEstadoChips">
+              <button type="button" class="ref-chip selected" data-value="Pendiente"      data-i18n="refState.Pendiente">Pendiente</button>
+              <button type="button" class="ref-chip"          data-value="Contactado"     data-i18n="refState.Contactado">Contactado</button>
+              <button type="button" class="ref-chip"          data-value="Referido hecho" data-i18n="refState.Referido hecho">Referido hecho</button>
+              <button type="button" class="ref-chip"          data-value="En proceso"     data-i18n="refState.En proceso">En proceso</button>
+              <button type="button" class="ref-chip"          data-value="Contratado"     data-i18n="refState.Contratado">Contratado</button>
+              <button type="button" class="ref-chip"          data-value="No aplica"      data-i18n="refState.No aplica">No aplica</button>
+            </div>
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>
+              <span data-i18n="refs.empresas">Empresas / postulaciones vinculadas</span>
+              <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:500;" data-i18n="refs.empresas.optional">(opcional)</span>
+            </label>
+            <div class="ref-empresas-wrap" id="refEmpresasWrap">
+              <span class="ref-empresa-empty" data-i18n="refs.empresas.empty">Agregá postulaciones primero para poder vincularlas</span>
+            </div>
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="refNotas" data-i18n="refs.notas">Notas</label>
+            <textarea id="refNotas" maxlength="2000" placeholder="En qué empresa está, si te puede referir, última charla..." data-i18n-placeholder="refs.notas.placeholder"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" data-i18n="refs.submit">Agregar referido</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== SECCIÓN: Referidos ===== -->
   <section class="section-card">
     <div class="section-card-header">
@@ -479,76 +564,8 @@
       </div>
     </div>
 
-    <div class="collapsible-body" id="referidosBody">
+    <div class="collapsible-body" id="refsBody">
       <div class="section-card-body">
-
-        <!-- Dashboard de referidos -->
-        <div class="dash-container" id="refsDashboard"></div>
-
-        <div class="form-card ref-form-card">
-          <h3 data-i18n="refs.new">➕ Nuevo referido</h3>
-          <form id="refForm">
-            <div class="field">
-              <label for="refNombre" data-i18n="refs.nombre">Nombre</label>
-              <input type="text" id="refNombre" maxlength="80" placeholder="Ej: Ana García" data-i18n-placeholder="refs.nombre.placeholder" required>
-            </div>
-            <div class="field">
-              <label for="refRol" data-i18n="refs.rol">Rol / Empresa</label>
-              <input type="text" id="refRol" maxlength="120" placeholder="Ej: Tech Lead @ Google" data-i18n-placeholder="refs.rol.placeholder">
-            </div>
-            <div class="field">
-              <label for="refContacto" data-i18n="refs.contacto">Contacto</label>
-              <input type="text" id="refContacto" maxlength="200" placeholder="Email, teléfono, @usuario..." data-i18n-placeholder="refs.contacto.placeholder">
-            </div>
-            <div class="field">
-              <label for="refLink" data-i18n="refs.link">Link</label>
-              <input type="url" id="refLink" maxlength="500" placeholder="https://...">
-            </div>
-
-            <div class="field" style="grid-column: 1 / -1;">
-              <label data-i18n="refs.relacion">Relación</label>
-              <div class="ref-chips" id="refRelacionChips">
-                <button type="button" class="ref-chip" data-value="Amigo"     data-i18n="rel.Amigo">Amigo</button>
-                <button type="button" class="ref-chip" data-value="Ex-colega" data-i18n="rel.Ex-colega">Ex-colega</button>
-                <button type="button" class="ref-chip" data-value="Familiar"  data-i18n="rel.Familiar">Familiar</button>
-                <button type="button" class="ref-chip" data-value="Conocido"  data-i18n="rel.Conocido">Conocido</button>
-                <button type="button" class="ref-chip" data-value="Recruiter" data-i18n="rel.Recruiter">Recruiter</button>
-                <button type="button" class="ref-chip" data-value="Mentor"    data-i18n="rel.Mentor">Mentor</button>
-              </div>
-            </div>
-
-            <div class="field" style="grid-column: 1 / -1;">
-              <label data-i18n="refs.estado">Estado del referido</label>
-              <div class="ref-chips ref-estado-chips" id="refEstadoChips">
-                <button type="button" class="ref-chip selected" data-value="Pendiente"      data-i18n="refState.Pendiente">Pendiente</button>
-                <button type="button" class="ref-chip"          data-value="Contactado"     data-i18n="refState.Contactado">Contactado</button>
-                <button type="button" class="ref-chip"          data-value="Referido hecho" data-i18n="refState.Referido hecho">Referido hecho</button>
-                <button type="button" class="ref-chip"          data-value="En proceso"     data-i18n="refState.En proceso">En proceso</button>
-                <button type="button" class="ref-chip"          data-value="Contratado"     data-i18n="refState.Contratado">Contratado</button>
-                <button type="button" class="ref-chip"          data-value="No aplica"      data-i18n="refState.No aplica">No aplica</button>
-              </div>
-            </div>
-
-            <div class="field" style="grid-column: 1 / -1;">
-              <label>
-                <span data-i18n="refs.empresas">Empresas / postulaciones vinculadas</span>
-                <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:500;" data-i18n="refs.empresas.optional">(opcional)</span>
-              </label>
-              <div class="ref-empresas-wrap" id="refEmpresasWrap">
-                <span class="ref-empresa-empty" data-i18n="refs.empresas.empty">Agregá postulaciones primero para poder vincularlas</span>
-              </div>
-            </div>
-
-            <div class="field" style="grid-column: 1 / -1;">
-              <label for="refNotas" data-i18n="refs.notas">Notas</label>
-              <textarea id="refNotas" maxlength="2000" placeholder="En qué empresa está, si te puede referir, última charla..." data-i18n-placeholder="refs.notas.placeholder"></textarea>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary" data-i18n="refs.submit">Agregar referido</button>
-            </div>
-          </form>
-        </div>
-
         <div class="ref-toolbar">
           <div class="ref-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">

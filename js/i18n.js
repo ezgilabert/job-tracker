@@ -96,7 +96,8 @@ const translations = {
 
     'refs.title': 'Referidos',
     'refs.subtitle': 'Tu red de contactos que pueden recomendarte',
-    'refs.new': '➕ Nuevo referido',
+    'refs.new.title': 'Nuevo referido',
+    'refs.new.subtitle': 'Agregá una persona a tu red',
     'refs.nombre': 'Nombre',
     'refs.nombre.placeholder': 'Ej: Ana García',
     'refs.rol': 'Rol / Empresa',
@@ -606,7 +607,8 @@ const translations = {
 
     'refs.title': 'Referrals',
     'refs.subtitle': 'Your network that can recommend you',
-    'refs.new': '➕ New referral',
+    'refs.new.title': 'New referral',
+    'refs.new.subtitle': 'Add someone to your network',
     'refs.nombre': 'Name',
     'refs.nombre.placeholder': 'Ex: Anna Smith',
     'refs.rol': 'Role / Company',

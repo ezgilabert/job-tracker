@@ -34,6 +34,42 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   let estadoChips = null;
 
   // ----------------------------------------------------------
+  // Collapsibles
+  // ----------------------------------------------------------
+  const refFormToggleBtn = document.getElementById('refFormToggleBtn');
+  const refFormBody = document.getElementById('refFormBody');
+  const refToggleBtn = document.getElementById('refToggleBtn');
+  const refsBody = document.getElementById('refsBody');
+
+  if (refFormToggleBtn && refFormBody) {
+    refFormToggleBtn.addEventListener('click', () => {
+      const collapsed = refFormBody.classList.toggle('collapsed');
+      refFormToggleBtn.classList.toggle('collapsed', collapsed);
+    });
+  }
+
+  if (refToggleBtn && refsBody) {
+    refToggleBtn.addEventListener('click', () => {
+      const collapsed = refsBody.classList.toggle('collapsed');
+      refToggleBtn.classList.toggle('collapsed', collapsed);
+    });
+  }
+
+  function expandRefForm() {
+    if (refFormBody && refFormBody.classList.contains('collapsed')) {
+      refFormBody.classList.remove('collapsed');
+      refFormToggleBtn.classList.remove('collapsed');
+    }
+  }
+
+  function expandRefsList() {
+    if (refsBody && refsBody.classList.contains('collapsed')) {
+      refsBody.classList.remove('collapsed');
+      refToggleBtn.classList.remove('collapsed');
+    }
+  }
+
+  // ----------------------------------------------------------
   // Dashboard
   // ----------------------------------------------------------
   function renderRefsDash() {
@@ -42,7 +78,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
     const refs = refsStore.get();
     const cfg = configStore.get();
-    // ⭐ CAMBIO: leer la nueva key con fallback a la vieja
     const style = cfg.dashboardStyleRefs || cfg.dashboardStyle || 'sparklines';
 
     const total = refs.length;
@@ -67,11 +102,13 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const trendHighlight = buildWeeklyTrend(refs.filter(r => r.estado === 'Contratado'), getDate);
     const trendClosed = buildWeeklyTrend(refs.filter(r => r.estado === 'No aplica'), getDate);
 
-    // ⭐ NUEVO: datos para heatmap
     const heatmap = buildDailyActivity(refs, getDate, 60);
 
     renderDashboard(container, {
       style,
+      kind: 'refs',                        // ⭐ NUEVO
+      icon: '🤝',                          // ⭐ NUEVO
+      label: t('refs.title'),              // ⭐ NUEVO
       total,
       active: activos,
       inProcess: enProceso,
@@ -196,6 +233,15 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       companies
     );
 
+    // Expandimos la lista para que se vea el nuevo referido
+    expandRefsList();
+
+    // Colapsamos el form (porque ya terminó la acción)
+    if (refFormBody && refFormToggleBtn) {
+      refFormBody.classList.add('collapsed');
+      refFormToggleBtn.classList.add('collapsed');
+    }
+
     showToast(t('toast.refAdded'), '✓');
   });
 
@@ -236,18 +282,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       b.classList.toggle('active', b === btn)
     );
     renderRefs();
-  });
-
-  // ----------------------------------------------------------
-  // Section toggle
-  // ----------------------------------------------------------
-  const refToggleBtn = document.getElementById('refToggleBtn');
-  const referidosBody = document.getElementById('referidosBody');
-  refToggleBtn.style.transition = 'transform 0.3s ease';
-
-  refToggleBtn.addEventListener('click', () => {
-    const collapsed = referidosBody.classList.toggle('collapsed');
-    refToggleBtn.style.transform = collapsed ? 'rotate(-90deg)' : 'rotate(0)';
   });
 
   // ----------------------------------------------------------
@@ -504,10 +538,8 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   document.addEventListener('scroll-to-ref', (e) => {
     const { refId } = e.detail;
 
-    if (referidosBody.classList.contains('collapsed')) {
-      referidosBody.classList.remove('collapsed');
-      refToggleBtn.style.transform = 'rotate(0)';
-    }
+    // Aseguramos que la lista esté visible
+    expandRefsList();
 
     let needsRender = false;
     if (currentFilter !== 'all') {

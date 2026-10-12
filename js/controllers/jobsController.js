@@ -117,6 +117,9 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     renderDashboard(container, {
       style,
+      kind: 'jobs',                        // ⭐ NUEVO
+      icon: '📋',                          // ⭐ NUEVO
+      label: t('jobs.title'),              // ⭐ NUEVO
       total,
       active: activas,
       inProcess: enProceso,
