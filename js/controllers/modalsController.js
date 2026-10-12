@@ -93,9 +93,11 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     }
   );
 
-  editCurrency.onChange = () => editSalaryInput.refresh();
-  editSalaryMode.onChange = () => editSalaryInput.refresh();
-  editSalaryHourlyCheckbox.addEventListener('change', () => editSalaryInput.refresh());
+  // ← CAMBIO: al cambiar moneda / modo / "es por hora" en el modal
+  // de edición, limpiamos el input (evita arrastrar dígitos viejos).
+  editCurrency.onChange = () => editSalaryInput.reset();
+  editSalaryMode.onChange = () => editSalaryInput.reset();
+  editSalaryHourlyCheckbox.addEventListener('change', () => editSalaryInput.reset());
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);

@@ -269,9 +269,11 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
   );
 
-  currencyPicker.onChange = () => salaryInput.refresh();
-  salaryModeChip.onChange = () => salaryInput.refresh();
-  salaryHourlyCheckbox.addEventListener('change', () => salaryInput.refresh());
+  // ← CAMBIO: al cambiar moneda / modo / "es por hora", limpiamos
+  // el input en vez de refrescarlo (evita arrastrar dígitos viejos).
+  currencyPicker.onChange = () => salaryInput.reset();
+  salaryModeChip.onChange = () => salaryInput.reset();
+  salaryHourlyCheckbox.addEventListener('change', () => salaryInput.reset());
 
   // ----------------------------------------------------------
   // Form

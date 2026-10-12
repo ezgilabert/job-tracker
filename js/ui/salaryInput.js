@@ -32,6 +32,13 @@ const FORMATS = {
   },
 };
 
+// ← CAMBIO: símbolos de moneda. Cambiá estos valores si querés
+// usar "$", "U$S", etc. en vez de "ARS " / "USD ".
+const CURRENCY_SYMBOLS = {
+  ars: 'ARS ',
+  usd: 'USD ',
+};
+
 function countDigits(s) {
   return (String(s).match(/\d/g) || []).length;
 }
@@ -111,14 +118,22 @@ export class SalaryInput {
     return countDigits(this._format());
   }
 
+  // ← CAMBIO: prefijo de moneda según el chip activo
+  _getSymbol() {
+    return CURRENCY_SYMBOLS[this.getCurrency()] || '';
+  }
+
+  // ← CAMBIO: ahora incluye el símbolo de moneda tanto en el hint
+  // como en el valor del input.
   _render() {
     const format = this._format();
+    const symbol = this._getSymbol();
 
     // Input vacío → hint visible
     if (!this.digits) {
       this.input.value = '';
       if (this.hint) {
-        this.hint.textContent = format;
+        this.hint.textContent = symbol + format;
         this.hint.classList.add('visible');
       }
       this.onChange();
@@ -143,10 +158,12 @@ export class SalaryInput {
       const minTxt = formatThousands(minDigits);
       const maxTxt = maxDigits ? formatThousands(maxDigits) : '';
 
-      this.input.value = maxDigits ? `${minTxt} – ${maxTxt}` : minTxt;
+      this.input.value = maxDigits
+        ? `${symbol}${minTxt} – ${maxTxt}`
+        : `${symbol}${minTxt}`;
     } else {
       // single
-      this.input.value = formatThousands(this.digits);
+      this.input.value = symbol + formatThousands(this.digits);
     }
 
     this.onChange();
