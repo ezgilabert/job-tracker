@@ -1033,3 +1033,137 @@ input[type="hidden"] {
 .combo-trigger-readonly:hover {
   border-color: var(--border);
 }
+
+/* ============================================================
+   ⭐ ContactLinkPicker: chips + input de link de contacto
+   ============================================================ */
+
+.contact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.55rem;
+}
+
+.contact-chip {
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.contact-chip:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.contact-chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+/* ⭐ CAMBIO: SVG dentro de los chips */
+.contact-chip > svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.platform-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.platform-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-dim);
+  pointer-events: none;
+  z-index: 1;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ⭐ CAMBIO: SVG del ícono del input */
+.platform-icon > svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.platform-input input[type="text"] {
+  padding-left: 2.7rem;
+}
+
+/* ============================================================
+   ⭐ Chip de contacto en la card del job
+   ============================================================ */
+
+.job-contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.job-contact-chip:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* ⭐ CAMBIO: SVG dentro del chip de la card */
+.job-contact-chip > svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.job-contact-chip .chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-contact-chip .chip-arrow {
+  font-size: 0.72rem;
+  opacity: 0.75;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.job-contact-chip:hover .chip-arrow {
+  transform: translateX(2px);
+  opacity: 1;
+}

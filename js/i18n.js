@@ -74,9 +74,16 @@ const translations = {
     'form.salario.toggleToRange': 'Cambiar a rango',
     'form.contacto': 'Contacto',
     'form.contacto.placeholder': 'Ej: María López (Recruiter)',
+    'form.contactoTipo': '¿Cómo la contactás?',                            // ⭐ NUEVO
     'form.notas': 'Notas',
     'form.notas.placeholder': 'Contacto, próxima instancia, referidos...',
     'form.submit': 'Agregar postulación',
+
+    // ⭐ NUEVO: plataformas de contacto
+    'contact.platform.linkedin': 'LinkedIn',
+    'contact.platform.email': 'Email',
+    'contact.platform.whatsapp': 'WhatsApp',
+    'contact.platform.otro': 'Otro',
 
     'jobs.title': '📋 Postulaciones',
     'jobs.subtitle': 'Tu historial de procesos',
@@ -160,6 +167,8 @@ const translations = {
     'job.refChipTitle': 'Ver referido: {name}',
     'job.offerRibbon': '🏆 Oferta',
     'job.noPuesto': 'No especificado',
+    'job.contactoAbrirTitle': 'Abrir contacto: {name}',                    // ⭐ NUEVO
+    'job.contactoContactar': 'Contactar',                                   // ⭐ NUEVO
 
     'job.offerConfirmed.title': '¡Felicitaciones!',
     'job.offerConfirmed.subtitle': 'Confirmaste la oferta de {empresa}. ¡A festejar!',
@@ -542,9 +551,16 @@ const translations = {
     'form.salario.toggleToRange': 'Switch to range',
     'form.contacto': 'Contact',
     'form.contacto.placeholder': 'Ex: Mary Smith (Recruiter)',
+    'form.contactoTipo': 'How do you reach them?',                        // ⭐ NUEVO
     'form.notas': 'Notes',
     'form.notas.placeholder': 'Contact, next step, referrals...',
     'form.submit': 'Add application',
+
+    // ⭐ NUEVO: contact platforms
+    'contact.platform.linkedin': 'LinkedIn',
+    'contact.platform.email': 'Email',
+    'contact.platform.whatsapp': 'WhatsApp',
+    'contact.platform.otro': 'Other',
 
     'jobs.title': '📋 Applications',
     'jobs.subtitle': 'Your process history',
@@ -628,6 +644,8 @@ const translations = {
     'job.refChipTitle': 'View referral: {name}',
     'job.offerRibbon': '🏆 Offer',
     'job.noPuesto': 'Not specified',
+    'job.contactoAbrirTitle': 'Open contact: {name}',                     // ⭐ NUEVO
+    'job.contactoContactar': 'Contact',                                     // ⭐ NUEVO
 
     'job.offerConfirmed.title': 'Congratulations!',
     'job.offerConfirmed.subtitle': 'You confirmed the offer from {empresa}. Celebrate!',

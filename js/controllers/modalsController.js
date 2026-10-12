@@ -10,6 +10,7 @@ import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
+import { ContactLinkPicker } from '../ui/contactLinkPicker.js';        // ⭐ NUEVO
 import { mountChips } from '../ui/chips.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
@@ -93,11 +94,15 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     }
   );
 
-  // ← CAMBIO: al cambiar moneda / modo / "es por hora" en el modal
-  // de edición, limpiamos el input (evita arrastrar dígitos viejos).
   editCurrency.onChange = () => editSalaryInput.reset();
   editSalaryMode.onChange = () => editSalaryInput.reset();
   editSalaryHourlyCheckbox.addEventListener('change', () => editSalaryInput.reset());
+
+  // ⭐ NUEVO: picker de contacto en el modal de edición
+  const editContactoLinkPicker = new ContactLinkPicker(
+    document.getElementById('editContactoLinkPicker'),
+    { value: { tipo: 'linkedin', link: '' } }
+  );
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -114,6 +119,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     editSalaryMode.setValue(j.salarioEsRango === false ? 'single' : 'range');
     editSalaryInput.setValue(j.salario || '');
     setVal('editContacto', j.contacto || '');
+    editContactoLinkPicker.setValue({                 // ⭐ NUEVO
+      tipo: j.contactoTipo || 'linkedin',
+      link: j.contactoLink || '',
+    });
     setVal('editNotas', j.notas || '');
     editModalidad.setValue(j.modalidad || '', j.hybridOfficeDays || 3);
 
@@ -135,6 +144,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
     const modal = editModalidad.getValue();
     const salarioMode = editSalaryMode.getValue();
+    const contactData = editContactoLinkPicker.getValue();   // ⭐ NUEVO
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
@@ -151,6 +161,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         modalidad: modal.modalidad,
         hybridOfficeDays: modal.hybridOfficeDays,
         contacto:  valueOf('editContacto'),
+        contactoLink: contactData.link,        // ⭐ NUEVO
+        contactoTipo: contactData.tipo,        // ⭐ NUEVO
         notas:     valueOf('editNotas'),
       };
     }));
@@ -739,6 +751,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       modalidad: '',
       hybridOfficeDays: null,
       contacto: r.nombre + (r.rol ? ` (${r.rol})` : ''),
+      contactoLink: '',                            // ⭐ NUEVO
+      contactoTipo: 'linkedin',                    // ⭐ NUEVO
       notas: `Referido por ${r.nombre}${r.notas ? '. ' + r.notas : ''}`,
       skipped: [],
       volvioAtras: false,
@@ -799,6 +813,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       const j = jobsStore.get().find(x => x.id === editingId);
       if (j) updateEditEstadoDisplay(j.estado);
     }
+    editContactoLinkPicker.refresh();              // ⭐ NUEVO
   });
 
   // ----------------------------------------------------------

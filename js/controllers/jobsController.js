@@ -10,6 +10,7 @@ import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
+import { ContactLinkPicker } from '../ui/contactLinkPicker.js';        // ⭐ NUEVO
 import { renderDashboard, buildWeeklyTrend } from '../ui/dashboard.js';
 import {
   computeStats, filterJobs, sortJobs, isClosed,
@@ -269,11 +270,17 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
   );
 
-  // ← CAMBIO: al cambiar moneda / modo / "es por hora", limpiamos
-  // el input en vez de refrescarlo (evita arrastrar dígitos viejos).
   currencyPicker.onChange = () => salaryInput.reset();
   salaryModeChip.onChange = () => salaryInput.reset();
   salaryHourlyCheckbox.addEventListener('change', () => salaryInput.reset());
+
+  // ----------------------------------------------------------
+  // ⭐ ContactLinkPicker (chips + link de contacto)
+  // ----------------------------------------------------------
+  const contactoLinkPicker = new ContactLinkPicker(
+    document.getElementById('contactoLinkPicker'),
+    { value: { tipo: 'linkedin', link: '' } }
+  );
 
   // ----------------------------------------------------------
   // Form
@@ -309,6 +316,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     const modal = modalidadPicker.getValue();
     const salarioMode = salaryModeChip.getValue();
+    const contactData = contactoLinkPicker.getValue();   // ⭐ NUEVO
 
     const newJob = {
       id: uid(),
@@ -324,6 +332,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       modalidad: modal.modalidad,
       hybridOfficeDays: modal.hybridOfficeDays,
       contacto: valueOf('contacto'),
+      contactoLink: contactData.link,           // ⭐ NUEVO
+      contactoTipo: contactData.tipo,           // ⭐ NUEVO
       notas: valueOf('notas'),
       skipped: [],
       volvioAtras: false,
@@ -338,6 +348,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     currencyPicker.setValue('usd');
     salaryModeChip.setValue('range');
     salaryInput.reset();
+    contactoLinkPicker.reset();                 // ⭐ NUEVO
     renderInitialStates();
     refreshPuestoOptionalHint();
 
@@ -511,6 +522,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     renderInitialStates();
     estadoCombo.refresh();
     salaryInput.refresh();
+    contactoLinkPicker.refresh();       // ⭐ NUEVO
     refreshPuestoOptionalHint();
     renderJobsDash();
     renderList();
