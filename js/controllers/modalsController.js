@@ -10,7 +10,7 @@ import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
-import { ContactLinkPicker } from '../ui/contactLinkPicker.js';        // ⭐ NUEVO
+import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
 import { mountChips } from '../ui/chips.js';
 import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
@@ -98,11 +98,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   editSalaryMode.onChange = () => editSalaryInput.reset();
   editSalaryHourlyCheckbox.addEventListener('change', () => editSalaryInput.reset());
 
-  // ⭐ NUEVO: picker de contacto en el modal de edición
+  // ContactLinkPicker con validación
   const editContactoLinkPicker = new ContactLinkPicker(
     document.getElementById('editContactoLinkPicker'),
     { value: { tipo: 'linkedin', link: '' } }
   );
+  editContactoLinkPicker.translate = t;
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -119,7 +120,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     editSalaryMode.setValue(j.salarioEsRango === false ? 'single' : 'range');
     editSalaryInput.setValue(j.salario || '');
     setVal('editContacto', j.contacto || '');
-    editContactoLinkPicker.setValue({                 // ⭐ NUEVO
+    editContactoLinkPicker.setValue({
       tipo: j.contactoTipo || 'linkedin',
       link: j.contactoLink || '',
     });
@@ -142,9 +143,18 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
 
+    // ⭐ Validación del link de contacto
+    const contactValidation = editContactoLinkPicker.validate();
+    if (!contactValidation.valid) {
+      editContactoLinkPicker.markTouched();
+      editContactoLinkPicker.focus();
+      showToast(t(contactValidation.errorKey), '!');
+      return;
+    }
+
     const modal = editModalidad.getValue();
     const salarioMode = editSalaryMode.getValue();
-    const contactData = editContactoLinkPicker.getValue();   // ⭐ NUEVO
+    const contactData = editContactoLinkPicker.getValue();
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
@@ -161,8 +171,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         modalidad: modal.modalidad,
         hybridOfficeDays: modal.hybridOfficeDays,
         contacto:  valueOf('editContacto'),
-        contactoLink: contactData.link,        // ⭐ NUEVO
-        contactoTipo: contactData.tipo,        // ⭐ NUEVO
+        contactoLink: contactData.link,
+        contactoTipo: contactData.tipo,
         notas:     valueOf('editNotas'),
       };
     }));
@@ -751,8 +761,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       modalidad: '',
       hybridOfficeDays: null,
       contacto: r.nombre + (r.rol ? ` (${r.rol})` : ''),
-      contactoLink: '',                            // ⭐ NUEVO
-      contactoTipo: 'linkedin',                    // ⭐ NUEVO
+      contactoLink: '',
+      contactoTipo: 'linkedin',
       notas: `Referido por ${r.nombre}${r.notas ? '. ' + r.notas : ''}`,
       skipped: [],
       volvioAtras: false,
@@ -813,7 +823,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       const j = jobsStore.get().find(x => x.id === editingId);
       if (j) updateEditEstadoDisplay(j.estado);
     }
-    editContactoLinkPicker.refresh();              // ⭐ NUEVO
+    editContactoLinkPicker.refresh();
   });
 
   // ----------------------------------------------------------

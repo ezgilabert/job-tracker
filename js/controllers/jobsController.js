@@ -10,7 +10,7 @@ import { ModalidadPicker } from '../ui/modalidad.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
-import { ContactLinkPicker } from '../ui/contactLinkPicker.js';        // ⭐ NUEVO
+import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
 import { renderDashboard, buildWeeklyTrend } from '../ui/dashboard.js';
 import {
   computeStats, filterJobs, sortJobs, isClosed,
@@ -275,12 +275,14 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   salaryHourlyCheckbox.addEventListener('change', () => salaryInput.reset());
 
   // ----------------------------------------------------------
-  // ⭐ ContactLinkPicker (chips + link de contacto)
+  // ContactLinkPicker (chips + link de contacto + validación)
   // ----------------------------------------------------------
   const contactoLinkPicker = new ContactLinkPicker(
     document.getElementById('contactoLinkPicker'),
     { value: { tipo: 'linkedin', link: '' } }
   );
+  // Inyectamos la función de traducción para los mensajes de error.
+  contactoLinkPicker.translate = t;
 
   // ----------------------------------------------------------
   // Form
@@ -314,9 +316,18 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       return;
     }
 
+    // ⭐ Validación del link de contacto
+    const contactValidation = contactoLinkPicker.validate();
+    if (!contactValidation.valid) {
+      contactoLinkPicker.markTouched();
+      contactoLinkPicker.focus();
+      showToast(t(contactValidation.errorKey), '!');
+      return;
+    }
+
     const modal = modalidadPicker.getValue();
     const salarioMode = salaryModeChip.getValue();
-    const contactData = contactoLinkPicker.getValue();   // ⭐ NUEVO
+    const contactData = contactoLinkPicker.getValue();
 
     const newJob = {
       id: uid(),
@@ -332,8 +343,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       modalidad: modal.modalidad,
       hybridOfficeDays: modal.hybridOfficeDays,
       contacto: valueOf('contacto'),
-      contactoLink: contactData.link,           // ⭐ NUEVO
-      contactoTipo: contactData.tipo,           // ⭐ NUEVO
+      contactoLink: contactData.link,
+      contactoTipo: contactData.tipo,
       notas: valueOf('notas'),
       skipped: [],
       volvioAtras: false,
@@ -348,7 +359,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     currencyPicker.setValue('usd');
     salaryModeChip.setValue('range');
     salaryInput.reset();
-    contactoLinkPicker.reset();                 // ⭐ NUEVO
+    contactoLinkPicker.reset();
     renderInitialStates();
     refreshPuestoOptionalHint();
 
@@ -522,7 +533,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     renderInitialStates();
     estadoCombo.refresh();
     salaryInput.refresh();
-    contactoLinkPicker.refresh();       // ⭐ NUEVO
+    contactoLinkPicker.refresh();
     refreshPuestoOptionalHint();
     renderJobsDash();
     renderList();

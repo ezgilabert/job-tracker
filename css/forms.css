@@ -1074,7 +1074,6 @@ input[type="hidden"] {
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* ⭐ CAMBIO: SVG dentro de los chips */
 .contact-chip > svg {
   width: 14px;
   height: 14px;
@@ -1086,6 +1085,8 @@ input[type="hidden"] {
   position: relative;
   display: flex;
   align-items: center;
+  border-radius: 10px;
+  transition: box-shadow 0.2s ease;
 }
 
 .platform-icon {
@@ -1098,9 +1099,9 @@ input[type="hidden"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s ease;
 }
 
-/* ⭐ CAMBIO: SVG del ícono del input */
 .platform-icon > svg {
   width: 16px;
   height: 16px;
@@ -1109,6 +1110,53 @@ input[type="hidden"] {
 
 .platform-input input[type="text"] {
   padding-left: 2.7rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ⭐ CAMBIO: estado VALID — borde e ícono en verde */
+.platform-input.valid input[type="text"] {
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+}
+
+.platform-input.valid .platform-icon {
+  color: var(--success);
+}
+
+/* ⭐ CAMBIO: estado INVALID — borde e ícono en rojo */
+.platform-input.invalid input[type="text"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+
+.platform-input.invalid .platform-icon {
+  color: var(--danger);
+}
+
+.platform-input.invalid input[type="text"]:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.22);
+}
+
+/* ⭐ CAMBIO: mensaje de error debajo del input */
+.contact-link-error {
+  display: none;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--danger-2);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+.contact-link-error.visible {
+  display: block;
+  animation: contactErrorIn 0.2s ease;
+}
+
+@keyframes contactErrorIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================
@@ -1142,7 +1190,6 @@ input[type="hidden"] {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-/* ⭐ CAMBIO: SVG dentro del chip de la card */
 .job-contact-chip > svg {
   width: 13px;
   height: 13px;

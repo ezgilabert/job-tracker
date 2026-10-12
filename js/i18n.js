@@ -74,16 +74,21 @@ const translations = {
     'form.salario.toggleToRange': 'Cambiar a rango',
     'form.contacto': 'Contacto',
     'form.contacto.placeholder': 'Ej: María López (Recruiter)',
-    'form.contactoTipo': '¿Cómo la contactás?',                            // ⭐ NUEVO
+    'form.contactoTipo': '¿Cómo la contactás?',
     'form.notas': 'Notas',
     'form.notas.placeholder': 'Contacto, próxima instancia, referidos...',
     'form.submit': 'Agregar postulación',
 
-    // ⭐ NUEVO: plataformas de contacto
     'contact.platform.linkedin': 'LinkedIn',
     'contact.platform.email': 'Email',
     'contact.platform.whatsapp': 'WhatsApp',
     'contact.platform.otro': 'Otro',
+
+    // ⭐ NUEVO: mensajes de error del link de contacto
+    'form.contactoLink.error.linkedin': 'Ingresá un perfil de LinkedIn (ej: linkedin.com/in/tu-usuario)',
+    'form.contactoLink.error.email': 'Ingresá un email válido (ej: nombre@empresa.com)',
+    'form.contactoLink.error.whatsapp': 'Ingresá un número válido con al menos 8 dígitos',
+    'form.contactoLink.error.url': 'Ingresá una URL válida (ej: https://… o dominio.com)',
 
     'jobs.title': '📋 Postulaciones',
     'jobs.subtitle': 'Tu historial de procesos',
@@ -167,8 +172,8 @@ const translations = {
     'job.refChipTitle': 'Ver referido: {name}',
     'job.offerRibbon': '🏆 Oferta',
     'job.noPuesto': 'No especificado',
-    'job.contactoAbrirTitle': 'Abrir contacto: {name}',                    // ⭐ NUEVO
-    'job.contactoContactar': 'Contactar',                                   // ⭐ NUEVO
+    'job.contactoAbrirTitle': 'Abrir contacto: {name}',
+    'job.contactoContactar': 'Contactar',
 
     'job.offerConfirmed.title': '¡Felicitaciones!',
     'job.offerConfirmed.subtitle': 'Confirmaste la oferta de {empresa}. ¡A festejar!',
@@ -551,16 +556,21 @@ const translations = {
     'form.salario.toggleToRange': 'Switch to range',
     'form.contacto': 'Contact',
     'form.contacto.placeholder': 'Ex: Mary Smith (Recruiter)',
-    'form.contactoTipo': 'How do you reach them?',                        // ⭐ NUEVO
+    'form.contactoTipo': 'How do you reach them?',
     'form.notas': 'Notes',
     'form.notas.placeholder': 'Contact, next step, referrals...',
     'form.submit': 'Add application',
 
-    // ⭐ NUEVO: contact platforms
     'contact.platform.linkedin': 'LinkedIn',
     'contact.platform.email': 'Email',
     'contact.platform.whatsapp': 'WhatsApp',
     'contact.platform.otro': 'Other',
+
+    // ⭐ NUEVO: contact link error messages
+    'form.contactoLink.error.linkedin': 'Enter a LinkedIn profile (ex: linkedin.com/in/your-handle)',
+    'form.contactoLink.error.email': 'Enter a valid email (ex: name@company.com)',
+    'form.contactoLink.error.whatsapp': 'Enter a valid number with at least 8 digits',
+    'form.contactoLink.error.url': 'Enter a valid URL (ex: https://… or domain.com)',
 
     'jobs.title': '📋 Applications',
     'jobs.subtitle': 'Your process history',
@@ -644,8 +654,8 @@ const translations = {
     'job.refChipTitle': 'View referral: {name}',
     'job.offerRibbon': '🏆 Offer',
     'job.noPuesto': 'Not specified',
-    'job.contactoAbrirTitle': 'Open contact: {name}',                     // ⭐ NUEVO
-    'job.contactoContactar': 'Contact',                                     // ⭐ NUEVO
+    'job.contactoAbrirTitle': 'Open contact: {name}',
+    'job.contactoContactar': 'Contact',
 
     'job.offerConfirmed.title': 'Congratulations!',
     'job.offerConfirmed.subtitle': 'You confirmed the offer from {empresa}. Celebrate!',
