@@ -27,6 +27,76 @@ boot();
 async function boot() {
   if (!(await requireSession('./login.html'))) return;
 
+  // Guardamos el idioma al arrancar para no animar en la carga inicial
+  let lastLang = getLanguage();
+
+  // ----------------------------------------------------------
+  // Stagger de textos al cambiar idioma
+  // ----------------------------------------------------------
+  function staggerI18nTexts() {
+    const all = document.querySelectorAll('.container [data-i18n]');
+    const visible = [];
+
+    all.forEach(el => {
+      if (el.dataset.i18nAnimating === '1') return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) visible.push(el);
+    });
+
+    if (!visible.length) return;
+
+    visible.forEach((el, i) => {
+      el.dataset.i18nAnimating = '1';
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation =
+        `i18nStagger 0.35s cubic-bezier(0.22, 1, 0.36, 1) ${Math.min(i * 15, 400)}ms both`;
+    });
+
+    setTimeout(() => {
+      visible.forEach(el => {
+        el.style.animation = '';
+        delete el.dataset.i18nAnimating;
+      });
+    }, 900);
+  }
+
+  // ----------------------------------------------------------
+  // ⭐ CAMBIO: ripple radial para el cambio de tema
+  // El degradé vive en el CSS (.theme-ripple).
+  // ----------------------------------------------------------
+  function triggerThemeRipple(x, y, nextTheme, onPeak) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Radio necesario para cubrir toda la pantalla desde (x, y)
+    const dx = Math.max(x, vw - x);
+    const dy = Math.max(y, vh - y);
+    const radius = Math.sqrt(dx * dx + dy * dy) * 1.05;
+    const size = radius * 2;
+
+    const ripple = document.createElement('div');
+    ripple.className = 'theme-ripple';
+    ripple.style.width  = size + 'px';
+    ripple.style.height = size + 'px';
+    ripple.style.left   = (x - radius) + 'px';
+    ripple.style.top    = (y - radius) + 'px';
+
+    document.body.appendChild(ripple);
+    void ripple.offsetWidth;
+    ripple.classList.add('run');
+
+    // A ~45% de la animación (cuando el velo ya cubre bien), cambiamos el tema
+    setTimeout(() => {
+      if (typeof onPeak === 'function') onPeak();
+    }, 380);
+
+    // Eliminamos el ripple cuando termina la animación
+    setTimeout(() => {
+      ripple.remove();
+    }, 900);
+  }
+
   // ----------------------------------------------------------
   // Theme
   // ----------------------------------------------------------
@@ -37,11 +107,23 @@ async function boot() {
     const btn = document.getElementById('themeToggle');
     if (!btn) return;
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem(STORAGE_KEYS.THEME, next);
+
+      // Coordenadas del click. Fallback al centro del botón (para teclado/Enter)
+      const rect = btn.getBoundingClientRect();
+      const x = (typeof e.clientX === 'number' && e.clientX > 0)
+        ? e.clientX
+        : rect.left + rect.width / 2;
+      const y = (typeof e.clientY === 'number' && e.clientY > 0)
+        ? e.clientY
+        : rect.top + rect.height / 2;
+
+      triggerThemeRipple(x, y, next, () => {
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem(STORAGE_KEYS.THEME, next);
+      });
     });
   }
 
@@ -55,7 +137,7 @@ async function boot() {
   // ----------------------------------------------------------
   // User menu
   // ----------------------------------------------------------
-  function mountUserMenu() {
+  function mountUserMenu(configStore) {
     const menu = document.getElementById('userMenu');
     const btn = document.getElementById('userBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -64,6 +146,7 @@ async function boot() {
     const userHeader = document.getElementById('userMenuHeader');
     const nameEl = document.getElementById('userMenuName');
     const emailEl = document.getElementById('userMenuEmail');
+    const langBtn = document.getElementById('langToggle');
 
     if (!menu || !btn) return;
 
@@ -125,6 +208,16 @@ async function boot() {
     if (loginBtn) {
       loginBtn.addEventListener('click', () => {
         window.location.href = './login.html';
+      });
+    }
+
+    // Toggle de idioma. El stagger se dispara desde i18n-changed.
+    if (langBtn) {
+      langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const current = getLanguage();
+        const next = current === 'es' ? 'en' : 'es';
+        configStore.update(c => ({ ...c, lang: next }));
       });
     }
 
@@ -241,7 +334,7 @@ async function boot() {
   refsCtrl.initChips(refRelacionChips, refEstadoChips);
 
   mountTheme();
-  mountUserMenu();
+  mountUserMenu(configStore);
 
   startSessionHeartbeat(() => {
     window.location.replace('./login.html');
@@ -251,8 +344,16 @@ async function boot() {
     try { sessionStorage.removeItem('jobTrackerFreshLogin'); } catch {}
   });
 
+  // Listener final: rerender + stagger de textos.
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
+
+    // Animamos stagger solo si realmente cambió el idioma
+    const current = getLanguage();
+    if (lastLang !== null && lastLang !== current) {
+      requestAnimationFrame(() => staggerI18nTexts());
+    }
+    lastLang = current;
   });
 }

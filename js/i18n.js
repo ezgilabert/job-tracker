@@ -17,6 +17,7 @@ const translations = {
     'app.documentTitle': 'Job Tracker · Mi búsqueda laboral',
     'action.config': 'Configuración',
     'action.theme': 'Cambiar tema',
+    'action.language': 'Cambiar idioma',
 
     'auth.documentTitle': 'Job Tracker · Acceso',
     'auth.tab.login': 'Iniciar sesión',
@@ -84,7 +85,6 @@ const translations = {
     'contact.platform.whatsapp': 'WhatsApp',
     'contact.platform.otro': 'Otro',
 
-    // ⭐ NUEVO: mensajes de error del link de contacto
     'form.contactoLink.error.linkedin': 'Ingresá un perfil de LinkedIn (ej: linkedin.com/in/tu-usuario)',
     'form.contactoLink.error.email': 'Ingresá un email válido (ej: nombre@empresa.com)',
     'form.contactoLink.error.whatsapp': 'Ingresá un número válido con al menos 8 dígitos',
@@ -499,6 +499,7 @@ const translations = {
     'app.documentTitle': 'Job Tracker · My job search',
     'action.config': 'Settings',
     'action.theme': 'Switch theme',
+    'action.language': 'Switch language',
 
     'auth.documentTitle': 'Job Tracker · Sign in',
     'auth.tab.login': 'Sign in',
@@ -566,7 +567,6 @@ const translations = {
     'contact.platform.whatsapp': 'WhatsApp',
     'contact.platform.otro': 'Other',
 
-    // ⭐ NUEVO: contact link error messages
     'form.contactoLink.error.linkedin': 'Enter a LinkedIn profile (ex: linkedin.com/in/your-handle)',
     'form.contactoLink.error.email': 'Enter a valid email (ex: name@company.com)',
     'form.contactoLink.error.whatsapp': 'Enter a valid number with at least 8 digits',
