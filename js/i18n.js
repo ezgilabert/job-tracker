@@ -51,7 +51,7 @@ const translations = {
     'stats.offers': 'Ofertas',
     'stats.closed': 'Cerradas',
 
-    'form.title': '✨ Nueva postulación',
+    'form.title': 'Nueva postulación',
     'form.subtitle': 'Cargá una nueva oportunidad',
     'form.toggle': 'Mostrar/ocultar',
     'form.section.job': 'Datos del puesto',
@@ -90,11 +90,11 @@ const translations = {
     'form.contactoLink.error.whatsapp': 'Ingresá un número válido con al menos 8 dígitos',
     'form.contactoLink.error.url': 'Ingresá una URL válida (ej: https://… o dominio.com)',
 
-    'jobs.title': '📋 Postulaciones',
+    'jobs.title': 'Postulaciones',
     'jobs.subtitle': 'Tu historial de procesos',
     'jobs.search.placeholder': 'Buscar por puesto, empresa, nota...',
 
-    'refs.title': '🤝 Referidos',
+    'refs.title': 'Referidos',
     'refs.subtitle': 'Tu red de contactos que pueden recomendarte',
     'refs.new': '➕ Nuevo referido',
     'refs.nombre': 'Nombre',
@@ -561,7 +561,7 @@ const translations = {
     'stats.offers': 'Offers',
     'stats.closed': 'Closed',
 
-    'form.title': '✨ New application',
+    'form.title': 'New application',
     'form.subtitle': 'Add a new opportunity',
     'form.toggle': 'Show/hide',
     'form.section.job': 'Job details',
@@ -600,11 +600,11 @@ const translations = {
     'form.contactoLink.error.whatsapp': 'Enter a valid number with at least 8 digits',
     'form.contactoLink.error.url': 'Enter a valid URL (ex: https://… or domain.com)',
 
-    'jobs.title': '📋 Applications',
+    'jobs.title': 'Applications',
     'jobs.subtitle': 'Your process history',
     'jobs.search.placeholder': 'Search by role, company, note...',
 
-    'refs.title': '🤝 Referrals',
+    'refs.title': 'Referrals',
     'refs.subtitle': 'Your network that can recommend you',
     'refs.new': '➕ New referral',
     'refs.nombre': 'Name',

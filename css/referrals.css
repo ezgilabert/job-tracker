@@ -1,52 +1,6 @@
 /* ============================================================
-   Referrals: sección completa de referidos
-   + tags de referidos en tarjetas de jobs
+   Referrals: sección completa de referidos + tags en jobs
    ============================================================ */
-
-.referidos-section {
-  margin-top: 3rem;
-  padding-top: 2.5rem;
-  border-top: 1px solid var(--border);
-}
-
-.referidos-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-  flex-wrap: nowrap;
-}
-
-.referidos-header > div:first-child {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.referidos-header h2 {
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.referidos-header p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.referidos-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-shrink: 0;
-}
 
 .ref-counter {
   display: inline-flex;
@@ -118,7 +72,6 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* Referral status chips */
 .ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
   background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
 }
@@ -309,7 +262,6 @@
 [data-theme="dark"] .referido[data-relacion="Recruiter"] .ref-relacion-badge { background: var(--success-soft); color: #34d399; border-color: transparent; }
 [data-theme="dark"] .referido[data-relacion="Mentor"] .ref-relacion-badge { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
 
-/* ===== Referral status badge ===== */
 .ref-estado-badge {
   display: inline-flex;
   align-items: center;
@@ -332,24 +284,12 @@
   box-shadow: 0 0 6px currentColor;
 }
 
-.ref-estado-badge[data-estado="Pendiente"] {
-  background: #f1f5f9; color: #64748b; border-color: #e2e8f0;
-}
-.ref-estado-badge[data-estado="Contactado"] {
-  background: var(--info-soft); color: var(--info-2); border-color: var(--info-border);
-}
-.ref-estado-badge[data-estado="Referido hecho"] {
-  background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border);
-}
-.ref-estado-badge[data-estado="En proceso"] {
-  background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border);
-}
-.ref-estado-badge[data-estado="Contratado"] {
-  background: var(--success-soft); color: var(--success-2); border-color: var(--success-border);
-}
-.ref-estado-badge[data-estado="No aplica"] {
-  background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border);
-}
+.ref-estado-badge[data-estado="Pendiente"] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+.ref-estado-badge[data-estado="Contactado"] { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
+.ref-estado-badge[data-estado="Referido hecho"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+.ref-estado-badge[data-estado="En proceso"] { background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border); }
+.ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
+.ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border); }
 
 [data-theme="dark"] .ref-estado-badge { border-color: transparent; }
 [data-theme="dark"] .ref-estado-badge[data-estado="Pendiente"] { background: rgba(100,116,139,0.18); color: #94a3b8; }
@@ -359,7 +299,6 @@
 [data-theme="dark"] .ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: #34d399; }
 [data-theme="dark"] .ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: #f87171; }
 
-/* ===== Referral workflow ===== */
 .ref-workflow {
   display: flex;
   flex-direction: column;
@@ -538,7 +477,7 @@
   color: white;
 }
 
-/* ===== Empresas vinculadas (chips) ===== */
+/* Empresas vinculadas */
 .ref-empresas-wrap {
   display: flex;
   flex-wrap: wrap;
@@ -666,7 +605,7 @@
   .ref-search { max-width: 100%; }
 }
 
-/* ===== Referral tags on jobs ===== */
+/* Referral tags on jobs */
 .job-refs {
   display: flex;
   flex-wrap: wrap;
@@ -690,10 +629,7 @@
   gap: 0.3rem;
 }
 
-.job-refs-label::before {
-  content: '🤝';
-  font-size: 0.85rem;
-}
+.job-refs-label::before { content: '🤝'; font-size: 0.85rem; }
 
 .job-ref-chip {
   padding: 0.3rem 0.7rem;

@@ -1,6 +1,59 @@
 /* ============================================================
-   Forms: form-card, fields, inputs, combo de puesto
-   + header colapsable + contador de caracteres
+   Forms: form-card, section-card, fields, inputs, combo
+   ============================================================ */
+
+/* ============================================================
+   ⭐ NUEVO: Section card (bloque compartido por las 3 secciones)
+   ============================================================ */
+
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+[data-theme="dark"] .section-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+}
+
+.section-card-header {
+  padding: 1.6rem 1.75rem;
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.section-card-header > .section-head-left { flex: 1; min-width: 0; }
+
+.section-card-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.section-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.section-card-body {
+  padding: 1.5rem 1.75rem 1.75rem;
+}
+
+/* ============================================================
+   Form-card legacy (se mantiene para modales y ref-form-card)
    ============================================================ */
 
 .form-card {
@@ -30,7 +83,7 @@
 .form-card-header > div:first-child { flex: 1; min-width: 0; }
 
 .form-card-header h2 {
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 0.25rem;
@@ -42,7 +95,7 @@
 }
 
 .form-card-subtitle {
-  font-size: 0.87rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   font-weight: 500;
   line-height: 1.4;
@@ -71,14 +124,12 @@
 }
 
 .form-card-header .icon-btn svg,
-.jobs-header .icon-btn svg,
-.referidos-header .icon-btn svg {
+.section-card-header .icon-btn svg {
   transition: transform 0.3s ease;
 }
 
 .form-card-header .icon-btn.collapsed svg,
-.jobs-header .icon-btn.collapsed svg,
-.referidos-header .icon-btn.collapsed svg {
+.section-card-header .icon-btn.collapsed svg {
   transform: rotate(-90deg);
 }
 
@@ -86,6 +137,12 @@ form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.9rem;
+}
+
+/* El form dentro de section-card-body no debe duplicar padding */
+.section-card-body > form {
+  display: block;
+  padding: 0;
 }
 
 .field { position: relative; }
@@ -98,6 +155,50 @@ form {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.4rem;
+}
+
+/* ============================================================
+   Section header shared (icon + title)
+   ============================================================ */
+
+.section-head-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.section-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px var(--accent-glow);
+  line-height: 1;
+}
+
+[data-theme="dark"] .section-icon {
+  box-shadow: 0 6px 18px var(--accent-glow);
+}
+
+.section-head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-head-text h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.15rem;
+  color: var(--text);
+  line-height: 1.15;
 }
 
 /* ============================================================
@@ -213,7 +314,6 @@ textarea {
 }
 
 .combo { position: relative; }
-
 .combo-input-wrap { position: relative; }
 
 .combo-input-wrap input {
@@ -394,13 +494,8 @@ textarea {
   pointer-events: none;
 }
 
-.field-counter.near-limit {
-  color: var(--warning-2);
-}
-
-.field-counter.at-limit {
-  color: var(--danger-2);
-}
+.field-counter.near-limit { color: var(--warning-2); }
+.field-counter.at-limit { color: var(--danger-2); }
 
 input:invalid:not(:placeholder-shown),
 textarea:invalid:not(:placeholder-shown) {
@@ -413,34 +508,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   V3 · Form-card con secciones outlined
-   ============================================================ */
-
-.form-card.v3 {
-  padding: 0;
-  overflow: hidden;
-}
-
-.form-card.v3 .form-card-header {
-  padding: 1.6rem 1.75rem;
-  margin-bottom: 0;
-  background: var(--surface-soft);
-  border-bottom: 1px solid var(--border);
-}
-
-.form-card.v3 .form-card-header h2 {
-  font-size: 1.35rem;
-  margin-bottom: 0.25rem;
-}
-
-.form-card.v3 form {
-  display: block;
-  padding: 1.5rem 1.75rem 1.75rem;
-  gap: 0;
-}
-
-/* ============================================================
-   Secciones (reutilizables: form-card + modal)
+   Secciones internas del form (v3-section, sec-head)
    ============================================================ */
 
 .v3-section {
@@ -454,10 +522,6 @@ textarea:invalid:not(:placeholder-shown):focus {
   padding-bottom: 0;
   margin-bottom: 0;
 }
-
-/* ============================================================
-   V2 · Section header: ícono + título grande
-   ============================================================ */
 
 .sec-head {
   display: flex;
@@ -487,10 +551,6 @@ textarea:invalid:not(:placeholder-shown):focus {
   line-height: 1.2;
 }
 
-/* ============================================================
-   Grid interno de cada sección
-   ============================================================ */
-
 .v3-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -503,19 +563,15 @@ textarea:invalid:not(:placeholder-shown):focus {
 .v3-grid .field.full { grid-column: 1 / -1; }
 
 @media (max-width: 720px) {
-  .v3-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .v3-grid { grid-template-columns: repeat(2, 1fr); }
   .v3-grid .field,
   .v3-grid .field.half,
   .v3-grid .field.third,
-  .v3-grid .field.full {
-    grid-column: 1 / -1;
-  }
+  .v3-grid .field.full { grid-column: 1 / -1; }
 }
 
 /* ============================================================
-   Modalidad picker: segmented control (estilo V3)
+   Modalidad picker
    ============================================================ */
 
 .modalidad-seg {
@@ -547,10 +603,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   min-width: 0;
 }
 
-.seg-btn:hover {
-  background: var(--surface);
-  color: var(--text);
-}
+.seg-btn:hover { background: var(--surface); color: var(--text); }
 
 .seg-btn.selected {
   background: var(--accent);
@@ -559,11 +612,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 @media (max-width: 520px) {
-  .seg-btn {
-    font-size: 0.72rem;
-    padding: 0.5rem 0.3rem;
-    gap: 0.25rem;
-  }
+  .seg-btn { font-size: 0.72rem; padding: 0.5rem 0.3rem; gap: 0.25rem; }
 }
 
 /* ============================================================
@@ -584,10 +633,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   flex-wrap: wrap;
 }
 
-.hybrid-days.visible {
-  display: flex;
-  animation: fadeInRow 0.2s ease;
-}
+.hybrid-days.visible { display: flex; animation: fadeInRow 0.2s ease; }
 
 @keyframes fadeInRow {
   from { opacity: 0; transform: translateY(-3px); }
@@ -624,12 +670,10 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Salary input: wrapper con chip de modo + chip de moneda
+   Salary input
    ============================================================ */
 
-.icon-input-wrap {
-  position: relative;
-}
+.icon-input-wrap { position: relative; }
 
 .icon-input-wrap input[type="text"] {
   width: 100%;
@@ -646,9 +690,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   outline: none;
 }
 
-[data-theme="dark"] .icon-input-wrap input[type="text"] {
-  background: var(--surface-soft);
-}
+[data-theme="dark"] .icon-input-wrap input[type="text"] { background: var(--surface-soft); }
 
 .icon-input-wrap input[type="text"]:focus {
   border-color: var(--accent);
@@ -659,15 +701,8 @@ textarea:invalid:not(:placeholder-shown):focus {
 .icon-input-wrap input::placeholder { color: var(--text-dim); }
 
 @media (max-width: 520px) {
-  .icon-input-wrap input[type="text"] {
-    padding-left: 5.5rem;
-    padding-right: 5.5rem;
-  }
+  .icon-input-wrap input[type="text"] { padding-left: 5.5rem; padding-right: 5.5rem; }
 }
-
-/* ============================================================
-   Chip de modo (Rango / Único) — izquierda del input
-   ============================================================ */
 
 .mode-chip {
   position: absolute;
@@ -675,17 +710,14 @@ textarea:invalid:not(:placeholder-shown):focus {
   left: 0.35rem;
   transform: translateY(-50%);
   z-index: 2;
-
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.35rem 0.65rem;
   border-radius: 7px;
-
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   color: var(--accent);
-
   font-family: inherit;
   font-size: 0.62rem;
   font-weight: 800;
@@ -711,10 +743,6 @@ textarea:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 5px currentColor;
   flex-shrink: 0;
 }
-
-/* ============================================================
-   Chip de moneda (ARS / USD) — derecha del input
-   ============================================================ */
 
 .cur-chip {
   position: absolute;
@@ -753,13 +781,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 1px 3px var(--accent-glow);
 }
 
-/* ============================================================
-   SalaryInput: hint del formato esperado
-   ============================================================ */
-
-.salary-input-wrap {
-  position: relative;
-}
+.salary-input-wrap { position: relative; }
 
 .salary-input-wrap input[type="text"] {
   font-variant-numeric: tabular-nums;
@@ -787,19 +809,14 @@ textarea:invalid:not(:placeholder-shown):focus {
   display: none;
 }
 
-.salary-hint.visible {
-  display: block;
-}
+.salary-hint.visible { display: block; }
 
 @media (max-width: 520px) {
-  .salary-hint {
-    left: 5.5rem;
-    right: 5.5rem;
-  }
+  .salary-hint { left: 5.5rem; right: 5.5rem; }
 }
 
 /* ============================================================
-   Notas destacada (borde acentuado + gradiente suave)
+   Notas destacada
    ============================================================ */
 
 .notas-highlight {
@@ -837,21 +854,12 @@ textarea:invalid:not(:placeholder-shown):focus {
    Modal con estructura V3
    ============================================================ */
 
-.modal.modal-v3 {
-  max-width: 620px;
-}
-
-.modal.modal-v3 h2 {
-  margin-bottom: 1.5rem;
-}
-
-.modal.modal-v3 .v3-section {
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.25rem;
-}
+.modal.modal-v3 { max-width: 620px; }
+.modal.modal-v3 h2 { margin-bottom: 1.5rem; }
+.modal.modal-v3 .v3-section { padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
 
 /* ============================================================
-   Combo · "Crear nuevo puesto" al final del dropdown
+   Combo · Crear nuevo puesto
    ============================================================ */
 
 .combo-create-option {
@@ -896,7 +904,6 @@ textarea:invalid:not(:placeholder-shown):focus {
   padding-bottom: 2px;
 }
 
-/* Subtitle dentro del modal */
 .modal .modal-subtitle {
   font-size: 0.82rem;
   color: var(--text-muted);
@@ -906,14 +913,10 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Combo · Chips de categoría dentro del modal de crear puesto
+   Chips de categoría en modal crear puesto
    ============================================================ */
 
-.create-cat-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
+.create-cat-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 
 .create-cat-chip {
   padding: 0.42rem 0.75rem;
@@ -967,12 +970,10 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   EstadoCombo · trigger estilo input (para Estado inicial)
+   EstadoCombo
    ============================================================ */
 
-input[type="hidden"] {
-  display: none;
-}
+input[type="hidden"] { display: none; }
 
 .combo-trigger {
   width: 100%;
@@ -992,13 +993,9 @@ input[type="hidden"] {
   transition: all 0.2s ease;
 }
 
-[data-theme="dark"] .combo-trigger {
-  background: var(--bg-1);
-}
+[data-theme="dark"] .combo-trigger { background: var(--bg-1); }
 
-.combo-trigger:hover {
-  border-color: var(--border-strong);
-}
+.combo-trigger:hover { border-color: var(--border-strong); }
 
 .combo-trigger:focus {
   outline: none;
@@ -1025,17 +1022,11 @@ input[type="hidden"] {
   text-overflow: ellipsis;
 }
 
-.combo-trigger-readonly {
-  cursor: default;
-  opacity: 0.9;
-}
-
-.combo-trigger-readonly:hover {
-  border-color: var(--border);
-}
+.combo-trigger-readonly { cursor: default; opacity: 0.9; }
+.combo-trigger-readonly:hover { border-color: var(--border); }
 
 /* ============================================================
-   ⭐ ContactLinkPicker: chips + input de link de contacto
+   ContactLinkPicker
    ============================================================ */
 
 .contact-chips {
@@ -1074,12 +1065,7 @@ input[type="hidden"] {
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-.contact-chip > svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  display: block;
-}
+.contact-chip > svg { width: 14px; height: 14px; flex-shrink: 0; display: block; }
 
 .platform-input {
   position: relative;
@@ -1102,43 +1088,32 @@ input[type="hidden"] {
   transition: color 0.2s ease;
 }
 
-.platform-icon > svg {
-  width: 16px;
-  height: 16px;
-  display: block;
-}
+.platform-icon > svg { width: 16px; height: 16px; display: block; }
 
 .platform-input input[type="text"] {
   padding-left: 2.7rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* ⭐ CAMBIO: estado VALID — borde e ícono en verde */
 .platform-input.valid input[type="text"] {
   border-color: var(--success);
   box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
 }
 
-.platform-input.valid .platform-icon {
-  color: var(--success);
-}
+.platform-input.valid .platform-icon { color: var(--success); }
 
-/* ⭐ CAMBIO: estado INVALID — borde e ícono en rojo */
 .platform-input.invalid input[type="text"] {
   border-color: var(--danger);
   box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
 }
 
-.platform-input.invalid .platform-icon {
-  color: var(--danger);
-}
+.platform-input.invalid .platform-icon { color: var(--danger); }
 
 .platform-input.invalid input[type="text"]:focus {
   border-color: var(--danger);
   box-shadow: 0 0 0 3px rgba(239,68,68,0.22);
 }
 
-/* ⭐ CAMBIO: mensaje de error debajo del input */
 .contact-link-error {
   display: none;
   margin-top: 0.4rem;
@@ -1149,10 +1124,7 @@ input[type="hidden"] {
   letter-spacing: 0.01em;
 }
 
-.contact-link-error.visible {
-  display: block;
-  animation: contactErrorIn 0.2s ease;
-}
+.contact-link-error.visible { display: block; animation: contactErrorIn 0.2s ease; }
 
 @keyframes contactErrorIn {
   from { opacity: 0; transform: translateY(-3px); }
@@ -1160,7 +1132,7 @@ input[type="hidden"] {
 }
 
 /* ============================================================
-   ⭐ Chip de contacto en la card del job
+   Chip de contacto en card del job
    ============================================================ */
 
 .job-contact-chip {
@@ -1190,18 +1162,9 @@ input[type="hidden"] {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.job-contact-chip > svg {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-  display: block;
-}
+.job-contact-chip > svg { width: 13px; height: 13px; flex-shrink: 0; display: block; }
 
-.job-contact-chip .chip-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.job-contact-chip .chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .job-contact-chip .chip-arrow {
   font-size: 0.72rem;
@@ -1210,7 +1173,4 @@ input[type="hidden"] {
   flex-shrink: 0;
 }
 
-.job-contact-chip:hover .chip-arrow {
-  transform: translateX(2px);
-  opacity: 1;
-}
+.job-contact-chip:hover .chip-arrow { transform: translateX(2px); opacity: 1; }

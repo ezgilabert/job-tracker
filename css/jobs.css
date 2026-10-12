@@ -1,42 +1,6 @@
 /* ============================================================
-   Jobs: collapsible section, job cards, badges
+   Jobs: job cards, badges
    ============================================================ */
-
-/* ===== Jobs section ===== */
-.jobs-section {
-  margin-bottom: 1.5rem;
-}
-
-.jobs-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.25rem;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.jobs-header h2 {
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.jobs-header p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.jobs-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
 
 .job-counter {
   display: inline-flex;
@@ -125,27 +89,19 @@
 [data-theme="dark"] .job[data-estado="Descartado"] { opacity: 0.65; }
 
 /* ============================================================
-   Final offer: golden border + corner ribbon
-   Shown while the offer waits for user confirmation.
+   Final offer
    ============================================================ */
 
 .job[data-estado="Oferta"] {
   border-color: var(--gold-border);
-  box-shadow:
-    0 8px 28px rgba(245,179,1,0.18),
-    var(--shadow-sm);
+  box-shadow: 0 8px 28px rgba(245,179,1,0.18), var(--shadow-sm);
 }
 
 .job[data-estado="Oferta"]:hover {
   border-color: var(--gold);
-  box-shadow:
-    0 12px 32px rgba(245,179,1,0.28),
-    var(--shadow);
+  box-shadow: 0 12px 32px rgba(245,179,1,0.28), var(--shadow);
 }
 
-/* Diagonal ribbon in the top-right corner.
-   .job has overflow: hidden, so the ribbon is clipped
-   automatically against the card border. */
 .job-offer-ribbon {
   position: absolute;
   top: 22px;
@@ -166,11 +122,7 @@
   white-space: nowrap;
 }
 
-/* Push the actions left so they don't sit under the
-   ribbon while the card is in the raw Oferta state. */
-.job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions {
-  margin-right: 70px;
-}
+.job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions { margin-right: 70px; }
 
 @media (max-width: 640px) {
   .job-offer-ribbon {
@@ -180,15 +132,11 @@
     font-size: 0.62rem;
     padding: 0.35rem 0;
   }
-  .job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions {
-    margin-right: 55px;
-  }
+  .job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions { margin-right: 55px; }
 }
 
 /* ============================================================
-   Offer CONFIRMED: festive confetti + banner
-   Card stays interactive, but the workflow is locked with an
-   "unmark" escape hatch.
+   Offer CONFIRMED
    ============================================================ */
 
 .job.offer-confirmed {
@@ -196,19 +144,14 @@
   background:
     radial-gradient(circle at 100% 0%, var(--gold-soft), transparent 55%),
     var(--surface);
-  box-shadow:
-    0 8px 32px rgba(245,179,1,0.18),
-    var(--shadow-sm);
+  box-shadow: 0 8px 32px rgba(245,179,1,0.18), var(--shadow-sm);
 }
 
 .job.offer-confirmed:hover {
   border-color: var(--gold);
-  box-shadow:
-    0 12px 36px rgba(245,179,1,0.28),
-    var(--shadow);
+  box-shadow: 0 12px 36px rgba(245,179,1,0.28), var(--shadow);
 }
 
-/* Confetti layer: absolute, clipped by the card's overflow. */
 .job-confetti {
   position: absolute;
   inset: 0;
@@ -242,7 +185,6 @@
   100% { transform: translateY(620px) rotate(720deg); opacity: 0; }
 }
 
-/* Make sure the card content sits above the confetti. */
 .job.offer-confirmed .job-header,
 .job.offer-confirmed .workflow,
 .job.offer-confirmed .badge,
@@ -255,7 +197,6 @@
   z-index: 1;
 }
 
-/* Congrats banner inside the card. */
 .congrats-banner {
   display: flex;
   align-items: center;
@@ -301,18 +242,14 @@
   font-weight: 500;
 }
 
-/* Confirmed badge: subtle difference from the raw Oferta badge. */
 .badge.badge-confirmed {
   background: linear-gradient(135deg, var(--gold-soft), rgba(16,185,129,0.12));
   color: var(--gold);
   border-color: var(--gold-border);
 }
 
-[data-theme="dark"] .badge.badge-confirmed {
-  color: #f5b301;
-}
+[data-theme="dark"] .badge.badge-confirmed { color: #f5b301; }
 
-/* Static "Offer confirmed" pill (replaces the workflow CTA). */
 .offer-confirmed-pill {
   flex: 1;
   min-width: 220px;
@@ -331,9 +268,7 @@
   box-shadow: 0 4px 14px rgba(245,179,1,0.4);
 }
 
-.offer-confirmed-pill .pill-emoji {
-  font-size: 1.05rem;
-}
+.offer-confirmed-pill .pill-emoji { font-size: 1.05rem; }
 
 /* Drag & drop */
 .job.dragging {
