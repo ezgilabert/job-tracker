@@ -1,6 +1,7 @@
 /* ============================================================
    Referrals: cards + tags de referidos en jobs
    V3 · Progress pegada al top + botones grandes
+   Empty ref · opción C (104px / 48px)
    ============================================================ */
 
 /* ============================================================
@@ -30,16 +31,21 @@ form.form-block {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: white;
+  background: var(--surface);
+  color: var(--accent);
+  border: 2px dashed var(--accent-border);
   display: grid;
   place-items: center;
-  font-size: 1.6rem;
-  font-weight: 800;
-  box-shadow: 0 6px 18px var(--accent-glow);
   flex-shrink: 0;
   line-height: 1;
   user-select: none;
+}
+
+.ref-hero-avatar svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 2;
+  display: block;
 }
 
 .ref-hero-input {
@@ -90,7 +96,10 @@ form.form-block {
   .ref-hero-avatar {
     width: 52px;
     height: 52px;
-    font-size: 1.35rem;
+  }
+  .ref-hero-avatar svg {
+    width: 24px;
+    height: 24px;
   }
   .ref-hero-input input {
     font-size: 1rem;
@@ -123,7 +132,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Chips (relación / estado) — form nuevo referido
+   Chips (relación / estado) en form
    ============================================================ */
 
 .ref-chips {
@@ -782,21 +791,21 @@ form.form-block {
 }
 
 /* ============================================================
-   Empty state (referidos): ícono link + círculo accent
+   Empty state (referidos) · OPCIÓN C · 104px / 48px
    ============================================================ */
 
 .empty-ref {
   text-align: center;
-  padding: 2.75rem 1rem 2.5rem;
+  padding: 3.25rem 1rem 3rem;
   background: var(--surface);
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius);
 }
 
 .empty-ref-visual {
-  margin: 0 auto 1.1rem;
-  width: 72px;
-  height: 72px;
+  margin: 0 auto 1.4rem;
+  width: 104px;
+  height: 104px;
   border-radius: 50%;
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
@@ -806,8 +815,8 @@ form.form-block {
 }
 
 .empty-ref-visual svg {
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   stroke-width: 1.8;
   display: block;
 }
@@ -819,18 +828,19 @@ form.form-block {
 }
 
 .empty-ref h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .empty-ref p {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   color: var(--text-muted);
-  max-width: 340px;
+  max-width: 380px;
   margin: 0 auto;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* ============================================================
