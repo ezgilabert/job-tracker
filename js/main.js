@@ -278,9 +278,16 @@ async function boot() {
                 fecha: r.createdAt || new Date().toISOString(),
               }];
 
+          // Normalizar relacion → array (multiselect)
+          const relacionRaw = r.relacion;
+          const relacion = Array.isArray(relacionRaw)
+            ? relacionRaw
+            : (relacionRaw ? [relacionRaw] : []);
+
           return {
             ...r,
             estado: normalizedEstado,
+            relacion,
             link: r.link ?? r.linkedin ?? '',
             empresasVinculadas: ensureArray(r.empresasVinculadas),
             volvioAtras: Boolean(r.volvioAtras),
@@ -343,7 +350,10 @@ async function boot() {
     onChange: () => {},
   });
 
-  const refRelacionChips = mountChips(document.getElementById('refRelacionChips'));
+  const refRelacionChips = mountChips(
+    document.getElementById('refRelacionChips'),
+    { allowMultiple: true }
+  );
   const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
 
   mountInputLimits(document);
@@ -371,9 +381,6 @@ async function boot() {
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
 
     const current = getLanguage();
-    if (lastLang !== null && lastLang !== current) {
-      // El stagger ya se dispara desde langToggle, así que no lo repetimos acá.
-    }
     lastLang = current;
   });
 }

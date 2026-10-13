@@ -544,7 +544,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
   const refEditRelacion = mountChips(
     document.getElementById('refEditRelacionChips'),
-    { onChange: () => {} }
+    { onChange: () => {}, allowMultiple: true }
   );
   const refEditEstado = mountChips(
     document.getElementById('refEditEstadoChips'),
@@ -562,7 +562,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     setVal('refEditLink', r.link || '');
     setVal('refEditNotas', r.notas || '');
 
-    refEditRelacion.setValue(r.relacion || 'Conocido');
+    // relacion: puede venir como string (legacy) o array (nuevo)
+    const relacionValue = Array.isArray(r.relacion)
+      ? r.relacion
+      : (r.relacion ? [r.relacion] : []);
+    refEditRelacion.setValue(relacionValue);
+
     refEditEstado.setValue(r.estado || 'Pendiente');
 
     refEditModal.classList.add('open');
@@ -581,6 +586,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   document.getElementById('refSaveEdit').addEventListener('click', () => {
     if (!refEditingId) return;
 
+    const relacionValue = refEditRelacion.getValue() || [];
+
     refsStore.update(refs => refs.map(r => {
       if (r.id !== refEditingId) return r;
       return {
@@ -589,10 +596,9 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         rol:      valueOf('refEditRol'),
         contacto: valueOf('refEditContacto'),
         link:     valueOf('refEditLink'),
-        relacion: refEditRelacion.getValue() || 'Conocido',
+        relacion: Array.isArray(relacionValue) ? relacionValue : [],
         estado:   refEditEstado.getValue() || 'Pendiente',
         notas:    valueOf('refEditNotas'),
-        // empresasVinculadas / linkedJobId se preservan desde ...r
       };
     }));
 

@@ -1,6 +1,7 @@
 // ============================================================
 // Template: referral card
 // V3 · Progress pegada al header + botones grandes
+// Multiselect de relación
 // ============================================================
 
 import { REF_WORKFLOW_STEPS } from '../constants.js';
@@ -23,7 +24,20 @@ export function renderRefCard(ref /*, ctx = {} */) {
     ? Math.round(((currentIdx + 1) / totalSteps) * 100)
     : 0;
 
-  // Meta inline (no chips, solo spans)
+  // ------------------------------------------------------------
+  // Relaciones: normalizamos a array (soporta legacy string)
+  // ------------------------------------------------------------
+  const relaciones = Array.isArray(ref.relacion)
+    ? ref.relacion
+    : (ref.relacion ? [ref.relacion] : []);
+
+  const primaryRelacion = relaciones[0] || '';
+
+  const relacionBadgesHtml = relaciones
+    .map(rel => `<span class="ref-relacion-badge" data-relacion="${escapeHtml(rel)}">${escapeHtml(rel)}</span>`)
+    .join('');
+
+  // Meta inline
   const linkTxt = ref.link
     ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))} ↗</a>`
     : '';
@@ -82,14 +96,14 @@ export function renderRefCard(ref /*, ctx = {} */) {
 
   return `
     <div class="referido"
-         data-relacion="${escapeHtml(ref.relacion || '')}"
+         data-relacion="${escapeHtml(primaryRelacion)}"
          data-estado="${escapeHtml(ref.estado)}"
          data-id="${ref.id}">
 
       <div class="ref-body">
         <div class="ref-top">
           <h4>${escapeHtml(ref.nombre)}</h4>
-          ${ref.relacion ? `<span class="ref-relacion-badge">${escapeHtml(ref.relacion)}</span>` : ''}
+          ${relacionBadgesHtml}
           <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(tRefState(ref.estado))}</span>
         </div>
 
@@ -136,7 +150,6 @@ function renderOpenActions(ref, currentIdx) {
   const hasLinkedJob = Boolean(ref.linkedJobId);
   const backLocked = alreadyWentBack || hasLinkedJob;
 
-  // Botón grande principal
   const nextBtn = nextStep
     ? `<button class="wf-btn-big primary"
               data-action="move-ref-next"
@@ -148,7 +161,6 @@ function renderOpenActions(ref, currentIdx) {
          ✓ ${escapeHtml(t('ref.contratado'))}
        </button>`;
 
-  // Botón volver
   let backBtn = '';
   if (prevStep) {
     const label = `← ${escapeHtml(tRefStateShort(prevStep.id))}`;
@@ -171,7 +183,6 @@ function renderOpenActions(ref, currentIdx) {
     backBtn = `<button class="wf-btn-secondary" disabled>← ${escapeHtml(t('job.firstStep'))}</button>`;
   }
 
-  // Botón no aplica
   const closeBtn = `<button class="wf-btn-secondary danger"
                             data-action="close-ref"
                             title="${escapeHtml(t('ref.notApplicableTitle'))}">

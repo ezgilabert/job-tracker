@@ -2,6 +2,7 @@
    Referrals: cards + tags de referidos en jobs
    V3 · Progress pegada al top + botones grandes
    Empty ref · opción C (104px / 48px)
+   Multiselect de relación
    ============================================================ */
 
 /* ============================================================
@@ -337,6 +338,11 @@ form.form-block {
   letter-spacing: -0.01em;
 }
 
+/* ============================================================
+   Badge de relación (multiselect)
+   Colores aplicados por el data-relacion DEL PROPIO BADGE
+   ============================================================ */
+
 .ref-relacion-badge {
   display: inline-flex;
   align-items: center;
@@ -351,19 +357,23 @@ form.form-block {
   border: 1px solid var(--accent-border);
 }
 
-.referido[data-relacion="Amigo"] .ref-relacion-badge { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-.referido[data-relacion="Ex-colega"] .ref-relacion-badge { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
-.referido[data-relacion="Familiar"] .ref-relacion-badge { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
-.referido[data-relacion="Conocido"] .ref-relacion-badge { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
-.referido[data-relacion="Recruiter"] .ref-relacion-badge { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
-.referido[data-relacion="Mentor"] .ref-relacion-badge { background: #fefce8; color: #a16207; border-color: #fef08a; }
+.ref-relacion-badge[data-relacion="Amigo"]      { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.ref-relacion-badge[data-relacion="Ex-colega"]  { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
+.ref-relacion-badge[data-relacion="Familiar"]   { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+.ref-relacion-badge[data-relacion="Conocido"]   { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.ref-relacion-badge[data-relacion="Recruiter"]  { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
+.ref-relacion-badge[data-relacion="Mentor"]     { background: #fefce8; color: #a16207; border-color: #fef08a; }
 
-[data-theme="dark"] .referido[data-relacion="Amigo"] .ref-relacion-badge { background: rgba(249,115,22,0.16); color: #fb923c; border-color: transparent; }
-[data-theme="dark"] .referido[data-relacion="Ex-colega"] .ref-relacion-badge { background: var(--info-soft); color: #60a5fa; border-color: transparent; }
-[data-theme="dark"] .referido[data-relacion="Familiar"] .ref-relacion-badge { background: rgba(236,72,153,0.16); color: #f472b6; border-color: transparent; }
-[data-theme="dark"] .referido[data-relacion="Conocido"] .ref-relacion-badge { background: rgba(124,58,237,0.16); color: #a78bfa; border-color: transparent; }
-[data-theme="dark"] .referido[data-relacion="Recruiter"] .ref-relacion-badge { background: var(--success-soft); color: #34d399; border-color: transparent; }
-[data-theme="dark"] .referido[data-relacion="Mentor"] .ref-relacion-badge { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
+[data-theme="dark"] .ref-relacion-badge[data-relacion="Amigo"]      { background: rgba(249,115,22,0.16); color: #fb923c; border-color: transparent; }
+[data-theme="dark"] .ref-relacion-badge[data-relacion="Ex-colega"]  { background: var(--info-soft); color: #60a5fa; border-color: transparent; }
+[data-theme="dark"] .ref-relacion-badge[data-relacion="Familiar"]   { background: rgba(236,72,153,0.16); color: #f472b6; border-color: transparent; }
+[data-theme="dark"] .ref-relacion-badge[data-relacion="Conocido"]   { background: rgba(124,58,237,0.16); color: #a78bfa; border-color: transparent; }
+[data-theme="dark"] .ref-relacion-badge[data-relacion="Recruiter"]  { background: var(--success-soft); color: #34d399; border-color: transparent; }
+[data-theme="dark"] .ref-relacion-badge[data-relacion="Mentor"]     { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
+
+/* ============================================================
+   Badge de estado
+   ============================================================ */
 
 .ref-estado-badge {
   display: inline-flex;

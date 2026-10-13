@@ -88,7 +88,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const relCount = {};
     refs.forEach(r => {
       if (!r.relacion) return;
-      relCount[r.relacion] = (relCount[r.relacion] || 0) + 1;
+      const list = Array.isArray(r.relacion) ? r.relacion : [r.relacion];
+      list.forEach(rel => {
+        if (!rel) return;
+        relCount[rel] = (relCount[rel] || 0) + 1;
+      });
     });
     const top = Object.entries(relCount)
       .map(([name, count]) => ({ name, count }))
@@ -221,7 +225,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   function initChips(relacion, estado) {
     relacionChips = relacion;
     estadoChips = estado;
-    relacionChips.setValue(null);
+    relacionChips.setValue([]);
     estadoChips.setValue('Pendiente');
   }
 
@@ -236,6 +240,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     if (!nombre) return;
 
     const initialState = estadoChips?.getValue() || 'Pendiente';
+    const relacionValue = relacionChips?.getValue() || [];
     const now = new Date().toISOString();
 
     const newRef = {
@@ -244,7 +249,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       rol: valueOf('refRol'),
       contacto: valueOf('refContacto'),
       link: valueOf('refLink'),
-      relacion: relacionChips?.getValue() || 'Conocido',
+      relacion: Array.isArray(relacionValue) ? relacionValue : [],
       estado: initialState,
       // Campos internos: los setea el flow de "Referido hecho" (refToJob).
       empresasVinculadas: [],
@@ -258,7 +263,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     refsStore.update(refs => [newRef, ...refs]);
 
     refForm.reset();
-    relacionChips?.setValue(null);
+    relacionChips?.setValue([]);
     estadoChips?.setValue('Pendiente');
 
     // Expandimos la lista y colapsamos el form

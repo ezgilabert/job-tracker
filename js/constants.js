@@ -328,7 +328,8 @@ export const STORAGE_KEYS = {
   CONFIG: 'jobTrackerConfig',
 };
 
-export const STORAGE_VERSION = 3;
+// ⭐ CAMBIO: bump de versión por el multiselect de relación
+export const STORAGE_VERSION = 4;
 // ⭐ CAMBIO: subimos la versión del config para forzar la migración
 export const CONFIG_VERSION = 2;
 
