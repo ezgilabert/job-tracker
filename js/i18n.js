@@ -201,6 +201,9 @@ const translations = {
     'ref.historyTitle': 'Ver historial',
     'ref.lockedBackTitle': 'No se puede volver atrás: la postulación ya fue creada',
 
+    'refCard.markAs': 'Marcar como {step}',
+    'refCard.history': 'Historial',
+
     'empty.jobs.title': 'Todavía no cargaste postulaciones',
     'empty.jobs.subtitle': 'Empezá agregando una arriba para hacerle seguimiento',
     'empty.jobs.filter.title': 'Sin resultados en este filtro',
@@ -726,6 +729,9 @@ const translations = {
     'ref.deleteTitle': 'Delete',
     'ref.historyTitle': 'View history',
     'ref.lockedBackTitle': "Can't go back: the application was already created",
+
+    'refCard.markAs': 'Mark as {step}',
+    'refCard.history': 'History',
 
     'empty.jobs.title': "You haven't added any applications yet",
     'empty.jobs.subtitle': 'Start by adding one above to track it',

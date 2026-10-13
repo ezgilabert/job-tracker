@@ -1,5 +1,6 @@
 // ============================================================
 // Template: referral card
+// V3 · Progress pegada al header + botones grandes
 // ============================================================
 
 import { REF_WORKFLOW_STEPS } from '../constants.js';
@@ -14,6 +15,15 @@ import { t, tRefState, tRefStateShort } from '../i18n.js';
  * @returns {string} HTML
  */
 export function renderRefCard(ref /*, ctx = {} */) {
+  const refClosed = isRefClosed(ref.estado);
+  const currentIdx = refStepIndex(ref.estado);
+  const totalSteps = REF_WORKFLOW_STEPS.length;
+  const currentStepNum = currentIdx >= 0 ? currentIdx + 1 : 0;
+  const progressPct = currentIdx >= 0
+    ? Math.round(((currentIdx + 1) / totalSteps) * 100)
+    : 0;
+
+  // Meta inline (no chips, solo spans)
   const linkTxt = ref.link
     ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))} ↗</a>`
     : '';
@@ -23,13 +33,16 @@ export function renderRefCard(ref /*, ctx = {} */) {
   const roleTxt = ref.rol
     ? `<span>💼 ${escapeHtml(ref.rol)}</span>`
     : '';
+  const metaHtml = (roleTxt || contactTxt || linkTxt)
+    ? `<div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>`
+    : '';
+
+  // Notas
   const notesTxt = ref.notas
     ? `<div class="ref-notas">${escapeHtml(ref.notas)}</div>`
     : '';
 
-  const refClosed = isRefClosed(ref.estado);
-  const currentIdx = refStepIndex(ref.estado);
-
+  // Steps
   const stepsHtml = refClosed
     ? ''
     : renderSteps(REF_WORKFLOW_STEPS, currentIdx, [], {
@@ -38,12 +51,27 @@ export function renderRefCard(ref /*, ctx = {} */) {
         kind: 'ref',
       });
 
-  const actionsHtml = refClosed
-    ? `<div class="ref-wf-actions">
-         <button class="ref-wf-btn" data-action="reopen-ref">↻ ${escapeHtml(t('ref.reopen'))}</button>
-       </div>`
-    : renderRefActions(ref, currentIdx);
+  // Bloque de progreso superior (solo si no está cerrado)
+  const topProgressHtml = refClosed
+    ? ''
+    : `<div class="ref-top-progress">
+         <span class="stage-count">${currentStepNum} / ${totalSteps}</span>
+         <div class="progress-bar"><div class="progress-fill" style="width: ${progressPct}%;"></div></div>
+         <button type="button"
+                 class="ref-history-btn"
+                 data-action="ref-history"
+                 title="${escapeHtml(t('ref.historyTitle'))}"
+                 aria-label="${escapeHtml(t('ref.historyTitle'))}">
+           🕒
+         </button>
+       </div>`;
 
+  // Acciones
+  const actionsHtml = refClosed
+    ? renderClosedActions()
+    : renderOpenActions(ref, currentIdx);
+
+  // Nota pendiente del paso actual
   const pendingNote = currentRefStepNote(ref);
   const pendingNoteHtml = (!refClosed && pendingNote)
     ? `<div class="step-note">
@@ -65,7 +93,8 @@ export function renderRefCard(ref /*, ctx = {} */) {
           <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(tRefState(ref.estado))}</span>
         </div>
 
-        <div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>
+        ${topProgressHtml}
+        ${metaHtml}
         ${notesTxt}
         ${pendingNoteHtml}
 
@@ -95,7 +124,10 @@ export function renderRefCard(ref /*, ctx = {} */) {
   `;
 }
 
-function renderRefActions(ref, currentIdx) {
+// ------------------------------------------------------------
+// Acciones cuando el referido está abierto
+// ------------------------------------------------------------
+function renderOpenActions(ref, currentIdx) {
   const canBack = currentIdx > 0;
   const canNext = currentIdx < REF_WORKFLOW_STEPS.length - 1;
   const prevStep = canBack ? REF_WORKFLOW_STEPS[currentIdx - 1] : null;
@@ -104,32 +136,73 @@ function renderRefActions(ref, currentIdx) {
   const hasLinkedJob = Boolean(ref.linkedJobId);
   const backLocked = alreadyWentBack || hasLinkedJob;
 
+  // Botón grande principal
   const nextBtn = nextStep
-    ? `<button class="ref-wf-btn primary" data-action="move-ref-next" title="${escapeHtml(t('ref.nextTitle', { step: tRefStateShort(nextStep.id) }))}">${escapeHtml(t('ref.next'))} ${escapeHtml(tRefStateShort(nextStep.id))}</button>`
-    : `<button class="ref-wf-btn success" disabled title="${escapeHtml(t('ref.contratadoTitle'))}">✓ ${escapeHtml(t('ref.contratado'))}</button>`;
+    ? `<button class="wf-btn-big primary"
+              data-action="move-ref-next"
+              title="${escapeHtml(t('ref.nextTitle', { step: tRefStateShort(nextStep.id) }))}">
+         → ${escapeHtml(tRefStateShort(nextStep.id))}
+       </button>`
+    : `<button class="wf-btn-big success" disabled
+              title="${escapeHtml(t('ref.contratadoTitle'))}">
+         ✓ ${escapeHtml(t('ref.contratado'))}
+       </button>`;
 
-  let prevBtn = '';
+  // Botón volver
+  let backBtn = '';
   if (prevStep) {
-    const label = `${escapeHtml(t('ref.prev'))} ${escapeHtml(tRefStateShort(prevStep.id))}`;
+    const label = `← ${escapeHtml(tRefStateShort(prevStep.id))}`;
     if (!backLocked) {
-      prevBtn = `<button class="ref-wf-btn" data-action="move-ref-prev" title="${escapeHtml(t('ref.prevTitle', { step: tRefStateShort(prevStep.id) }))}">${label}</button>`;
+      backBtn = `<button class="wf-btn-secondary"
+                        data-action="move-ref-prev"
+                        title="${escapeHtml(t('ref.prevTitle', { step: tRefStateShort(prevStep.id) }))}">
+                   ${label}
+                 </button>`;
     } else {
       const lockTitle = hasLinkedJob
         ? t('ref.lockedBackTitle')
         : t('toast.alreadyWentBackRef');
-      prevBtn = `<button class="ref-wf-btn" disabled title="${escapeHtml(lockTitle)}">🔒 ${label}</button>`;
+      backBtn = `<button class="wf-btn-secondary" disabled
+                        title="${escapeHtml(lockTitle)}">
+                   🔒 ${label}
+                 </button>`;
     }
+  } else {
+    backBtn = `<button class="wf-btn-secondary" disabled>← ${escapeHtml(t('job.firstStep'))}</button>`;
   }
 
+  // Botón no aplica
+  const closeBtn = `<button class="wf-btn-secondary danger"
+                            data-action="close-ref"
+                            title="${escapeHtml(t('ref.notApplicableTitle'))}">
+                      ${escapeHtml(t('ref.notApplicable'))}
+                    </button>`;
+
   return `
-    <div class="ref-wf-actions">
+    <div class="ref-wf-main-actions">
       ${nextBtn}
-      ${prevBtn}
-      <button class="ref-wf-btn danger" data-action="close-ref" title="${escapeHtml(t('ref.notApplicableTitle'))}">${escapeHtml(t('ref.notApplicable'))}</button>
+      ${backBtn}
+      ${closeBtn}
     </div>
   `;
 }
 
+// ------------------------------------------------------------
+// Acciones cuando el referido está cerrado (No aplica)
+// ------------------------------------------------------------
+function renderClosedActions() {
+  return `
+    <div class="ref-wf-main-actions">
+      <button class="wf-btn-big primary" data-action="reopen-ref">
+        ↻ ${escapeHtml(t('ref.reopen'))}
+      </button>
+    </div>
+  `;
+}
+
+// ------------------------------------------------------------
+// Nota del paso actual
+// ------------------------------------------------------------
 function currentRefStepNote(ref) {
   const hist = ensureArray(ref.history);
   for (let i = hist.length - 1; i >= 0; i--) {

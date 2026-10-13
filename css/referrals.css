@@ -1,5 +1,6 @@
 /* ============================================================
    Referrals: cards + tags de referidos en jobs
+   V3 · Progress pegada al top + botones grandes
    ============================================================ */
 
 /* ============================================================
@@ -12,7 +13,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Hero: avatar + nombre del referido
+   Hero: avatar + nombre del referido (form nuevo referido)
    ============================================================ */
 
 .ref-hero-row {
@@ -122,7 +123,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Chips (relación / estado)
+   Chips (relación / estado) — form nuevo referido
    ============================================================ */
 
 .ref-chips {
@@ -157,7 +158,6 @@ form.form-block {
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* Estados del referido con color por tipo */
 .ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
   background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
 }
@@ -394,7 +394,111 @@ form.form-block {
 [data-theme="dark"] .ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: #f87171; }
 
 /* ============================================================
-   Workflow de referidos
+   V3 · Progress pegada al top
+   ============================================================ */
+
+.ref-top-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.ref-top-progress .stage-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.ref-top-progress .progress-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+
+.ref-top-progress .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.4s ease;
+}
+
+.ref-history-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.ref-history-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* ============================================================
+   Meta inline
+   ============================================================ */
+
+.ref-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.ref-meta span,
+.ref-meta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ref-meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.ref-meta a:hover { opacity: 0.75; }
+
+/* ============================================================
+   Notas
+   ============================================================ */
+
+.ref-notas {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--accent-border);
+  margin-top: 0.5rem;
+}
+
+/* ============================================================
+   Workflow
    ============================================================ */
 
 .ref-workflow {
@@ -506,77 +610,73 @@ form.form-block {
   box-shadow: 0 0 0 3px rgba(239,68,68,0.2), 0 0 12px rgba(239,68,68,0.4);
 }
 
-.ref-wf-actions {
+/* ============================================================
+   V3 · Acciones grandes
+   ============================================================ */
+
+.ref-wf-main-actions {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
+  margin-top: 0.5rem;
 }
 
-.ref-wf-btn {
-  padding: 0.5rem 0.9rem;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+.ref-wf-main-actions .wf-btn-big {
+  flex: 1;
+  min-width: 200px;
+  justify-content: center;
 }
 
-.ref-wf-btn:hover:not(:disabled) {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  color: var(--accent);
-  transform: translateY(-1px);
+.ref-wf-main-actions .wf-btn-secondary {
+  flex-shrink: 0;
+  justify-content: center;
 }
 
-.ref-wf-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.ref-wf-btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  box-shadow: 0 3px 10px var(--accent-glow);
-}
-
-.ref-wf-btn.primary:hover:not(:disabled) {
-  background: var(--accent-2);
-  border-color: var(--accent-2);
-  color: white;
-  box-shadow: 0 5px 14px var(--accent-glow);
-}
-
-.ref-wf-btn.success {
-  background: var(--success);
-  border-color: var(--success);
-  color: white;
-  box-shadow: 0 3px 10px rgba(16,185,129,0.3);
-}
-.ref-wf-btn.success:hover:not(:disabled) {
-  background: var(--success-2);
-  box-shadow: 0 5px 14px rgba(16,185,129,0.4);
-}
-
-.ref-wf-btn.danger {
+.ref-wf-main-actions .wf-btn-secondary.danger {
   color: var(--danger-2);
   border-color: var(--danger-border);
   background: var(--danger-soft);
 }
-.ref-wf-btn.danger:hover:not(:disabled) {
+
+.ref-wf-main-actions .wf-btn-secondary.danger:hover:not(:disabled) {
   background: var(--danger);
   border-color: var(--danger);
   color: white;
+  box-shadow: 0 4px 12px rgba(239,68,68,0.35);
 }
 
 /* ============================================================
-   Empresas vinculadas
+   Mobile: apilar botones grandes
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .ref-wf-main-actions {
+    flex-direction: column;
+  }
+  .ref-wf-main-actions .wf-btn-big {
+    min-width: 0;
+    width: 100%;
+  }
+  .ref-wf-main-actions .wf-btn-secondary {
+    width: 100%;
+  }
+  .ref-top-progress .stage-count {
+    font-size: 0.68rem;
+  }
+}
+
+/* ============================================================
+   Cleanup: botones viejos (ya no se usan, se ocultan por las dudas)
+   ============================================================ */
+
+.ref-wf-actions,
+.ref-wf-btn {
+  display: none;
+}
+
+/* ============================================================
+   Empresas vinculadas (legacy, sin UI pero se mantiene por las dudas)
    ============================================================ */
 
 .ref-empresas-wrap {
@@ -661,34 +761,9 @@ form.form-block {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.ref-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.9rem;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
-}
-
-.ref-meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
-
-.ref-meta a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
-
-.ref-meta a:hover { opacity: 0.75; }
-
-.ref-notas {
-  font-size: 0.84rem;
-  color: var(--text-muted);
-  font-style: italic;
-  padding-left: 0.7rem;
-  border-left: 2px solid var(--accent-border);
-  margin-top: 0.5rem;
-}
+/* ============================================================
+   Acciones laterales de la card
+   ============================================================ */
 
 .ref-actions {
   display: flex;
@@ -704,6 +779,58 @@ form.form-block {
   .ref-actions { opacity: 1; }
   .ref-toolbar { flex-direction: column; align-items: stretch; }
   .ref-search { max-width: 100%; }
+}
+
+/* ============================================================
+   Empty state (referidos): ícono link + círculo accent
+   ============================================================ */
+
+.empty-ref {
+  text-align: center;
+  padding: 2.75rem 1rem 2.5rem;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.empty-ref-visual {
+  margin: 0 auto 1.1rem;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.empty-ref-visual svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.8;
+  display: block;
+}
+
+[data-theme="dark"] .empty-ref-visual {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.empty-ref h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.empty-ref p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.5;
 }
 
 /* ============================================================
@@ -777,55 +904,3 @@ form.form-block {
 .job-ref-chip[data-estado="En proceso"] .job-ref-estado-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .job-ref-chip[data-estado="Contratado"] .job-ref-estado-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
 .job-ref-chip[data-estado="No aplica"] .job-ref-estado-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
-
-/* ============================================================
-   Empty state (referidos): ícono link + círculo accent
-   ============================================================ */
-
-.empty-ref {
-  text-align: center;
-  padding: 2.75rem 1rem 2.5rem;
-  background: var(--surface);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius);
-}
-
-.empty-ref-visual {
-  margin: 0 auto 1.1rem;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  display: grid;
-  place-items: center;
-  color: var(--accent);
-}
-
-.empty-ref-visual svg {
-  width: 34px;
-  height: 34px;
-  stroke-width: 1.8;
-  display: block;
-}
-
-[data-theme="dark"] .empty-ref-visual {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  color: var(--accent);
-}
-
-.empty-ref h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.4rem;
-}
-
-.empty-ref p {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  max-width: 340px;
-  margin: 0 auto;
-  line-height: 1.5;
-}
