@@ -2,9 +2,8 @@
 // Dashboard: panel de stats que aparece arriba de las listas
 // de postulaciones y referidos.
 //
-// Cada dashboard se envuelve en una card con header propio
-// (ícono + título) que lo identifica visualmente como
-// "Postulaciones" o "Referidos".
+// Wrapper opción 4 · violeta unificado
+// Escala interna controlada por --dash-scale (definida en CSS)
 //
 // Soporta 6 estilos configurables:
 //   - 'sparklines' → 4 cards con mini-gráficos de tendencia
@@ -13,26 +12,23 @@
 //   - 'compact'    → chips horizontales + barra de distribución
 //   - 'circular'   → anillos de progreso SVG
 //   - 'heatmap'    → calendario de actividad tipo GitHub
-//
-// El resumen (summary) se renderiza SIEMPRE, en cualquier estilo,
-// al final del body.
-//
-// Uso:
-//   renderDashboard(container, {
-//     style: 'sparklines' | 'modular' | ... ,
-//     kind: 'jobs' | 'refs',
-//     icon: '📋',
-//     label: 'Postulaciones',
-//     total, active, closed, inProcess, highlight,
-//     highlightLabel, highlightIcon,
-//     trend: { total, active, highlight, closed },
-//     topLabel, topIcon, top: [{ name, count }],
-//     heatmap: [n, n, n, ...],
-//     summary,
-//   });
 // ============================================================
 
 import { escapeHtml } from '../utils.js';
+
+// ------------------------------------------------------------
+// Iconos SVG por tipo de dashboard
+// ------------------------------------------------------------
+const DASH_ICONS = {
+  jobs: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="4" y="4" width="16" height="16" rx="2"/>
+    <path d="M8 9h8M8 13h8M8 17h5"/>
+  </svg>`,
+  refs: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  </svg>`,
+};
 
 // ------------------------------------------------------------
 // Utilidades
@@ -112,7 +108,7 @@ export function buildDailyActivity(items, getDate, days = 60) {
 // ============================================================
 function renderSparklines(container, data) {
   const cards = [
-    { label: '📋 ' + data.labels.total, num: data.total, values: data.trend.total, color: '#7c5cff', grad: '#a855f7' },
+    { label: '📋 ' + data.labels.total, num: data.total, values: data.trend.total, color: '#8b6cff', grad: '#b975ff' },
     { label: '🔥 ' + data.labels.active, num: data.active, values: data.trend.active, color: '#f59e0b', grad: '#f97316' },
     { label: data.highlightIcon + ' ' + data.highlightLabel, num: data.highlight, values: data.trend.highlight, color: '#10b981', grad: '#14b8a6' },
     { label: '❌ ' + data.labels.closed, num: data.closed, values: data.trend.closed, color: '#ef4444', grad: '#f87171' },
@@ -408,18 +404,18 @@ export function renderDashboard(container, data) {
   container.innerHTML = '';
 
   const kind = data.kind === 'refs' ? 'refs' : 'jobs';
-  const icon = data.icon || '📊';
   const label = data.label || '';
+  const iconSvg = DASH_ICONS[kind] || DASH_ICONS.jobs;
 
-  // Wrapper con header propio
+  // Wrapper opción 4 · violeta unificado
   const wrapper = document.createElement('div');
   wrapper.className = `dash-labeled ${kind}`;
 
   const header = document.createElement('div');
   header.className = 'dash-labeled-header';
   header.innerHTML = `
-    <div class="dash-labeled-icon">${escapeHtml(icon)}</div>
-    <span class="dash-labeled-title">${escapeHtml(label)}</span>
+    <div class="dash-labeled-icon">${iconSvg}</div>
+    <div class="dash-labeled-title">${escapeHtml(label)}</div>
   `;
   wrapper.appendChild(header);
 
@@ -438,7 +434,7 @@ export function renderDashboard(container, data) {
       break;
   }
 
-  // ⭐ El summary va SIEMPRE, para los 6 estilos
+  // El summary va SIEMPRE, para los 6 estilos
   renderSummary(body, data);
 
   wrapper.appendChild(body);
