@@ -45,7 +45,6 @@
   --teal: #14b8a6;
   --teal-soft: #e6faf7;
 
-  /* Gold: used for the offer ribbon + final-stage highlight */
   --gold: #f5b301;
   --gold-2: #d99500;
   --gold-soft: #fff8e1;
@@ -110,9 +109,6 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* NOTA: El fondo Aurora u otros fondos se aplican con las clases
-   .bg-* definidas en css/backgrounds.css */
-
 .container { max-width: 1180px; margin: 0 auto; }
 
 header {
@@ -135,7 +131,6 @@ header {
   cursor: pointer;
 }
 
-/* ===== Brand logo (shared by header + login + config preview) ===== */
 .brand-logo {
   width: 64px;
   height: 64px;
@@ -229,7 +224,6 @@ header {
   color: var(--accent);
 }
 
-/* ---- Reset visual para que el brand no herede bg-clip en estado idle ---- */
 .brand:not(:hover) h1 {
   -webkit-text-fill-color: currentColor;
 }
@@ -271,7 +265,7 @@ header {
 }
 
 /* ============================================================
-   User menu trigger: más grande que el resto de .icon-btn
+   User menu trigger
    ============================================================ */
 
 #userBtn {
@@ -286,8 +280,7 @@ header {
 }
 
 /* ============================================================
-   User menu: icon-btn trigger + dropdown
-   Escala C · 320px · avatar 52px · items 1.05rem
+   User menu: dropdown
    ============================================================ */
 
 .user-menu {
@@ -448,27 +441,7 @@ header {
 }
 
 /* ============================================================
-   Animación de cambio de idioma (stagger por elemento)
-   Se aplica vía JS a los elementos con [data-i18n] del .container
-   ============================================================ */
-
-@keyframes i18nStagger {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Clase que se agrega temporalmente para animar.
-   El `animation-delay` se setea inline desde el JS. */
-.i18n-stagger {
-  animation-name: i18nStagger;
-  animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-fill-mode: both;
-}
-
-/* ============================================================
    Ripple radial para el cambio de tema
-   Velo púrpura con degradé radial, muy sutil.
    ============================================================ */
 
 .theme-ripple {

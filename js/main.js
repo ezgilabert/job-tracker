@@ -28,15 +28,33 @@ boot();
 async function boot() {
   if (!(await requireSession('./login.html'))) return;
 
-  let lastLang = getLanguage();
+  // ----------------------------------------------------------
+  // Pulse de textos al cambiar idioma (Web Animations API)
+  //
+  // V3 · Slide cascada
+  //   - Texto nuevo aplicado ANTES de animar (no hay flash).
+  //   - Cada elemento entra desde 24px abajo con fade.
+  //   - Stagger 60ms entre elementos, ordenados por posición
+  //     visual (arriba→abajo, izq→der).
+  //   - Duración 550ms por elemento. Total: ~1000ms máx.
+  //   - Respeta prefers-reduced-motion.
+  //   - Cancela animaciones previas si el usuario clickea rápido.
+  // ----------------------------------------------------------
+  function pulseI18nTexts() {
+    // Si el usuario prefiere no animaciones, no hacemos nada.
+    if (window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
 
-  // ----------------------------------------------------------
-  // Stagger de textos al cambiar idioma.
-  // ----------------------------------------------------------
-  function staggerI18nTexts() {
-    const all = document.querySelectorAll('.container [data-i18n]');
+    // Solo animamos texto real. NO placeholders (para no interferir
+    // con un input que esté enfocado), NO titles.
+    const all = document.querySelectorAll(
+      '.container [data-i18n], .container [data-i18n-html]'
+    );
+
+    // Filtramos a los que realmente están visibles en pantalla.
     const visible = [];
-
     all.forEach(el => {
       const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) visible.push(el);
@@ -44,31 +62,48 @@ async function boot() {
 
     if (!visible.length) return;
 
-    visible.forEach(el => {
-      el.classList.remove('i18n-stagger');
+    // Ordenamos por posición visual.
+    // Tolerancia de 8px para agrupar elementos en la misma fila.
+    visible.sort((a, b) => {
+      const ra = a.getBoundingClientRect();
+      const rb = b.getBoundingClientRect();
+      if (Math.abs(ra.top - rb.top) > 8) return ra.top - rb.top;
+      return ra.left - rb.left;
+    });
+
+    const STAGGER = 60;         // ms entre elementos
+    const MAX_STAGGER = 450;    // tope del delay acumulado
+    const DURATION = 550;       // duración de cada animación
+
+    visible.forEach((el, i) => {
+      // Cancelamos cualquier animación previa en el mismo elemento.
       if (typeof el.getAnimations === 'function') {
         el.getAnimations().forEach(a => {
           try { a.cancel(); } catch (_) { /* noop */ }
         });
       }
+
+      const delay = Math.min(i * STAGGER, MAX_STAGGER);
+
+      el.style.willChange = 'opacity, transform';
+
+      const anim = el.animate(
+        [
+          { opacity: 0, transform: 'translateY(24px)' },
+          { opacity: 1, transform: 'translateY(0)'    },
+        ],
+        {
+          duration: DURATION,
+          delay,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          fill: 'none',
+        }
+      );
+
+      const cleanup = () => { el.style.willChange = ''; };
+      anim.onfinish = cleanup;
+      anim.oncancel = cleanup;
     });
-
-    void document.body.offsetWidth;
-
-    visible.forEach((el, i) => {
-      el.style.animationDelay = Math.min(i * 15, 400) + 'ms';
-      el.classList.add('i18n-stagger');
-    });
-
-    const maxDelay = Math.min((visible.length - 1) * 15, 400);
-    const totalMs = 350 + maxDelay + 120;
-
-    setTimeout(() => {
-      visible.forEach(el => {
-        el.classList.remove('i18n-stagger');
-        el.style.animationDelay = '';
-      });
-    }, totalMs);
   }
 
   // ----------------------------------------------------------
@@ -217,12 +252,13 @@ async function boot() {
     }
 
     if (langBtn) {
+      // El cambio de idioma va solo por el configStore. El pulse se
+      // dispara desde el subscriber cuando detecta el cambio de lang.
       langBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const current = getLanguage();
         const next = current === 'es' ? 'en' : 'es';
         configStore.update(c => ({ ...c, lang: next }));
-        staggerI18nTexts();
       });
     }
 
@@ -299,7 +335,6 @@ async function boot() {
     },
   });
 
-  // ⭐ CAMBIO: configStore con migrate para dashboardStyle → dashboardStyleJobs/Refs
   const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
     version: CONFIG_VERSION,
     seed: () => getDefaultConfig(),
@@ -339,6 +374,11 @@ async function boot() {
     if (lang !== getLanguage()) {
       setLanguage(lang);
       applyI18n(document);
+
+      // Un único lugar dispara el pulse, tanto si el cambio viene
+      // del botón del menú como de la configuración.
+      pulseI18nTexts();
+
       document.dispatchEvent(new CustomEvent('i18n-changed'));
     }
   });
@@ -376,11 +416,9 @@ async function boot() {
     window.location.replace('./login.html');
   });
 
+  // Re-render de listas cuando cambia el idioma.
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
-
-    const current = getLanguage();
-    lastLang = current;
   });
 }
