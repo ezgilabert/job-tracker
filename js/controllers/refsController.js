@@ -106,9 +106,9 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
     renderDashboard(container, {
       style,
-      kind: 'refs',                        // ⭐ NUEVO
-      icon: '🤝',                          // ⭐ NUEVO
-      label: t('refs.title'),              // ⭐ NUEVO
+      kind: 'refs',
+      icon: '🤝',
+      label: t('refs.title'),
       total,
       active: activos,
       inProcess: enProceso,
@@ -135,9 +135,17 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       top,
       summary: t('dash.refs.summary', {
         total,
+        totalWord: t(total === 1
+          ? 'dash.refs.summaryWord.total.one'
+          : 'dash.refs.summaryWord.total.many'),
         active: activos,
+        activeWord: t(activos === 1
+          ? 'dash.refs.summaryWord.active.one'
+          : 'dash.refs.summaryWord.active.many'),
         highlight: contratados,
-        plural: contratados === 1 ? '' : 's',
+        highlightWord: t(contratados === 1
+          ? 'dash.refs.summaryWord.highlight.one'
+          : 'dash.refs.summaryWord.highlight.many'),
       }),
     });
   }
@@ -233,10 +241,8 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       companies
     );
 
-    // Expandimos la lista para que se vea el nuevo referido
+    // Expandimos la lista y colapsamos el form
     expandRefsList();
-
-    // Colapsamos el form (porque ya terminó la acción)
     if (refFormBody && refFormToggleBtn) {
       refFormBody.classList.add('collapsed');
       refFormToggleBtn.classList.add('collapsed');

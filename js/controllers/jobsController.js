@@ -86,7 +86,6 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     const jobs = jobsStore.get();
     const cfg = configStore.get();
-    // ⭐ CAMBIO: leer la nueva key con fallback a la vieja
     const style = cfg.dashboardStyleJobs || cfg.dashboardStyle || 'sparklines';
 
     const stats = computeStats(jobs);
@@ -112,14 +111,13 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const trendHighlight = buildWeeklyTrend(jobs.filter(j => j.estado === 'Oferta'), getDate);
     const trendClosed = buildWeeklyTrend(jobs.filter(j => isClosed(j.estado)), getDate);
 
-    // ⭐ NUEVO: datos para heatmap
     const heatmap = buildDailyActivity(jobs, getDate, 60);
 
     renderDashboard(container, {
       style,
-      kind: 'jobs',                        // ⭐ NUEVO
-      icon: '📋',                          // ⭐ NUEVO
-      label: t('jobs.title'),              // ⭐ NUEVO
+      kind: 'jobs',
+      icon: '📋',
+      label: t('jobs.title'),
       total,
       active: activas,
       inProcess: enProceso,
@@ -146,9 +144,17 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       top,
       summary: t('dash.jobs.summary', {
         total,
+        totalWord: t(total === 1
+          ? 'dash.jobs.summaryWord.total.one'
+          : 'dash.jobs.summaryWord.total.many'),
         active: activas,
+        activeWord: t(activas === 1
+          ? 'dash.jobs.summaryWord.active.one'
+          : 'dash.jobs.summaryWord.active.many'),
         highlight: ofertas,
-        plural: ofertas === 1 ? '' : 's',
+        highlightWord: t(ofertas === 1
+          ? 'dash.jobs.summaryWord.highlight.one'
+          : 'dash.jobs.summaryWord.highlight.many'),
       }),
     });
   }

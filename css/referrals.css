@@ -2,6 +2,110 @@
    Referrals: cards + tags de referidos en jobs
    ============================================================ */
 
+/* ============================================================
+   Form base (override del grid global)
+   ============================================================ */
+
+form.form-block {
+  display: block;
+  gap: 0;
+}
+
+/* ============================================================
+   Hero: avatar + nombre del referido
+   ============================================================ */
+
+.ref-hero-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.35rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.ref-hero-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  box-shadow: 0 6px 18px var(--accent-glow);
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.ref-hero-input {
+  position: relative;
+  min-width: 0;
+}
+
+.ref-hero-input input {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.85rem 5.5rem 0.85rem 1rem;
+  border-radius: 12px;
+  letter-spacing: -0.01em;
+}
+
+.ref-hero-input input::placeholder {
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: normal;
+  color: var(--text-dim);
+}
+
+.ref-hero-hint {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .ref-hero-row {
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+    padding-bottom: 1.1rem;
+  }
+  .ref-hero-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 1.35rem;
+  }
+  .ref-hero-input input {
+    font-size: 1rem;
+    padding: 0.8rem 4.8rem 0.8rem 0.9rem;
+  }
+  .ref-hero-hint {
+    font-size: 0.58rem;
+    padding: 0.15rem 0.4rem;
+    right: 0.75rem;
+  }
+}
+
+/* ============================================================
+   Counter
+   ============================================================ */
+
 .ref-counter {
   display: inline-flex;
   align-items: center;
@@ -16,6 +120,10 @@
   font-weight: 700;
   border: 1px solid var(--accent-border);
 }
+
+/* ============================================================
+   Chips (relación / estado)
+   ============================================================ */
 
 .ref-chips {
   display: flex;
@@ -49,7 +157,7 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* Referral status chips */
+/* Estados del referido con color por tipo */
 .ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
   background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
 }
@@ -68,6 +176,10 @@
 .ref-estado-chips .ref-chip.selected[data-value="No aplica"] {
   background: var(--danger); border-color: var(--danger); box-shadow: 0 3px 10px rgba(239,68,68,0.35);
 }
+
+/* ============================================================
+   Toolbar
+   ============================================================ */
 
 .ref-toolbar {
   display: flex;
@@ -151,6 +263,10 @@
   color: white;
   box-shadow: 0 4px 14px var(--accent-glow);
 }
+
+/* ============================================================
+   Lista de referidos
+   ============================================================ */
 
 #refList { display: grid; gap: 0.75rem; }
 
@@ -276,6 +392,10 @@
 [data-theme="dark"] .ref-estado-badge[data-estado="En proceso"] { background: var(--warning-soft); color: #fbbf24; }
 [data-theme="dark"] .ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: #34d399; }
 [data-theme="dark"] .ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: #f87171; }
+
+/* ============================================================
+   Workflow de referidos
+   ============================================================ */
 
 .ref-workflow {
   display: flex;
@@ -455,6 +575,10 @@
   color: white;
 }
 
+/* ============================================================
+   Empresas vinculadas
+   ============================================================ */
+
 .ref-empresas-wrap {
   display: flex;
   flex-wrap: wrap;
@@ -582,7 +706,10 @@
   .ref-search { max-width: 100%; }
 }
 
-/* ===== Referral tags on jobs ===== */
+/* ============================================================
+   Tags de referidos dentro de las cards de jobs
+   ============================================================ */
+
 .job-refs {
   display: flex;
   flex-wrap: wrap;
