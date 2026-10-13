@@ -1,7 +1,7 @@
 /* ============================================================
-   Dashboard: panel de stats con 6 estilos configurables
-   - Wrapper opción 4 · violeta unificado
-   - Escala interna controlada por --dash-scale
+   Dashboard: stats panel with 6 configurable styles
+   - Unified violet wrapper
+   - Internal scale controlled by --dash-scale
    ============================================================ */
 
 .dash-container {
@@ -9,11 +9,11 @@
 }
 
 /* ============================================================
-   WRAPPER · opción 4 (top bar + header prominente)
+   WRAPPER · top bar + prominent header
    ============================================================ */
 
 .dash-labeled {
-  /* Escala media: ajustá este valor para escalar todo el interior */
+  /* Medium scale: adjust this value to scale the whole interior */
   --dash-scale: 1.35;
 
   background: var(--surface);
@@ -74,7 +74,7 @@
 }
 
 /* ============================================================
-   ESTILO 1 · Sparklines
+   STYLE 1 · Sparklines
    ============================================================ */
 
 .dash-spark-grid {
@@ -132,7 +132,7 @@
   flex-shrink: 0;
 }
 
-.dash-spark-delta.up { background: var(--success-soft); color: var(--success-2); }
+.dash-spark-delta.up   { background: var(--success-soft); color: var(--success-2); }
 .dash-spark-delta.down { background: var(--danger-soft); color: var(--danger-2); }
 .dash-spark-delta.flat { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
 
@@ -154,7 +154,7 @@
 }
 
 /* ============================================================
-   ESTILO 2 · Modular
+   STYLE 2 · Modular
    ============================================================ */
 
 .dash-mod-grid {
@@ -305,21 +305,21 @@
   gap: 0.35rem;
 }
 
-.dash-mod-empresas {
+.dash-mod-companies {
   display: flex;
   flex-direction: column;
   gap: calc(0.5rem * var(--dash-scale));
   flex: 1;
 }
 
-.dash-mod-emp-row {
+.dash-mod-company-row {
   display: flex;
   align-items: center;
   gap: calc(0.6rem * var(--dash-scale));
   font-size: calc(0.78rem * var(--dash-scale));
 }
 
-.dash-mod-emp-pos {
+.dash-mod-company-pos {
   width: calc(18px * var(--dash-scale));
   height: calc(18px * var(--dash-scale));
   border-radius: 5px;
@@ -333,11 +333,11 @@
   flex-shrink: 0;
 }
 
-.dash-mod-emp-pos.top1 { background: var(--gold); border-color: var(--gold); color: white; }
-.dash-mod-emp-pos.top2 { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
-.dash-mod-emp-pos.top3 { background: var(--info-soft); border-color: var(--info-border); color: var(--info-2); }
+.dash-mod-company-pos.top1 { background: var(--gold); border-color: var(--gold); color: white; }
+.dash-mod-company-pos.top2 { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
+.dash-mod-company-pos.top3 { background: var(--info-soft); border-color: var(--info-border); color: var(--info-2); }
 
-.dash-mod-emp-name {
+.dash-mod-company-name {
   flex: 1;
   min-width: 0;
   font-weight: 600;
@@ -347,7 +347,7 @@
   white-space: nowrap;
 }
 
-.dash-mod-emp-count {
+.dash-mod-company-count {
   font-size: calc(0.72rem * var(--dash-scale));
   font-weight: 800;
   color: var(--text-muted);
@@ -363,7 +363,7 @@
 }
 
 /* ============================================================
-   ESTILO 3 · Minimal
+   STYLE 3 · Minimal
    ============================================================ */
 
 .dash-minimal {
@@ -417,7 +417,7 @@
 }
 
 /* ============================================================
-   ESTILO 4 · Compact
+   STYLE 4 · Compact
    ============================================================ */
 
 .dash-compact {
@@ -456,7 +456,7 @@
   color: var(--text);
 }
 
-.dash-compact-chip.accent .num  { color: var(--accent); }
+.dash-compact-chip.accent  .num { color: var(--accent); }
 .dash-compact-chip.warning .num { color: var(--warning); }
 .dash-compact-chip.success .num { color: var(--success); }
 .dash-compact-chip.neutral .num { color: var(--text-muted); }
@@ -508,7 +508,7 @@
 .dash-compact-legend .dot.s4 { background: var(--text-dim); }
 
 /* ============================================================
-   ESTILO 5 · Circular
+   STYLE 5 · Circular
    ============================================================ */
 
 .dash-circular {
@@ -595,7 +595,7 @@
 }
 
 /* ============================================================
-   ESTILO 6 · Heatmap
+   STYLE 6 · Heatmap
    ============================================================ */
 
 .dash-heatmap {
@@ -714,7 +714,7 @@
 }
 
 /* ============================================================
-   Summary strip (compartido por los 6 estilos)
+   Summary strip (shared by all 6 styles)
    ============================================================ */
 
 .dash-strip {
@@ -740,253 +740,12 @@
 .dash-strip-text strong { color: var(--accent); font-weight: 800; }
 
 /* ============================================================
-   Config selector de estilo de dashboard (previews)
-   No escala, son previews estáticas en el modal de config
+   Mobile · dashboards more compact
+   Reduces --dash-scale and compresses the wrapper so it
+   doesn't take too much space on small screens.
    ============================================================ */
 
-.config-dash-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.65rem;
-}
-
-.config-dash-option {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border-radius: 12px;
-  border: 1.5px solid var(--border);
-  background: var(--surface-soft);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  font-family: inherit;
-  color: var(--text);
-}
-
-.config-dash-option:hover {
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-  transform: translateY(-1px);
-}
-
-.config-dash-option.selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.config-dash-preview {
-  height: 52px;
-  border-radius: 8px;
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  position: relative;
-  overflow: hidden;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.config-dash-preview.dash-prev-spark {
-  flex-direction: column;
-  justify-content: flex-end;
-}
-.config-dash-preview.dash-prev-spark::before {
-  content: '';
-  position: absolute;
-  inset: auto 8px 8px 8px;
-  height: 26px;
-  background: linear-gradient(to right,
-    transparent 0%, transparent 12%,
-    var(--accent) 12%, var(--accent) 14%,
-    transparent 14%, transparent 30%,
-    var(--accent) 30%, var(--accent) 32%,
-    transparent 32%, transparent 48%,
-    var(--accent) 48%, var(--accent) 50%,
-    transparent 50%, transparent 66%,
-    var(--accent) 66%, var(--accent) 68%,
-    transparent 68%
-  );
-  opacity: 0.85;
-  transform: skewY(-4deg);
-  border-radius: 2px;
-}
-
-.config-dash-preview.dash-prev-mod {
-  padding: 5px;
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 4px;
-}
-.config-dash-preview.dash-prev-mod::before {
-  content: '';
-  grid-column: 1 / 2;
-  grid-row: 1 / 3;
-  background: linear-gradient(135deg, var(--gold), #d99500);
-  border-radius: 4px;
-  opacity: 0.85;
-}
-.config-dash-preview.dash-prev-mod::after {
-  content: '';
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
-
-.config-dash-preview.dash-prev-minimal {
-  display: flex;
-  gap: 4px;
-  padding: 6px;
-}
-.config-dash-preview.dash-prev-minimal::before {
-  content: '';
-  flex: 1;
-  height: 100%;
-  background: repeating-linear-gradient(
-    to right,
-    var(--accent-soft) 0,
-    var(--accent-soft) 3px,
-    transparent 3px,
-    transparent 8px
-  );
-  border-radius: 3px;
-}
-.config-dash-preview.dash-prev-minimal::after {
-  content: '';
-  flex: 1;
-  height: 100%;
-  background: repeating-linear-gradient(
-    to right,
-    var(--border) 0,
-    var(--border) 3px,
-    transparent 3px,
-    transparent 8px
-  );
-  border-radius: 3px;
-}
-
-.config-dash-preview.dash-prev-compact {
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px;
-}
-.config-dash-preview.dash-prev-compact::before {
-  content: '';
-  width: 100%;
-  height: 10px;
-  border-radius: 5px;
-  background: linear-gradient(to right,
-    var(--accent) 0%, var(--accent) 25%,
-    var(--warning) 25%, var(--warning) 55%,
-    var(--success) 55%, var(--success) 70%,
-    var(--text-dim) 70%, var(--text-dim) 100%
-  );
-}
-.config-dash-preview.dash-prev-compact::after {
-  content: '';
-  width: 100%;
-  height: 10px;
-  border-radius: 5px;
-  background: repeating-linear-gradient(
-    to right,
-    var(--surface-soft) 0,
-    var(--surface-soft) 15px,
-    transparent 15px,
-    transparent 18px
-  );
-  border: 1px solid var(--border);
-}
-
-.config-dash-preview.dash-prev-circular {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-}
-.config-dash-preview.dash-prev-circular::before,
-.config-dash-preview.dash-prev-circular::after {
-  content: '';
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 3px solid var(--surface-soft);
-}
-.config-dash-preview.dash-prev-circular::before {
-  border-top-color: var(--accent);
-  transform: rotate(45deg);
-}
-.config-dash-preview.dash-prev-circular::after {
-  border-top-color: var(--success);
-  transform: rotate(45deg);
-}
-
-.config-dash-preview.dash-prev-heatmap {
-  padding: 6px;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 2px;
-}
-.config-dash-preview.dash-prev-heatmap::before {
-  content: '';
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
-  background-image:
-    radial-gradient(circle, var(--accent) 40%, transparent 45%),
-    radial-gradient(circle, rgba(124,92,255,0.35) 40%, transparent 45%);
-  background-size: 12.5% 50%, 12.5% 50%;
-  background-position: 0 0, 6px 6px;
-  background-repeat: repeat;
-  border-radius: 3px;
-  opacity: 0.9;
-}
-
-.config-dash-info { flex: 0 0 auto; }
-
-.config-dash-info strong {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.1rem;
-}
-
-.config-dash-info span {
-  display: block;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  line-height: 1.3;
-}
-
-.config-dash-badge-new {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.1rem 0.4rem;
-  border-radius: 5px;
-  background: var(--success-soft);
-  color: var(--success-2);
-  font-size: 0.55rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-left: 0.35rem;
-  vertical-align: middle;
-}
-
-/* ============================================================
-   Mobile · dashboards más compactos
-   Reduce --dash-scale y comprime el wrapper para que no
-   ocupe tanto espacio en pantallas chicas.
-   ============================================================ */
-
-/* --- Tablet / mobile ancho (≤720px) --- */
+/* --- Tablet / wide mobile (≤720px) --- */
 @media (max-width: 720px) {
   .dash-container {
     margin-bottom: 1.25rem;
@@ -1024,7 +783,7 @@
   }
 }
 
-/* --- Mobile chico (≤480px) --- */
+/* --- Small mobile (≤480px) --- */
 @media (max-width: 480px) {
   .dash-labeled {
     --dash-scale: 0.8;

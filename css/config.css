@@ -1,5 +1,5 @@
 /* ============================================================
-   Config: settings modal with tabs + unsaved changes
+   Config: settings modal with tabs + unsaved-changes handling
    ============================================================ */
 
 .config-modal {
@@ -73,7 +73,7 @@
 
 @keyframes pulseBadge {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.65; }
+  50%      { opacity: 0.65; }
 }
 
 .config-layout {
@@ -194,6 +194,7 @@
   border: 1px solid var(--border);
 }
 
+/* ===== Categories ===== */
 .config-tags {
   display: flex;
   flex-wrap: wrap;
@@ -229,6 +230,7 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
+/* ===== Add custom role ===== */
 .config-add-row {
   display: flex;
   gap: 0.5rem;
@@ -258,7 +260,8 @@
   white-space: nowrap;
 }
 
-.config-puestos-list {
+/* ===== Role list ===== */
+.config-roles-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
@@ -268,7 +271,7 @@
   background: var(--surface-soft);
 }
 
-.config-puesto-item {
+.config-role-item {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -282,10 +285,10 @@
   transition: all 0.15s ease;
 }
 
-.config-puesto-item:hover { border-color: var(--border-strong); }
+.config-role-item:hover { border-color: var(--border-strong); }
 
-.config-puesto-item .remove,
-.config-puesto-item .restore {
+.config-role-item .remove,
+.config-role-item .restore {
   width: 20px;
   height: 20px;
   border: none;
@@ -302,17 +305,17 @@
   padding: 0;
 }
 
-.config-puesto-item .remove:hover {
+.config-role-item .remove:hover {
   background: var(--danger-soft);
   color: var(--danger);
 }
 
-.config-puesto-item.hidden-puesto {
+.config-role-item.hidden-role {
   opacity: 0.55;
   border-style: dashed;
 }
 
-.config-puesto-item .restore:hover {
+.config-role-item .restore:hover {
   background: var(--success-soft);
   color: var(--success-2);
 }
@@ -326,6 +329,7 @@
   width: 100%;
 }
 
+/* ===== Initial statuses ===== */
 .config-checks {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -370,7 +374,7 @@
 
 .config-check .icon { font-size: 1rem; flex-shrink: 0; }
 
-.config-default-estado {
+.config-default-status {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -405,13 +409,14 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-.config-filtros {
+/* ===== Filter ordering ===== */
+.config-filters {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 
-.config-filtro-item {
+.config-filter-item {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -422,14 +427,14 @@
   transition: all 0.15s ease;
 }
 
-.config-filtro-item:hover {
+.config-filter-item:hover {
   background: var(--surface-hover);
   border-color: var(--border-strong);
 }
 
-.config-filtro-item.oculto { opacity: 0.5; }
+.config-filter-item.hidden { opacity: 0.5; }
 
-.config-filtro-item .drag-info {
+.config-filter-item .drag-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -439,9 +444,9 @@
   color: var(--text);
 }
 
-.config-filtro-item .drag-info .icon { font-size: 1rem; }
+.config-filter-item .drag-info .icon { font-size: 1rem; }
 
-.config-filtro-item .drag-info .builtin-tag {
+.config-filter-item .drag-info .builtin-tag {
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -453,7 +458,7 @@
   border-radius: 6px;
 }
 
-.config-filtro-actions {
+.config-filter-actions {
   display: flex;
   gap: 0.25rem;
   align-items: center;
@@ -504,6 +509,10 @@
   flex-wrap: wrap;
 }
 
+/* ============================================================
+   Danger zone · 2 cards + full reset
+   ============================================================ */
+
 .config-section-danger {
   border-bottom: none;
 }
@@ -511,10 +520,6 @@
 .config-section-danger .config-section-head h3 {
   color: var(--danger-2);
 }
-
-/* ============================================================
-   Zona de peligro · 2 tarjetas + reset total
-   ============================================================ */
 
 .config-danger-cards {
   display: grid;
@@ -620,7 +625,7 @@
 }
 
 /* ============================================================
-   Botón variants adicionales
+   Additional button variants
    ============================================================ */
 
 .btn-warning-ghost {
@@ -651,7 +656,7 @@
 }
 
 /* ============================================================
-   Data & Backup section (Advanced tab)
+   Data & backup section (Advanced tab)
    ============================================================ */
 
 .config-backup-card {
@@ -1322,7 +1327,7 @@
 }
 
 /* ============================================================
-   ⭐ CAMBIO: Dashboard selector (nueva pestaña con 6 opciones)
+   Dashboard selector (config tab with 6 options)
    ============================================================ */
 
 .config-dash-grid {
@@ -1372,7 +1377,7 @@
   justify-content: center;
 }
 
-/* --- Preview: sparklines (barras verticales) --- */
+/* --- Preview: sparklines (vertical bars) --- */
 .config-dash-preview.dash-prev-spark {
   flex-direction: column;
   justify-content: flex-end;
@@ -1398,7 +1403,7 @@
   border-radius: 2px;
 }
 
-/* --- Preview: modular (bloques) --- */
+/* --- Preview: modular (blocks) --- */
 .config-dash-preview.dash-prev-mod {
   padding: 5px;
   display: grid;
@@ -1423,7 +1428,7 @@
   border-radius: 4px;
 }
 
-/* --- Preview: minimal (filas de números) --- */
+/* --- Preview: minimal (rows of numbers) --- */
 .config-dash-preview.dash-prev-minimal {
   display: flex;
   gap: 4px;
@@ -1456,7 +1461,7 @@
   border-radius: 3px;
 }
 
-/* --- Preview: compact (chips + barra) --- */
+/* --- Preview: compact (chips + bar) --- */
 .config-dash-preview.dash-prev-compact {
   flex-direction: column;
   justify-content: center;
@@ -1481,18 +1486,17 @@
   width: 100%;
   height: 10px;
   border-radius: 5px;
-  background:
-    linear-gradient(to right,
-      var(--surface-soft) 0%, var(--surface-soft) 30%,
-      transparent 30%, transparent 33%,
-      var(--surface-soft) 33%, var(--surface-soft) 60%,
-      transparent 60%, transparent 63%,
-      var(--surface-soft) 63%, var(--surface-soft) 100%
-    );
+  background: repeating-linear-gradient(
+    to right,
+    var(--surface-soft) 0,
+    var(--surface-soft) 15px,
+    transparent 15px,
+    transparent 18px
+  );
   border: 1px solid var(--border);
 }
 
-/* --- Preview: circular (anillos) --- */
+/* --- Preview: circular (rings) --- */
 .config-dash-preview.dash-prev-circular {
   display: flex;
   gap: 6px;
@@ -1516,12 +1520,11 @@
   transform: rotate(45deg);
 }
 
-/* --- Preview: heatmap (grid tipo GitHub) --- */
+/* --- Preview: heatmap (GitHub-like grid) --- */
 .config-dash-preview.dash-prev-heatmap {
-  padding: 5px;
+  padding: 6px;
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   gap: 2px;
 }
 .config-dash-preview.dash-prev-heatmap::before {
@@ -1529,18 +1532,16 @@
   grid-column: 1 / -1;
   grid-row: 1 / -1;
   background-image:
-    radial-gradient(circle, var(--accent) 0.5px, transparent 1px),
-    radial-gradient(circle, rgba(124,92,255,0.35) 0.5px, transparent 1px);
-  background-size: 10% 25%, 10% 25%;
-  background-position: 0 0, 5px 6px;
+    radial-gradient(circle, var(--accent) 40%, transparent 45%),
+    radial-gradient(circle, rgba(124,92,255,0.35) 40%, transparent 45%);
+  background-size: 12.5% 50%, 12.5% 50%;
+  background-position: 0 0, 6px 6px;
+  background-repeat: repeat;
   border-radius: 3px;
   opacity: 0.9;
 }
 
-/* --- Info --- */
-.config-dash-info {
-  flex: 0 0 auto;
-}
+.config-dash-info { flex: 0 0 auto; }
 
 .config-dash-info strong {
   display: block;
@@ -1557,7 +1558,6 @@
   line-height: 1.3;
 }
 
-/* Badge NUEVO */
 .config-dash-badge-new {
   display: inline-flex;
   align-items: center;

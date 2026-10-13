@@ -1,3 +1,4 @@
+# README.md
 # Job Tracker
 
 Local app for tracking a job search: applications, process stages, and referrals.
@@ -14,14 +15,15 @@ folder over HTTP.
 
 - Create, edit, and delete applications: company, role, date, link, salary,
   work mode, contact, notes.
-- **Stage workflow**: Guardado → Aplicado → Contacto → Entrevista RRHH →
-  Challenge técnico → Live coding → Entrevista Técnica → Entrevista con cliente →
-  Charla con cliente → Entrevista Final → Referencias → Negociación → Oferta.
-- **Close with a reason**: Rechazado, Ghosted, Descartado, Oferta. Each close
+- **Stage workflow**: Saved → Applied → Contact → HR Interview →
+  Technical Challenge → Live Coding → Technical Interview → Client Interview →
+  Client Chat → Final Interview → References → Negotiation → Offer.
+- **Close with a reason**: Rejected, Ghosted, Discarded, Offer. Each close
   state comes with preset reason chips and a free-text field.
 - **Advance with a note**: when moving a stage forward you can leave a reminder
   for that step (shown as a "PD" on the card).
-- **Skip a stage**: mark the current step as "No aplica" and jump to the next one.
+- **Skip a stage**: mark the current step as "Not applicable" and jump to the
+  next one.
 - **Go back once**: you can move a stage back a single time per application.
 - **Reopen** closed applications.
 - **Drag & drop** to reorder cards.
@@ -38,13 +40,13 @@ folder over HTTP.
 
 - Create, edit, and delete referrals: name, role, contact, link, relationship,
   status, notes.
-- **Own workflow**: Pendiente → Contactado → Referido hecho → En proceso →
-  Contratado (or No aplica).
-- **Referral → application flow**: when a referral reaches "En proceso", a modal
+- **Own workflow**: Pending → Contacted → Referred → In Process → Hired
+  (or Not applicable).
+- **Referral → application flow**: when a referral reaches "In Process", a modal
   offers to either create a new application (pre-filled) or link it to an
   existing one. The link is stored internally as `linkedJobId`.
-- **Auto-sync**: when the linked application is closed as "Oferta", the referral
-  moves to "Contratado" (and vice versa).
+- **Auto-sync**: when the linked application is closed as "Offer", the referral
+  moves to "Hired" (and vice versa).
 - **History modal** with the same timeline treatment as jobs.
 - **Filters by status** + free-text search across name, role, contact, notes.
 
@@ -61,23 +63,24 @@ Six configurable styles, **independently selectable** for jobs and referrals:
 | `circular` | SVG progress rings |
 | `heatmap` | GitHub-style activity calendar |
 
-Each dashboard is wrapped in a header ("Postulaciones" / "Referidos") so the
+Each dashboard is wrapped in a header ("Applications" / "Referrals") so the
 two are visually distinguishable.
 
 ### Configuration modal
 
 Eight tabs, all changes staged as a draft and applied on Save:
 
-- **Puestos** — enable/disable role categories, add custom roles, hide/restore.
-- **Estados iniciales** — pick which statuses appear in the dropdown and which
+- **Roles** — enable/disable role categories, add custom roles, hide/restore.
+- **Initial statuses** — pick which statuses appear in the dropdown and which
   one is default.
-- **Filtros** — reorder and show/hide the filter chips.
-- **Apariencia** — logo (2 options) and background (10 options: aurora, mesh,
+- **Filters** — reorder and show/hide the filter chips.
+- **Appearance** — logo (2 options) and background (11 options: aurora, mesh,
   grid, dots, waves, conic, noise, stripes, cosmos, blobs, none).
 - **Dashboard** — pick a style for jobs and another for referrals.
-- **Idioma** — ES / EN.
-- **Perfil** — name, username, email, bio, avatar (stored as dataURL).
-- **Avanzado** — export/import JSON backup, plus three danger-zone actions:
+- **Language** — ES / EN.
+- **Profile** — first name, last name, username, email, bio, avatar (stored as
+  dataURL).
+- **Advanced** — export/import JSON backup, plus three danger-zone actions:
   reset preferences, delete data, reset everything.
 
 An unsaved-changes badge appears whenever the draft differs from the saved
@@ -86,7 +89,7 @@ state, and closing prompts to discard or save.
 ### Appearance & UX
 
 - Light / dark theme with a radial ripple animation on toggle.
-- Ten animated/static background styles.
+- Eleven animated/static background styles.
 - Toast notifications, custom confirm modals, and a progress-ring reset
   animation.
 - All UI is fully internationalized (Spanish / English).
@@ -165,23 +168,23 @@ Three stores, each persisted under its own key via the `Store` class
 
 | Key | Store | Version | Contents |
 | --- | --- | --- | --- |
-| `jobTrackerV2` | `jobs` | 3 | Array of applications |
-| `jobTrackerReferidos` | `refs` | 3 | Array of referrals |
-| `jobTrackerConfig` | `config` | 2 | User preferences |
+| `jobTrackerV2` | `jobs` | 5 | Array of applications |
+| `jobTrackerReferrals` | `refs` | 5 | Array of referrals |
+| `jobTrackerConfig` | `config` | 3 | User preferences |
 | `jobTrackerTheme` | — | — | `'light'` \| `'dark'` |
 
 ### Application shape (abridged)
 
 ```js
 {
-  id, empresa, puesto, fecha, estado,
-  link, salario, salarioPorHora, salarioEsRango, moneda,
-  modalidad, hybridOfficeDays,
-  contacto, contactoLink, contactoTipo,
-  notas,
-  skipped: [],              // step ids marked "not applicable"
-  volvioAtras: false,       // only one backtrack allowed
-  history: [{ estado, fecha, motivo?, nota?, retroceso? }],
+  id, company, role, date, status,
+  link, salary, hourlySalary, salaryIsRange, currency,
+  workMode, hybridOfficeDays,
+  contact, contactLink, contactPlatform,
+  notes,
+  skipped: [],           // step ids marked "not applicable"
+  wentBack: false,       // only one backtrack allowed
+  history: [{ status, date, reason?, note?, wentBack? }],
   offerConfirmed?: boolean
 }
 ```
@@ -190,12 +193,26 @@ Three stores, each persisted under its own key via the `Store` class
 
 ```js
 {
-  id, nombre, rol, contacto, link, relacion, estado, notas,
-  empresasVinculadas: [],   // legacy field, no longer shown in UI
-  linkedJobId: null,        // set by the "Referral → Application" flow
-  volvioAtras: false,
+  id, name, role, contact, link, relationship, status, notes,
+  linkedCompanies: [],   // legacy field, no longer shown in UI
+  linkedJobId: null,     // set by the "Referral → Application" flow
+  wentBack: false,
   createdAt,
-  history: [{ estado, fecha, motivo?, nota?, retroceso? }]
+  history: [{ status, date, reason?, note?, wentBack? }]
+}
+```
+
+### Config shape (abridged)
+
+```js
+{
+  lang, logo, background,
+  dashboardStyleJobs, dashboardStyleRefs,
+  profile: { firstName, lastName, username, email, bio, avatar },
+  roles: { activeTags, hidden, custom, customTags },
+  initialStatuses: [...],
+  defaultInitialStatus: 'Applied',
+  filters: [{ id, visible }]
 }
 ```
 
@@ -204,15 +221,24 @@ Three stores, each persisted under its own key via the `Store` class
 `main.js` registers a `migrate` function on each store that:
 
 - Backfills missing fields on legacy records.
-- Maps legacy referral state `'Me va a referir'` → `'Contactado'`.
+- Maps legacy Spanish keys to their English equivalents (`empresa` → `company`,
+  `puesto` → `role`, `estado` → `status`, etc.).
+- Maps legacy Spanish state values to their English equivalents
+  (`Guardado` → `Saved`, `Oferta` → `Offer`, `Pendiente` → `Pending`, …).
+- Maps the legacy referral state `'Me va a referir'` → `'Contacted'`.
 - Splits the old single `dashboardStyle` into `dashboardStyleJobs` +
   `dashboardStyleRefs`.
+- Renames `profile.nombre`/`apellido` → `profile.firstName`/`lastName`.
+
+Migrations run **once** on first load after upgrade, based on the version stamp
+inside each stored payload. Old data is replaced in place — rolling back to a
+pre-rename build after migration will not read the data correctly.
 
 ---
 
 ## Backup / Restore
 
-From **Configuración → Avanzado**:
+From **Settings → Advanced**:
 
 - **Export**: downloads a JSON file with jobs, referrals, config, and theme.
 - **Import**: replaces all current data from a backup file. Validates the
@@ -220,7 +246,7 @@ From **Configuración → Avanzado**:
 
 Danger zone (all irreversible):
 
-- **Reset preferences**: roles, states, filters, appearance → defaults. Data
+- **Reset preferences**: roles, statuses, filters, appearance → defaults. Data
   untouched.
 - **Delete data**: wipes applications + referrals. Config untouched.
 - **Reset everything**: config + data + theme → defaults.
@@ -266,22 +292,22 @@ the hash before shipping anything to a real user.
 │   │   ├── refsController.js
 │   │   ├── modalsController.js
 │   │   ├── configController.js
-│   │   └── createPuestoController.js
+│   │   └── createRoleController.js
 │   ├── templates/
 │   │   ├── jobCard.js
 │   │   ├── refCard.js
 │   │   └── steps.js
 │   └── ui/
 │       ├── combo.js              # Role picker
-│       ├── estadoCombo.js        # Status picker
+│       ├── statusCombo.js        # Status picker
 │       ├── datePicker.js
-│       ├── modalidad.js
+│       ├── workModePicker.js
 │       ├── currencyPicker.js
 │       ├── salaryModeChip.js
 │       ├── salaryInput.js
 │       ├── contactLinkPicker.js
 │       ├── chips.js
-│       ├── empresasChips.js      # (unused after referral changes)
+│       ├── companiesChips.js     # (unused after referral changes)
 │       ├── dashboard.js
 │       ├── inputLimits.js
 │       ├── confirmModal.js
@@ -306,6 +332,19 @@ the hash before shipping anything to a real user.
     ├── responsive.css
     └── auth.css
 ```
+
+---
+
+## Coding conventions
+
+- **Language**: all identifiers, comments, and internal log messages are in
+  English. User-facing strings live in `js/i18n.js` and are the only place
+  Spanish is allowed.
+- **Data keys**: everything stored in `localStorage` uses English keys
+  (`company`, `role`, `status`, `date`, …) and English values for enum-like
+  fields (`Saved`, `Applied`, `Offer`, `Pending`, `Hired`, …).
+- **CSS**: class names and any `data-*` attributes are English
+  (`data-status`, `data-relationship`, `.workmode-seg`, `.currency-chip`, …).
 
 ---
 

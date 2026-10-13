@@ -1,6 +1,6 @@
 /* ============================================================
    Job Tracker — CSS entry point
-   Only imports. Styles live in the listed files.
+   Imports only. Styles live in the listed files.
    ============================================================ */
 
 @import url('./base.css');

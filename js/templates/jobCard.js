@@ -13,54 +13,54 @@ import { t, tState, tStateShort } from '../i18n.js';
 
 /**
  * @param {object} job
- * @param {{ referidos: object[], index?: number }} ctx
+ * @param {{ referrals: object[], index?: number }} ctx
  * @returns {string} HTML
  */
 export function renderJobCard(job, ctx = {}) {
-  const { referidos = [], index = 0 } = ctx;
+  const { referrals = [], index = 0 } = ctx;
 
-  const days = daysSince(job.fecha);
+  const days = daysSince(job.date);
   const daysTxt = days !== null
     ? `<span>⏱️ ${t(days === 1 ? 'job.daysAgoOne' : 'job.daysAgoMany', { n: days })}</span>`
     : '';
-  const dateTxt = job.fecha ? `<span>📅 ${formatDate(job.fecha)}</span>` : '';
+  const dateTxt = job.date ? `<span>📅 ${formatDate(job.date)}</span>` : '';
   const salaryTxt = renderSalaryTag(job);
-  const modalidadTxt = renderModalidadTag(job);
+  const workModeTxt = renderWorkModeTag(job);
   const contactTxt = renderContactChip(job);
   const linkTxt = job.link
     ? `<a href="${escapeHtml(job.link)}" target="_blank" rel="noopener">${escapeHtml(t('job.viewOffer'))} ↗</a>`
     : '';
-  const notesTxt = job.notas
-    ? `<div class="job-notas">${escapeHtml(job.notas)}</div>`
+  const notesTxt = job.notes
+    ? `<div class="job-notes">${escapeHtml(job.notes)}</div>`
     : '';
 
-  const puestoDisplay = job.puesto || t('job.noPuesto');
+  const roleDisplay = job.role || t('job.noRole');
 
-  const linkedRefs = refsForCompany(referidos, job.empresa);
+  const linkedRefs = refsForCompany(referrals, job.company);
   const refsHtml = linkedRefs.length
     ? `<div class="job-refs">
-         <span class="job-refs-label">${escapeHtml(t(linkedRefs.length === 1 ? 'job.referidoOne' : 'job.referidoMany'))}</span>
+         <span class="job-refs-label">${escapeHtml(t(linkedRefs.length === 1 ? 'job.referralOne' : 'job.referralMany'))}</span>
          ${linkedRefs.map(r => `
            <button type="button"
                    class="job-ref-chip"
                    data-action="scroll-to-ref"
                    data-ref-id="${r.id}"
-                   data-estado="${escapeHtml(r.estado)}"
-                   title="${escapeHtml(t('job.refChipTitle', { name: r.nombre }))}">
-             <span class="job-ref-estado-dot"></span>
-             ${escapeHtml(r.nombre)}
+                   data-status="${escapeHtml(r.status)}"
+                   title="${escapeHtml(t('job.refChipTitle', { name: r.name }))}">
+             <span class="job-ref-status-dot"></span>
+             ${escapeHtml(r.name)}
            </button>
          `).join('')}
        </div>`
     : '';
 
-  const closed = isClosed(job.estado);
-  const currentIdx = stepIndex(job.estado);
-  const pct = progressPct(job.estado);
+  const closed = isClosed(job.status);
+  const currentIdx = stepIndex(job.status);
+  const pct = progressPct(job.status);
 
-  const offerConfirmed = job.estado === 'Oferta' && job.offerConfirmed === true;
+  const offerConfirmed = job.status === 'Offer' && job.offerConfirmed === true;
 
-  const offerRibbon = (job.estado === 'Oferta' && !offerConfirmed)
+  const offerRibbon = (job.status === 'Offer' && !offerConfirmed)
     ? `<span class="job-offer-ribbon" aria-hidden="true">${escapeHtml(t('job.offerRibbon'))}</span>`
     : '';
 
@@ -70,7 +70,7 @@ export function renderJobCard(job, ctx = {}) {
          <span class="congrats-emoji">🎉</span>
          <div class="congrats-text">
            <strong>${escapeHtml(t('job.offerConfirmed.title'))}</strong>
-           <span>${escapeHtml(t('job.offerConfirmed.subtitle', { empresa: job.empresa }))}</span>
+           <span>${escapeHtml(t('job.offerConfirmed.subtitle', { company: job.company }))}</span>
          </div>
        </div>`
     : '';
@@ -107,12 +107,12 @@ export function renderJobCard(job, ctx = {}) {
   `;
 
   const badgeHtml = offerConfirmed
-    ? `<span class="badge badge-confirmed" data-estado="Oferta">✓ ${escapeHtml(tState(job.estado))}</span>`
-    : `<span class="badge" data-estado="${escapeHtml(job.estado)}">${escapeHtml(tState(job.estado))}</span>`;
+    ? `<span class="badge badge-confirmed" data-status="Offer">✓ ${escapeHtml(tState(job.status))}</span>`
+    : `<span class="badge" data-status="${escapeHtml(job.status)}">${escapeHtml(tState(job.status))}</span>`;
 
   return `
     <div class="job ${offerConfirmed ? 'offer-confirmed' : ''}"
-         data-estado="${escapeHtml(job.estado)}"
+         data-status="${escapeHtml(job.status)}"
          data-id="${job.id}"
          draggable="true"
          style="animation-delay:${Math.min(index * 40, 400)}ms">
@@ -123,8 +123,8 @@ export function renderJobCard(job, ctx = {}) {
 
       <div class="job-header">
         <div class="job-info">
-          <h3>${escapeHtml(puestoDisplay)} <span class="company">· ${escapeHtml(job.empresa)}</span></h3>
-          <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${modalidadTxt}${contactTxt}</div>
+          <h3>${escapeHtml(roleDisplay)} <span class="company">· ${escapeHtml(job.company)}</span></h3>
+          <div class="job-meta">${dateTxt}${daysTxt}${salaryTxt}${workModeTxt}${contactTxt}</div>
         </div>
         <div class="job-actions">
           <button class="action-btn" title="${escapeHtml(t('job.editTitle'))}" data-action="edit" aria-label="${escapeHtml(t('job.editTitle'))}">
@@ -161,44 +161,45 @@ export function renderJobCard(job, ctx = {}) {
 }
 
 // ------------------------------------------------------------
-// Salario: "💰 USD 3.000–4.000 · por hora"
-// Soporta datos viejos donde el salario ya incluye la moneda.
+// Salary: "💰 USD 3,000–4,000 · per hour"
+// Supports legacy data where the salary already includes the
+// currency code.
 // ------------------------------------------------------------
 function renderSalaryTag(job) {
-  if (!job.salario) return '';
+  if (!job.salary) return '';
 
-  const raw = String(job.salario).trim();
+  const raw = String(job.salary).trim();
   if (!raw) return '';
 
   const hasCode = /^(ars|usd)\b/i.test(raw);
-  const codePrefix = (job.moneda && !hasCode)
-    ? escapeHtml(String(job.moneda).toUpperCase()) + ' '
+  const codePrefix = (job.currency && !hasCode)
+    ? escapeHtml(String(job.currency).toUpperCase()) + ' '
     : '';
 
-  const hourlyTxt = job.salarioPorHora ? ' · ' + t('job.perHour') : '';
+  const hourlyTxt = job.hourlySalary ? ' · ' + t('job.perHour') : '';
 
   return `<span>💰 ${codePrefix}${escapeHtml(raw)}${hourlyTxt}</span>`;
 }
 
 // ------------------------------------------------------------
-// Modalidad: "🏢 Presencial" / "🏠 Home" / "🔄 Híbrido · 3d"
+// Work mode: "🏢 On-site" / "🏠 Remote" / "🔄 Hybrid · 3d"
 // ------------------------------------------------------------
-function renderModalidadTag(job) {
-  if (job.modalidad === 'presencial') {
-    return `<span>🏢 ${escapeHtml(t('modalidad.presencial'))}</span>`;
+function renderWorkModeTag(job) {
+  if (job.workMode === 'onsite') {
+    return `<span>🏢 ${escapeHtml(t('workMode.onsite'))}</span>`;
   }
-  if (job.modalidad === 'home') {
-    return `<span>🏠 ${escapeHtml(t('modalidad.home'))}</span>`;
+  if (job.workMode === 'remote') {
+    return `<span>🏠 ${escapeHtml(t('workMode.remote'))}</span>`;
   }
-  if (job.modalidad === 'hybrid') {
+  if (job.workMode === 'hybrid') {
     const days = Number(job.hybridOfficeDays) || 3;
-    return `<span>🔄 ${escapeHtml(t('modalidad.hybridShort', { n: days }))}</span>`;
+    return `<span>🔄 ${escapeHtml(t('workMode.hybridShort', { n: days }))}</span>`;
   }
   return '';
 }
 
 // ------------------------------------------------------------
-// ⭐ SVG icons por plataforma (mismo look que en el picker).
+// SVG icons per platform (same look as the picker).
 // ------------------------------------------------------------
 const CONTACT_ICONS_SVG = {
   linkedin: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -211,18 +212,18 @@ const CONTACT_ICONS_SVG = {
   whatsapp: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
   </svg>`,
-  otro: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  other: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
   </svg>`,
 };
 
-function buildContactHref(tipo, link) {
+function buildContactHref(platform, link) {
   if (!link) return null;
   const raw = String(link).trim();
   if (!raw) return null;
 
-  switch (tipo) {
+  switch (platform) {
     case 'email':
       return raw.startsWith('mailto:') ? raw : `mailto:${raw}`;
     case 'whatsapp': {
@@ -230,7 +231,7 @@ function buildContactHref(tipo, link) {
       return digits ? `https://wa.me/${digits}` : null;
     }
     case 'linkedin':
-    case 'otro':
+    case 'other':
     default:
       if (/^https?:\/\//i.test(raw)) return raw;
       if (/^[\w-]+(\.[\w-]+)+/.test(raw)) return 'https://' + raw;
@@ -239,28 +240,28 @@ function buildContactHref(tipo, link) {
 }
 
 function renderContactChip(job) {
-  const nombre = (job.contacto || '').trim();
-  const link = (job.contactoLink || '').trim();
+  const name = (job.contact || '').trim();
+  const link = (job.contactLink || '').trim();
 
-  // Sin nombre ni link → nada
-  if (!nombre && !link) return '';
+  // Neither name nor link → render nothing.
+  if (!name && !link) return '';
 
-  const tipo = job.contactoTipo || 'otro';
-  const iconSvg = CONTACT_ICONS_SVG[tipo] || CONTACT_ICONS_SVG.otro;
-  const href = link ? buildContactHref(tipo, link) : null;
+  const platform = job.contactPlatform || 'other';
+  const iconSvg = CONTACT_ICONS_SVG[platform] || CONTACT_ICONS_SVG.other;
+  const href = link ? buildContactHref(platform, link) : null;
 
-  // Sin link → texto plano como antes
+  // No link → plain text as before.
   if (!href) {
-    return `<span>👤 ${escapeHtml(nombre || link)}</span>`;
+    return `<span>👤 ${escapeHtml(name || link)}</span>`;
   }
 
-  // Con link → chip clickeable con SVG
-  const label = nombre || t('job.contactoContactar');
+  // With link → clickable chip with SVG.
+  const label = name || t('job.contactoContactar');
   return `<a href="${escapeHtml(href)}"
              class="job-contact-chip"
              target="_blank"
              rel="noopener"
-             title="${escapeHtml(t('job.contactoAbrirTitle', { name: nombre || '' }))}">
+             title="${escapeHtml(t('job.contactoAbrirTitle', { name: name || '' }))}">
     ${iconSvg}
     <span class="chip-name">${escapeHtml(label)}</span>
     <span class="chip-arrow">↗</span>
@@ -305,8 +306,8 @@ function renderOpenActions(job, currentIdx, offerConfirmed = false) {
   const canNext = currentIdx < WORKFLOW_STEPS.length - 1;
   const prevStep = canBack ? WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? WORKFLOW_STEPS[currentIdx + 1] : null;
-  const isOffer = job.estado === 'Oferta';
-  const alreadyWentBack = Boolean(job.volvioAtras);
+  const isOffer = job.status === 'Offer';
+  const alreadyWentBack = Boolean(job.wentBack);
 
   const mainBtn = nextStep
     ? `<button class="wf-btn-big" data-action="move-next">${escapeHtml(t('job.advanceTo', { step: tStateShort(nextStep.id) }))}</button>`
@@ -329,7 +330,7 @@ function renderOpenActions(job, currentIdx, offerConfirmed = false) {
     : '';
 
   const offerCloseBtn = !isOffer
-    ? `<button class="wf-close-btn offer" data-action="close" data-estado="Oferta">${escapeHtml(t('job.closeOffer'))}</button>`
+    ? `<button class="wf-close-btn offer" data-action="close" data-status="Offer">${escapeHtml(t('job.closeOffer'))}</button>`
     : '';
 
   return `
@@ -344,9 +345,9 @@ function renderOpenActions(job, currentIdx, offerConfirmed = false) {
       <div class="wf-close-actions">
         <div class="wf-section-label">${escapeHtml(t('job.orCloseAs'))}</div>
         ${offerCloseBtn}
-        <button class="wf-close-btn reject" data-action="close" data-estado="Rechazado">${escapeHtml(t('job.closeRejected'))}</button>
-        <button class="wf-close-btn"        data-action="close" data-estado="Ghosted">${escapeHtml(t('job.closeGhosted'))}</button>
-        <button class="wf-close-btn"        data-action="close" data-estado="Descartado">${escapeHtml(t('job.closeDiscarded'))}</button>
+        <button class="wf-close-btn reject" data-action="close" data-status="Rejected">${escapeHtml(t('job.closeRejected'))}</button>
+        <button class="wf-close-btn"        data-action="close" data-status="Ghosted">${escapeHtml(t('job.closeGhosted'))}</button>
+        <button class="wf-close-btn"        data-action="close" data-status="Discarded">${escapeHtml(t('job.closeDiscarded'))}</button>
       </div>
     </div>
   `;
@@ -354,18 +355,18 @@ function renderOpenActions(job, currentIdx, offerConfirmed = false) {
 
 function renderClosedActions(job) {
   const last = lastHistoryEntry(job);
-  const reasonTxt = last && last.motivo
-    ? `<div class="closed-banner-motivo">"${escapeHtml(last.motivo)}"</div>`
+  const reasonTxt = last && last.reason
+    ? `<div class="closed-banner-reason">"${escapeHtml(last.reason)}"</div>`
     : '';
-  const fecha = last && last.fecha
-    ? ` · ${escapeHtml(t('job.closedOn'))} ${formatDate(last.fecha.slice(0, 10))}`
+  const date = last && last.date
+    ? ` · ${escapeHtml(t('job.closedOn'))} ${formatDate(last.date.slice(0, 10))}`
     : '';
 
   return `
     <div class="closed-banner" style="flex-direction:column;align-items:stretch;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;">
         <div class="text">
-          ${escapeHtml(t('job.closedLabel'))} <strong>${escapeHtml(tState(job.estado))}</strong>${fecha}
+          ${escapeHtml(t('job.closedLabel'))} <strong>${escapeHtml(tState(job.status))}</strong>${date}
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
           <button class="status-clickable" data-action="history" title="${escapeHtml(t('job.historyTitle'))}">🕒 ${escapeHtml(t('job.history'))}</button>

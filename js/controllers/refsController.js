@@ -15,9 +15,9 @@ import { t, tRefState, tRefStateShort } from '../i18n.js';
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
  * @param {{
- *   onOpenRefEdit:  (id:number)=>void,
- *   onRefToJob:     (refId:number)=>void,
- *   onOpenRefHistory: (id:number)=>void,
+ *   onOpenRefEdit:   (id:number)=>void,
+ *   onRefToJob:      (refId:number)=>void,
+ *   onOpenRefHistory:(id:number)=>void,
  * }} modals
  * @param {import('../store.js').Store} configStore
  */
@@ -28,8 +28,8 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   let currentFilter = 'all';
   let searchTerm = '';
 
-  let relacionChips = null;
-  let estadoChips = null;
+  let relationshipChips = null;
+  let statusChips = null;
 
   // ----------------------------------------------------------
   // Collapsibles
@@ -79,30 +79,30 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const style = cfg.dashboardStyleRefs || cfg.dashboardStyle || 'sparklines';
 
     const total = refs.length;
-    const activos = refs.filter(r => !isRefClosed(r.estado)).length;
-    const contratados = refs.filter(r => r.estado === 'Contratado').length;
-    const noAplica = refs.filter(r => r.estado === 'No aplica').length;
-    const enProceso = refs.filter(r => r.estado === 'En proceso').length;
-    const tasaConv = total ? Math.round((contratados / total) * 100) : 0;
+    const active = refs.filter(r => !isRefClosed(r.status)).length;
+    const hired = refs.filter(r => r.status === 'Hired').length;
+    const notApplicable = refs.filter(r => r.status === 'Not Applicable').length;
+    const inProcess = refs.filter(r => r.status === 'In Process').length;
+    const conversionRate = total ? Math.round((hired / total) * 100) : 0;
 
-    const relCount = {};
+    const relationshipCount = {};
     refs.forEach(r => {
-      if (!r.relacion) return;
-      const list = Array.isArray(r.relacion) ? r.relacion : [r.relacion];
+      if (!r.relationship) return;
+      const list = Array.isArray(r.relationship) ? r.relationship : [r.relationship];
       list.forEach(rel => {
         if (!rel) return;
-        relCount[rel] = (relCount[rel] || 0) + 1;
+        relationshipCount[rel] = (relationshipCount[rel] || 0) + 1;
       });
     });
-    const top = Object.entries(relCount)
+    const top = Object.entries(relationshipCount)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
-    const getDate = r => r.createdAt || r.fecha || '';
+    const getDate = r => r.createdAt || r.date || '';
     const trendTotal = buildWeeklyTrend(refs, getDate);
-    const trendActive = buildWeeklyTrend(refs.filter(r => !isRefClosed(r.estado)), getDate);
-    const trendHighlight = buildWeeklyTrend(refs.filter(r => r.estado === 'Contratado'), getDate);
-    const trendClosed = buildWeeklyTrend(refs.filter(r => r.estado === 'No aplica'), getDate);
+    const trendActive = buildWeeklyTrend(refs.filter(r => !isRefClosed(r.status)), getDate);
+    const trendHighlight = buildWeeklyTrend(refs.filter(r => r.status === 'Hired'), getDate);
+    const trendClosed = buildWeeklyTrend(refs.filter(r => r.status === 'Not Applicable'), getDate);
 
     const heatmap = buildDailyActivity(refs, getDate, 60);
 
@@ -112,13 +112,13 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       icon: '🤝',
       label: t('refs.title'),
       total,
-      active: activos,
-      inProcess: enProceso,
-      closed: noAplica,
-      highlight: contratados,
+      active,
+      inProcess,
+      closed: notApplicable,
+      highlight: hired,
       highlightIcon: '🎉',
       highlightLabel: t('dash.refs.highlight'),
-      highlightSub: t('dash.refs.highlightSub', { pct: tasaConv }),
+      highlightSub: t('dash.refs.highlightSub', { pct: conversionRate }),
       labels: {
         total: t('dash.refs.total'),
         active: t('dash.refs.active'),
@@ -140,12 +140,12 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
         totalWord: t(total === 1
           ? 'dash.refs.summaryWord.total.one'
           : 'dash.refs.summaryWord.total.many'),
-        active: activos,
-        activeWord: t(activos === 1
+        active,
+        activeWord: t(active === 1
           ? 'dash.refs.summaryWord.active.one'
           : 'dash.refs.summaryWord.active.many'),
-        highlight: contratados,
-        highlightWord: t(contratados === 1
+        highlight: hired,
+        highlightWord: t(hired === 1
           ? 'dash.refs.summaryWord.highlight.one'
           : 'dash.refs.summaryWord.highlight.many'),
       }),
@@ -183,7 +183,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   }
 
   // ----------------------------------------------------------
-  // Empty states (helpers)
+  // Empty states
   // ----------------------------------------------------------
   function renderEmptyRefs(title, subtitle) {
     return `
@@ -222,11 +222,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   // Chips
   // ----------------------------------------------------------
-  function initChips(relacion, estado) {
-    relacionChips = relacion;
-    estadoChips = estado;
-    relacionChips.setValue([]);
-    estadoChips.setValue('Pendiente');
+  function initChips(relationship, status) {
+    relationshipChips = relationship;
+    statusChips = status;
+    relationshipChips.setValue([]);
+    statusChips.setValue('Pending');
   }
 
   // ----------------------------------------------------------
@@ -236,37 +236,37 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   refForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const nombre = valueOf('refNombre');
-    if (!nombre) return;
+    const name = valueOf('refName');
+    if (!name) return;
 
-    const initialState = estadoChips?.getValue() || 'Pendiente';
-    const relacionValue = relacionChips?.getValue() || [];
+    const initialState = statusChips?.getValue() || 'Pending';
+    const relationshipValue = relationshipChips?.getValue() || [];
     const now = new Date().toISOString();
 
     const newRef = {
       id: uid(),
-      nombre,
-      rol: valueOf('refRol'),
-      contacto: valueOf('refContacto'),
+      name,
+      role: valueOf('refRole'),
+      contact: valueOf('refContact'),
       link: valueOf('refLink'),
-      relacion: Array.isArray(relacionValue) ? relacionValue : [],
-      estado: initialState,
-      // Campos internos: los setea el flow de "Referido hecho" (refToJob).
-      empresasVinculadas: [],
+      relationship: Array.isArray(relationshipValue) ? relationshipValue : [],
+      status: initialState,
+      // Internal fields set by the "Referral done" flow.
+      linkedCompanies: [],
       linkedJobId: null,
-      notas: valueOf('refNotas'),
-      volvioAtras: false,
+      notes: valueOf('refNotes'),
+      wentBack: false,
       createdAt: now,
-      history: [{ estado: initialState, fecha: now }],
+      history: [{ status: initialState, date: now }],
     };
 
     refsStore.update(refs => [newRef, ...refs]);
 
     refForm.reset();
-    relacionChips?.setValue([]);
-    estadoChips?.setValue('Pendiente');
+    relationshipChips?.setValue([]);
+    statusChips?.setValue('Pending');
 
-    // Expandimos la lista y colapsamos el form
+    // Expand the list and collapse the form.
     expandRefsList();
     if (refFormBody && refFormToggleBtn) {
       refFormBody.classList.add('collapsed');
@@ -310,14 +310,14 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const action = actionEl.dataset.action;
 
     switch (action) {
-      case 'edit-ref':         modals.onOpenRefEdit(id);   break;
-      case 'delete-ref':       confirmDelete(id);          break;
-      case 'move-ref-next':    requestMoveNext(id);        break;
-      case 'move-ref-prev':    requestMovePrev(id);        break;
-      case 'close-ref':        closeRef(id);               break;
-      case 'reopen-ref':       reopenRef(id);              break;
-      case 'ref-history':      modals.onOpenRefHistory(id); break;
-      case 'scroll-to-job':    scrollToJob(Number(actionEl.dataset.jobId)); break;
+      case 'edit-ref':      modals.onOpenRefEdit(id);   break;
+      case 'delete-ref':    confirmDelete(id);          break;
+      case 'move-ref-next': requestMoveNext(id);        break;
+      case 'move-ref-prev': requestMovePrev(id);        break;
+      case 'close-ref':     closeRef(id);               break;
+      case 'reopen-ref':    reopenRef(id);              break;
+      case 'ref-history':   modals.onOpenRefHistory(id); break;
+      case 'scroll-to-job': scrollToJob(Number(actionEl.dataset.jobId)); break;
     }
   });
 
@@ -325,7 +325,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
     const confirmed = await showConfirm({
-      title: t('confirm.deleteRef.title', { name: r.nombre }),
+      title: t('confirm.deleteRef.title', { name: r.name }),
       message: t('confirm.deleteRef.message'),
       confirmText: t('confirm.deleteRef.confirm'),
       danger: true,
@@ -345,20 +345,20 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
   function requestMoveNext(id) {
     const r = refsStore.get().find(x => x.id === id);
-    if (!r || isRefClosed(r.estado)) return;
+    if (!r || isRefClosed(r.status)) return;
 
-    const idx = refStepIndex(r.estado);
+    const idx = refStepIndex(r.status);
     if (idx < 0) return;
 
     const nextIdx = idx + 1;
     if (nextIdx >= REF_WORKFLOW_STEPS.length) return;
 
     const step = REF_WORKFLOW_STEPS[nextIdx];
-    pendingRefAdvance = { id, nextState: step.id };
+    pendingRefAdvance = { id, nextStatus: step.id };
 
     refNoteSubtitle.innerHTML = t('note.subtitle', {
       step: escapeHtml(tRefStateShort(step.id)),
-      name: escapeHtml(r.nombre),
+      name: escapeHtml(r.name),
     });
 
     refStepNoteInput.value = '';
@@ -368,28 +368,28 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
   function applyRefAdvance({ note } = {}) {
     if (!pendingRefAdvance) return;
-    const { id, nextState } = pendingRefAdvance;
+    const { id, nextStatus } = pendingRefAdvance;
 
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
-    const prevState = r.estado;
+    const prevStatus = r.status;
 
     refsStore.update(refs => refs.map(x => {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
-      const entry = { estado: nextState, fecha: new Date().toISOString() };
-      if (note) entry.nota = note;
+      const entry = { status: nextStatus, date: new Date().toISOString() };
+      if (note) entry.note = note;
       history.push(entry);
-      return { ...x, estado: nextState, history };
+      return { ...x, status: nextStatus, history };
     }));
 
-    showToast(t('toast.advanceTo', { name: r.nombre, estado: tRefState(nextState) }), '→');
+    showToast(t('toast.advanceTo', { name: r.name, status: tRefState(nextStatus) }), '→');
 
-    if (nextState === 'Contratado' && r.linkedJobId) {
-      syncLinkedJobToOffer(r.linkedJobId, r.nombre);
+    if (nextStatus === 'Hired' && r.linkedJobId) {
+      syncLinkedJobToOffer(r.linkedJobId, r.name);
     }
 
-    if (nextState === 'En proceso' && prevState !== 'En proceso') {
+    if (nextStatus === 'In Process' && prevStatus !== 'In Process') {
       setTimeout(() => modals.onRefToJob(id), 400);
     }
   }
@@ -397,14 +397,14 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   function syncLinkedJobToOffer(jobId, refName) {
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== jobId) return j;
-      if (j.estado === 'Oferta') return j;
+      if (j.status === 'Offer') return j;
       const history = cloneArray(j.history);
       history.push({
-        estado: 'Oferta',
-        fecha: new Date().toISOString(),
-        motivo: `Referido contratado: ${refName}`,
+        status: 'Offer',
+        date: new Date().toISOString(),
+        reason: `Referral hired: ${refName}`,
       });
-      return { ...j, estado: 'Oferta', history };
+      return { ...j, status: 'Offer', history };
     }));
   }
 
@@ -433,23 +433,23 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   });
 
   // ----------------------------------------------------------
-  // Backtrack: with confirmation, only once per referral
+  // Backtrack: confirm, once per referral
   // ----------------------------------------------------------
   async function requestMovePrev(id) {
     const r = refsStore.get().find(x => x.id === id);
-    if (!r || isRefClosed(r.estado)) return;
+    if (!r || isRefClosed(r.status)) return;
 
     if (r.linkedJobId) {
       showToast(t('ref.lockedBackTitle'), '🔒');
       return;
     }
 
-    if (r.volvioAtras) {
+    if (r.wentBack) {
       showToast(t('toast.alreadyWentBackRef'), '!');
       return;
     }
 
-    const idx = refStepIndex(r.estado);
+    const idx = refStepIndex(r.status);
     if (idx <= 0) return;
 
     const prevStep = REF_WORKFLOW_STEPS[idx - 1];
@@ -457,8 +457,8 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const confirmed = await showConfirm({
       title: t('confirm.prevRef.title'),
       message: t('confirm.prevRef.message', {
-        name: escapeHtml(r.nombre),
-        from: escapeHtml(tRefState(r.estado)),
+        name: escapeHtml(r.name),
+        from: escapeHtml(tRefState(r.status)),
         to: escapeHtml(tRefStateShort(prevStep.id)),
       }),
       confirmText: t('confirm.prevRef.confirm'),
@@ -471,35 +471,35 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   function applyMovePrev(id) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
-    if (r.volvioAtras) return;
+    if (r.wentBack) return;
 
-    const idx = refStepIndex(r.estado);
+    const idx = refStepIndex(r.status);
     if (idx <= 0) return;
 
-    const prevState = REF_WORKFLOW_STEPS[idx - 1].id;
+    const prevStatus = REF_WORKFLOW_STEPS[idx - 1].id;
 
     refsStore.update(refs => refs.map(x => {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
       history.push({
-        estado: prevState,
-        fecha: new Date().toISOString(),
-        retroceso: true,
+        status: prevStatus,
+        date: new Date().toISOString(),
+        wentBack: true,
       });
-      return { ...x, estado: prevState, volvioAtras: true, history };
+      return { ...x, status: prevStatus, wentBack: true, history };
     }));
 
-    showToast(t('toast.backTo', { name: r.nombre, estado: tRefState(prevState) }), '←');
+    showToast(t('toast.backTo', { name: r.name, status: tRefState(prevStatus) }), '←');
   }
 
   // ----------------------------------------------------------
-  // Close / Reopen
+  // Close / reopen
   // ----------------------------------------------------------
   async function closeRef(id) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
     const confirmed = await showConfirm({
-      title: t('confirm.closeRef.title', { name: r.nombre }),
+      title: t('confirm.closeRef.title', { name: r.name }),
       message: t('confirm.closeRef.message'),
       confirmText: t('confirm.closeRef.confirm'),
       danger: true,
@@ -510,14 +510,14 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
       history.push({
-        estado: 'No aplica',
-        fecha: new Date().toISOString(),
-        motivo: 'No aplica',
+        status: 'Not Applicable',
+        date: new Date().toISOString(),
+        reason: 'Not applicable',
       });
-      return { ...x, estado: 'No aplica', history };
+      return { ...x, status: 'Not Applicable', history };
     }));
 
-    showToast(t('toast.refClosed', { name: r.nombre }), '🚫');
+    showToast(t('toast.refClosed', { name: r.name }), '🚫');
   }
 
   function reopenRef(id) {
@@ -528,11 +528,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
       history.push({
-        estado: 'Pendiente',
-        fecha: new Date().toISOString(),
-        motivo: 'Reopen',
+        status: 'Pending',
+        date: new Date().toISOString(),
+        reason: 'Reopen',
       });
-      return { ...x, estado: 'Pendiente', history };
+      return { ...x, status: 'Pending', history };
     }));
 
     showToast(t('toast.refReopened'), '↻');
@@ -548,7 +548,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   document.addEventListener('scroll-to-ref', (e) => {
     const { refId } = e.detail;
 
-    // Aseguramos que la lista esté visible
     expandRefsList();
 
     let needsRender = false;

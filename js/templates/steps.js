@@ -6,10 +6,10 @@ import { escapeHtml } from '../utils.js';
 import { t, tStateShort, tRefStateShort } from '../i18n.js';
 
 /**
- * @param {Array<{id:string, short:string}>} steps
+ * @param {Array<{ id: string, short: string }>} steps
  * @param {number} currentIdx  current step index (-1 if closed)
  * @param {string[]} skipped   step ids marked as not applicable
- * @param {{ cssPrefix?: string, showSkipped?: boolean, kind?: 'job'|'ref' }} opts
+ * @param {{ cssPrefix?: string, showSkipped?: boolean, kind?: 'job' | 'ref' }} opts
  * @returns {string} HTML
  */
 export function renderSteps(steps, currentIdx, skipped = [], opts = {}) {

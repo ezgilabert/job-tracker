@@ -1,12 +1,12 @@
 /* ============================================================
-   Referrals: cards + tags de referidos en jobs
-   V3 · Progress pegada al top + botones grandes
-   Empty ref · opción C (104px / 48px)
-   Multiselect de relación
+   Referrals: cards + referral tags inside job cards
+   V3 · Progress bar pinned to the top + large buttons
+   Empty ref · option C (104px / 48px)
+   Relationship multi-select
    ============================================================ */
 
 /* ============================================================
-   Form base (override del grid global)
+   Base form (overrides the global grid)
    ============================================================ */
 
 form.form-block {
@@ -15,7 +15,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Hero: avatar + nombre del referido (form nuevo referido)
+   Hero: avatar + referral name (new-referral form)
    ============================================================ */
 
 .ref-hero-row {
@@ -133,7 +133,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Chips (relación / estado) en form
+   Chips (relationship / status) in the form
    ============================================================ */
 
 .ref-chips {
@@ -168,22 +168,22 @@ form.form-block {
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-.ref-estado-chips .ref-chip.selected[data-value="Pendiente"] {
+.ref-status-chips .ref-chip.selected[data-value="Pending"] {
   background: #64748b; border-color: #64748b; box-shadow: 0 3px 10px rgba(100,116,139,0.35);
 }
-.ref-estado-chips .ref-chip.selected[data-value="Contactado"] {
+.ref-status-chips .ref-chip.selected[data-value="Contacted"] {
   background: var(--info); border-color: var(--info); box-shadow: 0 3px 10px rgba(59,130,246,0.35);
 }
-.ref-estado-chips .ref-chip.selected[data-value="Referido hecho"] {
+.ref-status-chips .ref-chip.selected[data-value="Referred"] {
   background: var(--accent); border-color: var(--accent); box-shadow: 0 3px 10px var(--accent-glow);
 }
-.ref-estado-chips .ref-chip.selected[data-value="En proceso"] {
+.ref-status-chips .ref-chip.selected[data-value="In Process"] {
   background: var(--warning); border-color: var(--warning); box-shadow: 0 3px 10px rgba(245,158,11,0.35);
 }
-.ref-estado-chips .ref-chip.selected[data-value="Contratado"] {
+.ref-status-chips .ref-chip.selected[data-value="Hired"] {
   background: var(--success); border-color: var(--success); box-shadow: 0 3px 10px rgba(16,185,129,0.35);
 }
-.ref-estado-chips .ref-chip.selected[data-value="No aplica"] {
+.ref-status-chips .ref-chip.selected[data-value="Not Applicable"] {
   background: var(--danger); border-color: var(--danger); box-shadow: 0 3px 10px rgba(239,68,68,0.35);
 }
 
@@ -275,7 +275,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Lista de referidos
+   Referral list
    ============================================================ */
 
 #refList { display: grid; gap: 0.75rem; }
@@ -308,12 +308,13 @@ form.form-block {
   background: linear-gradient(180deg, var(--accent), var(--accent-2));
 }
 
-.referido[data-relacion="Amigo"]::before { background: linear-gradient(180deg, #fb923c, #f97316); }
-.referido[data-relacion="Ex-colega"]::before { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
-.referido[data-relacion="Familiar"]::before { background: linear-gradient(180deg, #f472b6, #ec4899); }
-.referido[data-relacion="Conocido"]::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
-.referido[data-relacion="Recruiter"]::before { background: linear-gradient(180deg, #34d399, #10b981); }
-.referido[data-relacion="Mentor"]::before { background: linear-gradient(180deg, #facc15, #eab308); }
+/* ===== Relationship accent bar ===== */
+.referido[data-relationship="Friend"]::before       { background: linear-gradient(180deg, #fb923c, #f97316); }
+.referido[data-relationship="Ex-colleague"]::before { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
+.referido[data-relationship="Family"]::before       { background: linear-gradient(180deg, #f472b6, #ec4899); }
+.referido[data-relationship="Acquaintance"]::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
+.referido[data-relationship="Recruiter"]::before    { background: linear-gradient(180deg, #34d399, #10b981); }
+.referido[data-relationship="Mentor"]::before       { background: linear-gradient(180deg, #facc15, #eab308); }
 
 .referido:hover {
   transform: translateY(-2px);
@@ -339,11 +340,11 @@ form.form-block {
 }
 
 /* ============================================================
-   Badge de relación (multiselect)
-   Colores aplicados por el data-relacion DEL PROPIO BADGE
+   Relationship badge (multiselect)
+   Colors keyed by data-relationship ON THE BADGE ITSELF
    ============================================================ */
 
-.ref-relacion-badge {
+.ref-relationship-badge {
   display: inline-flex;
   align-items: center;
   padding: 0.2rem 0.6rem;
@@ -357,25 +358,25 @@ form.form-block {
   border: 1px solid var(--accent-border);
 }
 
-.ref-relacion-badge[data-relacion="Amigo"]      { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-.ref-relacion-badge[data-relacion="Ex-colega"]  { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
-.ref-relacion-badge[data-relacion="Familiar"]   { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
-.ref-relacion-badge[data-relacion="Conocido"]   { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
-.ref-relacion-badge[data-relacion="Recruiter"]  { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
-.ref-relacion-badge[data-relacion="Mentor"]     { background: #fefce8; color: #a16207; border-color: #fef08a; }
+.ref-relationship-badge[data-relationship="Friend"]       { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.ref-relationship-badge[data-relationship="Ex-colleague"] { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
+.ref-relationship-badge[data-relationship="Family"]       { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+.ref-relationship-badge[data-relationship="Acquaintance"] { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.ref-relationship-badge[data-relationship="Recruiter"]    { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
+.ref-relationship-badge[data-relationship="Mentor"]       { background: #fefce8; color: #a16207; border-color: #fef08a; }
 
-[data-theme="dark"] .ref-relacion-badge[data-relacion="Amigo"]      { background: rgba(249,115,22,0.16); color: #fb923c; border-color: transparent; }
-[data-theme="dark"] .ref-relacion-badge[data-relacion="Ex-colega"]  { background: var(--info-soft); color: #60a5fa; border-color: transparent; }
-[data-theme="dark"] .ref-relacion-badge[data-relacion="Familiar"]   { background: rgba(236,72,153,0.16); color: #f472b6; border-color: transparent; }
-[data-theme="dark"] .ref-relacion-badge[data-relacion="Conocido"]   { background: rgba(124,58,237,0.16); color: #a78bfa; border-color: transparent; }
-[data-theme="dark"] .ref-relacion-badge[data-relacion="Recruiter"]  { background: var(--success-soft); color: #34d399; border-color: transparent; }
-[data-theme="dark"] .ref-relacion-badge[data-relacion="Mentor"]     { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Friend"]       { background: rgba(249,115,22,0.16); color: #fb923c; border-color: transparent; }
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Ex-colleague"] { background: var(--info-soft); color: #60a5fa; border-color: transparent; }
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Family"]       { background: rgba(236,72,153,0.16); color: #f472b6; border-color: transparent; }
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Acquaintance"] { background: rgba(124,58,237,0.16); color: #a78bfa; border-color: transparent; }
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Recruiter"]    { background: var(--success-soft); color: #34d399; border-color: transparent; }
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Mentor"]       { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
 
 /* ============================================================
-   Badge de estado
+   Status badge
    ============================================================ */
 
-.ref-estado-badge {
+.ref-status-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -388,7 +389,7 @@ form.form-block {
   border: 1px solid transparent;
 }
 
-.ref-estado-badge::before {
+.ref-status-badge::before {
   content: '';
   width: 6px;
   height: 6px;
@@ -397,23 +398,23 @@ form.form-block {
   box-shadow: 0 0 6px currentColor;
 }
 
-.ref-estado-badge[data-estado="Pendiente"] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
-.ref-estado-badge[data-estado="Contactado"] { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
-.ref-estado-badge[data-estado="Referido hecho"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
-.ref-estado-badge[data-estado="En proceso"] { background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border); }
-.ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
-.ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border); }
+.ref-status-badge[data-status="Pending"]        { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+.ref-status-badge[data-status="Contacted"]      { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
+.ref-status-badge[data-status="Referred"]       { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+.ref-status-badge[data-status="In Process"]     { background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border); }
+.ref-status-badge[data-status="Hired"]          { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
+.ref-status-badge[data-status="Not Applicable"] { background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border); }
 
-[data-theme="dark"] .ref-estado-badge { border-color: transparent; }
-[data-theme="dark"] .ref-estado-badge[data-estado="Pendiente"] { background: rgba(100,116,139,0.18); color: #94a3b8; }
-[data-theme="dark"] .ref-estado-badge[data-estado="Contactado"] { background: var(--info-soft); color: #60a5fa; }
-[data-theme="dark"] .ref-estado-badge[data-estado="Referido hecho"] { background: var(--accent-soft); color: #a78bfa; }
-[data-theme="dark"] .ref-estado-badge[data-estado="En proceso"] { background: var(--warning-soft); color: #fbbf24; }
-[data-theme="dark"] .ref-estado-badge[data-estado="Contratado"] { background: var(--success-soft); color: #34d399; }
-[data-theme="dark"] .ref-estado-badge[data-estado="No aplica"] { background: var(--danger-soft); color: #f87171; }
+[data-theme="dark"] .ref-status-badge { border-color: transparent; }
+[data-theme="dark"] .ref-status-badge[data-status="Pending"]        { background: rgba(100,116,139,0.18); color: #94a3b8; }
+[data-theme="dark"] .ref-status-badge[data-status="Contacted"]      { background: var(--info-soft); color: #60a5fa; }
+[data-theme="dark"] .ref-status-badge[data-status="Referred"]       { background: var(--accent-soft); color: #a78bfa; }
+[data-theme="dark"] .ref-status-badge[data-status="In Process"]     { background: var(--warning-soft); color: #fbbf24; }
+[data-theme="dark"] .ref-status-badge[data-status="Hired"]          { background: var(--success-soft); color: #34d399; }
+[data-theme="dark"] .ref-status-badge[data-status="Not Applicable"] { background: var(--danger-soft); color: #f87171; }
 
 /* ============================================================
-   V3 · Progress pegada al top
+   V3 · Progress bar pinned to the top
    ============================================================ */
 
 .ref-top-progress {
@@ -475,7 +476,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Meta inline
+   Inline meta
    ============================================================ */
 
 .ref-meta {
@@ -504,10 +505,10 @@ form.form-block {
 .ref-meta a:hover { opacity: 0.75; }
 
 /* ============================================================
-   Notas
+   Notes
    ============================================================ */
 
-.ref-notas {
+.ref-notes {
   font-size: 0.84rem;
   color: var(--text-muted);
   font-style: italic;
@@ -617,20 +618,20 @@ form.form-block {
 .ref-step.current .ref-step-label { color: var(--accent); font-weight: 700; }
 .ref-step.done .ref-step-label { color: var(--text-muted); }
 
-.ref-step[data-step="Contratado"].done .ref-step-dot,
-.ref-step[data-step="Contratado"].current .ref-step-dot {
+.ref-step[data-step="Hired"].done .ref-step-dot,
+.ref-step[data-step="Hired"].current .ref-step-dot {
   background: linear-gradient(135deg, #34d399, #10b981);
   box-shadow: 0 0 0 3px rgba(52,211,153,0.2), 0 0 12px rgba(52,211,153,0.4);
 }
 
-.ref-step[data-step="No aplica"].done .ref-step-dot,
-.ref-step[data-step="No aplica"].current .ref-step-dot {
+.ref-step[data-step="Not Applicable"].done .ref-step-dot,
+.ref-step[data-step="Not Applicable"].current .ref-step-dot {
   background: linear-gradient(135deg, #f87171, #ef4444);
   box-shadow: 0 0 0 3px rgba(239,68,68,0.2), 0 0 12px rgba(239,68,68,0.4);
 }
 
 /* ============================================================
-   V3 · Acciones grandes
+   V3 · Large actions
    ============================================================ */
 
 .ref-wf-main-actions {
@@ -666,7 +667,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Mobile: apilar botones grandes
+   Mobile: stack the large buttons
    ============================================================ */
 
 @media (max-width: 640px) {
@@ -686,7 +687,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Cleanup: botones viejos (ya no se usan, se ocultan por las dudas)
+   Cleanup: legacy buttons (no longer used, hidden just in case)
    ============================================================ */
 
 .ref-wf-actions,
@@ -695,10 +696,10 @@ form.form-block {
 }
 
 /* ============================================================
-   Empresas vinculadas (legacy, sin UI pero se mantiene por las dudas)
+   Linked companies (legacy, no UI but kept just in case)
    ============================================================ */
 
-.ref-empresas-wrap {
+.ref-companies-wrap {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -710,13 +711,13 @@ form.form-block {
   align-items: center;
 }
 
-.ref-empresas-wrap .ref-empresa-empty {
+.ref-companies-wrap .ref-company-empty {
   font-size: 0.78rem;
   color: var(--text-dim);
   font-style: italic;
 }
 
-.ref-empresa-chip {
+.ref-company-chip {
   padding: 0.4rem 0.75rem;
   border-radius: 20px;
   border: 1px solid var(--border);
@@ -732,32 +733,32 @@ form.form-block {
   gap: 0.3rem;
 }
 
-.ref-empresa-chip:hover {
+.ref-company-chip:hover {
   background: var(--surface-hover);
   border-color: var(--border-strong);
   color: var(--text);
 }
 
-.ref-empresa-chip.selected {
+.ref-company-chip.selected {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-.ref-empresa-chip.selected::before {
+.ref-company-chip.selected::before {
   content: '✓';
   font-size: 0.7rem;
 }
 
-.ref-empresas-lista {
+.ref-companies-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
   margin-top: 0.4rem;
 }
 
-.ref-empresa-tag {
+.ref-company-tag {
   padding: 0.22rem 0.6rem;
   border-radius: 20px;
   background: var(--accent-soft);
@@ -772,7 +773,7 @@ form.form-block {
   transition: all 0.15s ease;
 }
 
-.ref-empresa-tag:hover {
+.ref-company-tag:hover {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
@@ -781,7 +782,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Acciones laterales de la card
+   Card side actions
    ============================================================ */
 
 .ref-actions {
@@ -801,7 +802,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Empty state (referidos) · OPCIÓN C · 104px / 48px
+   Empty state (referrals) · OPTION C · 104px / 48px
    ============================================================ */
 
 .empty-ref {
@@ -854,7 +855,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Tags de referidos dentro de las cards de jobs
+   Referral tags inside job cards
    ============================================================ */
 
 .job-refs {
@@ -909,7 +910,7 @@ form.form-block {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.job-ref-chip .job-ref-estado-dot {
+.job-ref-chip .job-ref-status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -918,9 +919,9 @@ form.form-block {
   flex-shrink: 0;
 }
 
-.job-ref-chip[data-estado="Pendiente"] .job-ref-estado-dot { background: #64748b; box-shadow: 0 0 6px #64748b; }
-.job-ref-chip[data-estado="Contactado"] .job-ref-estado-dot { background: var(--info); box-shadow: 0 0 6px var(--info); }
-.job-ref-chip[data-estado="Referido hecho"] .job-ref-estado-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-.job-ref-chip[data-estado="En proceso"] .job-ref-estado-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
-.job-ref-chip[data-estado="Contratado"] .job-ref-estado-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
-.job-ref-chip[data-estado="No aplica"] .job-ref-estado-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.job-ref-chip[data-status="Pending"]        .job-ref-status-dot { background: #64748b; box-shadow: 0 0 6px #64748b; }
+.job-ref-chip[data-status="Contacted"]      .job-ref-status-dot { background: var(--info); box-shadow: 0 0 6px var(--info); }
+.job-ref-chip[data-status="Referred"]       .job-ref-status-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.job-ref-chip[data-status="In Process"]     .job-ref-status-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.job-ref-chip[data-status="Hired"]          .job-ref-status-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.job-ref-chip[data-status="Not Applicable"] .job-ref-status-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); }

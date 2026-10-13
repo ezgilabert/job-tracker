@@ -1,33 +1,33 @@
 // ============================================================
 // Session: mocked auth (single valid user).
 //
-// CLIENT-SIDE ONLY. Esto NO es seguridad real: alguien con
-// devtools puede saltarlo. Es "raising the bar" mientras no
-// exista backend. Cuando haya API:
-//   - validateCredentials() → POST /auth/login
-//   - login()               → guardar httpOnly cookie del server
-//   - requireSession()      → GET /auth/me
+// CLIENT-SIDE ONLY. This is NOT real security: anyone with devtools
+// can bypass it. It is "raising the bar" until a backend exists.
+// When an API lands:
+//   - validateCredentials() -> POST /auth/login
+//   - login()               -> store server httpOnly cookie
+//   - requireSession()      -> GET /auth/me
 // ============================================================
 
 const SESSION_KEY         = 'jobTrackerSession';
 const RATE_KEY            = 'jobTrackerLoginRate';
 const INSTALL_SECRET_KEY  = 'jobTrackerInstallSecret';
 
-// Políticas
-const MAX_ATTEMPTS    = 5;                 // intentos antes del lockout
-const LOCKOUT_MS      = 5 * 60 * 1000;     // 5 min de bloqueo
-const SESSION_TTL_MS  = 30 * 60 * 1000;    // 30 min de inactividad
+// Policies
+const MAX_ATTEMPTS    = 5;               // attempts before lockout
+const LOCKOUT_MS      = 5 * 60 * 1000;   // 5 minutes lockout
+const SESSION_TTL_MS  = 30 * 60 * 1000;  // 30 min inactivity TTL
 
 // ------------------------------------------------------------
-// Credenciales (hash SHA-256 de `${salt}:${password}`)
+// Credentials (SHA-256 hash of `${salt}:${password}`).
 //
-// ⚠️ REEMPLAZAR `passwordHash` con el hash real. Para generarlo:
-//   1. Abrí login.html en el navegador.
-//   2. En la consola:
+// WARNING: replace `passwordHash` with the real hash. To generate:
+//   1. Open login.html.
+//   2. In the console:
 //        const m = await import('./js/auth/session.js');
-//        await m.computeHash('a7f3d9e2c4b8a1f6', 'TU_PASSWORD');
-//   3. Pegá el hex resultante en passwordHash y NO dejes la
-//      contraseña en texto plano en ningún lado del repo.
+//        await m.computeHash('a7f3d9e2c4b8a1f6', 'YOUR_PASSWORD');
+//   3. Paste the hex output into passwordHash. Never commit the
+//      plaintext password anywhere.
 // ------------------------------------------------------------
 const CREDENTIALS = [
   {
@@ -40,7 +40,7 @@ const CREDENTIALS = [
 ];
 
 // ------------------------------------------------------------
-// Cripto helpers
+// Crypto helpers
 // ------------------------------------------------------------
 async function sha256Hex(text) {
   const buf = new TextEncoder().encode(text);
@@ -50,16 +50,15 @@ async function sha256Hex(text) {
     .join('');
 }
 
-/** Expuesto para que puedas generar el hash desde la consola. */
+/** Exposed so the hash can be generated from the console. */
 export async function computeHash(salt, password) {
   return sha256Hex(`${salt}:${password}`);
 }
 
 /**
- * Secreto por instalación (no por usuario). Se genera una sola vez
- * y se guarda en localStorage. Sirve para firmar la sesión: sin
- * este valor, editar el JSON del sessionStorage no alcanza para
- * forjar una sesión válida.
+ * Per-install secret (not per user). Generated once and stored in
+ * localStorage. Used to sign the session payload: without it, editing
+ * sessionStorage JSON is not enough to forge a valid session.
  */
 function getInstallSecret() {
   let s = localStorage.getItem(INSTALL_SECRET_KEY);
@@ -79,7 +78,7 @@ async function signSession(session) {
 }
 
 // ------------------------------------------------------------
-// Rate limiting (persistido en localStorage)
+// Rate limiting (persisted in localStorage)
 // ------------------------------------------------------------
 function readRate() {
   try {
@@ -117,7 +116,7 @@ function clearRate() {
 }
 
 // ------------------------------------------------------------
-// Validación de credenciales (async por el hash)
+// Credential validation (async because of the hash)
 // ------------------------------------------------------------
 /**
  * @returns {Promise<
@@ -150,7 +149,7 @@ export async function validateCredentials(identifier, password) {
 }
 
 // ------------------------------------------------------------
-// Sesión
+// Session
 // ------------------------------------------------------------
 export function getSession() {
   try {
@@ -220,8 +219,8 @@ export async function requireSession(redirectTo = './login.html') {
 }
 
 /**
- * Si hay una sesión válida, redirige a la app.
- * Devuelve true si redirigió (para cortar el boot del login).
+ * If a valid session exists, redirect to the app.
+ * Returns true when it redirected (so the login boot can stop).
  */
 export async function redirectIfAuthenticated(redirectTo = './index.html') {
   const session = getSession();
@@ -234,7 +233,7 @@ export async function redirectIfAuthenticated(redirectTo = './index.html') {
 }
 
 // ------------------------------------------------------------
-// Heartbeat de inactividad (llamar desde main.js)
+// Inactivity heartbeat (call from main.js)
 // ------------------------------------------------------------
 export function startSessionHeartbeat(onExpire) {
   let last = Date.now();

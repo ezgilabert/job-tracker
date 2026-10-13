@@ -1,78 +1,79 @@
 // ============================================================
-// ContactLinkPicker: chips de plataforma + input de link.
-//   - Chips: LinkedIn / Email / WhatsApp / Otro
-//   - Cada chip tiene un SVG inline que se clona al ícono del input.
-//   - Mantiene un <input type="hidden"> con el tipo seleccionado.
-//   - Valida el contenido del input según el tipo seleccionado:
-//       · mientras tipeás → estado "valid" si pasa (borde verde)
-//       · al salir del campo → estado "invalid" si falla (borde rojo)
-//       · el submit puede llamar a validate() + markTouched() para bloquear
+// ContactLinkPicker: platform chips + link input.
+//   - Chips: LinkedIn / Email / WhatsApp / Other
+//   - Each chip has an inline SVG that gets cloned into the
+//     input icon.
+//   - Keeps a hidden input with the selected platform.
+//   - Validates the input content based on the selected platform:
+//       · while typing    → "valid" state if it passes (green border)
+//       · on field blur   → "invalid" state if it fails (red border)
+//       · submit can call validate() + markTouched() to block.
 //
-// Uso:
+// Usage:
 //   const picker = new ContactLinkPicker(rootEl, {
-//     onChange: ({ tipo, link }) => {},
+//     onChange: ({ platform, link }) => {},
 //   });
-//   picker.getValue();               // { tipo: 'linkedin', link: '...' }
-//   picker.setValue({ tipo, link });
+//   picker.getValue();               // { platform: 'linkedin', link: '...' }
+//   picker.setValue({ platform, link });
 //   picker.reset();
-//   picker.validate();               // { valid: boolean, errorKey: string|null }
-//   picker.markTouched();            // fuerza el render del error (para el submit)
-//   picker.focus();                  // enfoca el input
+//   picker.validate();               // { valid, errorKey }
+//   picker.markTouched();            // force error rendering (submit)
+//   picker.focus();                  // focus the input
 // ============================================================
 
-export const PLATFORM_VALUES = ['linkedin', 'email', 'whatsapp', 'otro'];
+export const PLATFORM_VALUES = ['linkedin', 'email', 'whatsapp', 'other'];
 export const DEFAULT_PLATFORM = 'linkedin';
 
 // ------------------------------------------------------------
-// Validadores por tipo. Devuelven `null` si es válido o una
-// clave i18n de error si no.
+// Validators per platform. Return `null` if valid, or an i18n
+// error key if not.
 // ------------------------------------------------------------
 const LINK_VALIDATORS = {
   linkedin(value) {
-    // Acepta con o sin protocolo, con o sin www.
+    // Accepts with or without protocol, with or without www.
     const clean = value
       .trim()
       .replace(/^https?:\/\//i, '')
       .replace(/^www\./i, '');
     if (!/^linkedin\.com\/(in|company|pub|school|showcase)\/[\w\-%.]+\/?$/i.test(clean)) {
-      return 'form.contactoLink.error.linkedin';
+      return 'form.contactLink.error.linkedin';
     }
     return null;
   },
 
   email(value) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
-      return 'form.contactoLink.error.email';
+      return 'form.contactLink.error.email';
     }
     return null;
   },
 
   whatsapp(value) {
     const trimmed = value.trim();
-    // Sólo permitimos dígitos, espacios, +, guiones, paréntesis y puntos.
+    // Only allow digits, spaces, +, hyphens, parentheses and dots.
     if (!/^[\d\s+\-().]+$/.test(trimmed)) {
-      return 'form.contactoLink.error.whatsapp';
+      return 'form.contactLink.error.whatsapp';
     }
     const digits = trimmed.replace(/[^\d]/g, '');
     if (digits.length < 8) {
-      return 'form.contactoLink.error.whatsapp';
+      return 'form.contactLink.error.whatsapp';
     }
     return null;
   },
 
-  otro(value) {
+  other(value) {
     const v = value.trim();
     if (/^https?:\/\/\S+$/i.test(v)) return null;
     if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v)) return null;
     if (/^(mailto|tel):\S+$/i.test(v)) return null;
-    return 'form.contactoLink.error.url';
+    return 'form.contactLink.error.url';
   },
 };
 
 export class ContactLinkPicker {
   /**
    * @param {HTMLElement} rootEl  wrapper .contact-link-picker
-   * @param {{ value?: {tipo?:string, link?:string}, onChange?: Function }} opts
+   * @param {{ value?: {platform?: string, link?: string}, onChange?: Function }} opts
    */
   constructor(rootEl, opts = {}) {
     this.root = rootEl;
@@ -84,19 +85,18 @@ export class ContactLinkPicker {
     this.hiddenEl = rootEl.querySelector('input[type="hidden"]');
 
     this.onChange = typeof opts.onChange === 'function' ? opts.onChange : () => {};
-    this.value = { tipo: DEFAULT_PLATFORM, link: '' };
+    this.value = { platform: DEFAULT_PLATFORM, link: '' };
 
-    // Sólo mostramos error rojo cuando el usuario ya "tocó" el campo
-    // (blur) o cuando el submit lo fuerza con markTouched().
+    // Only show a red error after the user has "touched" the field
+    // (blur) or the submit forces it with markTouched().
     this.touched = false;
 
-    // Estado inicial
+    // Initial state.
     if (opts.value) {
-      if (opts.value.tipo) this.value.tipo = opts.value.tipo;
+      if (opts.value.platform) this.value.platform = opts.value.platform;
       if (opts.value.link) this.value.link = opts.value.link;
     }
 
-    // Listeners
     this._onChipClick = this._onChipClick.bind(this);
     this._onInput = this._onInput.bind(this);
     this._onBlur = this._onBlur.bind(this);
@@ -121,20 +121,20 @@ export class ContactLinkPicker {
   // ----------------------------------------------------------
   getValue() {
     return {
-      tipo: this.value.tipo,
+      platform: this.value.platform,
       link: (this.inputEl?.value || '').trim(),
     };
   }
 
-  setValue({ tipo, link } = {}) {
-    if (tipo && PLATFORM_VALUES.includes(tipo)) this.value.tipo = tipo;
+  setValue({ platform, link } = {}) {
+    if (platform && PLATFORM_VALUES.includes(platform)) this.value.platform = platform;
     if (link !== undefined) this.value.link = link;
     this.touched = false;
     this._renderAll();
   }
 
   reset() {
-    this.value = { tipo: DEFAULT_PLATFORM, link: '' };
+    this.value = { platform: DEFAULT_PLATFORM, link: '' };
     this.touched = false;
     this._renderAll();
   }
@@ -144,23 +144,24 @@ export class ContactLinkPicker {
   }
 
   /**
-   * Valida el link según el tipo. No muestra error, sólo lo calcula.
-   * @returns {{ valid: boolean, errorKey: string|null }}
+   * Validates the link against the selected platform. Does not
+   * render anything; only computes.
+   * @returns {{ valid: boolean, errorKey: string | null }}
    */
   validate() {
     const link = (this.inputEl?.value || '').trim();
 
-    // Vacío = válido (el campo es opcional).
+    // Empty = valid (the field is optional).
     if (!link) return { valid: true, errorKey: null };
 
-    const fn = LINK_VALIDATORS[this.value.tipo];
+    const fn = LINK_VALIDATORS[this.value.platform];
     if (!fn) return { valid: true, errorKey: null };
 
     const errorKey = fn(link);
     return { valid: errorKey === null, errorKey };
   }
 
-  /** Fuerza el render del error (usar desde el submit). */
+  /** Forces error rendering (call from the submit handler). */
   markTouched() {
     this.touched = true;
     this._renderValidation();
@@ -176,10 +177,10 @@ export class ContactLinkPicker {
   _onChipClick(e) {
     const chip = e.target.closest('.contact-chip');
     if (!chip || !this.chipsEl.contains(chip)) return;
-    const tipo = chip.dataset.platform;
-    if (!PLATFORM_VALUES.includes(tipo)) return;
-    if (tipo === this.value.tipo) return;
-    this.value.tipo = tipo;
+    const platform = chip.dataset.platform;
+    if (!PLATFORM_VALUES.includes(platform)) return;
+    if (platform === this.value.platform) return;
+    this.value.platform = platform;
     this._renderChips();
     this._renderIcon();
     this._renderValidation();
@@ -212,14 +213,14 @@ export class ContactLinkPicker {
   _renderChips() {
     if (!this.chipsEl) return;
     this.chipsEl.querySelectorAll('.contact-chip').forEach(c => {
-      c.classList.toggle('selected', c.dataset.platform === this.value.tipo);
+      c.classList.toggle('selected', c.dataset.platform === this.value.platform);
     });
   }
 
   _renderIcon() {
     if (!this.chipsEl || !this.iconEl) return;
 
-    const chip = this.chipsEl.querySelector(`.contact-chip[data-platform="${this.value.tipo}"]`);
+    const chip = this.chipsEl.querySelector(`.contact-chip[data-platform="${this.value.platform}"]`);
     if (!chip) return;
 
     const svg = chip.querySelector('svg');
@@ -242,13 +243,13 @@ export class ContactLinkPicker {
 
   _renderHidden() {
     if (!this.hiddenEl) return;
-    this.hiddenEl.value = this.value.tipo;
+    this.hiddenEl.value = this.value.platform;
   }
 
   /**
-   * Estado visual:
-   *   - valid    → borde/ícono verde (el valor pasa la validación)
-   *   - invalid  → borde/ícono rojo + mensaje (falla y el usuario ya tocó el campo)
+   * Visual state:
+   *   - valid    → green border/icon (value passes validation)
+   *   - invalid  → red border/icon + message (fails and user touched)
    *   - ''       → neutral
    */
   _renderValidation() {
@@ -279,8 +280,8 @@ export class ContactLinkPicker {
   }
 
   /**
-   * Resuelve la traducción sin importar i18n.js aquí (evita ciclo).
-   * El consumidor puede pisar `this.translate` si quiere otra fuente.
+   * Resolves the translation without importing i18n.js here (avoids
+   * a cycle). The consumer can override `this.translate`.
    */
   _t(key) {
     if (typeof this.translate === 'function') {

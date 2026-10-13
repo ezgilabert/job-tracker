@@ -1,21 +1,21 @@
 // ============================================================
-// EstadoCombo: custom dropdown para elegir el estado inicial.
-// Mismo lenguaje visual que PuestoCombo: íconos, hover,
-// selected, highlighted, apertura con chevron rotado.
+// StatusCombo: custom dropdown to pick the initial status.
+// Same visual language as RoleCombo: icons, hover, selected,
+// highlighted, chevron rotation.
 //
-// Internamente mantiene un <input type="hidden" id="estado">
-// para que el resto del form lo lea como siempre.
+// Internally keeps a hidden input so the rest of the form can
+// read the value exactly like before.
 // ============================================================
 
 import { WORKFLOW_STEPS, getStateIcon } from '../constants.js';
 import { escapeHtml } from '../utils.js';
 import { tState } from '../i18n.js';
 
-export class EstadoCombo {
+export class StatusCombo {
   /**
    * @param {HTMLElement} comboEl  root .combo
    * @param {{
-   *   getStates?: () => string[],
+   *   getStatuses?: () => string[],
    *   getDefault?: () => string,
    *   onChange?: (value: string) => void,
    * }} opts
@@ -28,8 +28,8 @@ export class EstadoCombo {
     this.triggerText = comboEl.querySelector('.combo-trigger-text');
     this.dropdown = comboEl.querySelector('.combo-dropdown');
 
-    this.getStates = opts.getStates || (() => WORKFLOW_STEPS.map(s => s.id));
-    this.getDefault = opts.getDefault || (() => 'Aplicado');
+    this.getStatuses = opts.getStatuses || (() => WORKFLOW_STEPS.map(s => s.id));
+    this.getDefault = opts.getDefault || (() => 'Applied');
     this.onChange = opts.onChange || (() => {});
 
     this.open = false;
@@ -101,9 +101,9 @@ export class EstadoCombo {
   }
 
   setValue(value, { silent = false } = {}) {
-    const states = this.getStates();
-    if (!states.includes(value)) {
-      value = states[0] || this.getDefault();
+    const statuses = this.getStatuses();
+    if (!statuses.includes(value)) {
+      value = statuses[0] || this.getDefault();
     }
     this.value = value;
     if (this.hiddenInput) this.hiddenInput.value = value;
@@ -128,10 +128,10 @@ export class EstadoCombo {
   }
 
   _renderOptions() {
-    const states = this.getStates();
+    const statuses = this.getStatuses();
     const current = this.value;
 
-    this.dropdown.innerHTML = states.map(id => {
+    this.dropdown.innerHTML = statuses.map(id => {
       const icon = getStateIcon(id);
       const label = tState(id);
       const isSelected = id === current;

@@ -26,7 +26,7 @@
     gap: 1rem;
   }
 
-  /* Nav como grid de íconos */
+  /* Nav as a grid of icons */
   .config-nav {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -41,10 +41,10 @@
     overflow: visible;
   }
 
-  /* Los separadores verticales del desktop no aplican en el grid */
+  /* Desktop vertical separators don't apply inside the grid */
   .config-nav-sep { display: none; }
 
-  /* Tab en formato celda de grid: ícono arriba, label abajo */
+  /* Tab as a grid cell: icon on top, label below */
   .config-tab {
     flex-direction: column;
     align-items: center;
@@ -80,7 +80,7 @@
   }
 
   /* ==========================================================
-     Resto del config: sin cambios
+     Rest of the config: unchanged
      ========================================================== */
   .config-checks { grid-template-columns: 1fr; }
   .config-actions { flex-direction: column-reverse; align-items: stretch; }

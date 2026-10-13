@@ -6,7 +6,7 @@ import { t } from '../i18n.js';
 
 /**
  * Usage:
- *   const dp = new DatePicker(document.getElementById('miPicker'), {
+ *   const dp = new DatePicker(document.getElementById('myPicker'), {
  *     value: '2025-01-15',
  *     onChange: (iso) => console.log(iso),
  *   });
@@ -41,7 +41,7 @@ export class DatePicker {
 
     this.popover.addEventListener('click', (e) => this._handlePopoverClick(e));
 
-    // Re-render trigger on language change
+    // Re-render the trigger on language change.
     document.addEventListener('i18n-changed', () => {
       this.renderTrigger();
       if (this.open) this.renderPopover();
@@ -155,7 +155,7 @@ export class DatePicker {
         </div>
       </div>
       <div class="dp-weekdays">
-        <span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span><span>Do</span>
+        <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
       </div>
       <div class="dp-grid">${daysHtml}</div>
       <div class="dp-shortcuts">

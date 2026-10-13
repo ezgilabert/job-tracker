@@ -1,10 +1,10 @@
 // ============================================================
-// SalaryModeChip: chip toggle "Rango / Único" dentro del input
-// de salario. Al hacer click, cicla entre los dos modos.
-// También actualiza el texto del label del campo (arriba).
+// SalaryModeChip: "Range / Single" toggle chip inside the salary
+// input. Clicking it cycles between the two modes. Also updates
+// the field label text (above).
 //
-// Estilo: fondo accent-soft + borde accent-border + texto accent.
-// Sin cambio de color al alternar. El label solo cambia de texto.
+// Style: accent-soft background + accent-border + accent text.
+// No color change when toggling; only the label text changes.
 // ============================================================
 
 import { t } from '../i18n.js';
@@ -14,11 +14,11 @@ export const DEFAULT_SALARY_MODE = 'range';
 
 export class SalaryModeChip {
   /**
-   * @param {HTMLElement} chipEl  botón con [data-chip-label] adentro
+   * @param {HTMLElement} chipEl  button containing [data-chip-label]
    * @param {{
-   *   value?: 'range'|'single',
-   *   fieldLabelEl?: HTMLElement,  span del label arriba (opcional)
-   *   onChange?: (mode: 'range'|'single') => void,
+   *   value?: 'range' | 'single',
+   *   fieldLabelEl?: HTMLElement,   label span above the input (optional)
+   *   onChange?: (mode: 'range' | 'single') => void,
    * }} opts
    */
   constructor(chipEl, opts = {}) {
@@ -31,8 +31,8 @@ export class SalaryModeChip {
     this._onClick = this._onClick.bind(this);
     this.chip.addEventListener('click', this._onClick);
 
-    // Re-render de textos cuando cambia el idioma.
-    // (Después de applyI18n, para ganar la última palabra.)
+    // Re-render text on language change. Registered after applyI18n
+    // so it wins the last word.
     this._onI18nChange = () => this._renderText();
     document.addEventListener('i18n-changed', this._onI18nChange);
 
@@ -58,8 +58,8 @@ export class SalaryModeChip {
   _render() {
     this.chip.dataset.mode = this.value;
     this.chip.title = this.value === 'range'
-      ? t('form.salario.toggleToSingle')
-      : t('form.salario.toggleToRange');
+      ? t('form.salary.toggleToSingle')
+      : t('form.salary.toggleToRange');
     this._renderText();
   }
 
@@ -68,16 +68,16 @@ export class SalaryModeChip {
 
     if (this.chipLabel) {
       this.chipLabel.textContent = isRange
-        ? t('form.salario.mode.range')
-        : t('form.salario.mode.single');
+        ? t('form.salary.mode.range')
+        : t('form.salary.mode.single');
     }
 
     if (this.fieldLabel) {
       this.fieldLabel.textContent = isRange
-        ? t('form.salario')
-        : t('form.salario.single');
+        ? t('form.salary')
+        : t('form.salary.single');
 
-      // Micro animación de swap
+      // Small swap animation.
       const field = this.fieldLabel.closest('.field');
       if (field) {
         field.classList.remove('label-changing');

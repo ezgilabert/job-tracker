@@ -1,13 +1,13 @@
 // ============================================================
-// ResetAnimation: overlay full-screen con anillo de progreso
-// que se llena de 0% a 100%. Se usa al confirmar el reinicio
-// de configuración.
+// ResetAnimation: full-screen overlay with a progress ring that
+// fills from 0% to 100%. Used when the user confirms the config
+// reset.
 // ============================================================
 
 export class ResetAnimation {
   /**
-   * @param {HTMLElement} overlayEl  contenedor .reset-overlay
-   * @param {HTMLElement} contentEl  contenedor .reset-content (vacío)
+   * @param {HTMLElement} overlayEl  wrapper .reset-overlay
+   * @param {HTMLElement} contentEl  wrapper .reset-content (empty)
    */
   constructor(overlayEl, contentEl) {
     this.overlay = overlayEl;
@@ -15,8 +15,8 @@ export class ResetAnimation {
   }
 
   /**
-   * Muestra el overlay con la animación. Resuelve cuando termina.
-   * @param {number} duration  ms totales de la animación
+   * Shows the overlay with the animation. Resolves when it ends.
+   * @param {number} duration  total animation duration in ms
    */
   async run(duration = 2400) {
     if (!this.overlay || !this.content) return;
@@ -25,8 +25,7 @@ export class ResetAnimation {
     this.overlay.classList.add('active');
     this.overlay.classList.remove('fade-out');
 
-    // Pequeño delay para que el HTML esté en el DOM antes
-    // de arrancar el contador.
+    // Small delay so the HTML is in the DOM before the counter starts.
     await this._wait(50);
     this._startCounter(duration);
 
@@ -34,16 +33,15 @@ export class ResetAnimation {
   }
 
   /**
-   * Deja el overlay tal cual (opaco) para hacer el reload
-   * justo después sin que se vea un flash de la app vieja.
+   * Leaves the overlay opaque so a reload right after doesn't
+   * flash the old app.
    */
   keepVisible() {
-    // No hace nada; sólo documenta la intención.
-    // El overlay queda opaco hasta que la página recargue.
+    // No-op; the overlay stays opaque until the page reloads.
   }
 
   /**
-   * Oculta el overlay. Devuelve una promesa cuando termina el fade.
+   * Hides the overlay. Resolves when the fade ends.
    */
   async hide(fadeMs = 400) {
     if (!this.overlay) return;
@@ -70,8 +68,8 @@ export class ResetAnimation {
         </svg>
         <div class="reset-ring-percent" data-reset-percent>0%</div>
       </div>
-      <div class="reset-label">Reiniciando…</div>
-      <div class="reset-sub">Aplicando valores por defecto</div>
+      <div class="reset-label">Restarting…</div>
+      <div class="reset-sub">Applying default values</div>
     `;
   }
 

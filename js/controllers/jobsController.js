@@ -4,9 +4,9 @@
 
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
-import { PuestoCombo } from '../ui/combo.js';
-import { EstadoCombo } from '../ui/estadoCombo.js';
-import { ModalidadPicker } from '../ui/modalidad.js';
+import { RoleCombo } from '../ui/combo.js';
+import { StatusCombo } from '../ui/statusCombo.js';
+import { WorkModePicker } from '../ui/workModePicker.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
@@ -26,14 +26,13 @@ import { t, tState, tStateShort } from '../i18n.js';
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
  * @param {{ onOpenEdit, onClose, onAdvance, onOpenHistory }} modals
- * @param {import('../ui/datePicker.js').DatePicker} fechaPicker
+ * @param {import('../ui/datePicker.js').DatePicker} datePicker
  * @param {import('../store.js').Store} configStore
- * @param {{ requestNewPuesto: (suggested:string)=>Promise<string|null> }} createPuestoCtrl
+ * @param {{ requestNewRole: (suggested:string)=>Promise<string|null> }} createRoleCtrl
  */
-export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, configStore, createPuestoCtrl) {
+export function mountJobsController(jobsStore, refsStore, modals, datePicker, configStore, createRoleCtrl) {
   let currentFilter = 'all';
   let searchTerm = '';
-  const datePicker = fechaPicker;
 
   // ----------------------------------------------------------
   // Collapsibles
@@ -61,19 +60,19 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   }
 
   // ----------------------------------------------------------
-  // EstadoCombo
+  // StatusCombo
   // ----------------------------------------------------------
-  const estadoCombo = new EstadoCombo(
-    document.getElementById('estadoCombo'),
+  const statusCombo = new StatusCombo(
+    document.getElementById('statusCombo'),
     {
-      getStates: () => {
+      getStatuses: () => {
         const cfg = configStore.get();
-        return cfg.estadosIniciales && cfg.estadosIniciales.length
-          ? cfg.estadosIniciales
+        return cfg.initialStatuses && cfg.initialStatuses.length
+          ? cfg.initialStatuses
           : WORKFLOW_STEPS.map(s => s.id);
       },
-      getDefault: () => configStore.get().estadoInicialDefault || 'Aplicado',
-      onChange: () => refreshPuestoOptionalHint(),
+      getDefault: () => configStore.get().defaultInitialStatus || 'Applied',
+      onChange: () => refreshRoleOptionalHint(),
     }
   );
 
@@ -89,27 +88,27 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     const style = cfg.dashboardStyleJobs || cfg.dashboardStyle || 'sparklines';
 
     const stats = computeStats(jobs);
-    const ofertas = stats.ofertas;
-    const activas = stats.activos;
-    const cerradas = stats.cerradas;
-    const enProceso = stats.enProceso;
+    const offers = stats.offers;
+    const active = stats.active;
+    const closed = stats.closed;
+    const inProcess = stats.inProcess;
     const total = stats.total;
-    const tasaExito = total ? Math.round((ofertas / total) * 100) : 0;
+    const successRate = total ? Math.round((offers / total) * 100) : 0;
 
-    const empresaCount = {};
+    const companyCount = {};
     jobs.forEach(j => {
-      if (!j.empresa) return;
-      empresaCount[j.empresa] = (empresaCount[j.empresa] || 0) + 1;
+      if (!j.company) return;
+      companyCount[j.company] = (companyCount[j.company] || 0) + 1;
     });
-    const top = Object.entries(empresaCount)
+    const top = Object.entries(companyCount)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
-    const getDate = j => j.fecha || j.createdAt || '';
+    const getDate = j => j.date || j.createdAt || '';
     const trendTotal = buildWeeklyTrend(jobs, getDate);
-    const trendActive = buildWeeklyTrend(jobs.filter(j => !isClosed(j.estado)), getDate);
-    const trendHighlight = buildWeeklyTrend(jobs.filter(j => j.estado === 'Oferta'), getDate);
-    const trendClosed = buildWeeklyTrend(jobs.filter(j => isClosed(j.estado)), getDate);
+    const trendActive = buildWeeklyTrend(jobs.filter(j => !isClosed(j.status)), getDate);
+    const trendHighlight = buildWeeklyTrend(jobs.filter(j => j.status === 'Offer'), getDate);
+    const trendClosed = buildWeeklyTrend(jobs.filter(j => isClosed(j.status)), getDate);
 
     const heatmap = buildDailyActivity(jobs, getDate, 60);
 
@@ -119,13 +118,13 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       icon: '📋',
       label: t('jobs.title'),
       total,
-      active: activas,
-      inProcess: enProceso,
-      closed: cerradas,
-      highlight: ofertas,
+      active,
+      inProcess,
+      closed,
+      highlight: offers,
       highlightIcon: '🏆',
       highlightLabel: t('dash.jobs.highlight'),
-      highlightSub: t('dash.jobs.highlightSub', { pct: tasaExito }),
+      highlightSub: t('dash.jobs.highlightSub', { pct: successRate }),
       labels: {
         total: t('dash.jobs.total'),
         active: t('dash.jobs.active'),
@@ -147,12 +146,12 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
         totalWord: t(total === 1
           ? 'dash.jobs.summaryWord.total.one'
           : 'dash.jobs.summaryWord.total.many'),
-        active: activas,
-        activeWord: t(activas === 1
+        active,
+        activeWord: t(active === 1
           ? 'dash.jobs.summaryWord.active.one'
           : 'dash.jobs.summaryWord.active.many'),
-        highlight: ofertas,
-        highlightWord: t(ofertas === 1
+        highlight: offers,
+        highlightWord: t(offers === 1
           ? 'dash.jobs.summaryWord.highlight.one'
           : 'dash.jobs.summaryWord.highlight.many'),
       }),
@@ -185,12 +184,12 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
 
     list.innerHTML = filtered
-      .map((job, i) => renderJobCard(job, { referidos: refs, index: i }))
+      .map((job, i) => renderJobCard(job, { referrals: refs, index: i }))
       .join('');
   }
 
   // ----------------------------------------------------------
-  // Empty states (helpers)
+  // Empty states
   // ----------------------------------------------------------
   function renderEmptyJobs(title, subtitle) {
     return `
@@ -241,7 +240,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
   function renderFilters() {
     const cfg = configStore.get();
-    const filters = (cfg.filtros || []).filter(f => f.visible);
+    const filters = (cfg.filters || []).filter(f => f.visible);
     const container = document.getElementById('filters');
 
     if (!filters.some(f => f.id === currentFilter)) {
@@ -258,17 +257,17 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   configStore.subscribe(renderFilters);
 
   // ----------------------------------------------------------
-  // Dynamic initial state
+  // Initial status
   // ----------------------------------------------------------
-  function renderInitialStates() {
-    const def = configStore.get().estadoInicialDefault || 'Aplicado';
-    estadoCombo.setValue(def, { silent: true });
+  function renderInitialStatuses() {
+    const def = configStore.get().defaultInitialStatus || 'Applied';
+    statusCombo.setValue(def, { silent: true });
   }
 
-  configStore.subscribe(renderInitialStates);
+  configStore.subscribe(renderInitialStatuses);
 
   renderFilters();
-  renderInitialStates();
+  renderInitialStatuses();
 
   // ----------------------------------------------------------
   // Search
@@ -280,10 +279,10 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   });
 
   // ----------------------------------------------------------
-  // Modalidad + Currency + SalaryModeChip + SalaryInput
+  // Work mode + currency + salary controls
   // ----------------------------------------------------------
-  const modalidadPicker = new ModalidadPicker(
-    document.getElementById('modalidadPicker'),
+  const workModePicker = new WorkModePicker(
+    document.getElementById('workModePicker'),
     {
       hybridWrap: document.getElementById('hybridDaysWrap'),
       hybridSelect: document.getElementById('hybridOfficeDays'),
@@ -291,129 +290,129 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   );
 
   const currencyPicker = new CurrencyPicker(
-    document.getElementById('salarioCurrencyChip'),
+    document.getElementById('salaryCurrencyChip'),
     { value: 'usd' }
   );
 
-  const salarioLabelEl = document.querySelector('#jobForm .field [data-salary-label]');
+  const salaryLabelEl = document.querySelector('#jobForm .field [data-salary-label]');
 
   const salaryModeChip = new SalaryModeChip(
-    document.getElementById('salarioModeChip'),
+    document.getElementById('salaryModeChip'),
     {
       value: DEFAULT_SALARY_MODE,
-      fieldLabelEl: salarioLabelEl,
+      fieldLabelEl: salaryLabelEl,
     }
   );
 
-  const salaryHourlyCheckbox = document.getElementById('salarioPorHora');
+  const hourlySalaryCheckbox = document.getElementById('hourlySalary');
 
   const salaryInput = new SalaryInput(
-    document.getElementById('salario'),
-    document.getElementById('salarioHint'),
+    document.getElementById('salary'),
+    document.getElementById('salaryHint'),
     {
       getMode: () => salaryModeChip.getValue(),
       getCurrency: () => currencyPicker.getValue(),
-      getHourly: () => salaryHourlyCheckbox.checked,
+      getHourly: () => hourlySalaryCheckbox.checked,
     }
   );
 
   currencyPicker.onChange = () => salaryInput.reset();
   salaryModeChip.onChange = () => salaryInput.reset();
-  salaryHourlyCheckbox.addEventListener('change', () => salaryInput.reset());
+  hourlySalaryCheckbox.addEventListener('change', () => salaryInput.reset());
 
   // ----------------------------------------------------------
   // ContactLinkPicker
   // ----------------------------------------------------------
-  const contactoLinkPicker = new ContactLinkPicker(
-    document.getElementById('contactoLinkPicker'),
-    { value: { tipo: 'linkedin', link: '' } }
+  const contactLinkPicker = new ContactLinkPicker(
+    document.getElementById('contactLinkPicker'),
+    { value: { platform: 'linkedin', link: '' } }
   );
-  contactoLinkPicker.translate = t;
+  contactLinkPicker.translate = t;
 
   // ----------------------------------------------------------
   // Form
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
 
-  const puestoLabel = document.querySelector('label[for="puesto"]');
-  const puestoInput = document.getElementById('puesto');
-  const puestoOriginalLabel = puestoLabel ? puestoLabel.textContent : '';
+  const roleLabel = document.querySelector('label[for="role"]');
+  const roleInput = document.getElementById('role');
+  const roleOriginalLabel = roleLabel ? roleLabel.textContent : '';
 
-  function refreshPuestoOptionalHint() {
-    if (!puestoLabel) return;
-    const isGuardado = estadoCombo.getValue() === 'Guardado';
-    puestoLabel.dataset.optional = isGuardado ? 'true' : 'false';
-    puestoLabel.textContent = isGuardado
-      ? `${puestoOriginalLabel} (${t('form.puesto.optional')})`
-      : puestoOriginalLabel;
+  function refreshRoleOptionalHint() {
+    if (!roleLabel) return;
+    const isSaved = statusCombo.getValue() === 'Saved';
+    roleLabel.dataset.optional = isSaved ? 'true' : 'false';
+    roleLabel.textContent = isSaved
+      ? `${roleOriginalLabel} (${t('form.role.optional')})`
+      : roleOriginalLabel;
   }
 
-  refreshPuestoOptionalHint();
+  refreshRoleOptionalHint();
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const initialState = estadoCombo.getValue();
-    const puestoValue = valueOf('puesto');
+    const initialState = statusCombo.getValue();
+    const roleValue = valueOf('role');
 
-    if (!puestoValue && initialState !== 'Guardado') {
-      showToast(t('toast.puestoRequired'), '!');
-      if (puestoInput) puestoInput.focus();
+    if (!roleValue && initialState !== 'Saved') {
+      showToast(t('toast.roleRequired'), '!');
+      if (roleInput) roleInput.focus();
       return;
     }
 
-    const contactValidation = contactoLinkPicker.validate();
+    const contactValidation = contactLinkPicker.validate();
     if (!contactValidation.valid) {
-      contactoLinkPicker.markTouched();
-      contactoLinkPicker.focus();
+      contactLinkPicker.markTouched();
+      contactLinkPicker.focus();
       showToast(t(contactValidation.errorKey), '!');
       return;
     }
 
-    const modal = modalidadPicker.getValue();
-    const salarioMode = salaryModeChip.getValue();
-    const contactData = contactoLinkPicker.getValue();
+    const mode = workModePicker.getValue();
+    const salaryMode = salaryModeChip.getValue();
+    const contactData = contactLinkPicker.getValue();
 
     const newJob = {
       id: uid(),
-      empresa: valueOf('empresa'),
-      puesto: puestoValue,
-      fecha: datePicker?.getValue() || '',
-      estado: initialState,
+      company: valueOf('company'),
+      role: roleValue,
+      date: datePicker?.getValue() || '',
+      status: initialState,
       link: valueOf('link'),
-      salario: salaryInput.getValue(),
-      salarioPorHora: salaryHourlyCheckbox.checked,
-      salarioEsRango: salarioMode === 'range',
-      moneda: currencyPicker.getValue(),
-      modalidad: modal.modalidad,
-      hybridOfficeDays: modal.hybridOfficeDays,
-      contacto: valueOf('contacto'),
-      contactoLink: contactData.link,
-      contactoTipo: contactData.tipo,
-      notas: valueOf('notas'),
+      salary: salaryInput.getValue(),
+      hourlySalary: hourlySalaryCheckbox.checked,
+      salaryIsRange: salaryMode === 'range',
+      currency: currencyPicker.getValue(),
+      workMode: mode.workMode,
+      hybridOfficeDays: mode.hybridOfficeDays,
+      contact: valueOf('contact'),
+      contactLink: contactData.link,
+      contactPlatform: contactData.platform,
+      notes: valueOf('notes'),
       skipped: [],
-      volvioAtras: false,
-      history: [{ estado: initialState, fecha: new Date().toISOString() }],
+      wentBack: false,
+      history: [{ status: initialState, date: new Date().toISOString() }],
     };
 
     jobsStore.update(jobs => [newJob, ...jobs]);
 
     form.reset();
     datePicker?.setValue('');
-    modalidadPicker.setValue('');
+    workModePicker.setValue('');
     currencyPicker.setValue('usd');
     salaryModeChip.setValue('range');
     salaryInput.reset();
-    contactoLinkPicker.reset();
-    renderInitialStates();
-    refreshPuestoOptionalHint();
+    contactLinkPicker.reset();
+    renderInitialStatuses();
+    refreshRoleOptionalHint();
 
     expandJobs();
     showToast(t('toast.jobAdded'), '✓');
   });
 
   // ----------------------------------------------------------
-  // Filters: click
+  // Filter clicks
   // ----------------------------------------------------------
   document.getElementById('filters').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-filter]');
@@ -440,7 +439,7 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     if (!actionEl) return;
 
     const action = actionEl.dataset.action;
-    const estado = actionEl.dataset.estado;
+    const status = actionEl.dataset.status;
 
     switch (action) {
       case 'edit':              modals.onOpenEdit(id); break;
@@ -449,8 +448,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       case 'move-next':         modals.onAdvance(id, { direction: 'next' }); break;
       case 'move-prev':         modals.onAdvance(id, { direction: 'prev' }); break;
       case 'skip-step':         modals.onAdvance(id, { direction: 'next', skipCurrent: true }); break;
-      case 'close':             if (estado) modals.onClose(id, estado); break;
-      case 'close-offer':       modals.onClose(id, 'Oferta'); break;
+      case 'close':             if (status) modals.onClose(id, status); break;
+      case 'close-offer':       modals.onClose(id, 'Offer'); break;
       case 'unconfirm-offer':   unconfirmOffer(id); break;
       case 'reopen':            reopenJob(id); break;
       case 'scroll-to-ref':     scrollToRef(Number(actionEl.dataset.refId)); break;
@@ -479,8 +478,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
       const history = cloneArray(j.history);
-      history.push({ estado: 'Aplicado', fecha: new Date().toISOString() });
-      return { ...j, estado: 'Aplicado', history, offerConfirmed: false };
+      history.push({ status: 'Applied', date: new Date().toISOString() });
+      return { ...j, status: 'Applied', history, offerConfirmed: false };
     }));
     showToast(t('toast.jobReopened'), '↻');
   }
@@ -498,10 +497,8 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   }
 
   // ----------------------------------------------------------
-  // Drag & drop
+  // Drag & drop reordering
   // ----------------------------------------------------------
-  let draggedId = null;
-
   list.addEventListener('dragstart', (e) => {
     const card = e.target.closest('.job');
     if (!card) return;
@@ -509,17 +506,15 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
       e.preventDefault();
       return;
     }
-    draggedId = Number(card.dataset.id);
     card.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', String(draggedId));
+    e.dataTransfer.setData('text/plain', card.dataset.id);
   });
 
   list.addEventListener('dragend', (e) => {
     const card = e.target.closest('.job');
     if (card) card.classList.remove('dragging');
     list.querySelectorAll('.job').forEach(c => c.classList.remove('drag-over'));
-    draggedId = null;
   });
 
   list.addEventListener('dragover', (e) => {
@@ -575,11 +570,11 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   // ----------------------------------------------------------
   document.addEventListener('i18n-changed', () => {
     renderFilters();
-    renderInitialStates();
-    estadoCombo.refresh();
+    renderInitialStatuses();
+    statusCombo.refresh();
     salaryInput.refresh();
-    contactoLinkPicker.refresh();
-    refreshPuestoOptionalHint();
+    contactLinkPicker.refresh();
+    refreshRoleOptionalHint();
     renderJobsDash();
     renderList();
   });
@@ -593,18 +588,18 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
   }
 
   // ----------------------------------------------------------
-  // Puesto combo
+  // Role combo
   // ----------------------------------------------------------
-  const puestoCombo = new PuestoCombo(
-    document.getElementById('puestoCombo'),
+  const roleCombo = new RoleCombo(
+    document.getElementById('roleCombo'),
     {
-      getJobPuestos: () => jobsStore.get().map(j => j.puesto),
+      getJobRoles: () => jobsStore.get().map(j => j.role),
       getConfig: () => configStore.get(),
-      onCreateRequested: (suggested) => createPuestoCtrl.requestNewPuesto(suggested),
+      onCreateRequested: (suggested) => createRoleCtrl.requestNewRole(suggested),
     }
   );
 
-  return { renderList, getFilter: () => currentFilter, puestoCombo };
+  return { renderList, getFilter: () => currentFilter, roleCombo };
 }
 
 function getDragAfterElement(container, y) {

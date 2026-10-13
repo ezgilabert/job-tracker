@@ -1,10 +1,10 @@
 // ============================================================
 // Chips: selectable button group (relationship, status, etc.)
-// Soporta modo single-select (default) y multi-select (allowMultiple).
+// Supports single-select (default) and multi-select (allowMultiple).
 // ============================================================
 
 /**
- * @param {HTMLElement} container  container with .ref-chip buttons
+ * @param {HTMLElement} container  wrapper holding .ref-chip buttons
  * @param {{
  *   onChange?: (value: string | string[] | null) => void,
  *   allowMultiple?: boolean,
@@ -15,7 +15,7 @@
  * }}
  */
 export function mountChips(container, { onChange = () => {}, allowMultiple = false } = {}) {
-  // ---- Init state from DOM ----
+  // ---- Initial state from the DOM ----
   let currentValue;
 
   if (allowMultiple) {

@@ -2,20 +2,20 @@
 // inputLimits: maxlength helpers, paste sanitizer, char counters
 // ============================================================
 
-// Textareas con maxlength >= este umbral reciben un contador visible.
+// Textareas with maxlength >= this threshold get a visible counter.
 const COUNTER_THRESHOLD = 1000;
 
 /**
- * Se llama una sola vez al boot. Encuentra todos los inputs/textarea
- * dentro de `root` y les engancha:
- *   - Contador de caracteres (solo textareas largas).
- *   - Sanitizador de paste (colapsa saltos de línea en inputs).
+ * Called once at boot. Finds every input/textarea inside `root` and
+ * attaches:
+ *   - A character counter (only on long textareas).
+ *   - A paste sanitizer (collapses newlines for inputs).
  *
- * Los atributos `maxlength` / `minlength` / `pattern` del HTML se
- * respetan nativamente por el navegador.
+ * The HTML `maxlength` / `minlength` / `pattern` attributes are
+ * handled natively by the browser.
  */
 export function mountInputLimits(root = document) {
-  // ---------- 1) Contadores en textareas largas ----------
+  // ---------- 1) Counters on long textareas ----------
   root.querySelectorAll('textarea[maxlength]').forEach(ta => {
     if (ta.dataset.counterMounted === 'true') return;
     const max = Number(ta.getAttribute('maxlength'));
@@ -35,7 +35,7 @@ export function mountInputLimits(root = document) {
 }
 
 /**
- * Inserta un contador debajo de la textarea y lo mantiene actualizado.
+ * Inserts a counter below the textarea and keeps it updated.
  */
 function mountCounter(textarea, max) {
   const counter = document.createElement('div');
@@ -43,7 +43,6 @@ function mountCounter(textarea, max) {
   counter.setAttribute('aria-live', 'polite');
   counter.setAttribute('aria-atomic', 'true');
 
-  // Insertarlo como hermano de la textarea, dentro del .field
   const parent = textarea.parentNode;
   parent.appendChild(counter);
 
@@ -58,8 +57,8 @@ function mountCounter(textarea, max) {
   textarea.addEventListener('input', update);
   textarea.addEventListener('change', update);
 
-  // Si el valor se setea programáticamente (ej. abrir modal de edición),
-  // el input event no dispara solo. Observamos el value con un timer.
+  // If the value is set programmatically (e.g. opening the edit modal),
+  // the input event does not fire. Watch the length with a timer.
   let lastLen = textarea.value.length;
   const observer = setInterval(() => {
     if (textarea.value.length !== lastLen) {
@@ -71,8 +70,8 @@ function mountCounter(textarea, max) {
 }
 
 /**
- * Si el usuario pega texto multilínea en un <input> de una sola línea,
- * lo colapsamos a una sola línea y respetamos el maxlength.
+ * If the user pastes multi-line text into a single-line input,
+ * collapse it to one line and respect maxlength.
  */
 function onPasteSingleLine(e) {
   const el = e.target;
@@ -84,7 +83,7 @@ function onPasteSingleLine(e) {
   const text = clipboard.getData('text');
   if (!text) return;
 
-  // Si no tiene saltos de línea, no interferimos con el paste nativo.
+  // If it has no line breaks, don't interfere with native paste.
   if (!/[\r\n\t]/.test(text)) return;
 
   e.preventDefault();
@@ -99,7 +98,7 @@ function onPasteSingleLine(e) {
 
   el.value = (before + clean + after).slice(0, max);
 
-  // Mover el cursor al final del texto pegado.
+  // Move the cursor to the end of the pasted text.
   const newPos = Math.min(before.length + clean.length, el.value.length);
   try { el.setSelectionRange(newPos, newPos); } catch {}
 

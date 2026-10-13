@@ -1,9 +1,9 @@
 /* ============================================================
-   Backgrounds: 10 fondos aplicables al body
-   Uso: <body class="bg-aurora"> ... </body>
+   Backgrounds: 10 backgrounds that can be applied to the body
+   Usage: <body class="bg-aurora"> ... </body>
    ============================================================ */
 
-/* Base compartida */
+/* Shared base */
 body.bg-aurora::before,
 body.bg-mesh::before,
 body.bg-grid::before,
@@ -210,11 +210,11 @@ body.bg-blobs::after {
   100% { transform: translate(-2%, 3%) scale(1.02); }
 }
 @keyframes wave1 {
-  0% { transform: translate(0, 0) scale(1); }
+  0%   { transform: translate(0, 0) scale(1); }
   100% { transform: translate(15%, 20%) scale(1.2); }
 }
 @keyframes wave2 {
-  0% { transform: translate(0, 0) scale(1); }
+  0%   { transform: translate(0, 0) scale(1); }
   100% { transform: translate(-20%, -15%) scale(1.15); }
 }
 @keyframes conicSpin { to { transform: rotate(360deg); } }

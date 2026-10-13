@@ -1,5 +1,5 @@
 /* ============================================================
-   Jobs: job cards, badges
+   Jobs: cards, badges
    ============================================================ */
 
 .job-counter {
@@ -45,7 +45,7 @@
 
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .job::before {
@@ -57,22 +57,23 @@
   z-index: 1;
 }
 
-.job[data-estado="Guardado"]::before { background: linear-gradient(180deg, #94a3b8, #64748b); }
-.job[data-estado="Aplicado"]::before { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
-.job[data-estado="Contacto"]::before { background: linear-gradient(180deg, #22d3ee, #06b6d4); }
-.job[data-estado="Entrevista RRHH"]::before { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
-.job[data-estado="Challenge técnico"]::before { background: linear-gradient(180deg, #a3e635, #84cc16); }
-.job[data-estado="Live coding"]::before { background: linear-gradient(180deg, #4ade80, #22c55e); }
-.job[data-estado="Entrevista Técnica"]::before { background: linear-gradient(180deg, #facc15, #eab308); }
-.job[data-estado="Entrevista con cliente"]::before { background: linear-gradient(180deg, #fb923c, #f97316); }
-.job[data-estado="Charla con cliente"]::before { background: linear-gradient(180deg, #f472b6, #ec4899); }
-.job[data-estado="Entrevista Final"]::before { background: linear-gradient(180deg, #fb7185, #f43f5e); }
-.job[data-estado="Referencias"]::before { background: linear-gradient(180deg, #c084fc, #a855f7); }
-.job[data-estado="Negociación"]::before { background: linear-gradient(180deg, #2dd4bf, #14b8a6); }
-.job[data-estado="Oferta"]::before { background: linear-gradient(180deg, #f5b301, #d99500); }
-.job[data-estado="Rechazado"]::before { background: linear-gradient(180deg, #f87171, #ef4444); }
-.job[data-estado="Ghosted"]::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
-.job[data-estado="Descartado"]::before { background: linear-gradient(180deg, #cbd5e1, #94a3b8); }
+/* ===== Status accent bar ===== */
+.job[data-status="Saved"]::before               { background: linear-gradient(180deg, #94a3b8, #64748b); }
+.job[data-status="Applied"]::before             { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
+.job[data-status="Contact"]::before             { background: linear-gradient(180deg, #22d3ee, #06b6d4); }
+.job[data-status="HR Interview"]::before        { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
+.job[data-status="Technical Challenge"]::before { background: linear-gradient(180deg, #a3e635, #84cc16); }
+.job[data-status="Live Coding"]::before         { background: linear-gradient(180deg, #4ade80, #22c55e); }
+.job[data-status="Technical Interview"]::before { background: linear-gradient(180deg, #facc15, #eab308); }
+.job[data-status="Client Interview"]::before    { background: linear-gradient(180deg, #fb923c, #f97316); }
+.job[data-status="Client Chat"]::before         { background: linear-gradient(180deg, #f472b6, #ec4899); }
+.job[data-status="Final Interview"]::before     { background: linear-gradient(180deg, #fb7185, #f43f5e); }
+.job[data-status="References"]::before          { background: linear-gradient(180deg, #c084fc, #a855f7); }
+.job[data-status="Negotiation"]::before         { background: linear-gradient(180deg, #2dd4bf, #14b8a6); }
+.job[data-status="Offer"]::before               { background: linear-gradient(180deg, #f5b301, #d99500); }
+.job[data-status="Rejected"]::before            { background: linear-gradient(180deg, #f87171, #ef4444); }
+.job[data-status="Ghosted"]::before             { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
+.job[data-status="Discarded"]::before           { background: linear-gradient(180deg, #cbd5e1, #94a3b8); }
 
 .job:hover {
   transform: translateY(-2px);
@@ -80,24 +81,24 @@
   box-shadow: var(--shadow);
 }
 
-.job[data-estado="Rechazado"],
-.job[data-estado="Ghosted"],
-.job[data-estado="Descartado"] { opacity: 0.72; }
+.job[data-status="Rejected"],
+.job[data-status="Ghosted"],
+.job[data-status="Discarded"] { opacity: 0.72; }
 
-[data-theme="dark"] .job[data-estado="Rechazado"],
-[data-theme="dark"] .job[data-estado="Ghosted"],
-[data-theme="dark"] .job[data-estado="Descartado"] { opacity: 0.65; }
+[data-theme="dark"] .job[data-status="Rejected"],
+[data-theme="dark"] .job[data-status="Ghosted"],
+[data-theme="dark"] .job[data-status="Discarded"] { opacity: 0.65; }
 
 /* ============================================================
-   Final offer
+   Confirmed offer
    ============================================================ */
 
-.job[data-estado="Oferta"] {
+.job[data-status="Offer"] {
   border-color: var(--gold-border);
   box-shadow: 0 8px 28px rgba(245,179,1,0.18), var(--shadow-sm);
 }
 
-.job[data-estado="Oferta"]:hover {
+.job[data-status="Offer"]:hover {
   border-color: var(--gold);
   box-shadow: 0 12px 32px rgba(245,179,1,0.28), var(--shadow);
 }
@@ -122,7 +123,7 @@
   white-space: nowrap;
 }
 
-.job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions { margin-right: 70px; }
+.job[data-status="Offer"]:not(.offer-confirmed) .job-actions { margin-right: 70px; }
 
 @media (max-width: 640px) {
   .job-offer-ribbon {
@@ -132,7 +133,7 @@
     font-size: 0.62rem;
     padding: 0.35rem 0;
   }
-  .job[data-estado="Oferta"]:not(.offer-confirmed) .job-actions { margin-right: 55px; }
+  .job[data-status="Offer"]:not(.offer-confirmed) .job-actions { margin-right: 55px; }
 }
 
 /* ============================================================
@@ -152,6 +153,7 @@
   box-shadow: 0 12px 36px rgba(245,179,1,0.28), var(--shadow);
 }
 
+/* ===== Confetti ===== */
 .job-confetti {
   position: absolute;
   inset: 0;
@@ -189,7 +191,7 @@
 .job.offer-confirmed .workflow,
 .job.offer-confirmed .badge,
 .job.offer-confirmed .congrats-banner,
-.job.offer-confirmed .job-notas,
+.job.offer-confirmed .job-notes,
 .job.offer-confirmed .job-refs,
 .job.offer-confirmed .step-note,
 .job.offer-confirmed .drag-handle {
@@ -270,7 +272,7 @@
 
 .offer-confirmed-pill .pill-emoji { font-size: 1.05rem; }
 
-/* Drag & drop */
+/* ===== Drag & drop ===== */
 .job.dragging {
   opacity: 0.35;
   transform: scale(0.98);
@@ -368,7 +370,7 @@
 
 .job a:hover { opacity: 0.85; transform: translateY(-1px); }
 
-.job-notas {
+.job-notes {
   color: var(--text-muted);
   font-size: 0.85rem;
   font-style: italic;
@@ -387,8 +389,7 @@
 .job:hover .job-actions { opacity: 1; }
 
 /* ============================================================
-   Action buttons (V2 · soft squares)
-   Compartidos por jobs y referidos
+   Action buttons (V2 · soft squares) — shared by jobs + referrals
    ============================================================ */
 
 .action-btn {
@@ -453,40 +454,41 @@
   box-shadow: 0 0 6px currentColor;
 }
 
-.badge[data-estado="Guardado"] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
-.badge[data-estado="Aplicado"] { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
-.badge[data-estado="Contacto"] { background: #ecfeff; color: #0891b2; border-color: #cffafe; }
-.badge[data-estado="Entrevista RRHH"] { background: #fefce8; color: #a16207; border-color: #fef08a; }
-.badge[data-estado="Challenge técnico"] { background: #f7fee7; color: #4d7c0f; border-color: #d9f99d; }
-.badge[data-estado="Live coding"] { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-.badge[data-estado="Entrevista Técnica"] { background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border); }
-.badge[data-estado="Entrevista con cliente"] { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-.badge[data-estado="Charla con cliente"] { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
-.badge[data-estado="Entrevista Final"] { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
-.badge[data-estado="Referencias"] { background: #faf5ff; color: #7e22ce; border-color: #e9d5ff; }
-.badge[data-estado="Negociación"] { background: var(--teal-soft); color: #0f766e; border-color: #99f6e4; }
-.badge[data-estado="Oferta"] { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
-.badge[data-estado="Rechazado"] { background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border); }
-.badge[data-estado="Ghosted"] { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
-.badge[data-estado="Descartado"] { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+/* ===== Badge colors per status ===== */
+.badge[data-status="Saved"]               { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+.badge[data-status="Applied"]             { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
+.badge[data-status="Contact"]             { background: #ecfeff; color: #0891b2; border-color: #cffafe; }
+.badge[data-status="HR Interview"]        { background: #fefce8; color: #a16207; border-color: #fef08a; }
+.badge[data-status="Technical Challenge"] { background: #f7fee7; color: #4d7c0f; border-color: #d9f99d; }
+.badge[data-status="Live Coding"]         { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.badge[data-status="Technical Interview"] { background: var(--warning-soft); color: var(--warning-2); border-color: var(--warning-border); }
+.badge[data-status="Client Interview"]    { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.badge[data-status="Client Chat"]         { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+.badge[data-status="Final Interview"]     { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+.badge[data-status="References"]          { background: #faf5ff; color: #7e22ce; border-color: #e9d5ff; }
+.badge[data-status="Negotiation"]         { background: var(--teal-soft); color: #0f766e; border-color: #99f6e4; }
+.badge[data-status="Offer"]               { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
+.badge[data-status="Rejected"]            { background: var(--danger-soft); color: var(--danger-2); border-color: var(--danger-border); }
+.badge[data-status="Ghosted"]             { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.badge[data-status="Discarded"]           { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
 
 [data-theme="dark"] .badge { border-color: transparent; }
-[data-theme="dark"] .badge[data-estado="Guardado"] { background: rgba(100,116,139,0.18); color: #94a3b8; }
-[data-theme="dark"] .badge[data-estado="Aplicado"] { background: var(--info-soft); color: #60a5fa; }
-[data-theme="dark"] .badge[data-estado="Contacto"] { background: rgba(6,182,212,0.16); color: #22d3ee; }
-[data-theme="dark"] .badge[data-estado="Entrevista RRHH"] { background: rgba(234,179,8,0.16); color: #facc15; }
-[data-theme="dark"] .badge[data-estado="Challenge técnico"] { background: rgba(132,204,22,0.16); color: #a3e635; }
-[data-theme="dark"] .badge[data-estado="Live coding"] { background: rgba(34,197,94,0.16); color: #4ade80; }
-[data-theme="dark"] .badge[data-estado="Entrevista Técnica"] { background: var(--warning-soft); color: #fbbf24; }
-[data-theme="dark"] .badge[data-estado="Entrevista con cliente"] { background: rgba(249,115,22,0.16); color: #fb923c; }
-[data-theme="dark"] .badge[data-estado="Charla con cliente"] { background: rgba(236,72,153,0.16); color: #f472b6; }
-[data-theme="dark"] .badge[data-estado="Entrevista Final"] { background: rgba(244,63,94,0.16); color: #fb7185; }
-[data-theme="dark"] .badge[data-estado="Referencias"] { background: rgba(168,85,247,0.16); color: #c084fc; }
-[data-theme="dark"] .badge[data-estado="Negociación"] { background: var(--teal-soft); color: #2dd4bf; }
-[data-theme="dark"] .badge[data-estado="Oferta"] { background: var(--success-soft); color: #34d399; }
-[data-theme="dark"] .badge[data-estado="Rechazado"] { background: var(--danger-soft); color: #f87171; }
-[data-theme="dark"] .badge[data-estado="Ghosted"] { background: rgba(124,58,237,0.16); color: #a78bfa; }
-[data-theme="dark"] .badge[data-estado="Descartado"] { background: rgba(71,85,105,0.18); color: #94a3b8; }
+[data-theme="dark"] .badge[data-status="Saved"]               { background: rgba(100,116,139,0.18); color: #94a3b8; }
+[data-theme="dark"] .badge[data-status="Applied"]             { background: var(--info-soft); color: #60a5fa; }
+[data-theme="dark"] .badge[data-status="Contact"]             { background: rgba(6,182,212,0.16); color: #22d3ee; }
+[data-theme="dark"] .badge[data-status="HR Interview"]        { background: rgba(234,179,8,0.16); color: #facc15; }
+[data-theme="dark"] .badge[data-status="Technical Challenge"] { background: rgba(132,204,22,0.16); color: #a3e635; }
+[data-theme="dark"] .badge[data-status="Live Coding"]         { background: rgba(34,197,94,0.16); color: #4ade80; }
+[data-theme="dark"] .badge[data-status="Technical Interview"] { background: var(--warning-soft); color: #fbbf24; }
+[data-theme="dark"] .badge[data-status="Client Interview"]    { background: rgba(249,115,22,0.16); color: #fb923c; }
+[data-theme="dark"] .badge[data-status="Client Chat"]         { background: rgba(236,72,153,0.16); color: #f472b6; }
+[data-theme="dark"] .badge[data-status="Final Interview"]     { background: rgba(244,63,94,0.16); color: #fb7185; }
+[data-theme="dark"] .badge[data-status="References"]          { background: rgba(168,85,247,0.16); color: #c084fc; }
+[data-theme="dark"] .badge[data-status="Negotiation"]         { background: var(--teal-soft); color: #2dd4bf; }
+[data-theme="dark"] .badge[data-status="Offer"]               { background: var(--success-soft); color: #34d399; }
+[data-theme="dark"] .badge[data-status="Rejected"]            { background: var(--danger-soft); color: #f87171; }
+[data-theme="dark"] .badge[data-status="Ghosted"]             { background: rgba(124,58,237,0.16); color: #a78bfa; }
+[data-theme="dark"] .badge[data-status="Discarded"]           { background: rgba(71,85,105,0.18); color: #94a3b8; }
 
 /* ===== Closed banner ===== */
 .closed-banner {
@@ -508,7 +510,7 @@
 
 .closed-banner .text strong { color: var(--text); }
 
-.closed-banner-motivo {
+.closed-banner-reason {
   margin-top: 0.5rem;
   font-size: 0.82rem;
   color: var(--text);
@@ -517,7 +519,7 @@
   border-left: 2px solid var(--danger-border);
 }
 
-/* ===== Empty state (postulaciones) ===== */
+/* ===== Empty state (applications) ===== */
 
 .empty-jobs {
   text-align: center;
@@ -568,8 +570,8 @@
 }
 
 /* ============================================================
-   Filtros: alinear visualmente con los filtros de referidos
-   (texto plano, sin emojis ni puntos decorativos inyectados)
+   Filters: align visually with referral filters
+   (plain text, no emojis or decorative dots injected)
    ============================================================ */
 
 #filters button::before,
@@ -577,9 +579,8 @@
   content: none;
 }
 
-
 /* ============================================================
-   Empty filter (compartido por jobs y referidos)
+   Empty filter (shared by jobs and referrals)
    ============================================================ */
 
 .empty-filter {

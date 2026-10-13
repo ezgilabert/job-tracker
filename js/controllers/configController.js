@@ -11,7 +11,7 @@ import {
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
   DASHBOARD_STYLES, DEFAULT_DASHBOARD_STYLE, DASHBOARD_STYLE_META,
-  NO_PUESTO_VALUE,
+  NO_ROLE_VALUE,
   BACKUP_APP_ID, BACKUP_VERSION,
   STORAGE_KEYS,
 } from '../constants.js';
@@ -40,7 +40,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     : null;
 
   let draft = null;
-  let preferredDefaultState = null;
+  let preferredDefaultStatus = null;
 
   function cloneConfig(cfg) {
     return JSON.parse(JSON.stringify(cfg));
@@ -68,28 +68,32 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     return true;
   }
 
+  /**
+   * Normalizes ordering-sensitive arrays so the dirty check doesn't
+   * flag a change when the user just reorders the same set of items.
+   */
   function normalizeForDirtyCheck(cfg) {
     const copy = cloneConfig(cfg || {});
-    if (copy.puestos) {
-      if (Array.isArray(copy.puestos.activeTags)) {
-        copy.puestos.activeTags = [...copy.puestos.activeTags].sort();
+    if (copy.roles) {
+      if (Array.isArray(copy.roles.activeTags)) {
+        copy.roles.activeTags = [...copy.roles.activeTags].sort();
       }
-      if (Array.isArray(copy.puestos.hidden)) {
-        copy.puestos.hidden = [...copy.puestos.hidden].sort();
+      if (Array.isArray(copy.roles.hidden)) {
+        copy.roles.hidden = [...copy.roles.hidden].sort();
       }
-      if (Array.isArray(copy.puestos.custom)) {
-        copy.puestos.custom = [...copy.puestos.custom].sort();
+      if (Array.isArray(copy.roles.custom)) {
+        copy.roles.custom = [...copy.roles.custom].sort();
       }
-      if (copy.puestos.customTags && typeof copy.puestos.customTags === 'object') {
+      if (copy.roles.customTags && typeof copy.roles.customTags === 'object') {
         const sorted = {};
-        Object.keys(copy.puestos.customTags).sort().forEach(k => {
-          sorted[k] = [...copy.puestos.customTags[k]].sort();
+        Object.keys(copy.roles.customTags).sort().forEach(k => {
+          sorted[k] = [...copy.roles.customTags[k]].sort();
         });
-        copy.puestos.customTags = sorted;
+        copy.roles.customTags = sorted;
       }
     }
-    if (Array.isArray(copy.estadosIniciales)) {
-      copy.estadosIniciales = [...copy.estadosIniciales].sort();
+    if (Array.isArray(copy.initialStatuses)) {
+      copy.initialStatuses = [...copy.initialStatuses].sort();
     }
     return copy;
   }
@@ -128,7 +132,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (!draft.dashboardStyleJobs) draft.dashboardStyleJobs = DEFAULT_DASHBOARD_STYLE;
     if (!draft.dashboardStyleRefs) draft.dashboardStyleRefs = DEFAULT_DASHBOARD_STYLE;
 
-    preferredDefaultState = draft.estadoInicialDefault || null;
+    preferredDefaultStatus = draft.defaultInitialStatus || null;
 
     modal.classList.add('open');
     renderAll();
@@ -140,7 +144,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     applyLogoToBrand(saved.logo || DEFAULT_LOGO);
 
     draft = null;
-    preferredDefaultState = null;
+    preferredDefaultStatus = null;
     modal.classList.remove('open');
     unsavedBadge.classList.remove('visible');
   }
@@ -217,11 +221,10 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Restablecer preferencias (solo config)
-  //   No recarga la página: resetea los stores en memoria y
-  //   los subscribers se encargan de re-renderizar. Esto evita
-  //   pasar por el guard de auth (requireSession) y ser redirigido
-  //   a login.html.
+  // Reset preferences (config only)
+  //   No page reload: resets the in-memory stores so subscribers
+  //   re-render. This avoids passing through the auth guard and
+  //   being redirected to login.html.
   // ----------------------------------------------------------
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
@@ -233,7 +236,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (!ok) return;
 
     draft = getDefaultConfig();
-    preferredDefaultState = draft.estadoInicialDefault || null;
+    preferredDefaultStatus = draft.defaultInitialStatus || null;
     renderAll();
 
     saveDraft();
@@ -249,9 +252,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Borrar datos (jobs + refs). NO toca la config.
-  //   Tampoco recarga. Wipea los dos stores y deja que el
-  //   subscriber re-renderice las listas vacías.
+  // Delete data (jobs + refs). Config untouched. No reload.
   // ----------------------------------------------------------
   document.getElementById('resetDataBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -270,8 +271,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // Persistimos cualquier cambio pendiente de config antes de cerrar
-    // (el usuario está dentro del modal de config, tal vez tocó algo).
+    // Persist any pending config edits before closing.
     saveDraft();
 
     jobsStore.update(() => []);
@@ -289,9 +289,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Restablecer TODO (config + datos + tema).
-  //   Sin recarga: seteamos cada store a su valor por defecto y
-  //   forzamos el tema a 'light'. Los subscribers hacen el resto.
+  // Reset everything (config + data + theme). No reload.
   // ----------------------------------------------------------
   document.getElementById('resetAllBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -305,17 +303,16 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // Reset de tema (no vive en configStore)
+    // Theme lives outside the config store, reset it manually.
     try { localStorage.setItem(STORAGE_KEYS.THEME, 'light'); } catch (_) {}
     document.documentElement.setAttribute('data-theme', 'light');
 
-    // Reset de los tres stores a sus valores por defecto
     configStore.update(() => getDefaultConfig());
     jobsStore.update(() => []);
     refsStore.update(() => []);
 
     draft = getDefaultConfig();
-    preferredDefaultState = draft.estadoInicialDefault || null;
+    preferredDefaultStatus = draft.defaultInitialStatus || null;
     closeDirect();
     unsavedModal.classList.remove('open');
 
@@ -341,15 +338,15 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     renderTags();
     renderRolesList();
     renderHiddenList();
-    renderStateCheckboxes();
-    renderDefaultState();
+    renderStatusCheckboxes();
+    renderDefaultStatus();
     renderFilters();
     renderLogos();
     renderBackgrounds();
     renderDashboardsJobs();
     renderDashboardsRefs();
     renderLangs();
-    renderPerfil();
+    renderProfile();
     renderBackupStats();
     updateBadge();
   }
@@ -358,7 +355,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   // Panel: Roles
   // ------------------------------------------------------------
   function renderTags() {
-    const active = new Set(draft.puestos.activeTags || []);
+    const active = new Set(draft.roles.activeTags || []);
     document.getElementById('configTags').innerHTML = ROLE_TAGS_LIST.map(tag => {
       const isSelected = active.has(tag.id);
       return `
@@ -375,18 +372,18 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const btn = e.target.closest('.config-tag');
     if (!btn) return;
     const tag = btn.dataset.tag;
-    const active = new Set(draft.puestos.activeTags || []);
+    const active = new Set(draft.roles.activeTags || []);
     if (active.has(tag)) active.delete(tag);
     else active.add(tag);
-    draft.puestos.activeTags = [...active];
+    draft.roles.activeTags = [...active];
     renderAll();
   });
 
   function getVisibleRoles() {
-    const active = new Set(draft.puestos.activeTags || []);
-    const hidden = new Set(draft.puestos.hidden || []);
-    const custom = draft.puestos.custom || [];
-    const customTags = draft.puestos.customTags || {};
+    const active = new Set(draft.roles.activeTags || []);
+    const hidden = new Set(draft.roles.hidden || []);
+    const custom = draft.roles.custom || [];
+    const customTags = draft.roles.customTags || {};
 
     function tagsFor(role) {
       return ROLE_TAGS[role] || customTags[role] || [];
@@ -402,7 +399,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     const defaults = DEFAULT_ROLES.filter(p => {
       if (hidden.has(p)) return false;
-      if (p === NO_PUESTO_VALUE) return true;
+      if (p === NO_ROLE_VALUE) return true;
       if (active.size === 0) return true;
       const tags = ROLE_TAGS[p] || [];
       return tags.some(tg => active.has(tg));
@@ -413,22 +410,22 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   function renderRolesList() {
     const list = getVisibleRoles();
-    const container = document.getElementById('configPuestosList');
-    document.getElementById('configPuestosCount').textContent = list.length;
+    const container = document.getElementById('configRolesList');
+    document.getElementById('configRolesCount').textContent = list.length;
 
     if (list.length === 0) {
-      container.innerHTML = `<div class="config-empty">${escapeHtml(t('config.noPuestos'))}</div>`;
+      container.innerHTML = `<div class="config-empty">${escapeHtml(t('config.noRoles'))}</div>`;
       return;
     }
 
     container.innerHTML = list.map(p => {
-      const isCustom = (draft.puestos.custom || []).includes(p);
+      const isCustom = (draft.roles.custom || []).includes(p);
       return `
-        <div class="config-puesto-item">
+        <div class="config-role-item">
           <span>${escapeHtml(p)}</span>
           <button type="button"
                   class="remove"
-                  data-puesto="${escapeHtml(p)}"
+                  data-role="${escapeHtml(p)}"
                   data-custom="${isCustom}"
                   title="${isCustom ? t('config.removeCustom') : t('config.hide')}">×</button>
         </div>
@@ -436,27 +433,27 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     }).join('');
   }
 
-  document.getElementById('configPuestosList').addEventListener('click', (e) => {
+  document.getElementById('configRolesList').addEventListener('click', (e) => {
     const btn = e.target.closest('.remove');
     if (!btn) return;
-    const puesto = btn.dataset.puesto;
+    const role = btn.dataset.role;
     const isCustom = btn.dataset.custom === 'true';
 
     if (isCustom) {
-      draft.puestos.custom = (draft.puestos.custom || []).filter(p => p !== puesto);
-      if (draft.puestos.customTags) {
-        delete draft.puestos.customTags[puesto];
+      draft.roles.custom = (draft.roles.custom || []).filter(p => p !== role);
+      if (draft.roles.customTags) {
+        delete draft.roles.customTags[role];
       }
     } else {
-      const hidden = new Set(draft.puestos.hidden || []);
-      hidden.add(puesto);
-      draft.puestos.hidden = [...hidden];
+      const hidden = new Set(draft.roles.hidden || []);
+      hidden.add(role);
+      draft.roles.hidden = [...hidden];
     }
     renderAll();
   });
 
   function renderHiddenList() {
-    const hidden = draft.puestos.hidden || [];
+    const hidden = draft.roles.hidden || [];
     const section = document.getElementById('configHiddenSection');
     const container = document.getElementById('configHiddenList');
 
@@ -467,9 +464,9 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     section.style.display = 'block';
 
     container.innerHTML = hidden.map(p => `
-      <div class="config-puesto-item hidden-puesto">
+      <div class="config-role-item hidden-role">
         <span>${escapeHtml(p)}</span>
-        <button type="button" class="restore" data-puesto="${escapeHtml(p)}" title="${t('config.restore')}">+</button>
+        <button type="button" class="restore" data-role="${escapeHtml(p)}" title="${t('config.restore')}">+</button>
       </div>
     `).join('');
   }
@@ -477,43 +474,43 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   document.getElementById('configHiddenList').addEventListener('click', (e) => {
     const btn = e.target.closest('.restore');
     if (!btn) return;
-    const puesto = btn.dataset.puesto;
-    draft.puestos.hidden = (draft.puestos.hidden || []).filter(p => p !== puesto);
+    const role = btn.dataset.role;
+    draft.roles.hidden = (draft.roles.hidden || []).filter(p => p !== role);
     renderAll();
   });
 
-  const newRoleInput = document.getElementById('configNewPuesto');
+  const newRoleInput = document.getElementById('configNewRole');
 
   function addCustomRole() {
     const value = newRoleInput.value.trim();
     if (!value) return;
-    const alreadyExists = (draft.puestos.custom || []).includes(value) || DEFAULT_ROLES.includes(value);
+    const alreadyExists = (draft.roles.custom || []).includes(value) || DEFAULT_ROLES.includes(value);
     if (alreadyExists) {
       showToast(t('toast.roleExists'), '!');
       return;
     }
-    draft.puestos.custom = [...(draft.puestos.custom || []), value];
-    draft.puestos.hidden = (draft.puestos.hidden || []).filter(p => p !== value);
+    draft.roles.custom = [...(draft.roles.custom || []), value];
+    draft.roles.hidden = (draft.roles.hidden || []).filter(p => p !== value);
     newRoleInput.value = '';
     renderAll();
     showToast(t('toast.roleAdded'), '✓');
   }
 
-  document.getElementById('configAddPuesto').addEventListener('click', addCustomRole);
+  document.getElementById('configAddRole').addEventListener('click', addCustomRole);
   newRoleInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); addCustomRole(); }
   });
 
   // ------------------------------------------------------------
-  // Panel: Initial states
+  // Panel: Initial statuses
   // ------------------------------------------------------------
-  function renderStateCheckboxes() {
-    const active = new Set(draft.estadosIniciales || []);
-    document.getElementById('configEstados').innerHTML = WORKFLOW_STEPS.map(s => {
+  function renderStatusCheckboxes() {
+    const active = new Set(draft.initialStatuses || []);
+    document.getElementById('configStatuses').innerHTML = WORKFLOW_STEPS.map(s => {
       const checked = active.has(s.id);
       return `
         <label class="config-check ${checked ? 'checked' : ''}">
-          <input type="checkbox" data-estado="${escapeHtml(s.id)}" ${checked ? 'checked' : ''}>
+          <input type="checkbox" data-status="${escapeHtml(s.id)}" ${checked ? 'checked' : ''}>
           <span class="icon">${s.icon}</span>
           <span>${escapeHtml(tState(s.id))}</span>
         </label>
@@ -521,33 +518,33 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     }).join('');
   }
 
-  document.getElementById('configEstados').addEventListener('change', (e) => {
+  document.getElementById('configStatuses').addEventListener('change', (e) => {
     const input = e.target.closest('input[type="checkbox"]');
     if (!input) return;
-    const estado = input.dataset.estado;
-    const stateSet = new Set(draft.estadosIniciales || []);
+    const status = input.dataset.status;
+    const statusSet = new Set(draft.initialStatuses || []);
 
     if (input.checked) {
-      stateSet.add(estado);
-      if (estado === preferredDefaultState) {
-        draft.estadoInicialDefault = estado;
+      statusSet.add(status);
+      if (status === preferredDefaultStatus) {
+        draft.defaultInitialStatus = status;
       }
     } else {
-      stateSet.delete(estado);
+      statusSet.delete(status);
     }
 
-    draft.estadosIniciales = [...stateSet];
+    draft.initialStatuses = [...statusSet];
 
-    if (stateSet.size > 0 && !stateSet.has(draft.estadoInicialDefault)) {
-      draft.estadoInicialDefault = [...stateSet][0];
+    if (statusSet.size > 0 && !statusSet.has(draft.defaultInitialStatus)) {
+      draft.defaultInitialStatus = [...statusSet][0];
     }
 
     renderAll();
   });
 
-  function renderDefaultState() {
-    const active = draft.estadosIniciales || [];
-    const container = document.getElementById('configDefaultEstado');
+  function renderDefaultStatus() {
+    const active = draft.initialStatuses || [];
+    const container = document.getElementById('configDefaultStatus');
 
     if (active.length === 0) {
       container.innerHTML = `<div class="config-empty">${escapeHtml(t('config.noStates'))}</div>`;
@@ -557,22 +554,22 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     container.innerHTML = active.map(id => {
       const step = WORKFLOW_STEPS.find(s => s.id === id);
       const icon = step ? step.icon : '•';
-      const isSelected = id === draft.estadoInicialDefault ? 'selected' : '';
+      const isSelected = id === draft.defaultInitialStatus ? 'selected' : '';
       return `
         <button type="button"
                 class="config-default-btn ${isSelected}"
-                data-estado="${escapeHtml(id)}">
+                data-status="${escapeHtml(id)}">
           ${icon} ${escapeHtml(tState(id))}
         </button>
       `;
     }).join('');
   }
 
-  document.getElementById('configDefaultEstado').addEventListener('click', (e) => {
+  document.getElementById('configDefaultStatus').addEventListener('click', (e) => {
     const btn = e.target.closest('.config-default-btn');
     if (!btn) return;
-    draft.estadoInicialDefault = btn.dataset.estado;
-    preferredDefaultState = btn.dataset.estado;
+    draft.defaultInitialStatus = btn.dataset.status;
+    preferredDefaultStatus = btn.dataset.status;
     renderAll();
   });
 
@@ -588,17 +585,17 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   }
 
   function renderFilters() {
-    const filters = draft.filtros || [];
-    document.getElementById('configFiltros').innerHTML = filters.map((f, idx) => {
+    const filters = draft.filters || [];
+    document.getElementById('configFilters').innerHTML = filters.map((f, idx) => {
       const { label, icon, builtin } = getFilterLabel(f.id);
       return `
-        <div class="config-filtro-item ${f.visible ? '' : 'oculto'}">
+        <div class="config-filter-item ${f.visible ? '' : 'hidden'}">
           <div class="drag-info">
             <span class="icon">${icon}</span>
             <span>${escapeHtml(label)}</span>
             ${builtin ? `<span class="builtin-tag">${escapeHtml(t('config.fixed'))}</span>` : ''}
           </div>
-          <div class="config-filtro-actions">
+          <div class="config-filter-actions">
             <button type="button"
                     class="config-icon-btn"
                     data-move="up"
@@ -623,16 +620,16 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     }).join('');
   }
 
-  document.getElementById('configFiltros').addEventListener('click', (e) => {
+  document.getElementById('configFilters').addEventListener('click', (e) => {
     const moveBtn = e.target.closest('[data-move]');
     if (moveBtn && !moveBtn.disabled) {
       const idx = Number(moveBtn.dataset.idx);
       const dir = moveBtn.dataset.move === 'up' ? -1 : 1;
       const targetIdx = idx + dir;
-      const filters = cloneArray(draft.filtros);
+      const filters = cloneArray(draft.filters);
       if (targetIdx < 0 || targetIdx >= filters.length) return;
       [filters[idx], filters[targetIdx]] = [filters[targetIdx], filters[idx]];
-      draft.filtros = filters;
+      draft.filters = filters;
       renderAll();
       return;
     }
@@ -640,9 +637,9 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const toggleBtn = e.target.closest('[data-toggle]');
     if (toggleBtn) {
       const idx = Number(toggleBtn.dataset.toggle);
-      const filters = cloneArray(draft.filtros);
+      const filters = cloneArray(draft.filters);
       filters[idx] = { ...filters[idx], visible: !filters[idx].visible };
-      draft.filtros = filters;
+      draft.filters = filters;
       renderAll();
     }
   });
@@ -822,14 +819,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (el) el.value = val ?? '';
   }
 
-  function renderPerfil() {
+  function renderProfile() {
     const p = draft.profile || {};
 
-    setVal('configProfileNombre',   p.nombre   || '');
-    setVal('configProfileApellido', p.apellido || '');
-    setVal('configProfileUsername', p.username || '');
-    setVal('configProfileEmail',    p.email    || '');
-    setVal('configProfileBio',      p.bio      || '');
+    setVal('configProfileFirstName', p.firstName || '');
+    setVal('configProfileLastName',  p.lastName  || '');
+    setVal('configProfileUsername',  p.username  || '');
+    setVal('configProfileEmail',     p.email     || '');
+    setVal('configProfileBio',       p.bio       || '');
 
     const av = document.getElementById('configProfileAvatar');
     if (!av) return;
@@ -851,11 +848,11 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   }
 
   const profileFields = {
-    configProfileNombre:   'nombre',
-    configProfileApellido: 'apellido',
-    configProfileUsername: 'username',
-    configProfileEmail:    'email',
-    configProfileBio:      'bio',
+    configProfileFirstName: 'firstName',
+    configProfileLastName:  'lastName',
+    configProfileUsername:  'username',
+    configProfileEmail:     'email',
+    configProfileBio:       'bio',
   };
 
   Object.entries(profileFields).forEach(([id, key]) => {
@@ -888,7 +885,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
         if (!draft) return;
         draft.profile = draft.profile || {};
         draft.profile.avatar = ev.target.result;
-        renderPerfil();
+        renderProfile();
         updateBadge();
       };
       reader.readAsDataURL(file);
@@ -902,7 +899,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       if (!draft) return;
       draft.profile = draft.profile || {};
       draft.profile.avatar = '';
-      renderPerfil();
+      renderProfile();
       updateBadge();
     });
   }

@@ -5,20 +5,18 @@
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
-import { PuestoCombo } from '../ui/combo.js';
-import { ModalidadPicker } from '../ui/modalidad.js';
+import { RoleCombo } from '../ui/combo.js';
+import { WorkModePicker } from '../ui/workModePicker.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
 import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
 import { mountChips } from '../ui/chips.js';
 import {
-  CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS,
+  CLOSE_REASONS, WORKFLOW_STEPS,
   getStateIcon, getRefStateIcon,
 } from '../constants.js';
-import {
-  stepIndex, isClosed,
-} from '../selectors.js';
+import { stepIndex, isClosed } from '../selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray,
   formatDateTime,
@@ -31,52 +29,52 @@ import {
  * @param {import('../store.js').Store} jobsStore
  * @param {import('../store.js').Store} refsStore
  * @param {import('../store.js').Store} configStore
- * @param {{ requestNewPuesto: (suggested:string)=>Promise<string|null> }} createPuestoCtrl
+ * @param {{ requestNewRole: (suggested:string)=>Promise<string|null> }} createRoleCtrl
  */
-export function mountModalsController(jobsStore, refsStore, configStore, createPuestoCtrl) {
+export function mountModalsController(jobsStore, refsStore, configStore, createRoleCtrl) {
   // ----------------------------------------------------------
   // Edit job
   // ----------------------------------------------------------
   const editModal = document.getElementById('editModal');
 
-  const editEstadoEl = document.getElementById('editEstado');
-  const editEstadoIcon = editEstadoEl
-    ? editEstadoEl.querySelector('[data-estado-icon]')
+  const editStatusEl = document.getElementById('editStatus');
+  const editStatusIcon = editStatusEl
+    ? editStatusEl.querySelector('[data-status-icon]')
     : null;
-  const editEstadoText = editEstadoEl
-    ? editEstadoEl.querySelector('[data-estado-text]')
+  const editStatusText = editStatusEl
+    ? editStatusEl.querySelector('[data-status-text]')
     : null;
 
-  function updateEditEstadoDisplay(estado) {
-    if (editEstadoIcon) editEstadoIcon.textContent = getStateIcon(estado);
-    if (editEstadoText) editEstadoText.textContent = tState(estado);
+  function updateEditStatusDisplay(status) {
+    if (editStatusIcon) editStatusIcon.textContent = getStateIcon(status);
+    if (editStatusText) editStatusText.textContent = tState(status);
   }
 
-  const editSalaryHourlyCheckbox = document.getElementById('editSalarioPorHora');
+  const editHourlySalaryCheckbox = document.getElementById('editHourlySalary');
 
   let editingId = null;
-  const editFecha = new DatePicker(document.getElementById('editFechaPicker'));
-  const editPuesto = new PuestoCombo(document.getElementById('editPuestoCombo'), {
-    getJobPuestos: () => jobsStore.get().map(j => j.puesto),
+  const editDate = new DatePicker(document.getElementById('editDatePicker'));
+  const editRole = new RoleCombo(document.getElementById('editRoleCombo'), {
+    getJobRoles: () => jobsStore.get().map(j => j.role),
     getConfig: () => configStore.get(),
-    onCreateRequested: (suggested) => createPuestoCtrl.requestNewPuesto(suggested),
+    onCreateRequested: (suggested) => createRoleCtrl.requestNewRole(suggested),
   });
-  const editModalidad = new ModalidadPicker(
-    document.getElementById('editModalidadPicker'),
+  const editWorkMode = new WorkModePicker(
+    document.getElementById('editWorkModePicker'),
     {
       hybridWrap: document.getElementById('editHybridDaysWrap'),
       hybridSelect: document.getElementById('editHybridOfficeDays'),
     }
   );
   const editCurrency = new CurrencyPicker(
-    document.getElementById('editSalarioCurrencyChip'),
+    document.getElementById('editSalaryCurrencyChip'),
     { value: 'usd' }
   );
 
   const editSalaryLabelEl = document.querySelector('#editModal .field [data-salary-label]');
 
   const editSalaryMode = new SalaryModeChip(
-    document.getElementById('editSalarioModeChip'),
+    document.getElementById('editSalaryModeChip'),
     {
       value: 'range',
       fieldLabelEl: editSalaryLabelEl,
@@ -84,47 +82,46 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   );
 
   const editSalaryInput = new SalaryInput(
-    document.getElementById('editSalario'),
-    document.getElementById('editSalarioHint'),
+    document.getElementById('editSalary'),
+    document.getElementById('editSalaryHint'),
     {
       getMode: () => editSalaryMode.getValue(),
       getCurrency: () => editCurrency.getValue(),
-      getHourly: () => editSalaryHourlyCheckbox.checked,
+      getHourly: () => editHourlySalaryCheckbox.checked,
     }
   );
 
   editCurrency.onChange = () => editSalaryInput.reset();
   editSalaryMode.onChange = () => editSalaryInput.reset();
-  editSalaryHourlyCheckbox.addEventListener('change', () => editSalaryInput.reset());
+  editHourlySalaryCheckbox.addEventListener('change', () => editSalaryInput.reset());
 
-  // ContactLinkPicker con validación
-  const editContactoLinkPicker = new ContactLinkPicker(
-    document.getElementById('editContactoLinkPicker'),
-    { value: { tipo: 'linkedin', link: '' } }
+  const editContactLinkPicker = new ContactLinkPicker(
+    document.getElementById('editContactLinkPicker'),
+    { value: { platform: 'linkedin', link: '' } }
   );
-  editContactoLinkPicker.translate = t;
+  editContactLinkPicker.translate = t;
 
   function openEdit(id) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
     editingId = id;
 
-    setVal('editEmpresa', j.empresa);
-    setVal('editPuesto', j.puesto);
-    editFecha.setValue(j.fecha || '');
-    updateEditEstadoDisplay(j.estado);
+    setVal('editCompany', j.company);
+    setVal('editRole', j.role);
+    editDate.setValue(j.date || '');
+    updateEditStatusDisplay(j.status);
     setVal('editLink', j.link || '');
-    editSalaryHourlyCheckbox.checked = Boolean(j.salarioPorHora);
-    editCurrency.setValue(j.moneda || 'usd');
-    editSalaryMode.setValue(j.salarioEsRango === false ? 'single' : 'range');
-    editSalaryInput.setValue(j.salario || '');
-    setVal('editContacto', j.contacto || '');
-    editContactoLinkPicker.setValue({
-      tipo: j.contactoTipo || 'linkedin',
-      link: j.contactoLink || '',
+    editHourlySalaryCheckbox.checked = Boolean(j.hourlySalary);
+    editCurrency.setValue(j.currency || 'usd');
+    editSalaryMode.setValue(j.salaryIsRange === false ? 'single' : 'range');
+    editSalaryInput.setValue(j.salary || '');
+    setVal('editContact', j.contact || '');
+    editContactLinkPicker.setValue({
+      platform: j.contactPlatform || 'linkedin',
+      link: j.contactLink || '',
     });
-    setVal('editNotas', j.notas || '');
-    editModalidad.setValue(j.modalidad || '', j.hybridOfficeDays || 3);
+    setVal('editNotes', j.notes || '');
+    editWorkMode.setValue(j.workMode || '', j.hybridOfficeDays || 3);
 
     editModal.classList.add('open');
   }
@@ -142,37 +139,36 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
 
-    // ⭐ Validación del link de contacto
-    const contactValidation = editContactoLinkPicker.validate();
+    const contactValidation = editContactLinkPicker.validate();
     if (!contactValidation.valid) {
-      editContactoLinkPicker.markTouched();
-      editContactoLinkPicker.focus();
+      editContactLinkPicker.markTouched();
+      editContactLinkPicker.focus();
       showToast(t(contactValidation.errorKey), '!');
       return;
     }
 
-    const modal = editModalidad.getValue();
-    const salarioMode = editSalaryMode.getValue();
-    const contactData = editContactoLinkPicker.getValue();
+    const mode = editWorkMode.getValue();
+    const salaryMode = editSalaryMode.getValue();
+    const contactData = editContactLinkPicker.getValue();
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== editingId) return j;
       return {
         ...j,
-        empresa:   valueOf('editEmpresa'),
-        puesto:    valueOf('editPuesto'),
-        fecha:     editFecha.getValue(),
-        link:      valueOf('editLink'),
-        salario:   editSalaryInput.getValue(),
-        salarioPorHora: editSalaryHourlyCheckbox.checked,
-        salarioEsRango: salarioMode === 'range',
-        moneda:    editCurrency.getValue(),
-        modalidad: modal.modalidad,
-        hybridOfficeDays: modal.hybridOfficeDays,
-        contacto:  valueOf('editContacto'),
-        contactoLink: contactData.link,
-        contactoTipo: contactData.tipo,
-        notas:     valueOf('editNotas'),
+        company:  valueOf('editCompany'),
+        role:     valueOf('editRole'),
+        date:     editDate.getValue(),
+        link:     valueOf('editLink'),
+        salary:   editSalaryInput.getValue(),
+        hourlySalary: editHourlySalaryCheckbox.checked,
+        salaryIsRange: salaryMode === 'range',
+        currency: editCurrency.getValue(),
+        workMode: mode.workMode,
+        hybridOfficeDays: mode.hybridOfficeDays,
+        contact:  valueOf('editContact'),
+        contactLink: contactData.link,
+        contactPlatform: contactData.platform,
+        notes:    valueOf('editNotes'),
       };
     }));
 
@@ -185,20 +181,20 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   // ----------------------------------------------------------
   const closeModal = document.getElementById('closeModal');
   const closeReasonsEl = document.getElementById('closeReasons');
-  const closeReasonInput = document.getElementById('closeMotivo');
+  const closeReasonInput = document.getElementById('closeReason');
   let pendingClose = null;
 
-  function openClose(id, estado) {
+  function openClose(id, status) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
-    pendingClose = { id, estado };
+    pendingClose = { id, status };
 
     document.getElementById('closeModalTitle').textContent =
-      t('close.titleAs', { estado: tState(estado) });
+      t('close.titleAs', { status: tState(status) });
     document.getElementById('closeModalSubtitle').innerHTML =
-      `<strong>${escapeHtml(j.puesto)}</strong> · ${escapeHtml(j.empresa)}`;
+      `<strong>${escapeHtml(j.role)}</strong> · ${escapeHtml(j.company)}`;
 
-    const reasons = CLOSE_REASONS[estado] || [];
+    const reasons = CLOSE_REASONS[status] || [];
     closeReasonsEl.innerHTML = reasons
       .map(r => `<button type="button" class="close-reason-chip" data-reason="${escapeHtml(r)}">${escapeHtml(r)}</button>`)
       .join('');
@@ -246,43 +242,43 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       return;
     }
 
-    const { id, estado } = pendingClose;
+    const { id, status } = pendingClose;
     const closedJob = jobsStore.get().find(x => x.id === id);
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
       const history = cloneArray(j.history);
-      history.push({ estado, fecha: new Date().toISOString(), motivo: reason });
-      const patch = { ...j, estado, history };
-      if (estado === 'Oferta') patch.offerConfirmed = true;
+      history.push({ status, date: new Date().toISOString(), reason });
+      const patch = { ...j, status, history };
+      if (status === 'Offer') patch.offerConfirmed = true;
       return patch;
     }));
 
-    if (estado === 'Oferta') {
-      syncLinkedRefToContratado(id, closedJob);
+    if (status === 'Offer') {
+      syncLinkedRefToHired(id, closedJob);
     }
 
     hideClose();
-    const icons = { 'Rechazado': '✕', 'Ghosted': '👻', 'Descartado': '🚫', 'Oferta': '🎉' };
-    showToast(t('toast.closedAs', { estado: tState(estado) }), icons[estado] || '✓');
+    const icons = { 'Rejected': '✕', 'Ghosted': '👻', 'Discarded': '🚫', 'Offer': '🎉' };
+    showToast(t('toast.closedAs', { status: tState(status) }), icons[status] || '✓');
   });
 
-  function syncLinkedRefToContratado(jobId, job) {
+  function syncLinkedRefToHired(jobId, job) {
     refsStore.update(refs => refs.map(r => {
       if (r.linkedJobId !== jobId) return r;
-      if (r.estado === 'No aplica') return r;
-      if (r.estado === 'Contratado') return r;
+      if (r.status === 'Not Applicable') return r;
+      if (r.status === 'Hired') return r;
 
       const history = cloneArray(r.history);
       const label = job
-        ? `${job.puesto || '—'} · ${job.empresa || '—'}`
+        ? `${job.role || '—'} · ${job.company || '—'}`
         : '—';
       history.push({
-        estado: 'Contratado',
-        fecha: new Date().toISOString(),
-        motivo: `Offer accepted: ${label}`,
+        status: 'Hired',
+        date: new Date().toISOString(),
+        reason: `Offer accepted: ${label}`,
       });
-      return { ...r, estado: 'Contratado', history };
+      return { ...r, status: 'Hired', history };
     }));
   }
 
@@ -300,7 +296,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     if (!j) return;
 
     historySubtitle.innerHTML =
-      `<strong>${escapeHtml(j.puesto)}</strong> · ${escapeHtml(j.empresa)}`;
+      `<strong>${escapeHtml(j.role)}</strong> · ${escapeHtml(j.company)}`;
 
     const history = ensureArray(j.history);
     const lastIdx = history.length - 1;
@@ -309,42 +305,42 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
       historyTimeline.innerHTML = `<div class="history-empty">${escapeHtml(t('hist.empty'))}</div>`;
     } else {
       historyTimeline.innerHTML = history.map((entry, i) => {
-        const isCurrent = i === lastIdx && !isClosed(entry.estado);
-        const isClosedEntry = isClosed(entry.estado);
-        const isBackward = Boolean(entry.retroceso);
+        const isCurrent = i === lastIdx && !isClosed(entry.status);
+        const isClosedEntry = isClosed(entry.status);
+        const isBackward = Boolean(entry.wentBack);
 
         let itemClass = 'history-item';
         if (isCurrent) itemClass += ' current';
         if (isBackward) itemClass += ' retroceso';
-        if (isClosedEntry) itemClass += ' closed-' + entry.estado.toLowerCase().replace(/\s+/g, '-');
+        if (isClosedEntry) itemClass += ' closed-' + entry.status.toLowerCase().replace(/\s+/g, '-');
 
         let tagsHtml = '';
         if (isCurrent) tagsHtml += `<span class="history-tag current">${escapeHtml(t('hist.current'))}</span>`;
         if (isBackward) tagsHtml += `<span class="history-tag retroceso">${escapeHtml(t('hist.backward'))}</span>`;
-        if (isClosedEntry && entry.estado !== 'Oferta') {
+        if (isClosedEntry && entry.status !== 'Offer') {
           tagsHtml += `<span class="history-tag cerrada">${escapeHtml(t('hist.closed'))}</span>`;
         }
-        if (entry.estado === 'Oferta') {
+        if (entry.status === 'Offer') {
           tagsHtml += `<span class="history-tag oferta">${escapeHtml(t('hist.offer'))}</span>`;
         }
 
-        const reasonHtml = entry.motivo
-          ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
+        const reasonHtml = entry.reason
+          ? `<div class="history-reason">"${escapeHtml(entry.reason)}"</div>`
           : '';
 
-        const noteHtml = entry.nota
-          ? `<div class="history-nota"><strong>${escapeHtml(t('hist.note'))}</strong>${escapeHtml(entry.nota)}</div>`
+        const noteHtml = entry.note
+          ? `<div class="history-note"><strong>${escapeHtml(t('hist.note'))}</strong>${escapeHtml(entry.note)}</div>`
           : '';
 
         return `
           <div class="${itemClass}">
-            <div class="history-dot">${getStateIcon(entry.estado)}</div>
+            <div class="history-dot">${getStateIcon(entry.status)}</div>
             <div class="history-content">
-              <div class="history-estado">
-                ${escapeHtml(tState(entry.estado))}
+              <div class="history-status">
+                ${escapeHtml(tState(entry.status))}
                 ${tagsHtml}
               </div>
-              <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
+              <div class="history-date">${formatDateTime(entry.date)}</div>
               ${reasonHtml}
               ${noteHtml}
             </div>
@@ -388,8 +384,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     if (!r) return;
 
     refHistorySubtitle.innerHTML =
-      `<strong>${escapeHtml(r.nombre)}</strong>` +
-      (r.rol ? ` · ${escapeHtml(r.rol)}` : '');
+      `<strong>${escapeHtml(r.name)}</strong>` +
+      (r.role ? ` · ${escapeHtml(r.role)}` : '');
 
     const history = ensureArray(r.history);
     const lastIdx = history.length - 1;
@@ -399,37 +395,37 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         `<div class="history-empty">${escapeHtml(t('hist.empty'))}</div>`;
     } else {
       refHistoryTimeline.innerHTML = history.map((entry, i) => {
-        const isCurrent = i === lastIdx && entry.estado !== 'No aplica';
-        const isClosedEntry = entry.estado === 'No aplica';
-        const isBackward = Boolean(entry.retroceso);
+        const isCurrent = i === lastIdx && entry.status !== 'Not Applicable';
+        const isClosedEntry = entry.status === 'Not Applicable';
+        const isBackward = Boolean(entry.wentBack);
 
         let itemClass = 'history-item';
         if (isCurrent) itemClass += ' current';
         if (isBackward) itemClass += ' retroceso';
-        if (isClosedEntry) itemClass += ' closed-rechazado';
+        if (isClosedEntry) itemClass += ' closed-rejected';
 
         let tagsHtml = '';
         if (isCurrent) tagsHtml += `<span class="history-tag current">${escapeHtml(t('hist.current'))}</span>`;
         if (isBackward) tagsHtml += `<span class="history-tag retroceso">${escapeHtml(t('hist.backward'))}</span>`;
         if (isClosedEntry) tagsHtml += `<span class="history-tag cerrada">${escapeHtml(t('hist.closedRef'))}</span>`;
 
-        const reasonHtml = entry.motivo
-          ? `<div class="history-motivo">"${escapeHtml(entry.motivo)}"</div>`
+        const reasonHtml = entry.reason
+          ? `<div class="history-reason">"${escapeHtml(entry.reason)}"</div>`
           : '';
 
-        const noteHtml = entry.nota
-          ? `<div class="history-nota"><strong>${escapeHtml(t('hist.note'))}</strong>${escapeHtml(entry.nota)}</div>`
+        const noteHtml = entry.note
+          ? `<div class="history-note"><strong>${escapeHtml(t('hist.note'))}</strong>${escapeHtml(entry.note)}</div>`
           : '';
 
         return `
           <div class="${itemClass}">
-            <div class="history-dot">${getRefStateIcon(entry.estado)}</div>
+            <div class="history-dot">${getRefStateIcon(entry.status)}</div>
             <div class="history-content">
-              <div class="history-estado">
-                ${escapeHtml(tRefState(entry.estado))}
+              <div class="history-status">
+                ${escapeHtml(tRefState(entry.status))}
                 ${tagsHtml}
               </div>
-              <div class="history-fecha">${formatDateTime(entry.fecha)}</div>
+              <div class="history-date">${formatDateTime(entry.date)}</div>
               ${reasonHtml}
               ${noteHtml}
             </div>
@@ -469,18 +465,18 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
 
-    const idx = stepIndex(j.estado);
+    const idx = stepIndex(j.status);
     if (idx < 0) return;
 
     const nextIdx = direction === 'next' ? idx + 1 : idx - 1;
     if (nextIdx < 0 || nextIdx >= WORKFLOW_STEPS.length) return;
 
-    const nextState = WORKFLOW_STEPS[nextIdx].id;
-    pendingAdvance = { id, nextState, skipCurrent: !!opts.skipCurrent, direction };
+    const nextStatus = WORKFLOW_STEPS[nextIdx].id;
+    pendingAdvance = { id, nextStatus, skipCurrent: !!opts.skipCurrent, direction };
 
     noteSubtitle.innerHTML = t('note.subtitle', {
-      step: escapeHtml(tStateShort(nextState)),
-      name: escapeHtml(j.empresa),
+      step: escapeHtml(tStateShort(nextStatus)),
+      name: escapeHtml(j.company),
     });
 
     stepNoteInput.value = '';
@@ -490,24 +486,24 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
   function applyAdvance({ note } = {}) {
     if (!pendingAdvance) return;
-    const { id, nextState, skipCurrent } = pendingAdvance;
+    const { id, nextStatus, skipCurrent } = pendingAdvance;
 
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== id) return j;
       const skipped = cloneArray(j.skipped);
-      if (skipCurrent && !skipped.includes(j.estado)) skipped.push(j.estado);
+      if (skipCurrent && !skipped.includes(j.status)) skipped.push(j.status);
 
       const history = cloneArray(j.history);
-      const entry = { estado: nextState, fecha: new Date().toISOString() };
-      if (note) entry.nota = note;
+      const entry = { status: nextStatus, date: new Date().toISOString() };
+      if (note) entry.note = note;
       history.push(entry);
 
-      return { ...j, estado: nextState, skipped, history };
+      return { ...j, status: nextStatus, skipped, history };
     }));
 
     const j = jobsStore.get().find(x => x.id === id);
     showToast(
-      t('toast.advanceTo', { name: j?.empresa ?? '', estado: tState(nextState) }),
+      t('toast.advanceTo', { name: j?.company ?? '', status: tState(nextStatus) }),
       skipCurrent ? '🚫' : '→'
     );
   }
@@ -542,12 +538,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   const refEditModal = document.getElementById('refEditModal');
   let refEditingId = null;
 
-  const refEditRelacion = mountChips(
-    document.getElementById('refEditRelacionChips'),
+  const refEditRelationship = mountChips(
+    document.getElementById('refEditRelationshipChips'),
     { onChange: () => {}, allowMultiple: true }
   );
-  const refEditEstado = mountChips(
-    document.getElementById('refEditEstadoChips'),
+  const refEditStatus = mountChips(
+    document.getElementById('refEditStatusChips'),
     { onChange: () => {} }
   );
 
@@ -556,19 +552,19 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     if (!r) return;
     refEditingId = id;
 
-    setVal('refEditNombre', r.nombre);
-    setVal('refEditRol', r.rol || '');
-    setVal('refEditContacto', r.contacto || '');
+    setVal('refEditName', r.name);
+    setVal('refEditRole', r.role || '');
+    setVal('refEditContact', r.contact || '');
     setVal('refEditLink', r.link || '');
-    setVal('refEditNotas', r.notas || '');
+    setVal('refEditNotes', r.notes || '');
 
-    // relacion: puede venir como string (legacy) o array (nuevo)
-    const relacionValue = Array.isArray(r.relacion)
-      ? r.relacion
-      : (r.relacion ? [r.relacion] : []);
-    refEditRelacion.setValue(relacionValue);
+    // relationship: legacy may be a string, new format is an array.
+    const relationshipValue = Array.isArray(r.relationship)
+      ? r.relationship
+      : (r.relationship ? [r.relationship] : []);
+    refEditRelationship.setValue(relationshipValue);
 
-    refEditEstado.setValue(r.estado || 'Pendiente');
+    refEditStatus.setValue(r.status || 'Pending');
 
     refEditModal.classList.add('open');
   }
@@ -586,19 +582,19 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   document.getElementById('refSaveEdit').addEventListener('click', () => {
     if (!refEditingId) return;
 
-    const relacionValue = refEditRelacion.getValue() || [];
+    const relationshipValue = refEditRelationship.getValue() || [];
 
     refsStore.update(refs => refs.map(r => {
       if (r.id !== refEditingId) return r;
       return {
         ...r,
-        nombre:   valueOf('refEditNombre'),
-        rol:      valueOf('refEditRol'),
-        contacto: valueOf('refEditContacto'),
-        link:     valueOf('refEditLink'),
-        relacion: Array.isArray(relacionValue) ? relacionValue : [],
-        estado:   refEditEstado.getValue() || 'Pendiente',
-        notas:    valueOf('refEditNotas'),
+        name:    valueOf('refEditName'),
+        role:    valueOf('refEditRole'),
+        contact: valueOf('refEditContact'),
+        link:    valueOf('refEditLink'),
+        relationship: Array.isArray(relationshipValue) ? relationshipValue : [],
+        status:  refEditStatus.getValue() || 'Pending',
+        notes:   valueOf('refEditNotes'),
       };
     }));
 
@@ -607,7 +603,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   });
 
   // ----------------------------------------------------------
-  // Move referral → jobs
+  // Move referral → applications
   // ----------------------------------------------------------
   const refToJobModal = document.getElementById('refToJobModal');
   const refToJobLinkSection = document.getElementById('refToJobLinkSection');
@@ -625,7 +621,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     refToJobMode = null;
     refToJobSelectedId = null;
 
-    document.getElementById('refToJobName').textContent = r.nombre;
+    document.getElementById('refToJobName').textContent = r.name;
     refToJobLinkSection.style.display = 'none';
     refToJobConfirm.style.display = 'none';
     document.querySelectorAll('.ref-to-job-option').forEach(o => o.classList.remove('selected'));
@@ -681,10 +677,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
                 class="ref-to-job-item ${isSelected ? 'selected' : ''}"
                 data-job-id="${j.id}">
           <div class="info">
-            <strong>${escapeHtml(j.puesto)}</strong>
-            <span>${escapeHtml(j.empresa)}${alreadyLinked ? ' · ' + escapeHtml(t('refToJob.alreadyLinked')) : ''}</span>
+            <strong>${escapeHtml(j.role)}</strong>
+            <span>${escapeHtml(j.company)}${alreadyLinked ? ' · ' + escapeHtml(t('refToJob.alreadyLinked')) : ''}</span>
           </div>
-          <span class="estado-mini">${escapeHtml(tState(j.estado))}</span>
+          <span class="estado-mini">${escapeHtml(tState(j.status))}</span>
         </button>
       `;
     }).join('');
@@ -713,7 +709,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     }));
 
     closeRefToJob();
-    showToast(t('toast.linkedTo', { empresa: j.empresa }), '🔗');
+    showToast(t('toast.linkedTo', { company: j.company }), '🔗');
     document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: j.id } }));
   });
 
@@ -724,26 +720,26 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     const newId = Date.now();
     const newJob = {
       id: newId,
-      empresa: '—',
-      puesto: '',
-      fecha: todayISO(),
-      estado: 'Contacto',
+      company: '—',
+      role: '',
+      date: todayISO(),
+      status: 'Contact',
       link: '',
-      salario: '',
-      salarioEsRango: true,
-      moneda: 'usd',
-      modalidad: '',
+      salary: '',
+      salaryIsRange: true,
+      currency: 'usd',
+      workMode: '',
       hybridOfficeDays: null,
-      contacto: r.nombre + (r.rol ? ` (${r.rol})` : ''),
-      contactoLink: '',
-      contactoTipo: 'linkedin',
-      notas: `Referido por ${r.nombre}${r.notas ? '. ' + r.notas : ''}`,
+      contact: r.name + (r.role ? ` (${r.role})` : ''),
+      contactLink: '',
+      contactPlatform: 'linkedin',
+      notes: `Referred by ${r.name}${r.notes ? '. ' + r.notes : ''}`,
       skipped: [],
-      volvioAtras: false,
+      wentBack: false,
       history: [{
-        estado: 'Contacto',
-        fecha: new Date().toISOString(),
-        motivo: `Referido: ${r.nombre}`,
+        status: 'Contact',
+        date: new Date().toISOString(),
+        reason: `Referral: ${r.name}`,
       }],
     };
 
@@ -755,7 +751,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     }));
 
     closeRefToJob();
-    showToast(t('toast.jobCreatedFromRef', { name: r.nombre }), '✨');
+    showToast(t('toast.jobCreatedFromRef', { name: r.name }), '✨');
 
     setTimeout(() => {
       openEdit(newId);
@@ -793,9 +789,9 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   document.addEventListener('i18n-changed', () => {
     if (editModal.classList.contains('open') && editingId) {
       const j = jobsStore.get().find(x => x.id === editingId);
-      if (j) updateEditEstadoDisplay(j.estado);
+      if (j) updateEditStatusDisplay(j.status);
     }
-    editContactoLinkPicker.refresh();
+    editContactLinkPicker.refresh();
   });
 
   // ----------------------------------------------------------
@@ -822,12 +818,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
 
-    if (j.volvioAtras) {
+    if (j.wentBack) {
       showToast(t('toast.alreadyWentBackJob'), '!');
       return;
     }
 
-    const idx = stepIndex(j.estado);
+    const idx = stepIndex(j.status);
     if (idx <= 0) return;
 
     const prevStep = WORKFLOW_STEPS[idx - 1];
@@ -835,9 +831,9 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     const confirmed = await showConfirm({
       title: t('confirm.prevJob.title'),
       message: t('confirm.prevJob.message', {
-        puesto: escapeHtml(j.puesto),
-        empresa: escapeHtml(j.empresa),
-        from: escapeHtml(tState(j.estado)),
+        role: escapeHtml(j.role),
+        company: escapeHtml(j.company),
+        from: escapeHtml(tState(j.status)),
         to: escapeHtml(tStateShort(prevStep.id)),
       }),
       confirmText: t('confirm.prevJob.confirm'),
@@ -850,17 +846,17 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   function applyPrev(id) {
     const j = jobsStore.get().find(x => x.id === id);
     if (!j) return;
-    if (j.volvioAtras) return;
-    const idx = stepIndex(j.estado);
+    if (j.wentBack) return;
+    const idx = stepIndex(j.status);
     if (idx <= 0) return;
-    const prevState = WORKFLOW_STEPS[idx - 1].id;
+    const prevStatus = WORKFLOW_STEPS[idx - 1].id;
 
     jobsStore.update(jobs => jobs.map(x => {
       if (x.id !== id) return x;
       const history = cloneArray(x.history);
-      history.push({ estado: prevState, fecha: new Date().toISOString(), retroceso: true });
-      return { ...x, estado: prevState, history, volvioAtras: true };
+      history.push({ status: prevStatus, date: new Date().toISOString(), wentBack: true });
+      return { ...x, status: prevStatus, history, wentBack: true };
     }));
-    showToast(t('toast.backTo', { name: j.empresa, estado: tState(prevState) }), '←');
+    showToast(t('toast.backTo', { name: j.company, status: tState(prevStatus) }), '←');
   }
 }

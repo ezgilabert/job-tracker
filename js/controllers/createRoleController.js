@@ -1,8 +1,8 @@
 // ============================================================
-// Controller: crear puesto desde el combo
-// Modal con nombre + categorías (multi-select).
-// Guarda el puesto en config.puestos.custom y sus tags en
-// config.puestos.customTags.
+// Controller: create a role from the picker combo.
+// Modal with name + categories (multi-select).
+// Persists the role in config.roles.custom and its tags in
+// config.roles.customTags.
 // ============================================================
 
 import { showToast } from '../ui/toast.js';
@@ -13,17 +13,17 @@ import { t } from '../i18n.js';
 /**
  * @param {import('../store.js').Store} configStore
  */
-export function mountCreatePuestoController(configStore) {
-  const modal = document.getElementById('createPuestoModal');
-  const input = document.getElementById('createPuestoName');
-  const saveBtn = document.getElementById('saveCreatePuesto');
-  const cancelBtn = document.getElementById('cancelCreatePuesto');
-  const catsWrap = document.getElementById('createPuestoCats');
+export function mountCreateRoleController(configStore) {
+  const modal = document.getElementById('createRoleModal');
+  const input = document.getElementById('createRoleName');
+  const saveBtn = document.getElementById('saveCreateRole');
+  const cancelBtn = document.getElementById('cancelCreateRole');
+  const catsWrap = document.getElementById('createRoleCats');
 
   if (!modal || !input) {
     return {
       open: () => Promise.resolve(null),
-      requestNewPuesto: () => Promise.resolve(null),
+      requestNewRole: () => Promise.resolve(null),
     };
   }
 
@@ -31,7 +31,7 @@ export function mountCreatePuestoController(configStore) {
   let selectedCats = new Set();
 
   // ----------------------------------------------------------
-  // Render de chips de categoría
+  // Category chip rendering
   // ----------------------------------------------------------
   function renderCats() {
     if (!catsWrap) return;
@@ -126,12 +126,12 @@ export function mountCreatePuestoController(configStore) {
   }, true);
 
   // ----------------------------------------------------------
-  // requestNewPuesto
+  // requestNewRole
   // ----------------------------------------------------------
-  async function requestNewPuesto(suggested = '') {
+  async function requestNewRole(suggested = '') {
     const cfg = configStore.get();
-    const custom = cfg.puestos?.custom || [];
-    const customTags = cfg.puestos?.customTags || {};
+    const custom = cfg.roles?.custom || [];
+    const customTags = cfg.roles?.customTags || {};
     const preSelectedCats = customTags[suggested] || [];
 
     const result = await open({ suggested, preSelectedCats });
@@ -139,46 +139,45 @@ export function mountCreatePuestoController(configStore) {
 
     const { name, cats } = result;
 
-    const hidden = cfg.puestos?.hidden || [];
+    const hidden = cfg.roles?.hidden || [];
     const isDefault = DEFAULT_ROLES.includes(name);
     const isCustom = custom.includes(name);
 
     configStore.update(c => {
-      const nextPuestos = { ...(c.puestos || {}) };
-      const nextCustom = [...(nextPuestos.custom || [])];
-      const nextCustomTags = { ...(nextPuestos.customTags || {}) };
-      const nextHidden = [...(nextPuestos.hidden || [])];
+      const nextRoles = { ...(c.roles || {}) };
+      const nextCustom = [...(nextRoles.custom || [])];
+      const nextCustomTags = { ...(nextRoles.customTags || {}) };
+      const nextHidden = [...(nextRoles.hidden || [])];
 
-      // Si el puesto ya existe como default, no lo duplicamos en custom.
-      // Sólo guardamos sus categorías en customTags (para que se filtren bien).
+      // If the role already exists as a default, do not duplicate it in
+      // custom. Just store its tags so it filters correctly.
       if (!isDefault && !isCustom) {
         nextCustom.push(name);
       }
 
-      // Guardamos (o actualizamos) sus tags.
       if (cats.length > 0) {
         nextCustomTags[name] = cats;
       } else {
         delete nextCustomTags[name];
       }
 
-      // Desocultamos si estaba oculto.
+      // Unhide if it was hidden.
       const hiddenIdx = nextHidden.indexOf(name);
       if (hiddenIdx >= 0) nextHidden.splice(hiddenIdx, 1);
 
-      nextPuestos.custom = nextCustom;
-      nextPuestos.customTags = nextCustomTags;
-      nextPuestos.hidden = nextHidden;
+      nextRoles.custom = nextCustom;
+      nextRoles.customTags = nextCustomTags;
+      nextRoles.hidden = nextHidden;
 
-      return { ...c, puestos: nextPuestos };
+      return { ...c, roles: nextRoles };
     });
 
     if (!isDefault && !isCustom) {
-      showToast(t('toast.puestoCreated', { name }), '✨');
+      showToast(t('toast.roleCreated', { name }), '✨');
     }
 
     return name;
   }
 
-  return { open, requestNewPuesto };
+  return { open, requestNewRole };
 }

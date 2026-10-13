@@ -45,7 +45,7 @@
 
 @keyframes toastIn {
   from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes toastOut {
@@ -53,8 +53,8 @@
 }
 
 /* ============================================================
-   Reset animation: overlay de reinicio con anillo de progreso
-   Escala C (~1.5x) · consistente con el loading overlay
+   Reset animation: full-screen overlay with a progress ring
+   Scale C (~1.5x) · consistent with the boot overlay
    ============================================================ */
 
 .reset-overlay {
@@ -93,7 +93,7 @@
   max-width: 520px;
 }
 
-/* --- Anillo --- */
+/* --- Ring --- */
 .reset-ring {
   width: 144px;
   height: 144px;
@@ -140,7 +140,7 @@
   letter-spacing: -0.02em;
 }
 
-/* --- Textos --- */
+/* --- Labels --- */
 .reset-label {
   font-size: 1.4rem;
   font-weight: 800;

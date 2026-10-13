@@ -1,5 +1,5 @@
 // ============================================================
-// Entry point for the login screen (mocked single-user auth)
+// Entry point for the login screen (mocked single-user auth).
 // ============================================================
 
 import { applyI18n, setLanguage, t } from '../i18n.js';
@@ -14,13 +14,14 @@ import {
 import { mountInputLimits } from '../ui/inputLimits.js';
 
 // ------------------------------------------------------------
-// Read persisted config (logo + language + background)
+// Persisted config reader (logo, language, background)
 // ------------------------------------------------------------
 function readConfig() {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.CONFIG);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
+    // Support both wrapped ({ version, data }) and flat shapes.
     return parsed && typeof parsed === 'object' && 'data' in parsed
       ? parsed.data
       : parsed;
@@ -30,7 +31,7 @@ function readConfig() {
 }
 
 // ------------------------------------------------------------
-// Theme toggle
+// Theme
 // ------------------------------------------------------------
 function mountTheme() {
   const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
@@ -81,7 +82,7 @@ function mountTabs() {
 }
 
 // ------------------------------------------------------------
-// Password toggle
+// Password visibility toggles
 // ------------------------------------------------------------
 function mountPasswordToggles() {
   document.querySelectorAll('.pw-toggle').forEach(btn => {
@@ -137,7 +138,7 @@ function mountForms() {
     return;
   }
 
-  // Estado inicial: si ya está bloqueado, mostrarlo.
+  // If a lockout is already active on page load, surface it.
   if (getLockoutRemainingMs() > 0) {
     const mins = Math.ceil(getLockoutRemainingMs() / 60000);
     setLoginDisabled(true, t('auth.error.locked', { min: mins }));
@@ -196,7 +197,7 @@ function mountForms() {
 }
 
 // ------------------------------------------------------------
-// Socials (stubs)
+// Social sign-in stubs
 // ------------------------------------------------------------
 function mountSocials() {
   document.querySelectorAll('.btn-social').forEach(btn => {
@@ -211,7 +212,7 @@ function mountSocials() {
 // Boot
 // ------------------------------------------------------------
 async function boot() {
-  // 1) Config visual primero (logo / fondo / idioma) — no crítico.
+  // 1) Visual config first (logo / background / language) — non-critical.
   try {
     const config = readConfig();
     setLanguage(config.lang || DEFAULT_LANG);
@@ -222,8 +223,8 @@ async function boot() {
     console.error('[Login] config boot failed', err);
   }
 
-  // 2) Montar UI del login SIEMPRE, antes de cualquier redirección.
-  //    Así el formulario queda funcional pase lo que pase después.
+  // 2) Mount the login UI *before* any redirect so a failing redirect
+  //    cannot leave the screen without listeners.
   try {
     mountTheme();
     mountTabs();
@@ -235,9 +236,7 @@ async function boot() {
     console.error('[Login] UI mount failed', err);
   }
 
-  // 3) Si ya hay sesión válida, ir a la app.
-  //    Ojo: esto corre DESPUÉS de montar el form, para que un fallo
-  //    acá no deje la pantalla sin listener.
+  // 3) If a valid session exists, jump to the app.
   let shouldRedirect = false;
   try {
     shouldRedirect = await redirectIfAuthenticated('./index.html');

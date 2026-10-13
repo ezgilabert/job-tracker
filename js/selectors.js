@@ -14,52 +14,52 @@ import { ensureArray } from './utils.js';
 // ------------------------------------------------------------
 // Jobs
 // ------------------------------------------------------------
-export function isClosed(estado) {
-  return CLOSED_STATES.includes(estado);
+export function isClosed(status) {
+  return CLOSED_STATES.includes(status);
 }
 
-export function stepIndex(estado) {
-  return WORKFLOW_STEPS.findIndex(s => s.id === estado);
+export function stepIndex(status) {
+  return WORKFLOW_STEPS.findIndex(s => s.id === status);
 }
 
-export function progressPct(estado) {
-  if (isClosed(estado)) return 100;
-  const idx = stepIndex(estado);
+export function progressPct(status) {
+  if (isClosed(status)) return 100;
+  const idx = stepIndex(status);
   if (idx < 0) return 0;
   return Math.round(((idx + 1) / WORKFLOW_STEPS.length) * 100);
 }
 
 export function computeStats(jobs) {
-  const byState = {};
-  ALL_STATES.forEach(s => { byState[s] = 0; });
+  const byStatus = {};
+  ALL_STATES.forEach(s => { byStatus[s] = 0; });
   jobs.forEach(j => {
-    if (byState[j.estado] !== undefined) byState[j.estado]++;
+    if (byStatus[j.status] !== undefined) byStatus[j.status]++;
   });
 
   const inProcess =
-    byState['Contacto'] +
-    byState['Entrevista RRHH'] +
-    byState['Challenge técnico'] +
-    byState['Live coding'] +
-    byState['Entrevista Técnica'] +
-    byState['Entrevista con cliente'] +
-    byState['Charla con cliente'] +
-    byState['Entrevista Final'] +
-    byState['Referencias'] +
-    byState['Negociación'];
+    byStatus['Contact'] +
+    byStatus['HR Interview'] +
+    byStatus['Technical Challenge'] +
+    byStatus['Live Coding'] +
+    byStatus['Technical Interview'] +
+    byStatus['Client Interview'] +
+    byStatus['Client Chat'] +
+    byStatus['Final Interview'] +
+    byStatus['References'] +
+    byStatus['Negotiation'];
 
   const active =
-    byState['Guardado'] + byState['Aplicado'] + inProcess + byState['Oferta'];
+    byStatus['Saved'] + byStatus['Applied'] + inProcess + byStatus['Offer'];
   const closed =
-    byState['Rechazado'] + byState['Ghosted'] + byState['Descartado'];
+    byStatus['Rejected'] + byStatus['Ghosted'] + byStatus['Discarded'];
 
   return {
     total: jobs.length,
-    activos: active,
-    enProceso: inProcess,
-    ofertas: byState['Oferta'],
-    cerradas: closed,
-    porEstado: byState,
+    active,
+    inProcess,
+    offers: byStatus['Offer'],
+    closed,
+    byStatus,
   };
 }
 
@@ -73,45 +73,45 @@ export function filterJobs(jobs, filter, searchTerm = '') {
   if (filter === 'all') {
     // no status filter
   } else if (filter === 'active') {
-    out = out.filter(j => !isClosed(j.estado));
+    out = out.filter(j => !isClosed(j.status));
   } else if (filter === 'closed') {
-    out = out.filter(j => isClosed(j.estado));
+    out = out.filter(j => isClosed(j.status));
   } else {
-    out = out.filter(j => j.estado === filter);
+    out = out.filter(j => j.status === filter);
   }
 
   const q = searchTerm.trim().toLowerCase();
   if (q) {
     out = out.filter(j =>
-      (j.empresa  || '').toLowerCase().includes(q) ||
-      (j.puesto   || '').toLowerCase().includes(q) ||
-      (j.contacto || '').toLowerCase().includes(q) ||
-      (j.notas    || '').toLowerCase().includes(q) ||
-      (j.salario  || '').toLowerCase().includes(q)
+      (j.company || '').toLowerCase().includes(q) ||
+      (j.role    || '').toLowerCase().includes(q) ||
+      (j.contact || '').toLowerCase().includes(q) ||
+      (j.notes   || '').toLowerCase().includes(q) ||
+      (j.salary  || '').toLowerCase().includes(q)
     );
   }
 
   return out;
 }
 
-function advanceRank(estado) {
-  if (estado === 'Oferta') return 1000;
-  const idx = stepIndex(estado);
+function advanceRank(status) {
+  if (status === 'Offer') return 1000;
+  const idx = stepIndex(status);
   if (idx >= 0) return idx;
-  if (estado === 'Rechazado') return -1;
-  if (estado === 'Ghosted') return -2;
-  if (estado === 'Descartado') return -3;
+  if (status === 'Rejected') return -1;
+  if (status === 'Ghosted') return -2;
+  if (status === 'Discarded') return -3;
   return -10;
 }
 
 /** Most advanced first; ties broken by newer date/id. */
 export function sortJobs(jobs) {
   return [...jobs].sort((a, b) => {
-    const ra = advanceRank(a.estado);
-    const rb = advanceRank(b.estado);
+    const ra = advanceRank(a.status);
+    const rb = advanceRank(b.status);
     if (rb !== ra) return rb - ra;
-    const da = a.fecha || '';
-    const db = b.fecha || '';
+    const da = a.date || '';
+    const db = b.date || '';
     if (db !== da) return db.localeCompare(da);
     return (b.id || 0) - (a.id || 0);
   });
@@ -120,7 +120,7 @@ export function sortJobs(jobs) {
 export function currentStepNote(job) {
   const hist = ensureArray(job.history);
   for (let i = hist.length - 1; i >= 0; i--) {
-    if (hist[i].estado === job.estado && hist[i].nota) return hist[i].nota;
+    if (hist[i].status === job.status && hist[i].note) return hist[i].note;
   }
   return null;
 }
@@ -133,36 +133,36 @@ export function lastHistoryEntry(job) {
 // ------------------------------------------------------------
 // Referrals
 // ------------------------------------------------------------
-export function isRefClosed(estado) {
-  return REF_CLOSED_STATES.includes(estado);
+export function isRefClosed(status) {
+  return REF_CLOSED_STATES.includes(status);
 }
 
-export function refStepIndex(estado) {
-  return REF_WORKFLOW_STEPS.findIndex(s => s.id === estado);
+export function refStepIndex(status) {
+  return REF_WORKFLOW_STEPS.findIndex(s => s.id === status);
 }
 
 export function filterRefs(refs, filter, searchTerm = '') {
   let out = refs;
-  if (filter !== 'all') out = out.filter(r => r.estado === filter);
+  if (filter !== 'all') out = out.filter(r => r.status === filter);
   const q = searchTerm.trim().toLowerCase();
   if (q) {
     out = out.filter(r =>
-      (r.nombre || '').toLowerCase().includes(q) ||
-      (r.rol || '').toLowerCase().includes(q) ||
-      (r.contacto || '').toLowerCase().includes(q) ||
-      (r.notas || '').toLowerCase().includes(q) ||
-      (r.empresasVinculadas || []).some(e => e.toLowerCase().includes(q))
+      (r.name || '').toLowerCase().includes(q) ||
+      (r.role || '').toLowerCase().includes(q) ||
+      (r.contact || '').toLowerCase().includes(q) ||
+      (r.notes || '').toLowerCase().includes(q) ||
+      (r.linkedCompanies || []).some(e => e.toLowerCase().includes(q))
     );
   }
   return out;
 }
 
-export function refsForCompany(refs, empresa) {
+export function refsForCompany(refs, company) {
   return refs.filter(r =>
-    Array.isArray(r.empresasVinculadas) && r.empresasVinculadas.includes(empresa)
+    Array.isArray(r.linkedCompanies) && r.linkedCompanies.includes(company)
   );
 }
 
 export function uniqueCompanies(jobs) {
-  return [...new Set(jobs.map(j => j.empresa).filter(Boolean))];
+  return [...new Set(jobs.map(j => j.company).filter(Boolean))];
 }

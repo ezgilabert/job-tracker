@@ -3,83 +3,83 @@
 // ============================================================
 
 export const WORKFLOW_STEPS = [
-  { id: 'Guardado',               short: 'Guardado',     icon: '🔖' },
-  { id: 'Aplicado',               short: 'Aplicado',     icon: '📤' },
-  { id: 'Contacto',               short: 'Contacto',     icon: '💬' },
-  { id: 'Entrevista RRHH',        short: 'RRHH',         icon: '👤' },
-  { id: 'Challenge técnico',      short: 'Challenge',    icon: '🧪' },
-  { id: 'Live coding',            short: 'Live coding',  icon: '⌨️' },
-  { id: 'Entrevista Técnica',     short: 'Técnica',      icon: '💻' },
-  { id: 'Entrevista con cliente', short: 'Entrev. cli.', icon: '🤝' },
-  { id: 'Charla con cliente',     short: 'Charla cli.',  icon: '☕' },
-  { id: 'Entrevista Final',       short: 'Final',        icon: '🎤' },
-  { id: 'Referencias',            short: 'Referencias',  icon: '📞' },
-  { id: 'Negociación',            short: 'Negociación',  icon: '💼' },
-  { id: 'Oferta',                 short: 'Oferta',       icon: '🎉' },
+  { id: 'Saved',               short: 'Saved',       icon: '🔖' },
+  { id: 'Applied',             short: 'Applied',     icon: '📤' },
+  { id: 'Contact',             short: 'Contact',     icon: '💬' },
+  { id: 'HR Interview',        short: 'HR',          icon: '👤' },
+  { id: 'Technical Challenge', short: 'Challenge',   icon: '🧪' },
+  { id: 'Live Coding',         short: 'Live Coding', icon: '⌨️' },
+  { id: 'Technical Interview', short: 'Technical',   icon: '💻' },
+  { id: 'Client Interview',    short: 'Client Int.', icon: '🤝' },
+  { id: 'Client Chat',         short: 'Client Chat', icon: '☕' },
+  { id: 'Final Interview',     short: 'Final',       icon: '🎤' },
+  { id: 'References',          short: 'References',  icon: '📞' },
+  { id: 'Negotiation',         short: 'Negotiation', icon: '💼' },
+  { id: 'Offer',               short: 'Offer',       icon: '🎉' },
 ];
 
-export const CLOSED_STATES = ['Rechazado', 'Ghosted', 'Descartado'];
+export const CLOSED_STATES = ['Rejected', 'Ghosted', 'Discarded'];
 export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 
 export const STATE_ICONS = {
-  'Guardado':                '🔖',
-  'Aplicado':                '📤',
-  'Contacto':                '💬',
-  'Entrevista RRHH':         '👤',
-  'Challenge técnico':       '🧪',
-  'Live coding':             '⌨️',
-  'Entrevista Técnica':      '💻',
-  'Entrevista con cliente':  '🤝',
-  'Charla con cliente':      '☕',
-  'Entrevista Final':        '🎤',
-  'Referencias':             '📞',
-  'Negociación':             '💼',
-  'Oferta':                  '🎉',
-  'Rechazado':               '✕',
-  'Ghosted':                 '👻',
-  'Descartado':              '🚫',
+  'Saved':               '🔖',
+  'Applied':             '📤',
+  'Contact':             '💬',
+  'HR Interview':        '👤',
+  'Technical Challenge': '🧪',
+  'Live Coding':         '⌨️',
+  'Technical Interview': '💻',
+  'Client Interview':    '🤝',
+  'Client Chat':         '☕',
+  'Final Interview':     '🎤',
+  'References':          '📞',
+  'Negotiation':         '💼',
+  'Offer':               '🎉',
+  'Rejected':            '✕',
+  'Ghosted':             '👻',
+  'Discarded':           '🚫',
 };
 
-export function getStateIcon(estado) {
-  return STATE_ICONS[estado] || '•';
+export function getStateIcon(status) {
+  return STATE_ICONS[status] || '•';
 }
 
 export const REF_WORKFLOW_STEPS = [
-  { id: 'Pendiente',      short: 'Pendiente' },
-  { id: 'Contactado',     short: 'Contactado' },
-  { id: 'Referido hecho', short: 'Referido' },
-  { id: 'En proceso',     short: 'En proceso' },
-  { id: 'Contratado',     short: 'Contratado' },
+  { id: 'Pending',         short: 'Pending' },
+  { id: 'Contacted',       short: 'Contacted' },
+  { id: 'Referred',        short: 'Referred' },
+  { id: 'In Process',      short: 'In Process' },
+  { id: 'Hired',           short: 'Hired' },
 ];
 
-export const REF_CLOSED_STATES = ['No aplica'];
+export const REF_CLOSED_STATES = ['Not Applicable'];
 export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOSED_STATES];
 
 export const REF_STATE_ICONS = {
-  'Pendiente':       '⏳',
-  'Contactado':      '💬',
-  'Referido hecho':  '✅',
-  'En proceso':      '⏱️',
-  'Contratado':      '🎉',
-  'No aplica':       '🚫',
+  'Pending':        '⏳',
+  'Contacted':      '💬',
+  'Referred':       '✅',
+  'In Process':     '⏱️',
+  'Hired':          '🎉',
+  'Not Applicable': '🚫',
 };
 
-export function getRefStateIcon(estado) {
-  return REF_STATE_ICONS[estado] || '•';
+export function getRefStateIcon(status) {
+  return REF_STATE_ICONS[status] || '•';
 }
 
 export const CLOSE_REASONS = {
-  'Oferta':     ['Acepté la oferta', 'Recibí una mejor oferta', 'Fue mi primera opción'],
-  'Rechazado':  ['No avanzó mi perfil', 'Faltó experiencia técnica', 'Eligieron a otro candidato', 'No cumplía requisitos', 'Pretensión salarial'],
-  'Ghosted':    ['Dejaron de responder', 'Nunca dieron feedback', 'Se enfrió el proceso'],
-  'Descartado': ['Me arrepentí', 'No me convenció la empresa', 'Pausé la búsqueda', 'La ubicación no servía'],
+  'Offer':     ['I accepted the offer', 'Got a better offer', 'It was my first choice'],
+  'Rejected':  ["They didn't move forward", 'Lacked technical experience', 'Chose another candidate', "Didn't meet requirements", 'Salary expectations'],
+  'Ghosted':   ['Stopped responding', 'Never got feedback', 'The process went cold'],
+  'Discarded': ['I changed my mind', "I didn't like the company", 'Paused my search', 'Location was a dealbreaker'],
 };
 
 export const LOGO_OPTIONS = [
   {
-    id: 'diana',
-    label: 'Diana',
-    description: 'Flecha apuntando al centro',
+    id: 'target',
+    label: 'Target',
+    description: 'Arrow pointing to the center',
     svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9"/>
       <circle cx="12" cy="12" r="5"/>
@@ -89,9 +89,9 @@ export const LOGO_OPTIONS = [
     </svg>`,
   },
   {
-    id: 'maletin',
-    label: 'Maletín',
-    description: 'Ícono clásico de trabajo',
+    id: 'briefcase',
+    label: 'Briefcase',
+    description: 'Classic work icon',
     svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="3" y="7" width="18" height="13" rx="2"/>
       <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -101,7 +101,7 @@ export const LOGO_OPTIONS = [
   },
 ];
 
-export const DEFAULT_LOGO = 'diana';
+export const DEFAULT_LOGO = 'target';
 export const DEFAULT_LANG = 'es';
 
 // ============================================================
@@ -109,17 +109,17 @@ export const DEFAULT_LANG = 'es';
 // ============================================================
 
 export const BACKGROUND_OPTIONS = [
-  { id: 'aurora',  label: 'Aurora',     description: 'Manchas de color animadas y borrosas' },
-  { id: 'mesh',    label: 'Mesh',       description: 'Gradiente estático suave, sin animación' },
-  { id: 'grid',    label: 'Grid',       description: 'Cuadrícula fina con foco radial' },
-  { id: 'dots',    label: 'Puntos',     description: 'Patrón de puntos minimalista' },
-  { id: 'waves',   label: 'Olas',       description: 'Dos manchas de color que se mueven lentamente' },
-  { id: 'conic',   label: 'Conic',      description: 'Gradiente cónico girando lentamente' },
-  { id: 'noise',   label: 'Grano',      description: 'Textura sutil de ruido sobre gradiente' },
-  { id: 'stripes', label: 'Rayas',      description: 'Líneas diagonales finas' },
-  { id: 'cosmos',  label: 'Cosmos',     description: 'Cielo nocturno con estrellas. Ideal para modo oscuro' },
-  { id: 'blobs',   label: 'Blobs',      description: 'Dos manchas grandes que flotan lentamente' },
-  { id: 'none',    label: 'Sin fondo',  description: 'Fondo plano por defecto' },
+  { id: 'aurora',  label: 'Aurora',    description: 'Animated soft color blobs' },
+  { id: 'mesh',    label: 'Mesh',      description: 'Static soft gradient, no animation' },
+  { id: 'grid',    label: 'Grid',      description: 'Fine grid with a radial focus' },
+  { id: 'dots',    label: 'Dots',      description: 'Minimal dot pattern' },
+  { id: 'waves',   label: 'Waves',     description: 'Two slowly moving color blobs' },
+  { id: 'conic',   label: 'Conic',     description: 'Slowly rotating conic gradient' },
+  { id: 'noise',   label: 'Noise',     description: 'Subtle grain texture over a gradient' },
+  { id: 'stripes', label: 'Stripes',   description: 'Thin diagonal lines' },
+  { id: 'cosmos',  label: 'Cosmos',    description: 'Starry sky. Best in dark mode' },
+  { id: 'blobs',   label: 'Blobs',     description: 'Two large blobs drifting slowly' },
+  { id: 'none',    label: 'No background', description: 'Flat default background' },
 ];
 
 export const DEFAULT_BACKGROUND = 'aurora';
@@ -133,7 +133,7 @@ export function applyBackground(bgId) {
 }
 
 // ============================================================
-// ⭐ CAMBIO: Dashboard styles — ahora 6 opciones
+// Dashboard styles
 // ============================================================
 
 export const DASHBOARD_STYLES = [
@@ -147,45 +147,14 @@ export const DASHBOARD_STYLES = [
 
 export const DEFAULT_DASHBOARD_STYLE = 'sparklines';
 
-// Metadata para renderizar el selector en configuración.
-// Los `labelKey` y `descKey` apuntan a i18n.
+/** Metadata used by the config panel to render the style picker. */
 export const DASHBOARD_STYLE_META = [
-  {
-    id: 'sparklines',
-    labelKey: 'config.dashboard.sparklines',
-    descKey:  'config.dashboard.sparklinesDesc',
-    preview:  'dash-prev-spark',
-  },
-  {
-    id: 'modular',
-    labelKey: 'config.dashboard.modular',
-    descKey:  'config.dashboard.modularDesc',
-    preview:  'dash-prev-mod',
-  },
-  {
-    id: 'minimal',
-    labelKey: 'config.dashboard.minimal',
-    descKey:  'config.dashboard.minimalDesc',
-    preview:  'dash-prev-minimal',
-  },
-  {
-    id: 'compact',
-    labelKey: 'config.dashboard.compact',
-    descKey:  'config.dashboard.compactDesc',
-    preview:  'dash-prev-compact',
-  },
-  {
-    id: 'circular',
-    labelKey: 'config.dashboard.circular',
-    descKey:  'config.dashboard.circularDesc',
-    preview:  'dash-prev-circular',
-  },
-  {
-    id: 'heatmap',
-    labelKey: 'config.dashboard.heatmap',
-    descKey:  'config.dashboard.heatmapDesc',
-    preview:  'dash-prev-heatmap',
-  },
+  { id: 'sparklines', labelKey: 'config.dashboard.sparklines', descKey: 'config.dashboard.sparklinesDesc', preview: 'dash-prev-spark' },
+  { id: 'modular',    labelKey: 'config.dashboard.modular',    descKey: 'config.dashboard.modularDesc',    preview: 'dash-prev-mod' },
+  { id: 'minimal',    labelKey: 'config.dashboard.minimal',    descKey: 'config.dashboard.minimalDesc',    preview: 'dash-prev-minimal' },
+  { id: 'compact',    labelKey: 'config.dashboard.compact',    descKey: 'config.dashboard.compactDesc',    preview: 'dash-prev-compact' },
+  { id: 'circular',   labelKey: 'config.dashboard.circular',   descKey: 'config.dashboard.circularDesc',   preview: 'dash-prev-circular' },
+  { id: 'heatmap',    labelKey: 'config.dashboard.heatmap',    descKey: 'config.dashboard.heatmapDesc',    preview: 'dash-prev-heatmap' },
 ];
 
 // ============================================================
@@ -193,23 +162,23 @@ export const DASHBOARD_STYLE_META = [
 // ============================================================
 
 export const ROLE_TAGS_LIST = [
-  { id: 'programador', label: 'Programador', icon: '💻' },
-  { id: 'frontend',    label: 'Frontend',    icon: '🎨' },
-  { id: 'backend',     label: 'Backend',     icon: '⚙️' },
-  { id: 'fullstack',   label: 'Full Stack',  icon: '🧩' },
-  { id: 'mobile',      label: 'Mobile',      icon: '📱' },
-  { id: 'qa',          label: 'QA',          icon: '🧪' },
-  { id: 'devops',      label: 'DevOps',      icon: '🚀' },
-  { id: 'data',        label: 'Data / IA',   icon: '📊' },
-  { id: 'security',    label: 'Seguridad',   icon: '🔒' },
-  { id: 'liderazgo',   label: 'Liderazgo',   icon: '👑' },
-  { id: 'gamedev',     label: 'Game Dev',    icon: '🎮' },
+  { id: 'programmer', label: 'Programmer',  icon: '💻' },
+  { id: 'frontend',   label: 'Frontend',    icon: '🎨' },
+  { id: 'backend',    label: 'Backend',     icon: '⚙️' },
+  { id: 'fullstack',  label: 'Full Stack',  icon: '🧩' },
+  { id: 'mobile',     label: 'Mobile',      icon: '📱' },
+  { id: 'qa',         label: 'QA',          icon: '🧪' },
+  { id: 'devops',     label: 'DevOps',      icon: '🚀' },
+  { id: 'data',       label: 'Data / AI',   icon: '📊' },
+  { id: 'security',   label: 'Security',    icon: '🔒' },
+  { id: 'leadership', label: 'Leadership',  icon: '👑' },
+  { id: 'gamedev',    label: 'Game Dev',    icon: '🎮' },
 ];
 
-export const NO_PUESTO_VALUE = 'No especificado';
+export const NO_ROLE_VALUE = 'Not specified';
 
 export const DEFAULT_ROLES = [
-  NO_PUESTO_VALUE,
+  NO_ROLE_VALUE,
   'Software Engineer', 'Software Developer',
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
   'Web Developer', 'Mobile Developer', 'iOS Developer', 'Android Developer',
@@ -225,30 +194,30 @@ export const DEFAULT_ROLES = [
 ];
 
 export const ROLE_TAGS = {
-  'Software Engineer':          ['programador'],
-  'Software Developer':         ['programador'],
-  'Frontend Developer':         ['programador', 'frontend'],
-  'Backend Developer':          ['programador', 'backend'],
-  'Full Stack Developer':       ['programador', 'fullstack'],
-  'Web Developer':              ['programador', 'frontend'],
-  'Mobile Developer':           ['programador', 'mobile'],
-  'iOS Developer':              ['programador', 'mobile'],
-  'Android Developer':          ['programador', 'mobile'],
-  'Java Developer':             ['programador', 'backend'],
-  'JavaScript Developer':       ['programador', 'frontend'],
-  'TypeScript Developer':       ['programador'],
-  'Python Developer':           ['programador', 'backend'],
-  'Node.js Developer':          ['programador', 'backend'],
-  'React Developer':            ['programador', 'frontend'],
-  'Angular Developer':          ['programador', 'frontend'],
-  'Vue.js Developer':           ['programador', 'frontend'],
-  '.NET Developer':             ['programador', 'backend'],
-  'PHP Developer':              ['programador', 'backend'],
-  'Go Developer':               ['programador', 'backend'],
-  'Ruby Developer':             ['programador', 'backend'],
-  'C++ Developer':              ['programador', 'backend'],
-  'Embedded Software Engineer': ['programador'],
-  'Game Developer':             ['programador', 'gamedev'],
+  'Software Engineer':          ['programmer'],
+  'Software Developer':         ['programmer'],
+  'Frontend Developer':         ['programmer', 'frontend'],
+  'Backend Developer':          ['programmer', 'backend'],
+  'Full Stack Developer':       ['programmer', 'fullstack'],
+  'Web Developer':              ['programmer', 'frontend'],
+  'Mobile Developer':           ['programmer', 'mobile'],
+  'iOS Developer':              ['programmer', 'mobile'],
+  'Android Developer':          ['programmer', 'mobile'],
+  'Java Developer':             ['programmer', 'backend'],
+  'JavaScript Developer':       ['programmer', 'frontend'],
+  'TypeScript Developer':       ['programmer'],
+  'Python Developer':           ['programmer', 'backend'],
+  'Node.js Developer':          ['programmer', 'backend'],
+  'React Developer':            ['programmer', 'frontend'],
+  'Angular Developer':          ['programmer', 'frontend'],
+  'Vue.js Developer':           ['programmer', 'frontend'],
+  '.NET Developer':             ['programmer', 'backend'],
+  'PHP Developer':              ['programmer', 'backend'],
+  'Go Developer':               ['programmer', 'backend'],
+  'Ruby Developer':             ['programmer', 'backend'],
+  'C++ Developer':              ['programmer', 'backend'],
+  'Embedded Software Engineer': ['programmer'],
+  'Game Developer':             ['programmer', 'gamedev'],
   'QA Automation Engineer':     ['qa'],
   'DevOps Engineer':            ['devops'],
   'SRE':                        ['devops'],
@@ -258,7 +227,7 @@ export const ROLE_TAGS = {
   'Security Engineer':          ['security'],
   'Cloud Engineer':             ['devops'],
   'Platform Engineer':          ['devops'],
-  'Tech Lead':                  ['liderazgo'],
+  'Tech Lead':                  ['leadership'],
 };
 
 export const ROLE_ICONS = {
@@ -273,9 +242,9 @@ export const ROLE_ICONS = {
 };
 
 export const CONFIG_FILTER_META = {
-  'all':    { label: 'Todas',    icon: '🗂️' },
-  'active': { label: 'Activas',  icon: '🔥' },
-  'closed': { label: 'Cerradas', icon: '📦' },
+  'all':    { label: 'All',    icon: '🗂️' },
+  'active': { label: 'Active', icon: '🔥' },
+  'closed': { label: 'Closed', icon: '📦' },
 };
 
 export function getDefaultConfig() {
@@ -283,39 +252,38 @@ export function getDefaultConfig() {
     lang: DEFAULT_LANG,
     logo: DEFAULT_LOGO,
     background: DEFAULT_BACKGROUND,
-    // ⭐ CAMBIO: estilos de dashboard separados para jobs y refs
     dashboardStyleJobs: DEFAULT_DASHBOARD_STYLE,
     dashboardStyleRefs: DEFAULT_DASHBOARD_STYLE,
     profile: {
-      nombre: '',
-      apellido: '',
+      firstName: '',
+      lastName: '',
       username: '',
       email: '',
       bio: '',
       avatar: '',
     },
-    puestos: {
+    roles: {
       activeTags: ROLE_TAGS_LIST.map(t => t.id),
       hidden: [],
       custom: [],
       customTags: {},
     },
-    estadosIniciales: WORKFLOW_STEPS.map(s => s.id),
-    estadoInicialDefault: 'Aplicado',
-    filtros: [
+    initialStatuses: WORKFLOW_STEPS.map(s => s.id),
+    defaultInitialStatus: 'Applied',
+    filters: [
       { id: 'all',                visible: true },
       { id: 'active',             visible: true },
-      { id: 'Guardado',           visible: true },
-      { id: 'Aplicado',           visible: true },
-      { id: 'Contacto',           visible: true },
-      { id: 'Entrevista RRHH',    visible: true },
-      { id: 'Challenge técnico',  visible: true },
-      { id: 'Live coding',        visible: true },
-      { id: 'Entrevista Técnica', visible: true },
-      { id: 'Charla con cliente', visible: true },
-      { id: 'Referencias',        visible: true },
-      { id: 'Negociación',        visible: true },
-      { id: 'Oferta',             visible: true },
+      { id: 'Saved',              visible: true },
+      { id: 'Applied',            visible: true },
+      { id: 'Contact',            visible: true },
+      { id: 'HR Interview',       visible: true },
+      { id: 'Technical Challenge', visible: true },
+      { id: 'Live Coding',        visible: true },
+      { id: 'Technical Interview', visible: true },
+      { id: 'Client Chat',        visible: true },
+      { id: 'References',         visible: true },
+      { id: 'Negotiation',        visible: true },
+      { id: 'Offer',              visible: true },
       { id: 'closed',             visible: true },
     ],
   }));
@@ -323,15 +291,13 @@ export function getDefaultConfig() {
 
 export const STORAGE_KEYS = {
   JOBS: 'jobTrackerV2',
-  REFS: 'jobTrackerReferidos',
+  REFS: 'jobTrackerReferrals',
   THEME: 'jobTrackerTheme',
   CONFIG: 'jobTrackerConfig',
 };
 
-// ⭐ CAMBIO: bump de versión por el multiselect de relación
-export const STORAGE_VERSION = 4;
-// ⭐ CAMBIO: subimos la versión del config para forzar la migración
-export const CONFIG_VERSION = 2;
+export const STORAGE_VERSION = 5;
+export const CONFIG_VERSION = 3;
 
 // ============================================================
 // Backup / Import
@@ -339,6 +305,29 @@ export const CONFIG_VERSION = 2;
 export const BACKUP_APP_ID = 'jobTracker';
 export const BACKUP_VERSION = 1;
 
+// Sample data shown to first-time users.
 export const SAMPLE_JOBS = [
-  // ... (unchanged)
+  {
+    id: 1,
+    company: 'Acme Corp',
+    role: 'Frontend Developer',
+    date: '2025-01-15',
+    status: 'Applied',
+    link: 'https://example.com/jobs/frontend-developer',
+    salary: 'USD 4.000 – 5.500',
+    hourlySalary: false,
+    salaryIsRange: true,
+    currency: 'usd',
+    workMode: 'hybrid',
+    hybridOfficeDays: 3,
+    contact: 'Maria Lopez (Recruiter)',
+    contactLink: 'https://linkedin.com/in/maria-lopez',
+    contactPlatform: 'linkedin',
+    notes: 'Referred by a former colleague. Follow up next week.',
+    skipped: [],
+    wentBack: false,
+    history: [
+      { status: 'Applied', date: '2025-01-15T12:00:00.000Z' },
+    ],
+  },
 ];

@@ -1,5 +1,5 @@
 // ============================================================
-// Reactive store with localStorage persistence and migration
+// Reactive store with localStorage persistence and migration.
 // ============================================================
 
 export class Store {
@@ -8,7 +8,7 @@ export class Store {
    * @param {any} initialValue  default value
    * @param {{
    *   version?: number,
-   *   migrate?: (data:any, from:number, to:number)=>any,
+   *   migrate?: (data: any, from: number, to: number) => any,
    *   seed?: () => any,
    * }} opts
    */
@@ -30,7 +30,7 @@ export class Store {
       console.warn(`[Store:${this.key}] corrupt JSON, ignored`, e);
     }
 
-    // No stored data → seed or default
+    // Nothing stored yet: seed or use the default.
     if (stored === null) {
       const data = this.seed ? this.seed() : initialValue;
       const wrapped = { version: this.version, data };
@@ -38,7 +38,7 @@ export class Store {
       return wrapped;
     }
 
-    // Wrapped format { version, data }
+    // Wrapped format: { version, data }
     if (
       stored &&
       typeof stored === 'object' &&
@@ -53,7 +53,7 @@ export class Store {
       return stored;
     }
 
-    // Legacy flat array → migrate
+    // Legacy flat array: run the migration and rewrap.
     const data = this.migrate ? this.migrate(stored, 0, this.version) : stored;
     const wrapped = { version: this.version, data };
     this.#persistRaw(wrapped);
@@ -73,7 +73,7 @@ export class Store {
   }
 
   /**
-   * @param {(current:any)=>any} updater  must return the next state
+   * @param {(current: any) => any} updater  must return the next state
    */
   update(updater) {
     const next = updater(this.state.data);

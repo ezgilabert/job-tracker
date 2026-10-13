@@ -13,23 +13,23 @@ export function escapeHtml(str) {
   }[c]));
 }
 
-export function daysSince(fecha) {
-  if (!fecha) return null;
-  const iso = fecha.length === 10 ? fecha + 'T00:00:00' : fecha;
+export function daysSince(date) {
+  if (!date) return null;
+  const iso = date.length === 10 ? date + 'T00:00:00' : date;
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 }
 
-export function formatDate(fecha) {
-  if (!fecha) return '';
-  const iso = fecha.length === 10 ? fecha + 'T00:00:00' : fecha;
+export function formatDate(date) {
+  if (!date) return '';
+  const iso = date.length === 10 ? date + 'T00:00:00' : date;
   return new Date(iso).toLocaleDateString('es-AR', {
     day: '2-digit', month: 'short', year: 'numeric',
   });
 }
 
-export function formatDateTime(fechaISO) {
-  if (!fechaISO) return '';
-  const d = new Date(fechaISO);
+export function formatDateTime(isoString) {
+  if (!isoString) return '';
+  const d = new Date(isoString);
   if (isNaN(d.getTime())) return '';
   return d.toLocaleDateString('es-AR', {
     day: '2-digit',

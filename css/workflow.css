@@ -1,5 +1,5 @@
 /* ============================================================
-   Workflow: steps, progress, acciones, step-note
+   Workflow: steps, progress, actions, step-note
    ============================================================ */
 
 .workflow {
@@ -106,7 +106,7 @@
 
 @keyframes pulse {
   0%, 100% { box-shadow: 0 0 0 4px var(--accent-soft-2), 0 0 16px var(--accent-glow); }
-  50% { box-shadow: 0 0 0 6px rgba(124,92,255,0.12), 0 0 22px var(--accent-glow); }
+  50%      { box-shadow: 0 0 0 6px rgba(124,92,255,0.12), 0 0 22px var(--accent-glow); }
 }
 
 .step.current .step-label { color: var(--accent); font-weight: 700; }
@@ -136,8 +136,8 @@
   );
 }
 
-.step[data-step="Oferta"].done .step-dot,
-.step[data-step="Oferta"].current .step-dot {
+.step[data-step="Offer"].done .step-dot,
+.step[data-step="Offer"].current .step-dot {
   background: linear-gradient(135deg, #34d399, #10b981);
   box-shadow: 0 0 0 4px rgba(52,211,153,0.2), 0 0 14px rgba(52,211,153,0.4);
 }
@@ -181,7 +181,7 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 0% 50%; }
+  0%   { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
 }
 

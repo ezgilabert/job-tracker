@@ -2,7 +2,7 @@
    History: clickable status + stage timeline
    ============================================================ */
 
-/* ===== Clickable status (replaces the status-text) ===== */
+/* ===== Clickable status (replaces the plain status text) ===== */
 .status-clickable {
   display: inline-flex;
   align-items: center;
@@ -102,15 +102,15 @@
   color: var(--warning-2);
 }
 
-.history-item.closed-rechazado .history-dot,
+.history-item.closed-rejected .history-dot,
 .history-item.closed-ghosted .history-dot,
-.history-item.closed-descartado .history-dot {
+.history-item.closed-discarded .history-dot {
   background: var(--danger-soft);
   border-color: var(--danger-border);
   color: var(--danger-2);
 }
 
-.history-item.closed-oferta .history-dot {
+.history-item.closed-offer .history-dot {
   background: var(--success-soft);
   border-color: var(--success-border);
   color: var(--success-2);
@@ -129,7 +129,7 @@
   background: linear-gradient(135deg, var(--accent-soft), transparent);
 }
 
-.history-estado {
+.history-status {
   font-size: 0.92rem;
   font-weight: 700;
   color: var(--text);
@@ -139,14 +139,14 @@
   flex-wrap: wrap;
 }
 
-.history-fecha {
+.history-date {
   font-size: 0.75rem;
   color: var(--text-muted);
   margin-top: 0.2rem;
   font-weight: 500;
 }
 
-.history-motivo {
+.history-reason {
   margin-top: 0.55rem;
   padding: 0.5rem 0.75rem;
   background: var(--danger-soft);
@@ -157,7 +157,7 @@
   color: var(--text);
 }
 
-.history-nota {
+.history-note {
   margin-top: 0.55rem;
   padding: 0.5rem 0.75rem;
   background: var(--warning-soft);
@@ -168,7 +168,7 @@
   line-height: 1.4;
 }
 
-.history-nota strong {
+.history-note strong {
   color: var(--warning-2);
   font-size: 0.7rem;
   text-transform: uppercase;

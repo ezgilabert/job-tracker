@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Seguridad: CSP + metas defensivas -->
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'self';
                script-src 'self' 'unsafe-inline';
@@ -57,14 +56,13 @@
 <body class="auth-body">
 
 <!-- Theme toggle (top-right) -->
-<button class="icon-btn auth-theme-toggle" id="themeToggle" title="Cambiar tema" data-i18n-title="action.theme">
+<button class="icon-btn auth-theme-toggle" id="themeToggle" title="Switch theme" data-i18n-title="action.theme">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="4"/>
     <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
   </svg>
 </button>
 
-<!-- Centered card -->
 <main class="auth-screen">
   <div class="auth-card">
 
@@ -73,7 +71,7 @@
       <div class="brand-logo" id="brandLogo"></div>
       <div>
         <h1 data-i18n="app.name">Job Tracker</h1>
-        <p data-i18n="app.subtitle">Tu búsqueda laboral, organizada</p>
+        <p data-i18n="app.subtitle">Your job search, organized</p>
       </div>
     </div>
 
@@ -86,9 +84,9 @@
     <!-- Login form -->
     <form id="loginForm" novalidate>
       <div class="field">
-        <label for="loginEmail" data-i18n="auth.identifier">Usuario</label>
+        <label for="loginEmail" data-i18n="auth.identifier">Username</label>
         <input type="text" id="loginEmail" autocomplete="username"
-               placeholder="Usuario" data-i18n-placeholder="auth.identifier.placeholder">
+               placeholder="Username" data-i18n-placeholder="auth.identifier.placeholder">
       </div>
       <div class="field field-password">
         <label for="loginPassword" data-i18n="auth.password">Password</label>
@@ -111,7 +109,7 @@
       <button type="submit" class="btn btn-primary" data-i18n="auth.submit.login">Sign in</button>
     </form>
 
-    <!-- Register form (disabled in the mocked build) -->
+    <!-- Register form (disabled in this mocked build) -->
     <form id="registerForm" novalidate style="display:none;">
       <div class="field">
         <label for="registerName" data-i18n="auth.name">Name</label>
@@ -137,7 +135,7 @@
       <button type="submit" class="btn btn-primary" data-i18n="auth.submit.register">Create account</button>
     </form>
 
-    <!-- Social -->
+    <!-- Social sign-in (stubs) -->
     <div class="divider" data-i18n="auth.orContinue">or continue with</div>
     <div class="socials">
       <button type="button" class="btn-social" data-provider="google">

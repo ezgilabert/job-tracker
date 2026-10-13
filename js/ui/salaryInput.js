@@ -1,39 +1,38 @@
 // ============================================================
-// SalaryInput: input de salario con máscara auto-formato.
-//   - Sólo acepta dígitos.
-//   - Los separadores (puntos de miles y guión de rango) se
-//     insertan automáticamente y son inamovibles.
-//   - Cuando el input está vacío, muestra un "hint" con el
-//     formato esperado (ej: "3.000–4.000").
-//   - El formato depende de: modo (rango/único), moneda (ARS/USD)
-//     y frecuencia (por hora / mensual).
+// SalaryInput: salary input with auto-format mask.
+//   - Only digits are accepted.
+//   - Separators (thousand dots and range dash) are inserted
+//     automatically and cannot be moved.
+//   - When empty, shows a hint with the expected format
+//     (e.g. "3,000–4,000").
+//   - Format depends on: mode (range/single), currency (ARS/USD)
+//     and frequency (hourly / monthly).
 //
-// Uso:
+// Usage:
 //   const si = new SalaryInput(inputEl, hintEl, {
 //     getMode: () => 'range' | 'single',
 //     getCurrency: () => 'usd' | 'ars',
 //     getHourly: () => boolean,
 //     onChange: () => {},
 //   });
-//   si.getValue();    // '3.500 – 4.000'
-//   si.setValue('3.500 – 4.000');
-//   si.refresh();     // recalcula según los getters
-//   si.reset();       // vacía
+//   si.getValue();    // '3,500 – 4,000'
+//   si.setValue('3,500 – 4,000');
+//   si.refresh();     // recomputes from the getters
+//   si.reset();       // clears
 // ============================================================
 
 const FORMATS = {
   usd: {
-    monthly: { range: '3.000–4.000',         single: '3.500' },
+    monthly: { range: '3,000–4,000',         single: '3,500' },
     hourly:  { range: '25–35',               single: '30' },
   },
   ars: {
-    monthly: { range: '2.000.000–2.500.000', single: '2.200.000' },
-    hourly:  { range: '15.000–25.000',       single: '20.000' },
+    monthly: { range: '2,000,000–2,500,000', single: '2,200,000' },
+    hourly:  { range: '15,000–25,000',       single: '20,000' },
   },
 };
 
-// ← CAMBIO: símbolos de moneda. Cambiá estos valores si querés
-// usar "$", "U$S", etc. en vez de "ARS " / "USD ".
+// Currency symbols. Edit these if you prefer "$" or "U$S".
 const CURRENCY_SYMBOLS = {
   ars: 'ARS ',
   usd: 'USD ',
@@ -46,7 +45,7 @@ function countDigits(s) {
 function formatThousands(digits) {
   if (!digits) return '';
   digits = digits.replace(/^0+(?=\d)/, '');
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export class SalaryInput {
@@ -78,7 +77,7 @@ export class SalaryInput {
   }
 
   // ----------------------------------------------------------
-  // API pública
+  // Public API
   // ----------------------------------------------------------
   getValue() {
     return this.input.value;
@@ -90,8 +89,8 @@ export class SalaryInput {
   }
 
   refresh() {
-    // Si el contexto cambia y el formato nuevo tiene menos dígitos
-    // permitidos, recortamos.
+    // If the context changed and the new format allows fewer digits,
+    // truncate.
     const max = this._maxDigits();
     if (this.digits.length > max) {
       this.digits = this.digits.slice(0, max);
@@ -118,18 +117,15 @@ export class SalaryInput {
     return countDigits(this._format());
   }
 
-  // ← CAMBIO: prefijo de moneda según el chip activo
   _getSymbol() {
     return CURRENCY_SYMBOLS[this.getCurrency()] || '';
   }
 
-  // ← CAMBIO: ahora incluye el símbolo de moneda tanto en el hint
-  // como en el valor del input.
   _render() {
     const format = this._format();
     const symbol = this._getSymbol();
 
-    // Input vacío → hint visible
+    // Empty input → show hint.
     if (!this.digits) {
       this.input.value = '';
       if (this.hint) {
@@ -140,12 +136,12 @@ export class SalaryInput {
       return;
     }
 
-    // Hint oculto cuando hay dígitos
+    // Hide hint when there are digits.
     if (this.hint) {
       this.hint.classList.remove('visible');
     }
 
-    // Distribuir los dígitos: primero min, después max
+    // Distribute the digits: min first, then max.
     const mode = this.getMode();
     if (mode === 'range') {
       const [minFmt, maxFmt] = format.split(/–|-/);
@@ -178,14 +174,14 @@ export class SalaryInput {
   }
 
   _onKeyDown(e) {
-    // Backspace: borra el último dígito (no el separador)
+    // Backspace: delete the last digit (not the separator).
     if (e.key === 'Backspace') {
       e.preventDefault();
       this.digits = this.digits.slice(0, -1);
       this._render();
       return;
     }
-    // Bloqueamos flechas para evitar reposicionamientos raros
+    // Block arrows to avoid weird repositioning.
     if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Delete'].includes(e.key)) {
       e.preventDefault();
     }

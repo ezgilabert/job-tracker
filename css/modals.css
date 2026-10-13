@@ -1,5 +1,5 @@
 /* ============================================================
-   Modals: overlay genérico, close job, ref-to-job
+   Modals: generic overlay, close job, ref-to-job
    ============================================================ */
 
 .modal-overlay {
@@ -40,7 +40,7 @@
 
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 1.25rem; }
@@ -218,7 +218,7 @@
   text-overflow: ellipsis;
 }
 
-.ref-to-job-item .estado-mini {
+.ref-to-job-item .status-mini {
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;

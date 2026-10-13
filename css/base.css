@@ -173,7 +173,7 @@ header {
   transition: color 0.3s ease;
 }
 
-/* ===== Hover: gradient sweep en el título ===== */
+/* ===== Hover: gradient sweep on the title ===== */
 
 .brand:hover h1 {
   background: linear-gradient(
@@ -441,7 +441,7 @@ header {
 }
 
 /* ============================================================
-   Ripple radial para el cambio de tema
+   Radial ripple for the theme change
    ============================================================ */
 
 .theme-ripple {

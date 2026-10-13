@@ -1,7 +1,7 @@
 // ============================================================
 // Template: referral card
-// V3 · Progress pegada al header + botones grandes
-// Multiselect de relación
+// Progress bar pinned to the header + large buttons.
+// Relationship multi-select.
 // ============================================================
 
 import { REF_WORKFLOW_STEPS } from '../constants.js';
@@ -16,8 +16,8 @@ import { t, tRefState, tRefStateShort } from '../i18n.js';
  * @returns {string} HTML
  */
 export function renderRefCard(ref /*, ctx = {} */) {
-  const refClosed = isRefClosed(ref.estado);
-  const currentIdx = refStepIndex(ref.estado);
+  const refClosed = isRefClosed(ref.status);
+  const currentIdx = refStepIndex(ref.status);
   const totalSteps = REF_WORKFLOW_STEPS.length;
   const currentStepNum = currentIdx >= 0 ? currentIdx + 1 : 0;
   const progressPct = currentIdx >= 0
@@ -25,38 +25,36 @@ export function renderRefCard(ref /*, ctx = {} */) {
     : 0;
 
   // ------------------------------------------------------------
-  // Relaciones: normalizamos a array (soporta legacy string)
+  // Relationships: normalize to array (supports legacy string)
   // ------------------------------------------------------------
-  const relaciones = Array.isArray(ref.relacion)
-    ? ref.relacion
-    : (ref.relacion ? [ref.relacion] : []);
+  const relationships = Array.isArray(ref.relationship)
+    ? ref.relationship
+    : (ref.relationship ? [ref.relationship] : []);
 
-  const primaryRelacion = relaciones[0] || '';
+  const primaryRelationship = relationships[0] || '';
 
-  const relacionBadgesHtml = relaciones
-    .map(rel => `<span class="ref-relacion-badge" data-relacion="${escapeHtml(rel)}">${escapeHtml(rel)}</span>`)
+  const relationshipBadgesHtml = relationships
+    .map(rel => `<span class="ref-relationship-badge" data-relationship="${escapeHtml(rel)}">${escapeHtml(rel)}</span>`)
     .join('');
 
-  // Meta inline
+  // Inline meta
   const linkTxt = ref.link
     ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))} ↗</a>`
     : '';
-  const contactTxt = ref.contacto
-    ? `<span>✉️ ${escapeHtml(ref.contacto)}</span>`
+  const contactTxt = ref.contact
+    ? `<span>✉️ ${escapeHtml(ref.contact)}</span>`
     : '';
-  const roleTxt = ref.rol
-    ? `<span>💼 ${escapeHtml(ref.rol)}</span>`
+  const roleTxt = ref.role
+    ? `<span>💼 ${escapeHtml(ref.role)}</span>`
     : '';
   const metaHtml = (roleTxt || contactTxt || linkTxt)
     ? `<div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>`
     : '';
 
-  // Notas
-  const notesTxt = ref.notas
-    ? `<div class="ref-notas">${escapeHtml(ref.notas)}</div>`
+  const notesTxt = ref.notes
+    ? `<div class="ref-notes">${escapeHtml(ref.notes)}</div>`
     : '';
 
-  // Steps
   const stepsHtml = refClosed
     ? ''
     : renderSteps(REF_WORKFLOW_STEPS, currentIdx, [], {
@@ -65,7 +63,7 @@ export function renderRefCard(ref /*, ctx = {} */) {
         kind: 'ref',
       });
 
-  // Bloque de progreso superior (solo si no está cerrado)
+  // Top progress block (only when not closed).
   const topProgressHtml = refClosed
     ? ''
     : `<div class="ref-top-progress">
@@ -80,12 +78,10 @@ export function renderRefCard(ref /*, ctx = {} */) {
          </button>
        </div>`;
 
-  // Acciones
   const actionsHtml = refClosed
     ? renderClosedActions()
     : renderOpenActions(ref, currentIdx);
 
-  // Nota pendiente del paso actual
   const pendingNote = currentRefStepNote(ref);
   const pendingNoteHtml = (!refClosed && pendingNote)
     ? `<div class="step-note">
@@ -96,15 +92,15 @@ export function renderRefCard(ref /*, ctx = {} */) {
 
   return `
     <div class="referido"
-         data-relacion="${escapeHtml(primaryRelacion)}"
-         data-estado="${escapeHtml(ref.estado)}"
+         data-relationship="${escapeHtml(primaryRelationship)}"
+         data-status="${escapeHtml(ref.status)}"
          data-id="${ref.id}">
 
       <div class="ref-body">
         <div class="ref-top">
-          <h4>${escapeHtml(ref.nombre)}</h4>
-          ${relacionBadgesHtml}
-          <span class="ref-estado-badge" data-estado="${escapeHtml(ref.estado)}">${escapeHtml(tRefState(ref.estado))}</span>
+          <h4>${escapeHtml(ref.name)}</h4>
+          ${relationshipBadgesHtml}
+          <span class="ref-status-badge" data-status="${escapeHtml(ref.status)}">${escapeHtml(tRefState(ref.status))}</span>
         </div>
 
         ${topProgressHtml}
@@ -139,14 +135,14 @@ export function renderRefCard(ref /*, ctx = {} */) {
 }
 
 // ------------------------------------------------------------
-// Acciones cuando el referido está abierto
+// Actions when the referral is open
 // ------------------------------------------------------------
 function renderOpenActions(ref, currentIdx) {
   const canBack = currentIdx > 0;
   const canNext = currentIdx < REF_WORKFLOW_STEPS.length - 1;
   const prevStep = canBack ? REF_WORKFLOW_STEPS[currentIdx - 1] : null;
   const nextStep = canNext ? REF_WORKFLOW_STEPS[currentIdx + 1] : null;
-  const alreadyWentBack = Boolean(ref.volvioAtras);
+  const alreadyWentBack = Boolean(ref.wentBack);
   const hasLinkedJob = Boolean(ref.linkedJobId);
   const backLocked = alreadyWentBack || hasLinkedJob;
 
@@ -157,8 +153,8 @@ function renderOpenActions(ref, currentIdx) {
          → ${escapeHtml(tRefStateShort(nextStep.id))}
        </button>`
     : `<button class="wf-btn-big success" disabled
-              title="${escapeHtml(t('ref.contratadoTitle'))}">
-         ✓ ${escapeHtml(t('ref.contratado'))}
+              title="${escapeHtml(t('ref.hiredTitle'))}">
+         ✓ ${escapeHtml(t('ref.hired'))}
        </button>`;
 
   let backBtn = '';
@@ -199,7 +195,7 @@ function renderOpenActions(ref, currentIdx) {
 }
 
 // ------------------------------------------------------------
-// Acciones cuando el referido está cerrado (No aplica)
+// Actions when the referral is closed (Not applicable)
 // ------------------------------------------------------------
 function renderClosedActions() {
   return `
@@ -212,12 +208,12 @@ function renderClosedActions() {
 }
 
 // ------------------------------------------------------------
-// Nota del paso actual
+// Note for the current step
 // ------------------------------------------------------------
 function currentRefStepNote(ref) {
   const hist = ensureArray(ref.history);
   for (let i = hist.length - 1; i >= 0; i--) {
-    if (hist[i].estado === ref.estado && hist[i].nota) return hist[i].nota;
+    if (hist[i].status === ref.status && hist[i].note) return hist[i].note;
   }
   return null;
 }

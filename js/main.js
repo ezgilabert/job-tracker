@@ -13,7 +13,7 @@ import { mountJobsController } from './controllers/jobsController.js';
 import { mountRefsController } from './controllers/refsController.js';
 import { mountModalsController } from './controllers/modalsController.js';
 import { mountConfigController } from './controllers/configController.js';
-import { mountCreatePuestoController } from './controllers/createPuestoController.js';
+import { mountCreateRoleController } from './controllers/createRoleController.js';
 import { DatePicker } from './ui/datePicker.js';
 import { mountChips } from './ui/chips.js';
 import { mountInputLimits } from './ui/inputLimits.js';
@@ -23,37 +23,300 @@ import {
   logout, getSession, requireSession, startSessionHeartbeat,
 } from './auth/session.js';
 
+// ============================================================
+// Migration tables: old (Spanish) → new (English)
+//
+// These exist ONLY so a user who already had the app installed
+// with the previous Spanish-keyed schema does not lose data.
+// New installs never touch these tables.
+// ============================================================
+
+const JOB_STATUS_MAP = {
+  'Guardado':               'Saved',
+  'Aplicado':               'Applied',
+  'Contacto':               'Contact',
+  'Entrevista RRHH':        'HR Interview',
+  'Challenge técnico':      'Technical Challenge',
+  'Live coding':            'Live Coding',
+  'Entrevista Técnica':     'Technical Interview',
+  'Entrevista con cliente': 'Client Interview',
+  'Charla con cliente':     'Client Chat',
+  'Entrevista Final':       'Final Interview',
+  'Referencias':            'References',
+  'Negociación':            'Negotiation',
+  'Oferta':                 'Offer',
+  'Rechazado':              'Rejected',
+  'Ghosted':                'Ghosted',
+  'Descartado':             'Discarded',
+};
+
+const REF_STATUS_MAP = {
+  'Pendiente':       'Pending',
+  'Contactado':      'Contacted',
+  'Referido hecho':  'Referred',
+  'En proceso':      'In Process',
+  'Contratado':      'Hired',
+  'No aplica':       'Not Applicable',
+  // Legacy state that existed even before the previous rename.
+  'Me va a referir': 'Contacted',
+};
+
+const RELATIONSHIP_MAP = {
+  'Amigo':     'Friend',
+  'Ex-colega': 'Ex-colleague',
+  'Familiar':  'Family',
+  'Conocido':  'Acquaintance',
+  'Recruiter': 'Recruiter',
+  'Mentor':    'Mentor',
+};
+
+const CONTACT_PLATFORM_MAP = {
+  'linkedin': 'linkedin',
+  'email':    'email',
+  'whatsapp': 'whatsapp',
+  'otro':     'other',
+  'other':    'other',
+};
+
+const WORK_MODE_MAP = {
+  'presencial': 'onsite',
+  'home':       'remote',
+  'hybrid':     'hybrid',
+  'onsite':     'onsite',
+  'remote':     'remote',
+  '':           '',
+};
+
+function mapJobStatus(s) {
+  if (!s) return 'Saved';
+  return JOB_STATUS_MAP[s] || s;
+}
+
+function mapRefStatus(s) {
+  if (!s) return 'Pending';
+  return REF_STATUS_MAP[s] || s;
+}
+
+function mapRelationship(r) {
+  if (!r) return r;
+  return RELATIONSHIP_MAP[r] || r;
+}
+
+function mapContactPlatform(p) {
+  if (!p) return 'other';
+  return CONTACT_PLATFORM_MAP[p] || p;
+}
+
+function mapWorkMode(m) {
+  if (m === undefined || m === null) return '';
+  return WORK_MODE_MAP[m] ?? m;
+}
+
+// ------------------------------------------------------------
+// Job migration: Spanish keys → English keys
+// ------------------------------------------------------------
+function migrateJob(j) {
+  if (!j || typeof j !== 'object') return j;
+
+  const hourlyRaw   = j.hourlySalary   ?? j.salarioPorHora;
+  const rangeRaw    = j.salaryIsRange  ?? j.salarioEsRango;
+  const wentBackRaw = j.wentBack       ?? j.volvioAtras;
+
+  return {
+    id: j.id,
+    company:  j.company  ?? j.empresa  ?? '',
+    role:     j.role     ?? j.puesto   ?? '',
+    date:     j.date     ?? j.fecha    ?? '',
+    status:   mapJobStatus(j.status ?? j.estado),
+    link:     j.link ?? '',
+    salary:   j.salary   ?? j.salario  ?? '',
+    hourlySalary:  Boolean(hourlyRaw),
+    salaryIsRange: rangeRaw === undefined ? true : Boolean(rangeRaw),
+    currency: j.currency ?? j.moneda ?? 'usd',
+    workMode: mapWorkMode(j.workMode ?? j.modalidad),
+    hybridOfficeDays: j.hybridOfficeDays ?? null,
+    contact:  j.contact   ?? j.contacto       ?? '',
+    contactLink:     j.contactLink     ?? j.contactoLink     ?? '',
+    contactPlatform: mapContactPlatform(j.contactPlatform ?? j.contactoTipo),
+    notes:    j.notes ?? j.notas ?? '',
+    skipped: ensureArray(j.skipped).map(mapJobStatus),
+    wentBack: Boolean(wentBackRaw),
+    offerConfirmed: Boolean(j.offerConfirmed),
+    history: ensureArray(j.history).map(h => ({
+      status:   mapJobStatus(h.status ?? h.estado),
+      date:     h.date ?? h.fecha,
+      reason:   h.reason ?? h.motivo,
+      note:     h.note   ?? h.nota,
+      wentBack: Boolean(h.wentBack ?? h.retroceso),
+    })),
+  };
+}
+
+// ------------------------------------------------------------
+// Referral migration: Spanish keys → English keys
+// ------------------------------------------------------------
+function migrateRef(r) {
+  if (!r || typeof r !== 'object') return r;
+
+  const rawRelationship = r.relationship ?? r.relacion;
+  const relationship = Array.isArray(rawRelationship)
+    ? rawRelationship.map(mapRelationship)
+    : (rawRelationship ? [mapRelationship(rawRelationship)] : []);
+
+  const wentBackRaw = r.wentBack ?? r.volvioAtras;
+
+  return {
+    id: r.id,
+    name:     r.name  ?? r.nombre  ?? '',
+    role:     r.role  ?? r.rol     ?? '',
+    contact:  r.contact ?? r.contacto ?? '',
+    link:     r.link  ?? r.linkedin ?? '',
+    relationship,
+    status:   mapRefStatus(r.status ?? r.estado),
+    linkedCompanies: ensureArray(r.linkedCompanies ?? r.empresasVinculadas),
+    linkedJobId: r.linkedJobId ?? null,
+    notes:    r.notes ?? r.notas ?? '',
+    wentBack: Boolean(wentBackRaw),
+    createdAt: r.createdAt || new Date().toISOString(),
+    history: ensureArray(r.history).map(h => ({
+      status:   mapRefStatus(h.status ?? h.estado),
+      date:     h.date ?? h.fecha,
+      reason:   h.reason ?? h.motivo,
+      note:     h.note   ?? h.nota,
+      wentBack: Boolean(h.wentBack ?? h.retroceso),
+    })),
+  };
+}
+
+// ------------------------------------------------------------
+// Config migration: Spanish keys → English keys
+// ------------------------------------------------------------
+function migrateConfig(data) {
+  if (!data || typeof data !== 'object') return getDefaultConfig();
+
+  const defaults = getDefaultConfig();
+  const out = { ...defaults, ...data };
+
+  // ---- Profile ----
+  const oldProfile = data.profile || {};
+  out.profile = {
+    ...defaults.profile,
+    firstName: oldProfile.firstName ?? oldProfile.nombre ?? '',
+    lastName:  oldProfile.lastName  ?? oldProfile.apellido ?? '',
+    username:  oldProfile.username  ?? '',
+    email:     oldProfile.email     ?? '',
+    bio:       oldProfile.bio       ?? '',
+    avatar:    oldProfile.avatar    ?? '',
+  };
+
+  // ---- Roles ----
+  const oldRoles = data.roles || data.puestos || {};
+  out.roles = {
+    activeTags: oldRoles.activeTags || ROLE_TAGS_DEFAULT_IDS(),
+    hidden:     oldRoles.hidden     || [],
+    custom:     oldRoles.custom     || [],
+    customTags: oldRoles.customTags || {},
+  };
+  delete out.puestos;
+
+  // ---- Initial statuses ----
+  const oldStatuses = data.initialStatuses ?? data.estadosIniciales;
+  if (Array.isArray(oldStatuses)) {
+    out.initialStatuses = oldStatuses.map(mapJobStatus);
+  }
+  delete out.estadosIniciales;
+
+  const oldDefault = data.defaultInitialStatus ?? data.estadoInicialDefault;
+  if (oldDefault) {
+    out.defaultInitialStatus = mapJobStatus(oldDefault);
+  }
+  delete out.estadoInicialDefault;
+
+  // ---- Filters ----
+  const oldFilters = data.filters ?? data.filtros;
+  if (Array.isArray(oldFilters)) {
+    out.filters = oldFilters.map(f => ({
+      id: mapFilterId(f.id),
+      visible: f.visible !== false,
+    }));
+  }
+  delete out.filtros;
+
+  // ---- Dashboard styles (legacy single field) ----
+  if (data.dashboardStyle && !data.dashboardStyleJobs && !data.dashboardStyleRefs) {
+    out.dashboardStyleJobs = data.dashboardStyle;
+    out.dashboardStyleRefs = data.dashboardStyle;
+  }
+  if (!out.dashboardStyleJobs) out.dashboardStyleJobs = DEFAULT_DASHBOARD_STYLE;
+  if (!out.dashboardStyleRefs) out.dashboardStyleRefs = DEFAULT_DASHBOARD_STYLE;
+  delete out.dashboardStyle;
+
+  return out;
+}
+
+function ROLE_TAGS_DEFAULT_IDS() {
+  // Referenced lazily to avoid a circular import at module load.
+  return [
+    'programmer', 'frontend', 'backend', 'fullstack', 'mobile', 'qa',
+    'devops', 'data', 'security', 'leadership', 'gamedev',
+  ];
+}
+
+const FILTER_ID_MAP = {
+  'all':                'all',
+  'active':             'active',
+  'closed':             'closed',
+  'Guardado':           'Saved',
+  'Aplicado':           'Applied',
+  'Contacto':           'Contact',
+  'Entrevista RRHH':    'HR Interview',
+  'Challenge técnico':  'Technical Challenge',
+  'Live coding':        'Live Coding',
+  'Entrevista Técnica': 'Technical Interview',
+  'Entrevista con cliente': 'Client Interview',
+  'Charla con cliente':     'Client Chat',
+  'Entrevista Final':       'Final Interview',
+  'Referencias':        'References',
+  'Negociación':        'Negotiation',
+  'Oferta':             'Offer',
+  'Rechazado':          'Rejected',
+  'Ghosted':            'Ghosted',
+  'Descartado':         'Discarded',
+};
+
+function mapFilterId(id) {
+  return FILTER_ID_MAP[id] || id;
+}
+
+// ============================================================
+// Boot
+// ============================================================
 boot();
 
 async function boot() {
   if (!(await requireSession('./login.html'))) return;
 
   // ----------------------------------------------------------
-  // Pulse de textos al cambiar idioma (Web Animations API)
-  //
-  // V3 · Slide cascada
-  //   - Texto nuevo aplicado ANTES de animar (no hay flash).
-  //   - Cada elemento entra desde 24px abajo con fade.
-  //   - Stagger 60ms entre elementos, ordenados por posición
-  //     visual (arriba→abajo, izq→der).
-  //   - Duración 550ms por elemento. Total: ~1000ms máx.
-  //   - Respeta prefers-reduced-motion.
-  //   - Cancela animaciones previas si el usuario clickea rápido.
+  // Cascade pulse on language change (Web Animations API)
+  //   - New text is applied BEFORE animating (no flash).
+  //   - Each element slides up 24px with a fade.
+  //   - 60ms stagger between elements, ordered by visual position.
+  //   - 550ms per element, capped at 450ms of accumulated delay.
+  //   - Respects prefers-reduced-motion.
+  //   - Cancels any running animation on the same element first.
   // ----------------------------------------------------------
   function pulseI18nTexts() {
-    // Si el usuario prefiere no animaciones, no hacemos nada.
     if (window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;
     }
 
-    // Solo animamos texto real. NO placeholders (para no interferir
-    // con un input que esté enfocado), NO titles.
+    // Only animate visible text; skip placeholders and titles so
+    // we don't disturb a focused input.
     const all = document.querySelectorAll(
       '.container [data-i18n], .container [data-i18n-html]'
     );
 
-    // Filtramos a los que realmente están visibles en pantalla.
     const visible = [];
     all.forEach(el => {
       const rect = el.getBoundingClientRect();
@@ -62,8 +325,8 @@ async function boot() {
 
     if (!visible.length) return;
 
-    // Ordenamos por posición visual.
-    // Tolerancia de 8px para agrupar elementos en la misma fila.
+    // Sort by visual position; 8px tolerance groups elements on
+    // the same row.
     visible.sort((a, b) => {
       const ra = a.getBoundingClientRect();
       const rb = b.getBoundingClientRect();
@@ -71,12 +334,11 @@ async function boot() {
       return ra.left - rb.left;
     });
 
-    const STAGGER = 60;         // ms entre elementos
-    const MAX_STAGGER = 450;    // tope del delay acumulado
-    const DURATION = 550;       // duración de cada animación
+    const STAGGER = 60;
+    const MAX_STAGGER = 450;
+    const DURATION = 550;
 
     visible.forEach((el, i) => {
-      // Cancelamos cualquier animación previa en el mismo elemento.
       if (typeof el.getAnimations === 'function') {
         el.getAnimations().forEach(a => {
           try { a.cancel(); } catch (_) { /* noop */ }
@@ -84,7 +346,6 @@ async function boot() {
       }
 
       const delay = Math.min(i * STAGGER, MAX_STAGGER);
-
       el.style.willChange = 'opacity, transform';
 
       const anim = el.animate(
@@ -107,7 +368,7 @@ async function boot() {
   }
 
   // ----------------------------------------------------------
-  // Ripple radial para el cambio de tema
+  // Theme ripple (radial wipe) at click point
   // ----------------------------------------------------------
   function triggerThemeRipple(x, y, nextTheme, onPeak) {
     const vw = window.innerWidth;
@@ -252,8 +513,8 @@ async function boot() {
     }
 
     if (langBtn) {
-      // El cambio de idioma va solo por el configStore. El pulse se
-      // dispara desde el subscriber cuando detecta el cambio de lang.
+      // Language change goes through the config store. The pulse is
+      // triggered by the store subscriber when it detects a lang change.
       langBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const current = getLanguage();
@@ -272,65 +533,15 @@ async function boot() {
     version: STORAGE_VERSION,
     seed: () => SAMPLE_JOBS.map(j => ({ ...j })),
     migrate: (data) => {
-      if (Array.isArray(data)) {
-        return data.map(j => ({
-          ...j,
-          contacto: j.contacto ?? '',
-          moneda: j.moneda ?? '',
-          salarioEsRango: j.salarioEsRango === undefined ? true : Boolean(j.salarioEsRango),
-          skipped: ensureArray(j.skipped),
-          volvioAtras: Boolean(j.volvioAtras),
-          history: Array.isArray(j.history) && j.history.length
-            ? j.history
-            : [{ estado: j.estado, fecha: new Date().toISOString() }],
-        }));
-      }
+      if (Array.isArray(data)) return data.map(migrateJob);
       return data;
     },
   });
 
-  const LEGACY_REF_STATE_MAP = {
-    'Me va a referir': 'Contactado',
-  };
-
-  function migrateRefState(estado) {
-    return LEGACY_REF_STATE_MAP[estado] || estado;
-  }
-
   const refsStore = new Store(STORAGE_KEYS.REFS, [], {
     version: STORAGE_VERSION,
     migrate: (data) => {
-      if (Array.isArray(data)) {
-        return data.map(r => {
-          const normalizedEstado = migrateRefState(r.estado || 'Pendiente');
-
-          const history = Array.isArray(r.history) && r.history.length
-            ? r.history.map(entry => ({
-                ...entry,
-                estado: migrateRefState(entry.estado),
-              }))
-            : [{
-                estado: normalizedEstado,
-                fecha: r.createdAt || new Date().toISOString(),
-              }];
-
-          // Normalizar relacion → array (multiselect)
-          const relacionRaw = r.relacion;
-          const relacion = Array.isArray(relacionRaw)
-            ? relacionRaw
-            : (relacionRaw ? [relacionRaw] : []);
-
-          return {
-            ...r,
-            estado: normalizedEstado,
-            relacion,
-            link: r.link ?? r.linkedin ?? '',
-            empresasVinculadas: ensureArray(r.empresasVinculadas),
-            volvioAtras: Boolean(r.volvioAtras),
-            history,
-          };
-        });
-      }
+      if (Array.isArray(data)) return data.map(migrateRef);
       return data;
     },
   });
@@ -338,26 +549,7 @@ async function boot() {
   const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
     version: CONFIG_VERSION,
     seed: () => getDefaultConfig(),
-    migrate: (data) => {
-      if (!data || typeof data !== 'object') return getDefaultConfig();
-
-      const defaults = getDefaultConfig();
-      const out = { ...defaults, ...data };
-      out.profile = { ...defaults.profile, ...(data.profile || {}) };
-
-      // Migración: si venía del modelo viejo (una sola key `dashboardStyle`),
-      // la usamos como base para ambos.
-      if (data.dashboardStyle && !data.dashboardStyleJobs && !data.dashboardStyleRefs) {
-        out.dashboardStyleJobs = data.dashboardStyle;
-        out.dashboardStyleRefs = data.dashboardStyle;
-      }
-      if (!out.dashboardStyleJobs) out.dashboardStyleJobs = DEFAULT_DASHBOARD_STYLE;
-      if (!out.dashboardStyleRefs) out.dashboardStyleRefs = DEFAULT_DASHBOARD_STYLE;
-
-      delete out.dashboardStyle;
-
-      return out;
-    },
+    migrate: migrateConfig,
   });
 
   // ----------------------------------------------------------
@@ -375,8 +567,8 @@ async function boot() {
       setLanguage(lang);
       applyI18n(document);
 
-      // Un único lugar dispara el pulse, tanto si el cambio viene
-      // del botón del menú como de la configuración.
+      // Single trigger for the pulse — works for both the menu
+      // button and the config panel.
       pulseI18nTexts();
 
       document.dispatchEvent(new CustomEvent('i18n-changed'));
@@ -386,28 +578,28 @@ async function boot() {
   // ----------------------------------------------------------
   // UI wiring
   // ----------------------------------------------------------
-  const fechaPicker = new DatePicker(document.getElementById('fechaPicker'), {
+  const datePicker = new DatePicker(document.getElementById('datePicker'), {
     onChange: () => {},
   });
 
-  const refRelacionChips = mountChips(
-    document.getElementById('refRelacionChips'),
+  const refRelationshipChips = mountChips(
+    document.getElementById('refRelationshipChips'),
     { allowMultiple: true }
   );
-  const refEstadoChips = mountChips(document.getElementById('refEstadoChips'));
+  const refStatusChips = mountChips(document.getElementById('refStatusChips'));
 
   mountInputLimits(document);
 
-  const createPuestoCtrl = mountCreatePuestoController(configStore);
+  const createRoleCtrl = mountCreateRoleController(configStore);
 
   mountConfigController(configStore, jobsStore, refsStore);
-  const modals = mountModalsController(jobsStore, refsStore, configStore, createPuestoCtrl);
+  const modals = mountModalsController(jobsStore, refsStore, configStore, createRoleCtrl);
   const jobsCtrl = mountJobsController(
-    jobsStore, refsStore, modals, fechaPicker, configStore, createPuestoCtrl
+    jobsStore, refsStore, modals, datePicker, configStore, createRoleCtrl
   );
   const refsCtrl = mountRefsController(jobsStore, refsStore, modals, configStore);
 
-  refsCtrl.initChips(refRelacionChips, refEstadoChips);
+  refsCtrl.initChips(refRelationshipChips, refStatusChips);
 
   mountTheme();
   mountUserMenu(configStore);
@@ -416,7 +608,7 @@ async function boot() {
     window.location.replace('./login.html');
   });
 
-  // Re-render de listas cuando cambia el idioma.
+  // Re-render lists on language change.
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();

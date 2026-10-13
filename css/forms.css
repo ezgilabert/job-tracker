@@ -3,7 +3,7 @@
    ============================================================ */
 
 /* ============================================================
-   ⭐ NUEVO: Section card (bloque compartido por las 3 secciones)
+   Section card (shared by all three sections)
    ============================================================ */
 
 .section-card {
@@ -53,7 +53,7 @@
 }
 
 /* ============================================================
-   Form-card legacy (se mantiene para modales y ref-form-card)
+   Legacy form-card (still used by modals and the referral form)
    ============================================================ */
 
 .form-card {
@@ -139,7 +139,7 @@ form {
   gap: 0.9rem;
 }
 
-/* El form dentro de section-card-body no debe duplicar padding */
+/* A form inside .section-card-body must not re-apply the grid */
 .section-card-body > form {
   display: block;
   padding: 0;
@@ -210,11 +210,11 @@ form {
 }
 
 /* ============================================================
-   Hourly salary — switch
+   Hourly salary switch
    ============================================================ */
 
-.field label.hora-switch,
-label.hora-switch {
+.field label.hourly-switch,
+label.hourly-switch {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -234,11 +234,11 @@ label.hora-switch {
   border: none;
 }
 
-.field label.hora-switch:hover,
-label.hora-switch:hover { color: var(--text); }
+.field label.hourly-switch:hover,
+label.hourly-switch:hover { color: var(--text); }
 
-.field label.hora-switch input[type="checkbox"],
-label.hora-switch input[type="checkbox"] {
+.field label.hourly-switch input[type="checkbox"],
+label.hourly-switch input[type="checkbox"] {
   position: absolute;
   opacity: 0;
   pointer-events: none;
@@ -247,8 +247,8 @@ label.hora-switch input[type="checkbox"] {
   margin: 0;
 }
 
-.field label.hora-switch .track,
-label.hora-switch .track {
+.field label.hourly-switch .track,
+label.hourly-switch .track {
   display: inline-block;
   width: 36px;
   height: 20px;
@@ -260,8 +260,8 @@ label.hora-switch .track {
   vertical-align: middle;
 }
 
-.field label.hora-switch .track::after,
-label.hora-switch .track::after {
+.field label.hourly-switch .track::after,
+label.hourly-switch .track::after {
   content: '';
   position: absolute;
   top: 2px;
@@ -274,18 +274,18 @@ label.hora-switch .track::after {
   transition: transform 0.2s ease;
 }
 
-.field label.hora-switch input:checked ~ .track,
-label.hora-switch input:checked ~ .track {
+.field label.hourly-switch input:checked ~ .track,
+label.hourly-switch input:checked ~ .track {
   background: var(--accent);
 }
 
-.field label.hora-switch input:checked ~ .track::after,
-label.hora-switch input:checked ~ .track::after {
+.field label.hourly-switch input:checked ~ .track::after,
+label.hourly-switch input:checked ~ .track::after {
   transform: translateX(16px);
 }
 
-.field label.hora-switch input:checked ~ .lbl-text,
-label.hora-switch input:checked ~ .lbl-text {
+.field label.hourly-switch input:checked ~ .lbl-text,
+label.hourly-switch input:checked ~ .lbl-text {
   color: var(--accent);
   font-weight: 700;
 }
@@ -375,7 +375,7 @@ textarea {
 
 @keyframes comboIn {
   from { opacity: 0; transform: translateY(-4px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .combo-section-label {
@@ -430,12 +430,7 @@ textarea {
 }
 
 .combo-option:hover .combo-option-icon,
-.combo-option.highlighted .combo-option-icon {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-}
-
+.combo-option.highlighted .combo-option-icon,
 .combo-option.selected .combo-option-icon {
   background: var(--accent);
   border-color: var(--accent);
@@ -484,7 +479,7 @@ textarea {
 }
 
 /* ============================================================
-   Contador de caracteres para textareas largas
+   Character counter for long textareas
    ============================================================ */
 
 .field-counter {
@@ -503,7 +498,7 @@ textarea {
 }
 
 .field-counter.near-limit { color: var(--warning-2); }
-.field-counter.at-limit { color: var(--danger-2); }
+.field-counter.at-limit   { color: var(--danger-2); }
 
 input:invalid:not(:placeholder-shown),
 textarea:invalid:not(:placeholder-shown) {
@@ -516,7 +511,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Secciones internas del form (v3-section, sec-head)
+   Form internal sections (v3-section, sec-head)
    ============================================================ */
 
 .v3-section {
@@ -538,7 +533,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   margin-bottom: 1rem;
 }
 
-/* OPCIÓN 4 · SVG sin caja, solo ícono accent */
+/* Option 4: SVG without a box, just the accent icon */
 .sec-icon {
   width: 26px;
   height: 26px;
@@ -569,10 +564,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   gap: 0.85rem 1rem;
 }
 
-.v3-grid .field { grid-column: span 3; }
-.v3-grid .field.half { grid-column: span 3; }
-.v3-grid .field.third { grid-column: span 2; }
-.v3-grid .field.full { grid-column: 1 / -1; }
+.v3-grid .field        { grid-column: span 3; }
+.v3-grid .field.half   { grid-column: span 3; }
+.v3-grid .field.third  { grid-column: span 2; }
+.v3-grid .field.full   { grid-column: 1 / -1; }
 
 @media (max-width: 720px) {
   .v3-grid { grid-template-columns: repeat(2, 1fr); }
@@ -583,10 +578,10 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Modalidad picker
+   Work mode picker
    ============================================================ */
 
-.modalidad-seg {
+.workmode-seg {
   display: flex;
   gap: 0.25rem;
   padding: 0.3rem;
@@ -628,7 +623,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Fila de días híbridos
+   Hybrid days row
    ============================================================ */
 
 .hybrid-days {
@@ -756,7 +751,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   flex-shrink: 0;
 }
 
-.cur-chip {
+.currency-chip {
   position: absolute;
   top: 50%;
   right: 0.4rem;
@@ -770,7 +765,7 @@ textarea:invalid:not(:placeholder-shown):focus {
   z-index: 2;
 }
 
-.cur-chip button {
+.currency-chip button {
   padding: 0.3rem 0.55rem;
   border: none;
   border-radius: 5px;
@@ -785,9 +780,9 @@ textarea:invalid:not(:placeholder-shown):focus {
   line-height: 1;
 }
 
-.cur-chip button:hover { color: var(--text); }
+.currency-chip button:hover { color: var(--text); }
 
-.cur-chip button.active {
+.currency-chip button.active {
   background: var(--accent);
   color: white;
   box-shadow: 0 1px 3px var(--accent-glow);
@@ -828,10 +823,10 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Notas destacada
+   Highlighted notes field
    ============================================================ */
 
-.notas-highlight {
+.notes-highlight {
   position: relative;
   border-radius: 10px;
   border: 1.5px solid var(--accent-border);
@@ -839,12 +834,12 @@ textarea:invalid:not(:placeholder-shown):focus {
   transition: all 0.2s ease;
 }
 
-.notas-highlight:focus-within {
+.notes-highlight:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-.notas-highlight textarea {
+.notes-highlight textarea {
   width: 100%;
   padding: 0.85rem 1rem;
   min-height: 130px;
@@ -860,10 +855,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   outline: none;
 }
 
-.notas-highlight textarea::placeholder { color: var(--text-dim); }
+.notes-highlight textarea::placeholder { color: var(--text-dim); }
 
 /* ============================================================
-   Modal con estructura V3
+   V3 modal
    ============================================================ */
 
 .modal.modal-v3 { max-width: 620px; }
@@ -871,7 +866,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 .modal.modal-v3 .v3-section { padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
 
 /* ============================================================
-   Combo · Crear nuevo puesto
+   Combo · Create new role
    ============================================================ */
 
 .combo-create-option {
@@ -925,7 +920,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   Chips de categoría en modal crear puesto
+   Category chips in the create-role modal
    ============================================================ */
 
 .create-cat-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
@@ -982,7 +977,7 @@ textarea:invalid:not(:placeholder-shown):focus {
 }
 
 /* ============================================================
-   EstadoCombo
+   StatusCombo
    ============================================================ */
 
 input[type="hidden"] { display: none; }
@@ -1144,7 +1139,7 @@ input[type="hidden"] { display: none; }
 }
 
 /* ============================================================
-   Chip de contacto en card del job
+   Contact chip on the job card
    ============================================================ */
 
 .job-contact-chip {

@@ -1,6 +1,6 @@
 // ============================================================
-// CurrencyPicker: chip de moneda (ARS/USD) que vive dentro
-// del input de salario. Toggle simple de dos estados.
+// CurrencyPicker: currency chip (ARS / USD) that lives inside
+// the salary input. Simple two-state toggle.
 // ============================================================
 
 export const CURRENCY_VALUES = ['ars', 'usd'];
@@ -8,10 +8,10 @@ export const DEFAULT_CURRENCY = 'usd';
 
 export class CurrencyPicker {
   /**
-   * @param {HTMLElement} container  contenedor con [data-cur] buttons
+   * @param {HTMLElement} container  element holding the [data-cur] buttons
    * @param {{
-   *   value?: 'ars'|'usd',
-   *   onChange?: (value:string) => void,
+   *   value?: 'ars' | 'usd',
+   *   onChange?: (value: string) => void,
    * }} opts
    */
   constructor(container, opts = {}) {
@@ -35,7 +35,7 @@ export class CurrencyPicker {
   }
 
   /**
-   * @param {'ars'|'usd'} value
+   * @param {'ars' | 'usd'} value
    */
   setValue(value) {
     this.value = CURRENCY_VALUES.includes(value) ? value : DEFAULT_CURRENCY;

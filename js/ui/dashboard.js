@@ -1,23 +1,23 @@
 // ============================================================
-// Dashboard: panel de stats que aparece arriba de las listas
-// de postulaciones y referidos.
+// Dashboard: stats panel shown above the jobs and referrals
+// lists.
 //
-// Wrapper opción 4 · violeta unificado
-// Escala interna controlada por --dash-scale (definida en CSS)
+// Violet unified wrapper. Internal scale controlled by
+// --dash-scale (defined in CSS).
 //
-// Soporta 6 estilos configurables:
-//   - 'sparklines' → 4 cards con mini-gráficos de tendencia
-//   - 'modular'    → card destacada + mini-métricas + panel lateral
-//   - 'minimal'    → solo números grandes con label, sin gráficos
-//   - 'compact'    → chips horizontales + barra de distribución
-//   - 'circular'   → anillos de progreso SVG
-//   - 'heatmap'    → calendario de actividad tipo GitHub
+// Supports 6 configurable styles:
+//   - 'sparklines' → 4 cards with mini trend charts
+//   - 'modular'    → featured card + mini metrics + side panel
+//   - 'minimal'    → just big numbers with a label, no charts
+//   - 'compact'    → horizontal chips + distribution bar
+//   - 'circular'   → SVG progress rings
+//   - 'heatmap'    → GitHub-style activity calendar
 // ============================================================
 
 import { escapeHtml } from '../utils.js';
 
 // ------------------------------------------------------------
-// Iconos SVG por tipo de dashboard
+// SVG icons per dashboard kind
 // ------------------------------------------------------------
 const DASH_ICONS = {
   jobs: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -31,7 +31,7 @@ const DASH_ICONS = {
 };
 
 // ------------------------------------------------------------
-// Utilidades
+// Utilities
 // ------------------------------------------------------------
 function uid(prefix = 'd') {
   return prefix + '-' + Math.random().toString(36).slice(2, 9);
@@ -61,8 +61,8 @@ function buildSparkPath(values, width = 100, height = 32) {
 }
 
 /**
- * Trend semanal acumulativo: devuelve N puntos, cada uno con la
- * cantidad de items que ya existían al final de esa semana.
+ * Cumulative weekly trend: returns N points, each with the number
+ * of items that existed by the end of that week.
  */
 export function buildWeeklyTrend(items, getDate, weeks = 4) {
   const now = Date.now();
@@ -82,8 +82,8 @@ export function buildWeeklyTrend(items, getDate, weeks = 4) {
 }
 
 /**
- * Actividad por día para el heatmap. Devuelve un array de N números
- * (uno por día, empezando por el más viejo).
+ * Per-day activity for the heatmap. Returns an array of N numbers
+ * (one per day, oldest first).
  */
 export function buildDailyActivity(items, getDate, days = 60) {
   const now = new Date();
@@ -104,7 +104,7 @@ export function buildDailyActivity(items, getDate, days = 60) {
 }
 
 // ============================================================
-// ESTILO 1 · Sparklines
+// STYLE 1 · Sparklines
 // ============================================================
 function renderSparklines(container, data) {
   const cards = [
@@ -155,7 +155,7 @@ function renderSparklines(container, data) {
 }
 
 // ============================================================
-// ESTILO 2 · Modular
+// STYLE 2 · Modular
 // ============================================================
 function renderModular(container, data) {
   const ranks = ['top1', 'top2', 'top3', '', ''];
@@ -210,7 +210,7 @@ function renderModular(container, data) {
 }
 
 // ============================================================
-// ESTILO 3 · Minimal
+// STYLE 3 · Minimal
 // ============================================================
 function renderMinimal(container, data) {
   const items = [
@@ -234,7 +234,7 @@ function renderMinimal(container, data) {
 }
 
 // ============================================================
-// ESTILO 4 · Compact
+// STYLE 4 · Compact
 // ============================================================
 function renderCompact(container, data) {
   const total = data.total || 0;
@@ -282,12 +282,12 @@ function renderCompact(container, data) {
 }
 
 // ============================================================
-// ESTILO 5 · Circular
+// STYLE 5 · Circular
 // ============================================================
 function renderCircular(container, data) {
   const total = data.total || 0;
   const RADIUS = 30;
-  const CIRC = 2 * Math.PI * RADIUS; // ≈ 188.5
+  const CIRC = 2 * Math.PI * RADIUS;
 
   const rings = [
     { num: total,            label: data.labels.total,     color: 'accent',  showPct: false },
@@ -327,7 +327,7 @@ function renderCircular(container, data) {
 }
 
 // ============================================================
-// ESTILO 6 · Heatmap
+// STYLE 6 · Heatmap
 // ============================================================
 function renderHeatmap(container, data) {
   const days = Array.isArray(data.heatmap) ? data.heatmap : [];
@@ -382,7 +382,7 @@ function renderHeatmap(container, data) {
 }
 
 // ============================================================
-// Summary strip (compartido por los 6 estilos)
+// Summary strip (shared by all 6 styles)
 // ============================================================
 function renderSummary(container, data) {
   if (!data.summary) return;
@@ -407,7 +407,6 @@ export function renderDashboard(container, data) {
   const label = data.label || '';
   const iconSvg = DASH_ICONS[kind] || DASH_ICONS.jobs;
 
-  // Wrapper opción 4 · violeta unificado
   const wrapper = document.createElement('div');
   wrapper.className = `dash-labeled ${kind}`;
 
@@ -434,7 +433,7 @@ export function renderDashboard(container, data) {
       break;
   }
 
-  // El summary va SIEMPRE, para los 6 estilos
+  // The summary strip is always rendered, for all 6 styles.
   renderSummary(body, data);
 
   wrapper.appendChild(body);

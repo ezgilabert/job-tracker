@@ -1,34 +1,34 @@
 // ============================================================
-// ModalidadPicker: segmented control para modalidad laboral.
-// Opciones: '' (sin definir) / 'presencial' / 'home' / 'hybrid'.
-// Cuando se elige "hybrid" se muestra un select con los días
-// en oficina (1-4). El resto de los días se asume home.
+// WorkModePicker: segmented control for work mode.
+// Options: '' (undefined) / 'onsite' / 'remote' / 'hybrid'.
+// When "hybrid" is selected, a select for office days (1-4)
+// is shown. The remaining days are assumed remote.
 //
-// Los botones deben tener la clase .modalidad-btn + data-value.
-// El wrapper visual (segmented control) es .modalidad-seg.
+// Buttons must have class .workmode-btn + data-value.
+// The wrapper is .workmode-seg (segmented control).
 // ============================================================
 
-export const MODALIDAD_VALUES = ['', 'presencial', 'home', 'hybrid'];
+export const WORK_MODE_VALUES = ['', 'onsite', 'remote', 'hybrid'];
 
-export class ModalidadPicker {
+export class WorkModePicker {
   /**
-   * @param {HTMLElement} container  contenedor con .modalidad-btn
+   * @param {HTMLElement} container  wrapper holding .workmode-btn
    * @param {{
    *   hybridWrap?: HTMLElement,
    *   hybridSelect?: HTMLSelectElement,
    *   value?: string,
    *   hybridDays?: number,
-   *   onChange?: (value:string, hybridDays:number) => void,
+   *   onChange?: (value: string, hybridDays: number) => void,
    * }} opts
    */
   constructor(container, opts = {}) {
     this.container = container;
-    this.buttons = [...container.querySelectorAll('.modalidad-btn')];
+    this.buttons = [...container.querySelectorAll('.workmode-btn')];
     this.hybridWrap = opts.hybridWrap || null;
     this.hybridSelect = opts.hybridSelect || null;
     this.onChange = typeof opts.onChange === 'function' ? opts.onChange : () => {};
 
-    this.value = MODALIDAD_VALUES.includes(opts.value) ? opts.value : '';
+    this.value = WORK_MODE_VALUES.includes(opts.value) ? opts.value : '';
     this.hybridDays = Number(opts.hybridDays) || 3;
 
     this._boundClick = this._onClick.bind(this);
@@ -45,7 +45,7 @@ export class ModalidadPicker {
   }
 
   _onClick(e) {
-    const btn = e.target.closest('.modalidad-btn');
+    const btn = e.target.closest('.workmode-btn');
     if (!btn || !this.container.contains(btn)) return;
     const value = btn.dataset.value || '';
     this.setValue(value);
@@ -53,10 +53,10 @@ export class ModalidadPicker {
 
   /**
    * @param {string} value
-   * @param {number} [hybridDays]  sólo si value === 'hybrid'
+   * @param {number} [hybridDays]  only used when value === 'hybrid'
    */
   setValue(value, hybridDays) {
-    this.value = MODALIDAD_VALUES.includes(value) ? value : '';
+    this.value = WORK_MODE_VALUES.includes(value) ? value : '';
     if (hybridDays !== undefined && hybridDays !== null) {
       this.hybridDays = Number(hybridDays) || 3;
     }
@@ -65,13 +65,13 @@ export class ModalidadPicker {
   }
 
   /**
-   * @returns {{modalidad:string, hybridOfficeDays:number|null}}
+   * @returns {{workMode: string, hybridOfficeDays: number|null}}
    */
   getValue() {
     if (this.value === 'hybrid') {
-      return { modalidad: 'hybrid', hybridOfficeDays: this.hybridDays };
+      return { workMode: 'hybrid', hybridOfficeDays: this.hybridDays };
     }
-    return { modalidad: this.value, hybridOfficeDays: null };
+    return { workMode: this.value, hybridOfficeDays: null };
   }
 
   _render() {
