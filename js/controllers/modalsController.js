@@ -12,7 +12,6 @@ import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
 import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
 import { mountChips } from '../ui/chips.js';
-import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import {
   CLOSE_REASONS, ALL_STATES, WORKFLOW_STEPS,
   getStateIcon, getRefStateIcon,
@@ -551,9 +550,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
     document.getElementById('refEditEstadoChips'),
     { onChange: () => {} }
   );
-  let refEditCompanies = new Set();
-
-  mountCompanyChips(document.getElementById('refEditEmpresasWrap'), refEditCompanies);
 
   function openRefEdit(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -568,13 +564,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
     refEditRelacion.setValue(r.relacion || 'Conocido');
     refEditEstado.setValue(r.estado || 'Pendiente');
-    refEditCompanies = new Set(r.empresasVinculadas || []);
-    const companies = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-    renderCompanyChips(
-      document.getElementById('refEditEmpresasWrap'),
-      refEditCompanies,
-      companies
-    );
 
     refEditModal.classList.add('open');
   }
@@ -602,8 +591,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
         link:     valueOf('refEditLink'),
         relacion: refEditRelacion.getValue() || 'Conocido',
         estado:   refEditEstado.getValue() || 'Pendiente',
-        empresasVinculadas: [...refEditCompanies],
         notas:    valueOf('refEditNotas'),
+        // empresasVinculadas / linkedJobId se preservan desde ...r
       };
     }));
 
@@ -680,7 +669,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
     refToJobList.innerHTML = jobs.map(j => {
       const isSelected = refToJobSelectedId === j.id;
-      const alreadyLinked = r?.empresasVinculadas?.includes(j.empresa);
+      const alreadyLinked = r?.linkedJobId === j.id;
       return `
         <button type="button"
                 class="ref-to-job-item ${isSelected ? 'selected' : ''}"
@@ -714,9 +703,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
     refsStore.update(refs => refs.map(r => {
       if (r.id !== refToJobPending) return r;
-      const linked = cloneArray(r.empresasVinculadas);
-      if (!linked.includes(j.empresa)) linked.push(j.empresa);
-      return { ...r, empresasVinculadas: linked, linkedJobId: j.id };
+      return { ...r, linkedJobId: j.id };
     }));
 
     closeRefToJob();
@@ -728,29 +715,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
   // Create job from referral
   // ----------------------------------------------------------
   function createJobFromRef(r) {
-    const companies = ensureArray(r.empresasVinculadas);
-    const defaultCompany = companies[0] || '';
-
-    if (defaultCompany) {
-      const existing = jobsStore.get().find(j => j.empresa === defaultCompany);
-      if (existing) {
-        refsStore.update(refs => refs.map(x => {
-          if (x.id !== r.id) return x;
-          const linked = cloneArray(x.empresasVinculadas);
-          if (!linked.includes(existing.empresa)) linked.push(existing.empresa);
-          return { ...x, empresasVinculadas: linked, linkedJobId: existing.id };
-        }));
-        closeRefToJob();
-        showToast(t('toast.alreadyExisted', { empresa: existing.empresa }), '🔗');
-        document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: existing.id } }));
-        return;
-      }
-    }
-
     const newId = Date.now();
     const newJob = {
       id: newId,
-      empresa: defaultCompany || '—',
+      empresa: '—',
       puesto: '',
       fecha: todayISO(),
       estado: 'Contacto',
@@ -777,9 +745,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createP
 
     refsStore.update(refs => refs.map(x => {
       if (x.id !== r.id) return x;
-      const linked = cloneArray(x.empresasVinculadas);
-      if (newJob.empresa && !linked.includes(newJob.empresa)) linked.push(newJob.empresa);
-      return { ...x, empresasVinculadas: linked, linkedJobId: newId };
+      return { ...x, linkedJobId: newId };
     }));
 
     closeRefToJob();

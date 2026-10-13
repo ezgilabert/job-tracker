@@ -10,12 +10,10 @@ import { t, tRefState, tRefStateShort } from '../i18n.js';
 
 /**
  * @param {object} ref
- * @param {{ jobs: object[] }} ctx
+ * @param {{ jobs?: object[] }} ctx
  * @returns {string} HTML
  */
-export function renderRefCard(ref, ctx = {}) {
-  const { jobs = [] } = ctx;
-
+export function renderRefCard(ref /*, ctx = {} */) {
   const linkTxt = ref.link
     ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))} ↗</a>`
     : '';
@@ -27,19 +25,6 @@ export function renderRefCard(ref, ctx = {}) {
     : '';
   const notesTxt = ref.notas
     ? `<div class="ref-notas">${escapeHtml(ref.notas)}</div>`
-    : '';
-
-  const companies = ensureArray(ref.empresasVinculadas);
-  const companiesTxt = companies.length
-    ? `<div class="ref-empresas-lista">
-         ${companies.map(e => {
-           const job = jobs.find(j => j.empresa === e);
-           const clickable = job
-             ? `data-action="scroll-to-job" data-job-id="${job.id}" title="${escapeHtml(t('ref.goToJob', { empresa: e }))}"`
-             : '';
-           return `<span class="ref-empresa-tag" ${clickable}>🏢 ${escapeHtml(e)}</span>`;
-         }).join('')}
-       </div>`
     : '';
 
   const refClosed = isRefClosed(ref.estado);
@@ -81,7 +66,6 @@ export function renderRefCard(ref, ctx = {}) {
         </div>
 
         <div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>
-        ${companiesTxt}
         ${notesTxt}
         ${pendingNoteHtml}
 
@@ -92,8 +76,20 @@ export function renderRefCard(ref, ctx = {}) {
       </div>
 
       <div class="ref-actions">
-        <button class="action-btn" title="${escapeHtml(t('ref.editTitle'))}" data-action="edit-ref">✏️</button>
-        <button class="action-btn danger" title="${escapeHtml(t('ref.deleteTitle'))}" data-action="delete-ref">🗑️</button>
+        <button class="action-btn" title="${escapeHtml(t('ref.editTitle'))}" data-action="edit-ref" aria-label="${escapeHtml(t('ref.editTitle'))}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+          </svg>
+        </button>
+        <button class="action-btn danger" title="${escapeHtml(t('ref.deleteTitle'))}" data-action="delete-ref" aria-label="${escapeHtml(t('ref.deleteTitle'))}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+          </svg>
+        </button>
       </div>
     </div>
   `;

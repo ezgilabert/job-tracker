@@ -8,7 +8,7 @@ import {
   DEFAULT_BACKGROUND, applyBackground,
 } from '../constants.js';
 import {
-  logout, login, redirectIfAuthenticated, validateCredentials,
+  login, redirectIfAuthenticated, validateCredentials,
   getLockoutRemainingMs,
 } from './session.js';
 import { mountInputLimits } from '../ui/inputLimits.js';
@@ -132,6 +132,11 @@ function mountForms() {
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
 
+  if (!loginForm) {
+    console.error('[Login] #loginForm not found in DOM');
+    return;
+  }
+
   // Estado inicial: si ya está bloqueado, mostrarlo.
   if (getLockoutRemainingMs() > 0) {
     const mins = Math.ceil(getLockoutRemainingMs() / 60000);
@@ -142,45 +147,52 @@ function mountForms() {
     e.preventDefault();
     clearError(loginForm);
 
-    const identifier = document.getElementById('loginEmail').value.trim();
-    const password   = document.getElementById('loginPassword').value;
-    const remember   = document.getElementById('loginRemember').checked;
+    try {
+      const identifier = document.getElementById('loginEmail').value.trim();
+      const password   = document.getElementById('loginPassword').value;
+      const remember   = document.getElementById('loginRemember').checked;
 
-    const user = await validateCredentials(identifier, password);
+      const user = await validateCredentials(identifier, password);
 
-    if (user && user.locked) {
-      const mins = Math.ceil(getLockoutRemainingMs() / 60000);
-      setLoginDisabled(true, t('auth.error.locked', { min: mins }));
-      return;
-    }
-
-    if (!user) {
-      const remaining = getLockoutRemainingMs();
-      if (remaining > 0) {
-        const mins = Math.ceil(remaining / 60000);
+      if (user && user.locked) {
+        const mins = Math.ceil(getLockoutRemainingMs() / 60000);
         setLoginDisabled(true, t('auth.error.locked', { min: mins }));
-      } else {
-        showError(loginForm, t('auth.error.invalid'));
-        const pwInput = document.getElementById('loginPassword');
-        if (pwInput) { pwInput.value = ''; pwInput.focus(); }
+        return;
       }
-      return;
+
+      if (!user) {
+        const remaining = getLockoutRemainingMs();
+        if (remaining > 0) {
+          const mins = Math.ceil(remaining / 60000);
+          setLoginDisabled(true, t('auth.error.locked', { min: mins }));
+        } else {
+          showError(loginForm, t('auth.error.invalid'));
+          const pwInput = document.getElementById('loginPassword');
+          if (pwInput) { pwInput.value = ''; pwInput.focus(); }
+        }
+        return;
+      }
+
+      await login({
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        remember,
+      });
+      window.location.href = './index.html';
+    } catch (err) {
+      console.error('[Login] submit failed', err);
+      showError(loginForm, 'Unexpected error. Check the console.');
     }
+  });
 
-    await login({
-      username: user.username,
-      email: user.email,
-      name: user.name,
-      remember,
+  if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearError(registerForm);
+      showError(registerForm, t('auth.error.registerDisabled'));
     });
-    window.location.href = './index.html';
-  });
-
-  registerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    clearError(registerForm);
-    showError(registerForm, t('auth.error.registerDisabled'));
-  });
+  }
 }
 
 // ------------------------------------------------------------
@@ -199,23 +211,42 @@ function mountSocials() {
 // Boot
 // ------------------------------------------------------------
 async function boot() {
-  // El login es siempre obligatorio: limpiamos cualquier sesión vieja.
-  logout();
-  if (redirectIfAuthenticated('./index.html')) return;
+  // 1) Config visual primero (logo / fondo / idioma) — no crítico.
+  try {
+    const config = readConfig();
+    setLanguage(config.lang || DEFAULT_LANG);
+    applyI18n(document);
+    applyLogo(config.logo || DEFAULT_LOGO);
+    applyBackground(config.background || DEFAULT_BACKGROUND);
+  } catch (err) {
+    console.error('[Login] config boot failed', err);
+  }
 
-  const config = readConfig();
-  setLanguage(config.lang || DEFAULT_LANG);
-  applyI18n(document);
-  applyLogo(config.logo || DEFAULT_LOGO);
-  applyBackground(config.background || DEFAULT_BACKGROUND);
+  // 2) Montar UI del login SIEMPRE, antes de cualquier redirección.
+  //    Así el formulario queda funcional pase lo que pase después.
+  try {
+    mountTheme();
+    mountTabs();
+    mountPasswordToggles();
+    mountForms();
+    mountSocials();
+    mountInputLimits(document);
+  } catch (err) {
+    console.error('[Login] UI mount failed', err);
+  }
 
-  mountTheme();
-  mountTabs();
-  mountPasswordToggles();
-  mountForms();
-  mountSocials();
-
-  mountInputLimits(document);
+  // 3) Si ya hay sesión válida, ir a la app.
+  //    Ojo: esto corre DESPUÉS de montar el form, para que un fallo
+  //    acá no deje la pantalla sin listener.
+  let shouldRedirect = false;
+  try {
+    shouldRedirect = await redirectIfAuthenticated('./index.html');
+  } catch (err) {
+    console.error('[Login] redirect check failed', err);
+  }
+  if (shouldRedirect) return;
 }
 
-boot();
+boot().catch(err => {
+  console.error('[Login] boot failed', err);
+});

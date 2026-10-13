@@ -8,7 +8,6 @@ import { filterRefs, refStepIndex, isRefClosed } from '../selectors.js';
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import { uid, highlightAndScroll, escapeHtml, cloneArray } from '../utils.js';
-import { renderCompanyChips, mountCompanyChips } from '../ui/empresasChips.js';
 import { renderDashboard, buildWeeklyTrend, buildDailyActivity } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n.js';
 
@@ -28,7 +27,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   let currentFilter = 'all';
   let searchTerm = '';
-  let selectedCompanies = new Set();
 
   let relacionChips = null;
   let estadoChips = null;
@@ -167,23 +165,51 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const list = document.getElementById('refList');
 
     if (filtered.length === 0) {
-      list.innerHTML = `
-        <div class="empty" style="padding: 2.5rem 1rem;">
-          <div class="empty-icon" style="font-size: 2.2rem;">🤝</div>
-          <h3 style="font-size: 1rem;">
-            ${escapeHtml(refs.length === 0 ? t('empty.refs.title') : t('empty.refs.filter.title'))}
-          </h3>
-          <p style="font-size: 0.85rem;">
-            ${escapeHtml(refs.length === 0 ? t('empty.refs.subtitle') : t('empty.refs.filter.subtitle'))}
-          </p>
-        </div>
-      `;
+      const noRefsAtAll = refs.length === 0;
+
+      list.innerHTML = noRefsAtAll
+        ? renderEmptyRefs(t('empty.refs.title'), t('empty.refs.subtitle'))
+        : renderEmptyFilter(t('empty.refs.filter.title'), t('empty.refs.filter.subtitle'));
       return;
     }
 
     list.innerHTML = filtered
       .map(r => renderRefCard(r, { jobs }))
       .join('');
+  }
+
+  // ----------------------------------------------------------
+  // Empty states (helpers)
+  // ----------------------------------------------------------
+  function renderEmptyRefs(title, subtitle) {
+    return `
+      <div class="empty-ref">
+        <div class="empty-ref-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </div>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(subtitle)}</p>
+      </div>
+    `;
+  }
+
+  function renderEmptyFilter(title, subtitle) {
+    return `
+      <div class="empty-filter">
+        <div class="empty-filter-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 4h16l-6 8v6l-4 2v-8L4 4z"/>
+          </svg>
+        </div>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(subtitle)}</p>
+      </div>
+    `;
   }
 
   refsStore.subscribe(renderRefs);
@@ -220,7 +246,8 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       link: valueOf('refLink'),
       relacion: relacionChips?.getValue() || 'Conocido',
       estado: initialState,
-      empresasVinculadas: [...selectedCompanies],
+      // Campos internos: los setea el flow de "Referido hecho" (refToJob).
+      empresasVinculadas: [],
       linkedJobId: null,
       notas: valueOf('refNotas'),
       volvioAtras: false,
@@ -233,13 +260,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     refForm.reset();
     relacionChips?.setValue(null);
     estadoChips?.setValue('Pendiente');
-    selectedCompanies = new Set();
-    const companies = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-    renderCompanyChips(
-      document.getElementById('refEmpresasWrap'),
-      selectedCompanies,
-      companies
-    );
 
     // Expandimos la lista y colapsamos el form
     expandRefsList();
@@ -250,27 +270,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
     showToast(t('toast.refAdded'), '✓');
   });
-
-  // ----------------------------------------------------------
-  // Linked companies
-  // ----------------------------------------------------------
-  mountCompanyChips(document.getElementById('refEmpresasWrap'), selectedCompanies);
-
-  jobsStore.subscribe(() => {
-    const companies = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-    renderCompanyChips(
-      document.getElementById('refEmpresasWrap'),
-      selectedCompanies,
-      companies
-    );
-  });
-
-  const companies = [...new Set(jobsStore.get().map(j => j.empresa).filter(Boolean))];
-  renderCompanyChips(
-    document.getElementById('refEmpresasWrap'),
-    selectedCompanies,
-    companies
-  );
 
   // ----------------------------------------------------------
   // Search and filters

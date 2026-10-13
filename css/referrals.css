@@ -777,3 +777,55 @@ form.form-block {
 .job-ref-chip[data-estado="En proceso"] .job-ref-estado-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .job-ref-chip[data-estado="Contratado"] .job-ref-estado-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
 .job-ref-chip[data-estado="No aplica"] .job-ref-estado-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+/* ============================================================
+   Empty state (referidos): ícono link + círculo accent
+   ============================================================ */
+
+.empty-ref {
+  text-align: center;
+  padding: 2.75rem 1rem 2.5rem;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.empty-ref-visual {
+  margin: 0 auto 1.1rem;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.empty-ref-visual svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.8;
+  display: block;
+}
+
+[data-theme="dark"] .empty-ref-visual {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.empty-ref h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.empty-ref p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.5;
+}

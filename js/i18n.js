@@ -100,7 +100,6 @@ const translations = {
     'refs.new.subtitle': 'Agregá una persona a tu red',
     'refs.nombre': 'Nombre',
     'refs.nombre.placeholder': 'Ej: Ana García',
-     'refs.nombre.placeholder': 'Ej: Ana García',
     'refs.hero.namePlaceholder': 'Nombre del referido',
     'refs.hero.required': 'Requerido',
     'refs.rol': 'Rol / Empresa',
@@ -203,7 +202,7 @@ const translations = {
     'ref.lockedBackTitle': 'No se puede volver atrás: la postulación ya fue creada',
 
     'empty.jobs.title': 'Todavía no cargaste postulaciones',
-    'empty.jobs.subtitle': 'Empezá agregando una arriba ☝️',
+    'empty.jobs.subtitle': 'Empezá agregando una arriba para hacerle seguimiento',
     'empty.jobs.filter.title': 'Sin resultados en este filtro',
     'empty.jobs.filter.subtitle': 'Probá con otro filtro o búsqueda',
     'empty.refs.title': 'Todavía no cargaste referidos',
@@ -627,7 +626,6 @@ const translations = {
     'refs.new.subtitle': 'Add someone to your network',
     'refs.nombre': 'Name',
     'refs.nombre.placeholder': 'Ex: Anna Smith',
-    'refs.nombre.placeholder': 'Ex: Anna Smith',
     'refs.hero.namePlaceholder': 'Referral name',
     'refs.hero.required': 'Required',
     'refs.rol': 'Role / Company',
@@ -730,7 +728,7 @@ const translations = {
     'ref.lockedBackTitle': "Can't go back: the application was already created",
 
     'empty.jobs.title': "You haven't added any applications yet",
-    'empty.jobs.subtitle': 'Start by adding one above ☝️',
+    'empty.jobs.subtitle': 'Start by adding one above to track it',
     'empty.jobs.filter.title': 'No results for this filter',
     'empty.jobs.filter.subtitle': 'Try another filter or search',
     'empty.refs.title': "You haven't added any referrals yet",

@@ -10,7 +10,6 @@
 // ============================================================
 
 const SESSION_KEY         = 'jobTrackerSession';
-const FRESH_LOGIN_FLAG    = 'jobTrackerFreshLogin';
 const RATE_KEY            = 'jobTrackerLoginRate';
 const INSTALL_SECRET_KEY  = 'jobTrackerInstallSecret';
 
@@ -191,7 +190,6 @@ export async function login({ username = '', email = '', name = '' } = {}) {
   try {
     localStorage.removeItem(SESSION_KEY);
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    sessionStorage.setItem(FRESH_LOGIN_FLAG, '1');
   } catch (e) {
     console.error('[Session] persist failed', e);
   }
@@ -202,7 +200,6 @@ export function logout() {
   try {
     localStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(FRESH_LOGIN_FLAG);
   } catch (e) {
     console.error('[Session] logout failed', e);
   }
@@ -213,21 +210,26 @@ export function logout() {
 // ------------------------------------------------------------
 export async function requireSession(redirectTo = './login.html') {
   const session = getSession();
-  const fresh = sessionStorage.getItem(FRESH_LOGIN_FLAG) === '1';
   const valid = await isValidSession(session);
 
-  if (session && valid && fresh) {
-    sessionStorage.removeItem(FRESH_LOGIN_FLAG);
-    return true;
-  }
+  if (valid) return true;
 
   logout();
   window.location.replace(redirectTo);
   return false;
 }
 
-export function redirectIfAuthenticated(/* redirectTo */) {
-  // El login es siempre obligatorio: nunca salteamos la pantalla.
+/**
+ * Si hay una sesión válida, redirige a la app.
+ * Devuelve true si redirigió (para cortar el boot del login).
+ */
+export async function redirectIfAuthenticated(redirectTo = './index.html') {
+  const session = getSession();
+  const valid = await isValidSession(session);
+  if (valid) {
+    window.location.replace(redirectTo);
+    return true;
+  }
   return false;
 }
 

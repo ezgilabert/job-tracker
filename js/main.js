@@ -366,10 +366,6 @@ async function boot() {
     window.location.replace('./login.html');
   });
 
-  window.addEventListener('pagehide', () => {
-    try { sessionStorage.removeItem('jobTrackerFreshLogin'); } catch {}
-  });
-
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();

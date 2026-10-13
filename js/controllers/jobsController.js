@@ -177,19 +177,52 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
 
     if (filtered.length === 0) {
       const noJobsAtAll = jobs.length === 0;
-      list.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">📭</div>
-          <h3>${escapeHtml(noJobsAtAll ? t('empty.jobs.title') : t('empty.jobs.filter.title'))}</h3>
-          <p>${escapeHtml(noJobsAtAll ? t('empty.jobs.subtitle') : t('empty.jobs.filter.subtitle'))}</p>
-        </div>
-      `;
+
+      list.innerHTML = noJobsAtAll
+        ? renderEmptyJobs(t('empty.jobs.title'), t('empty.jobs.subtitle'))
+        : renderEmptyFilter(t('empty.jobs.filter.title'), t('empty.jobs.filter.subtitle'));
       return;
     }
 
     list.innerHTML = filtered
       .map((job, i) => renderJobCard(job, { referidos: refs, index: i }))
       .join('');
+  }
+
+  // ----------------------------------------------------------
+  // Empty states (helpers)
+  // ----------------------------------------------------------
+  function renderEmptyJobs(title, subtitle) {
+    return `
+      <div class="empty-jobs">
+        <div class="empty-jobs-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="8" y="2" width="8" height="4" rx="1"/>
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <path d="M9 12h6"/>
+            <path d="M9 16h4"/>
+          </svg>
+        </div>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(subtitle)}</p>
+      </div>
+    `;
+  }
+
+  function renderEmptyFilter(title, subtitle) {
+    return `
+      <div class="empty-filter">
+        <div class="empty-filter-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 4h16l-6 8v6l-4 2v-8L4 4z"/>
+          </svg>
+        </div>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(subtitle)}</p>
+      </div>
+    `;
   }
 
   jobsStore.subscribe(renderList);
@@ -216,9 +249,9 @@ export function mountJobsController(jobsStore, refsStore, modals, fechaPicker, c
     }
 
     container.innerHTML = filters.map(f => {
-      const { label, icon } = getFilterLabel(f.id);
+      const { label } = getFilterLabel(f.id);
       const active = f.id === currentFilter ? 'active' : '';
-      return `<button data-filter="${escapeHtml(f.id)}" class="${active}">${icon} ${escapeHtml(label)}</button>`;
+      return `<button data-filter="${escapeHtml(f.id)}" class="${active}">${escapeHtml(label)}</button>`;
     }).join('');
   }
 
