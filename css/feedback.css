@@ -54,6 +54,7 @@
 
 /* ============================================================
    Reset animation: overlay de reinicio con anillo de progreso
+   Escala C (~1.5x) · consistente con el loading overlay
    ============================================================ */
 
 .reset-overlay {
@@ -86,16 +87,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2.25rem;
   text-align: center;
   padding: 0 1.5rem;
-  max-width: 360px;
+  max-width: 520px;
 }
 
 /* --- Anillo --- */
 .reset-ring {
-  width: 96px;
-  height: 96px;
+  width: 144px;
+  height: 144px;
   position: relative;
 }
 
@@ -132,7 +133,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: 1.15rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
@@ -141,19 +142,19 @@
 
 /* --- Textos --- */
 .reset-label {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--text);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   animation: resetFadeUp 0.5s ease both;
 }
 
 .reset-sub {
-  font-size: 0.78rem;
+  font-size: 1.05rem;
   color: var(--text-muted);
   font-weight: 500;
   animation: resetFadeUp 0.5s 0.15s ease both;
-  margin-top: -0.75rem;
+  margin-top: -1.35rem;
 }
 
 @keyframes resetFadeUp {

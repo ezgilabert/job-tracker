@@ -205,6 +205,21 @@ header {
 }
 
 /* ============================================================
+   User menu trigger: más grande que el resto de .icon-btn
+   ============================================================ */
+
+#userBtn {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+}
+
+#userBtn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================================
    User menu: icon-btn trigger + dropdown
    ============================================================ */
 
