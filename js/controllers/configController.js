@@ -218,6 +218,10 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   // ----------------------------------------------------------
   // Restablecer preferencias (solo config)
+  //   No recarga la página: resetea los stores en memoria y
+  //   los subscribers se encargan de re-renderizar. Esto evita
+  //   pasar por el guard de auth (requireSession) y ser redirigido
+  //   a login.html.
   // ----------------------------------------------------------
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
@@ -238,14 +242,16 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     if (resetAnim) {
       await resetAnim.run(2400);
-      window.location.reload();
-    } else {
-      window.location.reload();
+      await resetAnim.hide();
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // ----------------------------------------------------------
   // Borrar datos (jobs + refs). NO toca la config.
+  //   Tampoco recarga. Wipea los dos stores y deja que el
+  //   subscriber re-renderice las listas vacías.
   // ----------------------------------------------------------
   document.getElementById('resetDataBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -264,17 +270,28 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
+    // Persistimos cualquier cambio pendiente de config antes de cerrar
+    // (el usuario está dentro del modal de config, tal vez tocó algo).
+    saveDraft();
+
     jobsStore.update(() => []);
     refsStore.update(() => []);
+
+    closeDirect();
+    unsavedModal.classList.remove('open');
 
     showToast(
       t('toast.dataReset', { jobs: jobsCount, refs: refsCount }),
       '🗑️'
     );
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // ----------------------------------------------------------
   // Restablecer TODO (config + datos + tema).
+  //   Sin recarga: seteamos cada store a su valor por defecto y
+  //   forzamos el tema a 'light'. Los subscribers hacen el resto.
   // ----------------------------------------------------------
   document.getElementById('resetAllBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -288,23 +305,26 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    try {
-      localStorage.removeItem(STORAGE_KEYS.JOBS);
-      localStorage.removeItem(STORAGE_KEYS.REFS);
-      localStorage.removeItem(STORAGE_KEYS.CONFIG);
-      localStorage.removeItem(STORAGE_KEYS.THEME);
-    } catch (_) { /* noop */ }
+    // Reset de tema (no vive en configStore)
+    try { localStorage.setItem(STORAGE_KEYS.THEME, 'light'); } catch (_) {}
+    document.documentElement.setAttribute('data-theme', 'light');
+
+    // Reset de los tres stores a sus valores por defecto
+    configStore.update(() => getDefaultConfig());
+    jobsStore.update(() => []);
+    refsStore.update(() => []);
 
     draft = getDefaultConfig();
+    preferredDefaultState = draft.estadoInicialDefault || null;
     closeDirect();
     unsavedModal.classList.remove('open');
 
     if (resetAnim) {
       await resetAnim.run(2400);
-      window.location.reload();
-    } else {
-      window.location.reload();
+      await resetAnim.hide();
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   tabs.forEach(tab => {

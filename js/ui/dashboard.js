@@ -14,12 +14,15 @@
 //   - 'circular'   → anillos de progreso SVG
 //   - 'heatmap'    → calendario de actividad tipo GitHub
 //
+// El resumen (summary) se renderiza SIEMPRE, en cualquier estilo,
+// al final del body.
+//
 // Uso:
 //   renderDashboard(container, {
 //     style: 'sparklines' | 'modular' | ... ,
-//     kind: 'jobs' | 'refs',           // ← determina color + clase
-//     icon: '📋',                      // ← ícono del header
-//     label: 'Postulaciones',          // ← título del header
+//     kind: 'jobs' | 'refs',
+//     icon: '📋',
+//     label: 'Postulaciones',
 //     total, active, closed, inProcess, highlight,
 //     highlightLabel, highlightIcon,
 //     trend: { total, active, highlight, closed },
@@ -153,13 +156,6 @@ function renderSparklines(container, data) {
   }).join('');
 
   container.appendChild(grid);
-
-  if (data.summary) {
-    const strip = document.createElement('div');
-    strip.className = 'dash-strip';
-    strip.innerHTML = `<span class="dash-strip-icon">📈</span><span class="dash-strip-text">${data.summary}</span>`;
-    container.appendChild(strip);
-  }
 }
 
 // ============================================================
@@ -310,7 +306,6 @@ function renderCircular(container, data) {
 
   el.innerHTML = rings.map(r => {
     const pct = total > 0 ? Math.round((r.num / total) * 100) : 0;
-    // Cuando es "Total", mostramos el anillo completo
     const fillPct = r.showPct ? pct : 100;
     const offset = CIRC * (1 - fillPct / 100);
 
@@ -391,6 +386,21 @@ function renderHeatmap(container, data) {
 }
 
 // ============================================================
+// Summary strip (compartido por los 6 estilos)
+// ============================================================
+function renderSummary(container, data) {
+  if (!data.summary) return;
+
+  const strip = document.createElement('div');
+  strip.className = 'dash-strip';
+  strip.innerHTML = `
+    <span class="dash-strip-icon">📈</span>
+    <span class="dash-strip-text">${data.summary}</span>
+  `;
+  container.appendChild(strip);
+}
+
+// ============================================================
 // Entry point
 // ============================================================
 export function renderDashboard(container, data) {
@@ -427,6 +437,9 @@ export function renderDashboard(container, data) {
       renderSparklines(body, data);
       break;
   }
+
+  // ⭐ El summary va SIEMPRE, para los 6 estilos
+  renderSummary(body, data);
 
   wrapper.appendChild(body);
   container.appendChild(wrapper);
