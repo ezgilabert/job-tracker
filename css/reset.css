@@ -1,0 +1,29 @@
+/* ============================================================
+   Reset + body + page container.
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-1);
+  color: var(--text);
+  line-height: 1.55;
+  padding: 2rem 1rem 4rem;
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+}

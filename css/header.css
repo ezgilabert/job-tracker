@@ -1,0 +1,179 @@
+/* ============================================================
+   Header: top bar, brand, logo, icon buttons.
+   ============================================================ */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   Brand + hover animation (gradient sweep)
+   ============================================================ */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  cursor: pointer;
+}
+
+.brand-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #a78bfa, #c084fc);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 22px rgba(124,92,255,0.28);
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] .brand-logo {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 10px 30px var(--accent-glow);
+}
+
+.brand-logo svg {
+  width: 34px;
+  height: 34px;
+  color: #ffffff;
+  display: block;
+  flex-shrink: 0;
+}
+
+.brand h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  line-height: 1.1;
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+}
+
+.brand p {
+  font-size: 0.98rem;
+  color: var(--text-muted);
+  transition: color 0.3s ease;
+}
+
+/* ===== Hover: gradient sweep on the title ===== */
+
+.brand:hover h1 {
+  background: linear-gradient(
+    90deg,
+    var(--text) 0%,
+    var(--text) 35%,
+    var(--accent) 50%,
+    var(--text) 65%,
+    var(--text) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brandGradientSweep 1.2s ease infinite;
+}
+
+[data-theme="dark"] .brand:hover h1 {
+  background: linear-gradient(
+    90deg,
+    var(--text) 0%,
+    var(--text) 35%,
+    var(--accent) 50%,
+    var(--text) 65%,
+    var(--text) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes brandGradientSweep {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.brand:hover .brand-logo {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(124,92,255,0.45);
+}
+
+[data-theme="dark"] .brand:hover .brand-logo {
+  box-shadow: 0 14px 36px var(--accent-glow);
+}
+
+.brand:hover p {
+  color: var(--accent);
+}
+
+.brand:not(:hover) h1 {
+  -webkit-text-fill-color: currentColor;
+}
+
+/* ============================================================
+   Header actions + icon buttons
+   ============================================================ */
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .icon-btn {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.icon-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--accent-glow);
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+/* ============================================================
+   User menu trigger button (slightly larger than .icon-btn)
+   ============================================================ */
+
+#userBtn {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+}
+
+#userBtn svg {
+  width: 24px;
+  height: 24px;
+}

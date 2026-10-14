@@ -1,9 +1,18 @@
 /* ============================================================
    Job Tracker — CSS entry point
    Imports only. Styles live in the listed files.
+
+   Order matters:
+     tokens must load first (defines the variables every other
+     file references). reset then normalizes. Everything else
+     can be reordered freely.
    ============================================================ */
 
-@import url('./base.css');
+@import url('./tokens.css');
+@import url('./reset.css');
+@import url('./header.css');
+@import url('./user-menu.css');
+
 @import url('./backgrounds.css');
 @import url('./dashboard.css');
 @import url('./forms.css');
