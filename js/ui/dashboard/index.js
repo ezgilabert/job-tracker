@@ -74,6 +74,3 @@ export function renderDashboard(container, data) {
   wrapper.appendChild(body);
   container.appendChild(wrapper);
 }
-
-// Re-export the shared helpers used by controllers.
-export { buildWeeklyTrend, buildDailyActivity } from './shared.js';

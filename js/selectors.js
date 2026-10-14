@@ -1,5 +1,5 @@
 // ============================================================
-// Pure state selectors: stats, filters, sort
+// Pure state selectors: stats, filters, sort, dashboard data.
 // ============================================================
 
 import {
@@ -160,4 +160,79 @@ export function refsForCompany(refs, company) {
   return refs.filter(r =>
     Array.isArray(r.linkedCompanies) && r.linkedCompanies.includes(company)
   );
+}
+
+// ============================================================
+// Dashboard data: pure helpers shared by jobs + referrals.
+// ============================================================
+
+/**
+ * Counts the occurrences of a key across a set of items and returns
+ * them sorted by count descending.
+ *
+ * The key function may return:
+ *   - a single string (counted once)
+ *   - an array of strings (each unique value counted once)
+ *   - null / undefined / '' (skipped)
+ *
+ * @param {object[]} items
+ * @param {(item: object) => string|string[]|null|undefined} keyFn
+ * @returns {{ name: string, count: number }[]}
+ */
+export function topByCount(items, keyFn) {
+  const counts = {};
+  for (const item of items) {
+    const raw = keyFn(item);
+    const keys = Array.isArray(raw) ? raw : [raw];
+    for (const key of keys) {
+      if (!key) continue;
+      counts[key] = (counts[key] || 0) + 1;
+    }
+  }
+  return Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Cumulative weekly trend: returns N points, each with the number
+ * of items that existed by the end of that week.
+ */
+export function buildWeeklyTrend(items, getDate, weeks = 4) {
+  const now = Date.now();
+  const points = [];
+  for (let i = weeks - 1; i >= 0; i--) {
+    const cutoff = now - i * 7 * 86400000;
+    let count = 0;
+    for (const it of items) {
+      const d = getDate(it);
+      if (!d) continue;
+      const ts = new Date(d).getTime();
+      if (!isNaN(ts) && ts <= cutoff) count++;
+    }
+    points.push(count);
+  }
+  return points;
+}
+
+/**
+ * Per-day activity for the heatmap. Returns an array of N numbers
+ * (one per day, oldest first).
+ */
+export function buildDailyActivity(items, getDate, days = 60) {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const buckets = new Array(days).fill(0);
+  for (const it of items) {
+    const d = getDate(it);
+    if (!d) continue;
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) continue;
+    dt.setHours(0, 0, 0, 0);
+    const diffDays = Math.floor((now - dt) / 86400000);
+    if (diffDays >= 0 && diffDays < days) {
+      buckets[days - 1 - diffDays]++;
+    }
+  }
+  return buckets;
 }

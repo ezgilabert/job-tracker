@@ -1,13 +1,12 @@
 // ============================================================
 // Dashboard: re-export shim.
 //
-// Real implementation lives in ./dashboard/ (index.js + one
-// file per style + shared.js). This file exists so existing
-// imports from '../ui/dashboard.js' keep working unchanged.
+// Real implementation lives in ./dashboard/. This file exists so
+// existing imports from '../ui/dashboard.js' keep working.
+//
+// Only renderDashboard is exposed here. Trend/activity helpers
+// live in js/selectors.js (they are derivations of state, not
+// dashboard presentation).
 // ============================================================
 
-export {
-  renderDashboard,
-  buildWeeklyTrend,
-  buildDailyActivity,
-} from './dashboard/index.js';
+export { renderDashboard } from './dashboard/index.js';

@@ -1,5 +1,8 @@
 // ============================================================
 // Dashboard: shared utilities used by every style.
+//
+// Trend/activity helpers live in js/selectors.js now — they are
+// derivations of state, not dashboard presentation.
 // ============================================================
 
 import { escapeHtml } from '../../utils.js';
@@ -36,49 +39,6 @@ export function buildSparkPath(values, width = 100, height = 32) {
     d += ` Q ${cx} ${y1} ${x1} ${y1}`;
   }
   return d;
-}
-
-/**
- * Cumulative weekly trend: returns N points, each with the number
- * of items that existed by the end of that week.
- */
-export function buildWeeklyTrend(items, getDate, weeks = 4) {
-  const now = Date.now();
-  const points = [];
-  for (let i = weeks - 1; i >= 0; i--) {
-    const cutoff = now - i * 7 * 86400000;
-    let count = 0;
-    for (const it of items) {
-      const d = getDate(it);
-      if (!d) continue;
-      const ts = new Date(d).getTime();
-      if (!isNaN(ts) && ts <= cutoff) count++;
-    }
-    points.push(count);
-  }
-  return points;
-}
-
-/**
- * Per-day activity for the heatmap. Returns an array of N numbers
- * (one per day, oldest first).
- */
-export function buildDailyActivity(items, getDate, days = 60) {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const buckets = new Array(days).fill(0);
-  for (const it of items) {
-    const d = getDate(it);
-    if (!d) continue;
-    const dt = new Date(d);
-    if (isNaN(dt.getTime())) continue;
-    dt.setHours(0, 0, 0, 0);
-    const diffDays = Math.floor((now - dt) / 86400000);
-    if (diffDays >= 0 && diffDays < days) {
-      buckets[days - 1 - diffDays]++;
-    }
-  }
-  return buckets;
 }
 
 /**

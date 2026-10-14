@@ -4,11 +4,14 @@
 
 import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
-import { filterRefs, refStepIndex, isRefClosed } from '../selectors.js';
+import {
+  filterRefs, refStepIndex, isRefClosed,
+  topByCount, buildWeeklyTrend, buildDailyActivity,
+} from '../selectors.js';
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import { uid, highlightAndScroll, escapeHtml, cloneArray, valueOf } from '../utils.js';
-import { renderDashboard, buildWeeklyTrend, buildDailyActivity } from '../ui/dashboard.js';
+import { renderDashboard } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n.js';
 import { scrollToJob, onScrollToRef, onI18nChanged } from '../events.js';
 
@@ -86,18 +89,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const inProcess = refs.filter(r => r.status === 'In Process').length;
     const conversionRate = total ? Math.round((hired / total) * 100) : 0;
 
-    const relationshipCount = {};
-    refs.forEach(r => {
-      if (!r.relationship) return;
-      const list = Array.isArray(r.relationship) ? r.relationship : [r.relationship];
-      list.forEach(rel => {
-        if (!rel) return;
-        relationshipCount[rel] = (relationshipCount[rel] || 0) + 1;
-      });
-    });
-    const top = Object.entries(relationshipCount)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
+    const top = topByCount(refs, r => r.relationship);
 
     const getDate = r => r.createdAt || r.date || '';
     const trendTotal = buildWeeklyTrend(refs, getDate);

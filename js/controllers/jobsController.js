@@ -11,9 +11,10 @@ import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
 import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
-import { renderDashboard, buildWeeklyTrend, buildDailyActivity } from '../ui/dashboard.js';
+import { renderDashboard } from '../ui/dashboard.js';
 import {
   computeStats, filterJobs, sortJobs, isClosed,
+  topByCount, buildWeeklyTrend, buildDailyActivity,
 } from '../selectors.js';
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
 import { renderJobCard } from '../templates/jobCard.js';
@@ -96,14 +97,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     const total = stats.total;
     const successRate = total ? Math.round((offers / total) * 100) : 0;
 
-    const companyCount = {};
-    jobs.forEach(j => {
-      if (!j.company) return;
-      companyCount[j.company] = (companyCount[j.company] || 0) + 1;
-    });
-    const top = Object.entries(companyCount)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
+    const top = topByCount(jobs, j => j.company);
 
     const getDate = j => j.date || j.createdAt || '';
     const trendTotal = buildWeeklyTrend(jobs, getDate);
