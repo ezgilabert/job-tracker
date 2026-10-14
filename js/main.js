@@ -14,6 +14,7 @@ import { mountTheme, applyLogo } from './boot/theme.js';
 import { mountUserMenu }   from './boot/userMenu.js';
 import { pulseI18nTexts }  from './boot/i18nPulse.js';
 import { mountKeyboardShortcuts } from './boot/keyboard.js';
+import { mountFirstRun }   from './boot/firstRun.js';
 
 import { mountJobsController }      from './controllers/jobsController.js';
 import { mountRefsController }      from './controllers/refsController.js';
@@ -108,11 +109,12 @@ async function boot() {
   refsCtrl.initChips(refRelationshipChips, refStatusChips);
 
   // ----------------------------------------------------------
-  // Theme + header + keyboard shortcuts
+  // Theme + header + keyboard shortcuts + first-run banner
   // ----------------------------------------------------------
   mountTheme();
   mountUserMenu(configStore);
   mountKeyboardShortcuts();
+  mountFirstRun(jobsStore, refsStore);
 
   // ----------------------------------------------------------
   // Session heartbeat

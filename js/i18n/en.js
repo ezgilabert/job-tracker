@@ -12,6 +12,15 @@ export const en = {
   'action.language': 'Switch language',
   'action.print': 'Print / PDF',
 
+  // ===== First-run welcome =====
+  'welcome.title': 'Welcome to Job Tracker!',
+  'welcome.subtitle': 'A few shortcuts to get you started faster:',
+  'welcome.tip.new': 'Press N to add a new application',
+  'welcome.tip.search': 'Press / to jump to the search box',
+  'welcome.tip.drag': 'Drag cards to reorder them',
+  'welcome.tip.settings': 'Click your avatar to open Settings',
+  'welcome.dismiss': 'Got it',
+
   'auth.documentTitle': 'Job Tracker · Sign in',
   'auth.tab.login': 'Sign in',
   'auth.tab.register': 'Create account',

@@ -12,6 +12,15 @@ export const es = {
   'action.language': 'Cambiar idioma',
   'action.print': 'Imprimir / PDF',
 
+  // ===== First-run welcome =====
+  'welcome.title': '¡Bienvenido a Job Tracker!',
+  'welcome.subtitle': 'Un par de atajos para arrancar más rápido:',
+  'welcome.tip.new': 'Presioná N para agregar una nueva postulación',
+  'welcome.tip.search': 'Presioná / para saltar al buscador',
+  'welcome.tip.drag': 'Arrastrá las tarjetas para reordenarlas',
+  'welcome.tip.settings': 'Hacé click en tu avatar para abrir Configuración',
+  'welcome.dismiss': 'Entendido',
+
   'auth.documentTitle': 'Job Tracker · Acceso',
   'auth.tab.login': 'Iniciar sesión',
   'auth.tab.register': 'Crear cuenta',
