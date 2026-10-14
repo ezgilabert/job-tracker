@@ -413,7 +413,7 @@ export const es = {
 
   // ===== Ref → Job =====
   'refToJob.title': '¡Referido hecho!',
-  'refToJob.message': '<strong>{name}</strong> ya te hizo el referido. ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?',
+  'refToJob.message': ' ya te hizo el referido. ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?',
   'refToJob.createNew': 'Crear nueva postulación',
   'refToJob.createNewDesc': 'Se precarga con los datos del referido',
   'refToJob.linkExisting': 'Vincular a una existente',

@@ -413,7 +413,7 @@ export const en = {
 
   // ===== Ref → Job =====
   'refToJob.title': 'Referral done!',
-  'refToJob.message': '<strong>{name}</strong> has referred you. Do you want to move it to <strong>Applications</strong> to track it?',
+  'refToJob.message': ' has referred you. Do you want to move it to <strong>Applications</strong> to track it?',
   'refToJob.createNew': 'Create new application',
   'refToJob.createNewDesc': 'Pre-filled with the referral data',
   'refToJob.linkExisting': 'Link to existing',
