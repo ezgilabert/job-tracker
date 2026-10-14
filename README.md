@@ -96,7 +96,7 @@ state, and closing prompts to discard or save.
   recent action stays undoable; starting a new one dismisses the previous
   toast so the user never restores an intermediate state.
 - **First-run welcome banner** — teaches the keyboard shortcuts, drag-to-
-  reorder and where Settings lives. Dismissed once and never shown again.
+  reorder and where Settings lives. Dismissed once per user.
 - All UI is fully internationalized (Spanish / English). Reason chips, empty
   states, and every label come from the dictionary — no hardcoded strings.
 - Empty states are SVG-based, not emoji: clipboard for jobs, link for
@@ -126,8 +126,8 @@ state, and closing prompts to discard or save.
 
 ## Authentication
 
-Single-device mock. **Not real security** — anyone with DevTools can bypass
-it. It's "raising the bar" until a backend exists.
+Single-device, multi-user mock. **Not real security** — anyone with DevTools
+can bypass it. It's "raising the bar" until a backend exists.
 
 ### User registry
 
@@ -166,10 +166,42 @@ The registry API lives in `js/auth/users.js`:
 | `hasAnyUser()` | True if at least one account exists |
 | `findUserByUsername(u)` / `findUserByEmail(e)` / `findUserById(id)` | Lookups |
 | `createUser({ username, email, name, password })` | Hashes + stores |
-| `verifyPassword(user, password)` | Constant-time-ish compare |
+| `verifyPassword(user, password)` | Compares a hash |
 | `validateRegistration({ ... })` | Field-level validation, returns i18n keys |
 | `computeHash(salt, pw)` | Utility |
 | `deleteUser(id)` | Removes a record |
+
+### Per-user data isolation
+
+Every store is **scoped to the user id**:
+
+| Logical store | `localStorage` key |
+| --- | --- |
+| Applications | `jobTrackerV2__<userId>` |
+| Referrals | `jobTrackerReferrals__<userId>` |
+| Config | `jobTrackerConfig__<userId>` |
+| Welcome banner flag | `jobTrackerWelcomeDismissed__<userId>` |
+
+Shared (not prefixed):
+
+| What | Key | Why |
+| --- | --- | --- |
+| User registry | `jobTrackerUsers` | It's the registry itself. |
+| Theme | `jobTrackerTheme` | Device-level preference (same screen, same light). |
+| Last active user | `jobTrackerActiveUser` | Lets `login.html` show the last user's brand/background before a session exists. |
+| Session | `jobTrackerSession` | Per-tab (`sessionStorage`). |
+| Login rate limit | `jobTrackerLoginRate` | Per-install. |
+| Install secret | `jobTrackerInstallSecret` | Used to sign sessions. |
+
+`STORAGE_KEYS` in `js/app/constants.js` exposes the three prefixed keys
+as functions (`STORAGE_KEYS.JOBS(userId)`), not strings — callers must
+be explicit about which user they mean.
+
+**Legacy migration.** Before the multi-user refactor, every store lived
+under a single non-prefixed key. `migrateLegacyStorage(userId)` (in
+`js/app/migrations.js`) runs once per boot: the first user who logs in
+after the upgrade gets the old payloads moved into their scoped keys.
+Subsequent users start fresh. The legacy keys are then deleted.
 
 ### Session layer (`js/auth/session.js`)
 
@@ -184,6 +216,25 @@ The registry API lives in `js/auth/users.js`:
 - **Rate limiting**: 5 failed login attempts → 5-minute lockout
   (persisted in `localStorage`). Rate limiting applies to login only,
   not registration.
+
+### Profile seed and session sync
+
+When a user registers, their `name` / `email` / `username` go into the
+users registry. The config store starts with an empty `profile`. To
+avoid showing blank fields in Settings → Profile right after
+registering, `main.js` runs `seedProfileFromSession()` on boot: it
+copies the name (split into first + last), email and username from the
+session into `profile`, then marks `profile.seeded = true` so the seed
+runs once per user and never overwrites manual edits.
+
+When the user edits their profile and clicks Save, the config store
+emits a `PROFILE_CHANGED` event. Two subscribers react:
+
+1. `userMenu.js` re-renders the header dropdown so the new name shows
+   up immediately.
+2. `main.js` patches the current session in place (via
+   `updateSessionProfile()`) so the header keeps the new name after a
+   reload.
 
 ### Registering a new account
 
@@ -235,11 +286,13 @@ Never leave the plain password in the repo.
 | --- | --- |
 | `getSession()` | Returns the parsed session or `null` |
 | `isValidSession(s)` | Verifies signature + expiry |
-| `login({ username, email, name })` | Creates and signs a session |
+| `login({ userId, username, email, name })` | Creates and signs a session |
 | `registerUser({ username, email, name, password })` | Creates the user and logs them in |
-| `logout()` | Clears the session |
+| `logout()` | Clears the session (keeps `ACTIVE_USER`) |
 | `validateCredentials(id, pw)` | Looks the user up, checks the hash, updates rate limit |
 | `getLockoutRemainingMs()` | Ms remaining until lockout expires |
+| `getActiveUserId()` | Id of the last user who logged in |
+| `updateSessionProfile({ name, email })` | Patches the session without re-signing |
 | `computeHash(salt, pw)` | Re-exported from `users.js` |
 | `requireSession(redirectTo)` | Guard for protected pages |
 | `redirectIfAuthenticated(redirectTo)` | Guard for `login.html` |
@@ -249,16 +302,14 @@ Never leave the plain password in the repo.
 
 ## Data model
 
-Three stores, each persisted under its own key via the `Store` class
-(`js/app/store.js`), which handles versioning and migrations.
+Three stores (per user), each persisted under its own scoped key via the
+`Store` class (`js/app/store.js`), which handles versioning and migrations.
 
-| Key | Store | Version | Contents |
-| --- | --- | --- | --- |
-| `jobTrackerV2` | `jobs` | 5 | Array of applications |
-| `jobTrackerReferrals` | `refs` | 5 | Array of referrals |
-| `jobTrackerConfig` | `config` | 3 | User preferences |
-| `jobTrackerUsers` | — | — | Array of user accounts |
-| `jobTrackerTheme` | — | — | `'light'` \| `'dark'` |
+| Store | Version | Contents |
+| --- | --- | --- |
+| `jobs` | 5 | Array of applications |
+| `refs` | 5 | Array of referrals |
+| `config` | 3 | User preferences |
 
 ### Application shape (abridged)
 
@@ -309,7 +360,7 @@ Three stores, each persisted under its own key via the `Store` class
 {
   lang, logo, background,
   dashboardStyleJobs, dashboardStyleRefs,
-  profile: { firstName, lastName, username, email, bio, avatar },
+  profile: { firstName, lastName, username, email, bio, avatar, seeded },
   roles: { activeTags, hidden, custom, customTags },
   initialStatuses: [...],
   defaultInitialStatus: 'Applied',
@@ -319,15 +370,17 @@ Three stores, each persisted under its own key via the `Store` class
 
 ### Migration
 
-`js/app/migrations.js` owns every legacy → current conversion and is used from
-two places:
+`js/app/migrations.js` owns every legacy → current conversion and is used
+from three places:
 
 - **Boot** — each `Store` receives a `migrate` function that runs once when a
   stored payload's version is older than the current one.
-- **Backup import** — `configController` routes imported data through the same
+- **Backup import** — the Advanced panel routes imported data through the same
   functions so files exported by older builds keep working.
+- **Legacy storage** — `migrateLegacyStorage(userId)` runs once per boot to
+  move pre-multi-user payloads into the current user's scoped keys.
 
-The migration pipeline:
+The schema migration pipeline:
 
 - Backfills missing fields on legacy records.
 - Maps legacy Spanish keys to English (`empresa` → `company`, `puesto` → `role`,
@@ -386,9 +439,9 @@ There is no default account. On the first visit, register one from the
 
 ## Tests
 
-The pure modules (selectors, utils, migrations, store, users, i18n) have a
-smoke test suite built on Node's built-in test runner — no dependencies to
-install.
+The pure modules (selectors, utils, migrations, store, users, icons, i18n)
+have a smoke test suite built on Node's built-in test runner — no
+dependencies to install.
 
 ```bash
 npm test
@@ -400,16 +453,19 @@ Expected output: everything green. The suite covers:
 
 | File | Coverage |
 | --- | --- |
-| `tests/selectors.test.js` | Filters, sort, stats, dashboard helpers |
-| `tests/utils.test.js` | `escapeHtml`, date helpers, `uid`, array helpers |
-| `tests/migrations.test.js` | Every legacy → current schema map |
-| `tests/store.test.js` | Persistence, subscribe, versioning, migration |
-| `tests/users.test.js` | User registry: hash, lookups, validation |
-| `tests/constants.test.js` | Sprite names, workflow tables, defaults |
-| `tests/i18n.test.js` | Translations, interpolation, no residual emojis |
+| `tests/app/selectors.test.js` | Filters, sort, stats, dashboard helpers |
+| `tests/app/utils.test.js` | `escapeHtml`, date helpers, `uid`, array helpers |
+| `tests/app/migrations.test.js` | Schema migrations + legacy storage migration |
+| `tests/app/store.test.js` | Persistence, subscribe, versioning, migration |
+| `tests/app/constants.test.js` | Sprite names, workflow tables, defaults |
+| `tests/app/icons.test.js` | Sprite reference emitter + name guard |
+| `tests/auth/users.test.js` | User registry: hash, lookups, validation |
+| `tests/auth/session.test.js` | Rate limiting, signing, session helpers |
+| `tests/i18n/index.test.js` | Translations, interpolation, no residual emojis |
 
-The test files stub `localStorage` (a small in-memory Map) so they run in a
-plain Node environment, no jsdom needed.
+The test files stub `localStorage` (and, where relevant, `sessionStorage`)
+with a small in-memory Map so they run in a plain Node environment, no
+jsdom needed.
 
 ---
 
@@ -425,14 +481,14 @@ plain Node environment, no jsdom needed.
 │   ├── favicon.svg
 │   └── icons.svg                 # SVG sprite for every inline icon
 ├── js/
-│   ├── main.js                   # Boot orchestration only (~120 lines)
+│   ├── main.js                   # Boot orchestration only
 │   │
 │   ├── app/                      # Infra + domain
 │   │   ├── constants.js          # Workflow steps, states, defaults, options
-│   │   ├── events.js             # Typed event bus (scroll-to-*, i18n-changed)
-│   │   ├── icons.js              # icon() helper, sprite reference emitter
-│   │   ├── migrations.js         # Legacy → current schema maps
-│   │   ├── selectors.js          # Pure state selectors (filters, stats, trends)
+│   │   ├── events.js             # Typed event bus
+│   │   ├── icons.js              # icon() helper (sprite reference emitter)
+│   │   ├── migrations.js         # Legacy → current + legacy storage → scoped
+│   │   ├── selectors.js          # Pure state selectors
 │   │   ├── store.js              # Reactive localStorage store w/ migrations
 │   │   ├── undo.js               # withUndo() helper
 │   │   └── utils.js              # Shared helpers (+ updateById, withHistoryEntry)
@@ -445,22 +501,40 @@ plain Node environment, no jsdom needed.
 │   ├── auth/                     # Mock auth
 │   │   ├── login.js              # Login screen entry point
 │   │   ├── users.js              # Local user registry (hash + salt)
-│   │   └── session.js            # Session signing, guards
+│   │   └── session.js            # Session signing, guards, active-user helper
 │   │
 │   ├── boot/                     # Startup side-effects
 │   │   ├── firstRun.js           # First-run welcome banner
 │   │   ├── i18nPulse.js          # Cascade animation on language change
 │   │   ├── keyboard.js           # Shortcuts (n, /)
-│   │   ├── stores.js             # Instantiates the three stores
+│   │   ├── stores.js             # Instantiates the three scoped stores
 │   │   ├── theme.js              # Theme toggle, ripple, brand logo
 │   │   └── userMenu.js           # Header dropdown wiring
 │   │
 │   ├── controllers/              # Feature controllers
-│   │   ├── jobsController.js
-│   │   ├── refsController.js
-│   │   ├── modalsController.js
-│   │   ├── configController.js
-│   │   └── createRoleController.js
+│   │   ├── jobsController.js     # List + form + dashboard + drag&drop
+│   │   ├── refsController.js     # List + form + dashboard
+│   │   ├── createRoleController.js
+│   │   │
+│   │   ├── modals/               # Per-modal controllers
+│   │   │   ├── index.js          # Facade
+│   │   │   ├── editJobModal.js
+│   │   │   ├── editRefModal.js
+│   │   │   ├── closeJobModal.js
+│   │   │   ├── historyModal.js
+│   │   │   ├── noteModal.js
+│   │   │   └── refToJobModal.js
+│   │   │
+│   │   └── config/               # Per-tab controllers
+│   │       ├── index.js          # Facade + draft lifecycle + reset flows
+│   │       ├── rolesPanel.js
+│   │       ├── statusesPanel.js
+│   │       ├── filtersPanel.js
+│   │       ├── appearancePanel.js
+│   │       ├── dashboardPanel.js
+│   │       ├── languagePanel.js
+│   │       ├── profilePanel.js
+│   │       └── advancedPanel.js
 │   │
 │   ├── templates/                # Card renderers (pure HTML strings)
 │   │   ├── icon.js               # Re-export of app/icons.js
@@ -528,13 +602,18 @@ plain Node environment, no jsdom needed.
 │       ├── auth.css
 │       └── boot.css
 └── tests/
-    ├── selectors.test.js
-    ├── utils.test.js
-    ├── migrations.test.js
-    ├── store.test.js
-    ├── users.test.js
-    ├── constants.test.js
-    └── i18n.test.js
+    ├── app/
+    │   ├── constants.test.js
+    │   ├── icons.test.js
+    │   ├── migrations.test.js
+    │   ├── selectors.test.js
+    │   ├── store.test.js
+    │   └── utils.test.js
+    ├── auth/
+    │   ├── session.test.js
+    │   └── users.test.js
+    └── i18n/
+        └── index.test.js
 ```
 
 ---
@@ -565,14 +644,23 @@ editing:
   receives a container and a data object and renders into it. Adding a
   style is one new file in `js/ui/dashboard/` plus a switch case in
   `index.js`.
+- **Controllers are split by concern when a file grows past ~300 lines.**
+  `modalsController` and `configController` became directories with one
+  file per modal / per tab plus a small facade. `jobsController` and
+  `refsController` stay as single files — they're large but cohesive.
+- **Panels never hold a reference to the draft.** In the config split,
+  each panel receives a `host` object and calls `host.getDraft()` on
+  every read. That way a wholesale draft replacement (from Reset
+  preferences) is picked up on the next `render()` without the panel
+  needing to know.
 - **UI widgets live under `ui/` by concern:** `ui/form/` for form
   widgets, `ui/feedback/` for overlays, `ui/dashboard/` for the
-  dashboards. Nothing UI-related sits at the root of `js/ui/` except
-  `modal.js` (the shared modal lifecycle, which is a cross-cutting
-  primitive, not a component).
-- **Events are typed.** Cross-module signals go through `js/app/events.js`.
-  Raw `document.dispatchEvent(new CustomEvent(...))` calls are not
-  allowed outside that file.
+  dashboards. `ui/modal.js` (the shared modal lifecycle) is the only
+  cross-cutting primitive sitting at the root of `ui/`.
+- **Events are typed.** Cross-module signals go through
+  `js/app/events.js`. Raw `document.dispatchEvent(new CustomEvent(...))`
+  calls are not allowed outside that file. Current events:
+  `scroll-to-job`, `scroll-to-ref`, `i18n-changed`, `profile-changed`.
 - **Every migration is a pure function.** `migrateJob`, `migrateRef`,
   `migrateConfig` take an old-shaped object and return a current-shaped
   one. They're used both at boot and at backup import — that keeps the
@@ -583,8 +671,8 @@ editing:
   never restore an intermediate state.
 - **Shared mutation helpers.** `updateById(store, id, patchFn)` and
   `withHistoryEntry(item, patch, entry)` (both in `utils.js`) cover the
-  two most common store mutations. Both are used across the three
-  controllers instead of hand-rolled `store.update(items => items.map(…))`.
+  two most common store mutations. Both are used across the controllers
+  instead of hand-rolled `store.update(items => items.map(…))`.
 - **Modals use a shared lifecycle.** Every overlay goes through
   `createModal(el, opts)` from `js/ui/modal.js`, which handles open /
   close, overlay-click-to-close and a module-level Escape stack (only
@@ -637,8 +725,7 @@ editing:
 - **No emojis in the chrome.** Every button, tab, badge and card
   accent uses the sprite. The only text glyphs left are typographic:
   the `✓` / `—` / step number inside workflow dots, and the `—` / `+`
-  in the heatmap legend. Those read as characters, not icons, so they
-  don't belong in the sprite.
+  in the heatmap legend.
 - The `<use href>` uses the **document** path (relative to the HTML file),
   not the module path. Templates that inject HTML into `index.html` use
   the same relative URL.
@@ -680,6 +767,11 @@ editing:
   and `js/ui/dashboard/shared.js`). It runs the name through
   `^icon-[a-z0-9-]+$` before emitting the sprite reference, so no
   state-derived string can inject arbitrary markup.
+- **`data-i18n-html` strings never contain `{placeholder}`.** `applyI18n`
+  does not pass params to `t()` for HTML attributes, so a leftover
+  placeholder shows up as literal text. All the templated strings that
+  need params (confirm dialogs, etc.) go through `t(key, params)`
+  directly instead.
 - **File size**: aim for under ~500 lines per file. When a module grows past
   that, split by concern rather than by size.
 - **No build step**: everything ships as-is over HTTP. Avoid adding a bundler
@@ -698,6 +790,9 @@ protect data. Anyone who opens DevTools can:
   `localStorage` and is readable.
 - Skip the guards entirely by setting `sessionStorage` manually.
 - Register as many accounts as they want — there's no server-side gate.
+- Read another user's jobs / refs / config by inspecting the scoped
+  keys directly. The isolation is a UX convenience, not a security
+  boundary.
 
 When a backend is ready, replace:
 
@@ -706,3 +801,4 @@ When a backend is ready, replace:
 - `login()` → store a server-issued httpOnly cookie
 - `requireSession()` → `GET /auth/me`
 - `startSessionHeartbeat()` → rely on server-side session expiry
+- Per-user storage keys → server-side rows scoped to the session user
