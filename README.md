@@ -109,6 +109,9 @@ state, and closing prompts to discard or save.
 - **Print / PDF export** — hides all interactive chrome and renders the two
   lists (applications + referrals) as a clean, printable document. Links keep
   their URLs in parentheses for reference. Available from the user menu.
+- **Shared SVG sprite** — every icon lives once in `assets/icons.svg` and is
+  referenced via `<use href="./assets/icons.svg#icon-name"/>`. No duplicated
+  path data anywhere in the HTML or templates.
 
 ---
 
@@ -277,7 +280,8 @@ Danger zone (all irreversible):
 ## Run
 
 The app uses ES modules, so you need an HTTP server rather than opening
-`index.html` directly (file:// will fail on CORS).
+`index.html` directly (file:// will fail on CORS and on `<use>` external
+sprite references).
 
 ```bash
 npm start        # wraps: npx serve .
@@ -321,9 +325,11 @@ plain Node environment, no jsdom needed.
 .
 ├── index.html                    # Main app shell
 ├── login.html                    # Sign-in screen
-├── favicon.svg
 ├── package.json                  # npm start / npm test
 ├── README.md
+├── assets/
+│   ├── favicon.svg
+│   └── icons.svg                 # SVG sprite for every inline icon
 ├── js/
 │   ├── main.js                   # Boot orchestration only (~120 lines)
 │   │
@@ -391,28 +397,34 @@ plain Node environment, no jsdom needed.
 │           ├── resetAnimation.js
 │           └── toast.js
 ├── css/
-│   ├── styles.css                # @imports only
-│   ├── tokens.css                # CSS variables (light + dark)
-│   ├── reset.css                 # *, html, body, .container
-│   ├── header.css                # header, brand, icon buttons
-│   ├── user-menu.css             # Dropdown, ripple, highlight pulse
-│   ├── backgrounds.css
-│   ├── dashboard.css
-│   ├── forms.css
-│   ├── buttons.css
-│   ├── toolbar.css
-│   ├── jobs.css
-│   ├── workflow.css
-│   ├── datepicker.css
-│   ├── referrals.css
-│   ├── modals.css
-│   ├── history.css
-│   ├── config.css
-│   ├── feedback.css
-│   ├── welcome.css
-│   ├── responsive.css
-│   ├── auth.css
-│   └── print.css
+│   ├── styles.css                # @imports only — the CSS entry point
+│   ├── base/                     # Document-wide
+│   │   ├── tokens.css            # Variables (light + dark)
+│   │   ├── reset.css             # *, html, body, .container, .is-hidden
+│   │   └── print.css             # @media print
+│   ├── themes/                   # Body-level visual themes
+│   │   └── backgrounds.css       # 11 animated/static backgrounds
+│   ├── layout/                   # Page structure
+│   │   ├── header.css            # Header, brand, icon buttons
+│   │   ├── user-menu.css         # Dropdown, ripple, highlight pulse
+│   │   └── responsive.css        # Global media queries
+│   ├── components/               # Reusable widgets
+│   │   ├── buttons.css           # .btn and variants
+│   │   ├── forms.css             # Inputs, labels, combos, salary, notes
+│   │   ├── datepicker.css
+│   │   ├── toolbar.css           # Search + filters
+│   │   ├── modals.css            # Overlay, modals, close, variants
+│   │   ├── feedback.css          # Toasts, action toasts, reset overlay
+│   │   └── welcome.css           # First-run banner
+│   ├── features/                 # Domain-specific
+│   │   ├── jobs.css
+│   │   ├── referrals.css
+│   │   ├── workflow.css          # Steps, progress, actions
+│   │   ├── history.css           # Timeline
+│   │   ├── dashboard.css         # Six styles + config previews
+│   │   └── config.css            # Settings modal
+│   └── pages/                    # Full-page layouts
+│       └── auth.css              # Login screen
 └── tests/
     ├── selectors.test.js
     ├── utils.test.js
@@ -426,6 +438,8 @@ plain Node environment, no jsdom needed.
 
 A few conventions that have grown over time and are worth knowing before
 editing:
+
+### JavaScript
 
 - **`app/` is the domain + infra layer.** It contains the constants, the
   store, the selectors, the migrations, the utils, the event bus, and the
@@ -461,6 +475,51 @@ editing:
   window. Starting a new action dismisses the previous toast so users
   never restore an intermediate state.
 
+### CSS
+
+- **Only `css/styles.css` is loaded by the HTML.** Everything else is
+  pulled in via `@import` from that file. The load order (documented at
+  the top of the file) matters: tokens first (defines the variables),
+  then reset, then everything else.
+- **Folders mirror the JS organization:**
+  - `base/` — document-wide rules (variables, reset, print).
+  - `themes/` — visual themes applied to `body` (backgrounds).
+  - `layout/` — page structure (header, user menu, media queries).
+  - `components/` — reusable widgets (buttons, forms, modals, feedback).
+  - `features/` — domain-specific (jobs, referrals, workflow, dashboard,
+    config, history).
+  - `pages/` — full-page layouts (currently only the login screen).
+- **CSS custom properties drive everything.** Light/dark themes are a
+  swap of variables on `:root` / `[data-theme="dark"]`. Components never
+  hard-code colors — they reference variables.
+- **Utility classes are shared.** `.is-hidden` (toggles `display: none`)
+  is toggled by JS instead of inline `style.display`. Adding new utility
+  classes is fine, but keep them minimal and documented in
+  `base/reset.css`.
+
+### Assets
+
+- **Every icon lives in `assets/icons.svg`** as a `<symbol>`. Reference
+  it anywhere with:
+  ```html
+  <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-name"/></svg>
+  ```
+- The `<use href>` uses the **document** path (relative to the HTML file),
+  not the module path. Templates that inject HTML into `index.html` use
+  the same relative URL.
+- Icons inherit `currentColor`, so they follow light/dark theme, hover
+  state and any per-element color.
+- Because the sprite is external, the app **must** be served over HTTP.
+  `file://` will fail silently (icons won't render). This is the same
+  constraint that ES modules already impose.
+
+### General
+
+- **No build step.** Everything ships as-is over HTTP. Avoid adding a
+  bundler or TypeScript unless the scope grows significantly.
+- **File size**: aim for under ~500 lines per file. When a module grows
+  past that, split by concern rather than by size.
+
 ---
 
 ## Coding conventions
@@ -473,6 +532,8 @@ editing:
   fields (`Saved`, `Applied`, `Offer`, `Pending`, `Hired`, …).
 - **CSS**: class names and any `data-*` attributes are English
   (`data-status`, `data-relationship`, `.workmode-seg`, `.currency-chip`, …).
+- **CSS class naming**: kebab-case, block-scoped (`.job-card-header`,
+  `.config-tab`). Variants use a modifier class (`.modal-sm`, `.is-hidden`).
 - **File size**: aim for under ~500 lines per file. When a module grows past
   that, split by concern rather than by size.
 - **No build step**: everything ships as-is over HTTP. Avoid adding a bundler
