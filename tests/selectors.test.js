@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import {
   isClosed, stepIndex, progressPct, computeStats,
   filterJobs, sortJobs, currentStepNote, lastHistoryEntry,
-  isRefClosed, refStepIndex, filterRefs, refsForCompany,
+  isRefClosed, refStepIndex, filterRefs, refsForJob,
   topByCount, buildWeeklyTrend, buildDailyActivity,
 } from '../js/app/selectors.js';
 
@@ -178,14 +178,31 @@ test('filterRefs: by status and search', () => {
   assert.equal(filterRefs(refs, 'all', 'manager').length, 1);
 });
 
-test('refsForCompany: filters by linkedCompanies', () => {
+// ------------------------------------------------------------
+// refsForJob (replaces the old refsForCompany)
+// ------------------------------------------------------------
+test('refsForJob: filters by linkedJobId', () => {
   const refs = [
-    { linkedCompanies: ['Acme', 'Globex'] },
-    { linkedCompanies: ['Initech'] },
-    { linkedCompanies: null },
+    { id: 1, linkedJobId: 100 },
+    { id: 2, linkedJobId: 200 },
+    { id: 3, linkedJobId: 100 },
+    { id: 4, linkedJobId: null },
+    { id: 5 },                       // no linkedJobId field at all
   ];
-  assert.equal(refsForCompany(refs, 'Acme').length, 1);
-  assert.equal(refsForCompany(refs, 'Nope').length, 0);
+  assert.equal(refsForJob(refs, 100).length, 2);
+  assert.equal(refsForJob(refs, 200).length, 1);
+  assert.equal(refsForJob(refs, 999).length, 0);
+});
+
+test('refsForJob: null / undefined jobId → empty array', () => {
+  const refs = [{ id: 1, linkedJobId: 100 }];
+  assert.deepEqual(refsForJob(refs, null), []);
+  assert.deepEqual(refsForJob(refs, undefined), []);
+  assert.deepEqual(refsForJob(refs), []);
+});
+
+test('refsForJob: empty refs array → empty array', () => {
+  assert.deepEqual(refsForJob([], 100), []);
 });
 
 // ------------------------------------------------------------
