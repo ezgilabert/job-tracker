@@ -9,7 +9,7 @@ import {
 } from '../app/constants.js';
 import {
   login, redirectIfAuthenticated, validateCredentials,
-  getLockoutRemainingMs, registerUser,
+  getLockoutRemainingMs, registerUser, getActiveUserId,
 } from './session.js';
 import {
   hasAnyUser,
@@ -19,11 +19,18 @@ import { mountInputLimits } from '../ui/form/inputLimits.js';
 import { onI18nChanged } from '../app/events.js';
 
 // ------------------------------------------------------------
-// Persisted config reader (logo, language, background)
+// Persisted config reader
+// ------------------------------------------------------------
+// Reads the config of the last logged-in user (from
+// `jobTrackerActiveUser`) so we can apply their logo/background
+// before any session exists. Falls back to `{}` when nobody has
+// ever signed in on this browser profile.
 // ------------------------------------------------------------
 function readConfig() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.CONFIG);
+    const userId = getActiveUserId();
+    if (!userId) return {};
+    const raw = localStorage.getItem(STORAGE_KEYS.CONFIG(userId));
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === 'object' && 'data' in parsed
@@ -213,7 +220,6 @@ function mountForms() {
     try {
       const identifier = document.getElementById('loginEmail').value.trim();
       const password   = document.getElementById('loginPassword').value;
-      const remember   = document.getElementById('loginRemember').checked;
 
       const user = await validateCredentials(identifier, password);
 
@@ -237,10 +243,10 @@ function mountForms() {
       }
 
       await login({
+        userId: user.id,
         username: user.username,
         email: user.email,
         name: user.name,
-        remember,
       });
       window.location.href = './index.html';
     } catch (err) {

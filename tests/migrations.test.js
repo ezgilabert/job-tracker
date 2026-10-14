@@ -5,11 +5,29 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import {
-  migrateJob, migrateRef, migrateConfig,
+// ------------------------------------------------------------
+// Minimal localStorage mock — required by migrateLegacyStorage.
+// ------------------------------------------------------------
+function installLocalStorageMock() {
+  const map = new Map();
+  globalThis.localStorage = {
+    getItem: (k) => (map.has(k) ? map.get(k) : null),
+    setItem: (k, v) => { map.set(k, String(v)); },
+    removeItem: (k) => { map.delete(k); },
+    clear: () => { map.clear(); },
+    get length() { return map.size; },
+    key: (i) => [...map.keys()][i] ?? null,
+  };
+  return map;
+}
+
+installLocalStorageMock();
+
+const {
+  migrateJob, migrateRef, migrateConfig, migrateLegacyStorage,
   mapJobStatus, mapRefStatus, mapWorkMode, mapContactPlatform, mapRelationship,
   mapFilterId,
-} from '../js/app/migrations.js';
+} = await import('../js/app/migrations.js');
 
 // ------------------------------------------------------------
 // Small mappers
@@ -240,4 +258,52 @@ test('migrateConfig: null / invalid input → defaults', () => {
   assert.equal(typeof cfg, 'object');
   assert.ok(Array.isArray(cfg.filters));
   assert.ok(Array.isArray(cfg.initialStatuses));
+});
+
+// ------------------------------------------------------------
+// migrateLegacyStorage
+// ------------------------------------------------------------
+test('migrateLegacyStorage: moves legacy keys to scoped keys', () => {
+  localStorage.clear();
+  localStorage.setItem('jobTrackerV2', '[1,2]');
+  localStorage.setItem('jobTrackerReferrals', '[3]');
+  localStorage.setItem('jobTrackerConfig', '{"a":1}');
+
+  const moved = migrateLegacyStorage('user-1');
+
+  assert.equal(moved, true);
+  assert.equal(localStorage.getItem('jobTrackerV2__user-1'), '[1,2]');
+  assert.equal(localStorage.getItem('jobTrackerReferrals__user-1'), '[3]');
+  assert.equal(localStorage.getItem('jobTrackerConfig__user-1'), '{"a":1}');
+  assert.equal(localStorage.getItem('jobTrackerV2'), null);
+  assert.equal(localStorage.getItem('jobTrackerReferrals'), null);
+  assert.equal(localStorage.getItem('jobTrackerConfig'), null);
+});
+
+test('migrateLegacyStorage: no-op if scoped data already exists', () => {
+  localStorage.clear();
+  localStorage.setItem('jobTrackerV2', '[1,2]');
+  localStorage.setItem('jobTrackerV2__user-1', '[9,9,9]');
+
+  const moved = migrateLegacyStorage('user-1');
+
+  assert.equal(moved, false);
+  assert.equal(localStorage.getItem('jobTrackerV2__user-1'), '[9,9,9]');
+  // Legacy is left for another user.
+  assert.equal(localStorage.getItem('jobTrackerV2'), '[1,2]');
+});
+
+test('migrateLegacyStorage: no-op if no legacy keys', () => {
+  localStorage.clear();
+  const moved = migrateLegacyStorage('user-1');
+  assert.equal(moved, false);
+  assert.equal(localStorage.getItem('jobTrackerV2__user-1'), null);
+});
+
+test('migrateLegacyStorage: ignores empty userId', () => {
+  localStorage.clear();
+  localStorage.setItem('jobTrackerV2', '[1,2]');
+  const moved = migrateLegacyStorage('');
+  assert.equal(moved, false);
+  assert.equal(localStorage.getItem('jobTrackerV2'), '[1,2]');
 });

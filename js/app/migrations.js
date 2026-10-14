@@ -7,9 +7,16 @@
 //   2. Backup import (configController) so old backups keep working.
 //
 // New installs never touch these tables.
+//
+// Also exports migrateLegacyStorage() which moves the pre-multi-user
+// (single key) payloads into the current per-user scoped keys. It
+// runs once, from main.js, after the session is validated.
 // ============================================================
 
-import { getDefaultConfig, DEFAULT_DASHBOARD_STYLE } from './constants.js';
+import {
+  getDefaultConfig, DEFAULT_DASHBOARD_STYLE,
+  STORAGE_KEYS, LEGACY_STORAGE_KEYS,
+} from './constants.js';
 import { ensureArray } from './utils.js';
 
 // ------------------------------------------------------------
@@ -251,4 +258,48 @@ export function migrateConfig(data) {
   delete out.dashboardStyle;
 
   return out;
+}
+
+// ------------------------------------------------------------
+// Legacy storage → per-user storage
+// ------------------------------------------------------------
+// Before the multi-user migration, every store lived under a
+// single non-prefixed key (`jobTrackerV2`, `jobTrackerReferrals`,
+// `jobTrackerConfig`). Now each user has its own scoped keys. The
+// first user who logs in after the migration gets the old data:
+// we copy the three legacy payloads to their scoped equivalents
+// and delete the originals.
+//
+// If the user already has scoped data, the legacy is left alone
+// (someone else's later).
+// ------------------------------------------------------------
+
+/**
+ * @param {string} userId
+ * @returns {boolean} true if anything was migrated
+ */
+export function migrateLegacyStorage(userId) {
+  if (!userId) return false;
+
+  const legacyJobs   = localStorage.getItem(LEGACY_STORAGE_KEYS.JOBS);
+  const legacyRefs   = localStorage.getItem(LEGACY_STORAGE_KEYS.REFS);
+  const legacyConfig = localStorage.getItem(LEGACY_STORAGE_KEYS.CONFIG);
+
+  const hasLegacy = legacyJobs || legacyRefs || legacyConfig;
+  if (!hasLegacy) return false;
+
+  // If this user already has scoped data, they've used the app
+  // before — the legacy keys must belong to someone else.
+  const scopedJobs = localStorage.getItem(STORAGE_KEYS.JOBS(userId));
+  if (scopedJobs) return false;
+
+  if (legacyJobs)   localStorage.setItem(STORAGE_KEYS.JOBS(userId),   legacyJobs);
+  if (legacyRefs)   localStorage.setItem(STORAGE_KEYS.REFS(userId),   legacyRefs);
+  if (legacyConfig) localStorage.setItem(STORAGE_KEYS.CONFIG(userId), legacyConfig);
+
+  localStorage.removeItem(LEGACY_STORAGE_KEYS.JOBS);
+  localStorage.removeItem(LEGACY_STORAGE_KEYS.REFS);
+  localStorage.removeItem(LEGACY_STORAGE_KEYS.CONFIG);
+
+  return true;
 }

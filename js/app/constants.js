@@ -45,11 +45,11 @@ export function getStateIcon(status) {
 }
 
 export const REF_WORKFLOW_STEPS = [
-  { id: 'Pending',         short: 'Pending',   icon: 'icon-clock' },
-  { id: 'Contacted',       short: 'Contacted', icon: 'icon-message-circle' },
-  { id: 'Referred',        short: 'Referred',  icon: 'icon-check' },
+  { id: 'Pending',         short: 'Pending',    icon: 'icon-clock' },
+  { id: 'Contacted',       short: 'Contacted',  icon: 'icon-message-circle' },
+  { id: 'Referred',        short: 'Referred',   icon: 'icon-check' },
   { id: 'In Process',      short: 'In Process', icon: 'icon-refresh-cw' },
-  { id: 'Hired',           short: 'Hired',     icon: 'icon-user-check' },
+  { id: 'Hired',           short: 'Hired',      icon: 'icon-user-check' },
 ];
 
 export const REF_CLOSED_STATES = ['Not Applicable'];
@@ -70,6 +70,7 @@ export function getRefStateIcon(status) {
 
 // ============================================================
 // Close reasons: i18n keys per close status.
+// Actual strings live in js/i18n/es.js and js/i18n/en.js.
 // ============================================================
 export const CLOSE_REASON_KEYS = {
   'Offer': [
@@ -115,6 +116,10 @@ export const LOGO_OPTIONS = [
 export const DEFAULT_LOGO = 'target';
 export const DEFAULT_LANG = 'es';
 
+// ============================================================
+// Backgrounds
+// ============================================================
+
 export const BACKGROUND_OPTIONS = [
   { id: 'aurora',  label: 'Aurora',    description: 'Animated soft color blobs' },
   { id: 'mesh',    label: 'Mesh',      description: 'Static soft gradient, no animation' },
@@ -139,12 +144,22 @@ export function applyBackground(bgId) {
   }
 }
 
+// ============================================================
+// Dashboard styles
+// ============================================================
+
 export const DASHBOARD_STYLES = [
-  'sparklines', 'modular', 'minimal', 'compact', 'circular', 'heatmap',
+  'sparklines',
+  'modular',
+  'minimal',
+  'compact',
+  'circular',
+  'heatmap',
 ];
 
 export const DEFAULT_DASHBOARD_STYLE = 'sparklines';
 
+/** Metadata used by the config panel to render the style picker. */
 export const DASHBOARD_STYLE_META = [
   { id: 'sparklines', labelKey: 'config.dashboard.sparklines', descKey: 'config.dashboard.sparklinesDesc', preview: 'dash-prev-spark' },
   { id: 'modular',    labelKey: 'config.dashboard.modular',    descKey: 'config.dashboard.modularDesc',    preview: 'dash-prev-mod' },
@@ -153,6 +168,10 @@ export const DASHBOARD_STYLE_META = [
   { id: 'circular',   labelKey: 'config.dashboard.circular',   descKey: 'config.dashboard.circularDesc',   preview: 'dash-prev-circular' },
   { id: 'heatmap',    labelKey: 'config.dashboard.heatmap',    descKey: 'config.dashboard.heatmapDesc',    preview: 'dash-prev-heatmap' },
 ];
+
+// ============================================================
+// Roles
+// ============================================================
 
 export const ROLE_TAGS_LIST = [
   { id: 'programmer', label: 'Programmer',  icon: 'icon-monitor' },
@@ -273,19 +292,49 @@ export function getDefaultConfig() {
   }));
 }
 
+// ============================================================
+// Storage keys
+// ------------------------------------------------------------
+// Keys are prefixed with the current user id so each account has
+// its own data. Functions instead of strings so callers must be
+// explicit about which user's storage they mean.
+//
+// Shared (not prefixed):
+//   - USERS        → the account registry itself
+//   - THEME        → device-level preference (light/dark)
+//   → ACTIVE_USER  → the last user who logged in (used on login.html)
+//
+// The legacy (unprefixed) keys used by older builds are kept in
+// LEGACY_STORAGE_KEYS so the migration helper can find them.
+// ============================================================
 export const STORAGE_KEYS = {
-  JOBS: 'jobTrackerV2',
-  REFS: 'jobTrackerReferrals',
-  THEME: 'jobTrackerTheme',
-  CONFIG: 'jobTrackerConfig',
+  JOBS:    (userId) => `jobTrackerV2__${userId}`,
+  REFS:    (userId) => `jobTrackerReferrals__${userId}`,
+  CONFIG:  (userId) => `jobTrackerConfig__${userId}`,
+  WELCOME: (userId) => `jobTrackerWelcomeDismissed__${userId}`,
+
+  USERS:       'jobTrackerUsers',
+  THEME:       'jobTrackerTheme',
+  ACTIVE_USER: 'jobTrackerActiveUser',
+};
+
+export const LEGACY_STORAGE_KEYS = {
+  JOBS:    'jobTrackerV2',
+  REFS:    'jobTrackerReferrals',
+  CONFIG:  'jobTrackerConfig',
+  WELCOME: 'jobTrackerWelcomeDismissed',
 };
 
 export const STORAGE_VERSION = 5;
 export const CONFIG_VERSION = 3;
 
+// ============================================================
+// Backup / Import
+// ============================================================
 export const BACKUP_APP_ID = 'jobTracker';
 export const BACKUP_VERSION = 1;
 
+// Sample data shown to first-time users.
 export const SAMPLE_JOBS = [
   {
     id: 1,

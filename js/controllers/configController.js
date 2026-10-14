@@ -19,6 +19,7 @@ import {
 import { migrateJob, migrateRef, migrateConfig } from '../app/migrations.js';
 import { escapeHtml, cloneArray } from '../app/utils.js';
 import { icon } from '../app/icons.js';
+import { emitProfileChanged } from '../app/events.js';
 import {
   SUPPORTED_LANGS, t, tState, tStateShort,
 } from '../i18n/index.js';
@@ -44,8 +45,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   // Modal lifecycle
   // ----------------------------------------------------------
   const configModal = createModal(document.getElementById('configModal'), {
-    // Escape and overlay click route through tryClose() so the
-    // unsaved dialog can intercept them.
     escapeAction: () => tryClose(),
     onClose: () => {
       const saved = configStore.get();
@@ -177,6 +176,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     configStore.update(() => next);
     draft = cloneConfig(configStore.get());
     unsavedBadge.classList.remove('visible');
+
+    // Let subscribers (main.js → session sync; userMenu → refresh)
+    // know the profile may have changed.
+    try {
+      emitProfileChanged(next.profile);
+    } catch (err) {
+      console.error('[Config] profile-changed emit failed', err);
+    }
   }
 
   function tryClose() {

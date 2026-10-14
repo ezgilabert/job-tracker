@@ -6,6 +6,7 @@
 
 import { getSession, logout } from '../auth/session.js';
 import { getLanguage } from '../i18n/index.js';
+import { onI18nChanged, onProfileChanged } from '../app/events.js';
 
 /**
  * Wires up the header user menu.
@@ -108,5 +109,9 @@ export function mountUserMenu(configStore) {
     });
   }
 
-  document.addEventListener('i18n-changed', refresh);
+  onI18nChanged(refresh);
+
+  // Re-read the session when Settings → Profile saves, so the
+  // header reflects the new name without a full page reload.
+  onProfileChanged(refresh);
 }

@@ -1,19 +1,21 @@
 // ============================================================
 // Event bus: typed wrappers around CustomEvent.
 //
-// The app uses three cross-module signals:
-//   - scroll-to-job    → highlight and scroll to a job card
-//   - scroll-to-ref    → highlight and scroll to a referral card
-//   - i18n-changed     → language switched, re-render dynamic lists
+// The app uses these cross-module signals:
+//   - scroll-to-job     → highlight and scroll to a job card
+//   - scroll-to-ref     → highlight and scroll to a referral card
+//   - i18n-changed      → language switched, re-render dynamic lists
+//   - profile-changed   → Settings → Profile saved; sync session
 //
 // Everything goes through this module so the event names live in
 // one place and the payloads stay consistent.
 // ============================================================
 
 export const EVENTS = {
-  SCROLL_TO_JOB: 'scroll-to-job',
-  SCROLL_TO_REF: 'scroll-to-ref',
-  I18N_CHANGED: 'i18n-changed',
+  SCROLL_TO_JOB:    'scroll-to-job',
+  SCROLL_TO_REF:    'scroll-to-ref',
+  I18N_CHANGED:     'i18n-changed',
+  PROFILE_CHANGED:  'profile-changed',
 };
 
 // ------------------------------------------------------------
@@ -43,6 +45,10 @@ export function emitI18nChanged() {
   emit(EVENTS.I18N_CHANGED);
 }
 
+export function emitProfileChanged(profile) {
+  emit(EVENTS.PROFILE_CHANGED, { profile: profile || {} });
+}
+
 // ------------------------------------------------------------
 // Typed subscribers
 // ------------------------------------------------------------
@@ -56,4 +62,8 @@ export function onScrollToRef(handler) {
 
 export function onI18nChanged(handler) {
   return on(EVENTS.I18N_CHANGED, handler);
+}
+
+export function onProfileChanged(handler) {
+  return on(EVENTS.PROFILE_CHANGED, (e) => handler(e.detail?.profile || {}));
 }

@@ -3,14 +3,12 @@
 //
 // CLIENT-SIDE ONLY. This is NOT real security: anyone with devtools
 // can bypass it. It's "raising the bar" until a backend exists.
-// When an API lands:
-//   - validateCredentials() -> POST /auth/login
-//   - login()               -> store server httpOnly cookie
-//   - requireSession()      -> GET /auth/me
 //
 // Credentials live in js/auth/users.js (localStorage + per-user
-// salt). This module only handles rate limiting, session signing
-// and the guards.
+// salt). This module handles rate limiting, session signing and
+// the guards. It also remembers the last logged-in user (in a
+// non-prefixed localStorage key) so login.html can apply that
+// user's config before any session exists.
 // ============================================================
 
 import {
@@ -20,6 +18,7 @@ import {
   createUser,
   computeHash,
 } from './users.js';
+import { STORAGE_KEYS } from '../app/constants.js';
 
 // Re-export so the README snippet
 //   await m.computeHash('salt', 'password')
@@ -64,8 +63,34 @@ function getInstallSecret() {
 
 async function signSession(session) {
   const secret = getInstallSecret();
-  const payload = `${session.username}|${session.startedAt}|${session.expiresAt}`;
+  // Prefer the user id, but fall back to username so sessions
+  // created before the multi-user migration still verify.
+  const id = session.userId || session.username;
+  const payload = `${id}|${session.startedAt}|${session.expiresAt}`;
   return sha256Hex(`${secret}:${payload}`);
+}
+
+// ------------------------------------------------------------
+// Active user (shared, non-prefixed)
+// ------------------------------------------------------------
+/**
+ * @returns {string | null} the id of the last user who logged in.
+ * Used by login.html to load that user's config before a session
+ * exists (so the brand logo and background look right).
+ */
+export function getActiveUserId() {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.ACTIVE_USER) || null;
+  } catch {
+    return null;
+  }
+}
+
+function setActiveUserId(userId) {
+  if (!userId) return;
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_USER, userId);
+  } catch {}
 }
 
 // ------------------------------------------------------------
@@ -114,7 +139,7 @@ function clearRate() {
  * @param {string} password
  * @returns {Promise<
  *   | {locked:true}
- *   | {username:string,name:string,email:string}
+ *   | {id:string, username:string, name:string, email:string}
  *   | null
  * >}
  */
@@ -141,16 +166,19 @@ export async function validateCredentials(identifier, password) {
   }
 
   clearRate();
-  return { username: user.username, name: user.name, email: user.email };
+  return {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    email: user.email,
+  };
 }
 
 // ------------------------------------------------------------
 // Registration helper (creates the user and logs in)
 // ------------------------------------------------------------
 /**
- * Creates a new user in the local registry and logs them in. The
- * caller is responsible for validating the input first
- * (`validateRegistration` from users.js).
+ * Creates a new user in the local registry and logs them in.
  *
  * @param {{ username:string, email:string, name?:string, password:string }} input
  * @returns {Promise<object>} the created user record
@@ -158,6 +186,7 @@ export async function validateCredentials(identifier, password) {
 export async function registerUser({ username, email, name = '', password }) {
   const user = await createUser({ username, email, name, password });
   await login({
+    userId: user.id,
     username: user.username,
     email: user.email,
     name: user.name,
@@ -182,16 +211,22 @@ export function getSession() {
 }
 
 export async function isValidSession(s = getSession()) {
-  if (!s || s.valid !== true || !s.username || !s.sig) return false;
+  if (!s || s.valid !== true || !s.sig) return false;
+  if (!s.userId && !s.username) return false;
   if (s.expiresAt && Date.now() > s.expiresAt) return false;
   const expected = await signSession(s);
   return expected === s.sig;
 }
 
-export async function login({ username = '', email = '', name = '' } = {}) {
+export async function login({
+  userId = '',
+  username = '',
+  email = '',
+  name = '',
+} = {}) {
   const startedAt = new Date().toISOString();
   const expiresAt = Date.now() + SESSION_TTL_MS;
-  const base = { username, email, name, valid: true, startedAt, expiresAt };
+  const base = { userId, username, email, name, valid: true, startedAt, expiresAt };
   const sig = await signSession(base);
   const session = { ...base, sig };
 
@@ -201,6 +236,11 @@ export async function login({ username = '', email = '', name = '' } = {}) {
   } catch (e) {
     console.error('[Session] persist failed', e);
   }
+
+  // Remember who logged in so login.html can apply their config
+  // on the next visit (before a session exists).
+  setActiveUserId(userId);
+
   return session;
 }
 
@@ -211,6 +251,37 @@ export function logout() {
   } catch (e) {
     console.error('[Session] logout failed', e);
   }
+  // NOTE: we deliberately do NOT clear ACTIVE_USER. Keeping it
+  // lets login.html still show the last user's brand/background.
+}
+
+/**
+ * Patches the current session in place without re-signing.
+ * Only `name`, `email` and `username` are affected — the signed
+ * fields (userId, startedAt, expiresAt) are left untouched, so
+ * the signature remains valid.
+ *
+ * Used by the Settings → Profile save handler to keep the
+ * header in sync with the profile without a full re-login.
+ *
+ * @param {{ name?: string, email?: string, username?: string }} patch
+ * @returns {object | null} the updated session, or null if there is none
+ */
+export function updateSessionProfile({ name, email, username } = {}) {
+  const s = getSession();
+  if (!s) return null;
+
+  const next = { ...s };
+  if (typeof name === 'string') next.name = name;
+  if (typeof email === 'string') next.email = email;
+  if (typeof username === 'string') next.username = username;
+
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(next));
+  } catch (e) {
+    console.error('[Session] update failed', e);
+  }
+  return next;
 }
 
 // ------------------------------------------------------------
@@ -227,10 +298,6 @@ export async function requireSession(redirectTo = './login.html') {
   return false;
 }
 
-/**
- * If a valid session exists, redirect to the app.
- * Returns true when it redirected (so the login boot can stop).
- */
 export async function redirectIfAuthenticated(redirectTo = './index.html') {
   const session = getSession();
   const valid = await isValidSession(session);

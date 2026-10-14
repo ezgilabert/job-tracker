@@ -1,32 +1,27 @@
 // ============================================================
 // Boot: first-run welcome banner.
 //
-// Shown once, before the user dismisses it. Teaches the keyboard
-// shortcuts, drag-to-reorder and where Settings lives. The
-// dismissal flag is stored in localStorage so the banner never
-// comes back on a returning visit.
-//
-// The banner is generated dynamically and inserted above the
-// jobs dashboard. It listens for i18n changes so its labels stay
-// in sync when the user switches language.
+// Shown once per user, before they dismiss it. Teaches the
+// keyboard shortcuts, drag-to-reorder and where Settings lives.
+// The dismissal flag is stored under a per-user key so each
+// account sees the banner on their own first visit.
 // ============================================================
 
 import { onI18nChanged } from '../app/events.js';
 import { icon } from '../templates/icon.js';
+import { STORAGE_KEYS } from '../app/constants.js';
 
-const STORAGE_KEY = 'jobTrackerWelcomeDismissed';
-
-function isDismissed() {
+function isDismissed(userId) {
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'true';
+    return localStorage.getItem(STORAGE_KEYS.WELCOME(userId)) === 'true';
   } catch {
     return false;
   }
 }
 
-function markDismissed() {
+function markDismissed(userId) {
   try {
-    localStorage.setItem(STORAGE_KEY, 'true');
+    localStorage.setItem(STORAGE_KEYS.WELCOME(userId), 'true');
   } catch {
     /* localStorage unavailable — the banner will just show again */
   }
@@ -66,25 +61,23 @@ function buildContent(t) {
 /**
  * @param {import('../app/store.js').Store} jobsStore
  * @param {import('../app/store.js').Store} refsStore
+ * @param {string} userId
  */
-export function mountFirstRun(jobsStore, refsStore) {
-  if (isDismissed()) return;
+export function mountFirstRun(jobsStore, refsStore, userId) {
+  if (!userId) return;
+  if (isDismissed(userId)) return;
 
   const banner = document.createElement('div');
   banner.className = 'welcome-banner';
   banner.setAttribute('role', 'region');
   banner.setAttribute('aria-label', 'Welcome');
 
-  // Pull the current translator lazily so the module does not need
-  // to import from i18n at the top level.
   let tFn = (k) => k;
 
   const render = () => {
     banner.innerHTML = buildContent(tFn);
   };
 
-  // Insert above the jobs dashboard, so it appears right after the
-  // header and before the user's data.
   const anchor = document.getElementById('jobsDashboard');
   const container = document.querySelector('.container');
 
@@ -96,23 +89,19 @@ export function mountFirstRun(jobsStore, refsStore) {
     return;
   }
 
-  // Event delegation — survives innerHTML re-renders.
   banner.addEventListener('click', (e) => {
     if (e.target.closest('[data-dismiss]')) {
-      markDismissed();
+      markDismissed(userId);
       banner.classList.add('leaving');
       setTimeout(() => banner.remove(), 260);
     }
   });
 
-  // Load the translator and render. This is deferred so the rest of
-  // boot is not blocked on an extra dynamic import.
   import('../i18n/index.js').then(({ t }) => {
     tFn = t;
     render();
 
     onI18nChanged(() => {
-      // Only re-render if the banner is still attached.
       if (document.body.contains(banner)) render();
     });
   }).catch((err) => {
