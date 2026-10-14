@@ -15,6 +15,7 @@ import {
   BACKUP_APP_ID, BACKUP_VERSION,
   STORAGE_KEYS,
 } from '../constants.js';
+import { migrateJob, migrateRef, migrateConfig } from '../migrations.js';
 import { escapeHtml, cloneArray } from '../utils.js';
 import {
   SUPPORTED_LANGS, t, tState, tStateShort,
@@ -991,8 +992,16 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     }
 
     const data = parsed.data || {};
-    const jobsCount = Array.isArray(data.jobs) ? data.jobs.length : 0;
-    const refsCount = Array.isArray(data.refs) ? data.refs.length : 0;
+
+    // Route everything through the migration pipeline so backups
+    // made by older builds (Spanish keys / values) land in the
+    // current schema.
+    const nextConfig = migrateConfig(data.config || {});
+    const nextRefs   = Array.isArray(data.refs) ? data.refs.map(migrateRef) : [];
+    const nextJobs   = Array.isArray(data.jobs) ? data.jobs.map(migrateJob) : [];
+
+    const jobsCount = nextJobs.length;
+    const refsCount = nextRefs.length;
 
     const ok = await showConfirm({
       title: t('confirm.importBackup.title'),
@@ -1005,15 +1014,10 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    if (data.config && typeof data.config === 'object') {
-      configStore.update(() => data.config);
-    }
-    if (Array.isArray(data.refs)) {
-      refsStore.update(() => data.refs);
-    }
-    if (Array.isArray(data.jobs)) {
-      jobsStore.update(() => data.jobs);
-    }
+    configStore.update(() => nextConfig);
+    refsStore.update(() => nextRefs);
+    jobsStore.update(() => nextJobs);
+
     if (data.theme === 'light' || data.theme === 'dark') {
       try { localStorage.setItem(STORAGE_KEYS.THEME, data.theme); } catch {}
       document.documentElement.setAttribute('data-theme', data.theme);
@@ -1044,6 +1048,16 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   document.addEventListener('i18n-changed', () => {
     if (modal.classList.contains('open') && draft) renderAll();
+  });
+
+  // If the config store changes underneath while the modal is open
+  // (e.g. the role picker adds a role from outside), refresh the
+  // dirty badge so it reflects the current draft against the new
+  // stored value.
+  configStore.subscribe(() => {
+    if (modal.classList.contains('open') && draft) {
+      updateBadge();
+    }
   });
 
   return { open, close: closeDirect };

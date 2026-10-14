@@ -50,14 +50,6 @@ export function uid() {
   return Date.now() + Math.floor(Math.random() * 1000);
 }
 
-export function debounce(fn, ms = 200) {
-  let t;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), ms);
-  };
-}
-
 export function highlightAndScroll(el, duration = 1800) {
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });

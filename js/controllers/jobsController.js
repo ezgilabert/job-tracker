@@ -6,7 +6,7 @@ import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { RoleCombo } from '../ui/combo.js';
 import { StatusCombo } from '../ui/statusCombo.js';
-import { WorkModePicker } from '../ui/workModePicker.js';
+import { WorkModePicker } from '../ui/WorkModePicker.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';

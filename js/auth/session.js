@@ -2,7 +2,7 @@
 // Session: mocked auth (single valid user).
 //
 // CLIENT-SIDE ONLY. This is NOT real security: anyone with devtools
-// can bypass it. It is "raising the bar" until a backend exists.
+// can bypass it. It's "raising the bar" until a backend exists.
 // When an API lands:
 //   - validateCredentials() -> POST /auth/login
 //   - login()               -> store server httpOnly cookie
@@ -169,14 +169,6 @@ export async function isValidSession(s = getSession()) {
   if (s.expiresAt && Date.now() > s.expiresAt) return false;
   const expected = await signSession(s);
   return expected === s.sig;
-}
-
-export async function isLoggedIn() {
-  return isValidSession();
-}
-
-export function isGuest() {
-  return false;
 }
 
 export async function login({ username = '', email = '', name = '' } = {}) {

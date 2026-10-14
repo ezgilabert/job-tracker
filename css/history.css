@@ -96,7 +96,7 @@
   box-shadow: 0 0 0 4px var(--accent-soft), 0 3px 12px var(--accent-glow);
 }
 
-.history-item.retroceso .history-dot {
+.history-item.went-back .history-dot {
   background: var(--warning-soft);
   border-color: var(--warning-border);
   color: var(--warning-2);
@@ -194,19 +194,19 @@
   border-color: var(--accent);
 }
 
-.history-tag.retroceso {
+.history-tag.went-back {
   background: var(--warning-soft);
   color: var(--warning-2);
   border-color: var(--warning-border);
 }
 
-.history-tag.cerrada {
+.history-tag.closed {
   background: var(--danger-soft);
   color: var(--danger-2);
   border-color: var(--danger-border);
 }
 
-.history-tag.oferta {
+.history-tag.offer {
   background: var(--success-soft);
   color: var(--success-2);
   border-color: var(--success-border);

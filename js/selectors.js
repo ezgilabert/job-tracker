@@ -59,7 +59,6 @@ export function computeStats(jobs) {
     inProcess,
     offers: byStatus['Offer'],
     closed,
-    byStatus,
   };
 }
 
@@ -161,8 +160,4 @@ export function refsForCompany(refs, company) {
   return refs.filter(r =>
     Array.isArray(r.linkedCompanies) && r.linkedCompanies.includes(company)
   );
-}
-
-export function uniqueCompanies(jobs) {
-  return [...new Set(jobs.map(j => j.company).filter(Boolean))];
 }

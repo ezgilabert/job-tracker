@@ -6,7 +6,7 @@ import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { RoleCombo } from '../ui/combo.js';
-import { WorkModePicker } from '../ui/workModePicker.js';
+import { WorkModePicker } from '../ui/WorkModePicker.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
@@ -311,17 +311,17 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
         let itemClass = 'history-item';
         if (isCurrent) itemClass += ' current';
-        if (isBackward) itemClass += ' retroceso';
+        if (isBackward) itemClass += ' went-back';
         if (isClosedEntry) itemClass += ' closed-' + entry.status.toLowerCase().replace(/\s+/g, '-');
 
         let tagsHtml = '';
         if (isCurrent) tagsHtml += `<span class="history-tag current">${escapeHtml(t('hist.current'))}</span>`;
-        if (isBackward) tagsHtml += `<span class="history-tag retroceso">${escapeHtml(t('hist.backward'))}</span>`;
+        if (isBackward) tagsHtml += `<span class="history-tag went-back">${escapeHtml(t('hist.backward'))}</span>`;
         if (isClosedEntry && entry.status !== 'Offer') {
-          tagsHtml += `<span class="history-tag cerrada">${escapeHtml(t('hist.closed'))}</span>`;
+          tagsHtml += `<span class="history-tag closed">${escapeHtml(t('hist.closed'))}</span>`;
         }
         if (entry.status === 'Offer') {
-          tagsHtml += `<span class="history-tag oferta">${escapeHtml(t('hist.offer'))}</span>`;
+          tagsHtml += `<span class="history-tag offer">${escapeHtml(t('hist.offer'))}</span>`;
         }
 
         const reasonHtml = entry.reason
@@ -401,13 +401,13 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
         let itemClass = 'history-item';
         if (isCurrent) itemClass += ' current';
-        if (isBackward) itemClass += ' retroceso';
+        if (isBackward) itemClass += ' went-back';
         if (isClosedEntry) itemClass += ' closed-rejected';
 
         let tagsHtml = '';
         if (isCurrent) tagsHtml += `<span class="history-tag current">${escapeHtml(t('hist.current'))}</span>`;
-        if (isBackward) tagsHtml += `<span class="history-tag retroceso">${escapeHtml(t('hist.backward'))}</span>`;
-        if (isClosedEntry) tagsHtml += `<span class="history-tag cerrada">${escapeHtml(t('hist.closedRef'))}</span>`;
+        if (isBackward) tagsHtml += `<span class="history-tag went-back">${escapeHtml(t('hist.backward'))}</span>`;
+        if (isClosedEntry) tagsHtml += `<span class="history-tag closed">${escapeHtml(t('hist.closedRef'))}</span>`;
 
         const reasonHtml = entry.reason
           ? `<div class="history-reason">"${escapeHtml(entry.reason)}"</div>`
@@ -680,7 +680,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
             <strong>${escapeHtml(j.role)}</strong>
             <span>${escapeHtml(j.company)}${alreadyLinked ? ' · ' + escapeHtml(t('refToJob.alreadyLinked')) : ''}</span>
           </div>
-          <span class="estado-mini">${escapeHtml(tState(j.status))}</span>
+          <span class="status-mini">${escapeHtml(tState(j.status))}</span>
         </button>
       `;
     }).join('');
