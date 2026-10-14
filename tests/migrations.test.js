@@ -9,7 +9,7 @@ import {
   migrateJob, migrateRef, migrateConfig,
   mapJobStatus, mapRefStatus, mapWorkMode, mapContactPlatform, mapRelationship,
   mapFilterId,
-} from '../js/migrations.js';
+} from '../js/app/migrations.js';
 
 // ------------------------------------------------------------
 // Small mappers

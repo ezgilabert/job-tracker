@@ -91,6 +91,12 @@ state, and closing prompts to discard or save.
 - Eleven animated/static background styles.
 - Toast notifications, custom confirm modals, and a progress-ring reset
   animation.
+- **Undo for destructive actions** — delete, advance and close actions show a
+  5-second toast with an "Undo" button and a countdown bar. Only the most
+  recent action stays undoable; starting a new one dismisses the previous
+  toast so the user never restores an intermediate state.
+- **First-run welcome banner** — teaches the keyboard shortcuts, drag-to-
+  reorder and where Settings lives. Dismissed once and never shown again.
 - All UI is fully internationalized (Spanish / English). Reason chips, empty
   states, and every label come from the dictionary — no hardcoded strings.
 - Empty states are SVG-based, not emoji: clipboard for jobs, link for
@@ -100,6 +106,9 @@ state, and closing prompts to discard or save.
   - `n` — expand the "New application" section and focus the Company field.
   - `/` — focus the applications search box.
   - `Esc` — close any open modal.
+- **Print / PDF export** — hides all interactive chrome and renders the two
+  lists (applications + referrals) as a clean, printable document. Links keep
+  their URLs in parentheses for reference. Available from the user menu.
 
 ---
 
@@ -167,7 +176,7 @@ Paste the resulting hex into `CREDENTIALS[].passwordHash` in
 ## Data model
 
 Three stores, each persisted under its own key via the `Store` class
-(`js/store.js`), which handles versioning and migrations.
+(`js/app/store.js`), which handles versioning and migrations.
 
 | Key | Store | Version | Contents |
 | --- | --- | --- | --- |
@@ -221,8 +230,8 @@ Three stores, each persisted under its own key via the `Store` class
 
 ### Migration
 
-`js/migrations.js` owns every legacy → current conversion and is used from two
-places:
+`js/app/migrations.js` owns every legacy → current conversion and is used from
+two places:
 
 - **Boot** — each `Store` receives a `migrate` function that runs once when a
   stored payload's version is older than the current one.
@@ -317,38 +326,47 @@ plain Node environment, no jsdom needed.
 ├── README.md
 ├── js/
 │   ├── main.js                   # Boot orchestration only (~120 lines)
-│   ├── constants.js              # Workflow steps, states, defaults, options
-│   ├── store.js                  # Reactive localStorage store w/ migrations
-│   ├── selectors.js              # Pure state selectors (filters, stats, trends)
-│   ├── utils.js                  # Shared helpers (escapeHtml, dates, valueOf…)
-│   ├── events.js                 # Typed event bus (scroll-to-*, i18n-changed)
-│   ├── migrations.js             # Legacy → current schema maps
-│   ├── i18n.js                   # Public i18n API (t, applyI18n, setLanguage)
-│   ├── i18n/
+│   │
+│   ├── app/                      # Infra + domain
+│   │   ├── constants.js          # Workflow steps, states, defaults, options
+│   │   ├── events.js             # Typed event bus (scroll-to-*, i18n-changed)
+│   │   ├── migrations.js         # Legacy → current schema maps
+│   │   ├── selectors.js          # Pure state selectors (filters, stats, trends)
+│   │   ├── store.js              # Reactive localStorage store w/ migrations
+│   │   ├── undo.js               # withUndo() helper
+│   │   └── utils.js              # Shared helpers (escapeHtml, dates, valueOf…)
+│   │
+│   ├── i18n/                     # Translations
+│   │   ├── index.js              # Public API (t, applyI18n, setLanguage…)
 │   │   ├── es.js                 # Spanish dictionary
 │   │   └── en.js                 # English dictionary
-│   ├── boot/
+│   │
+│   ├── auth/                     # Mock auth
+│   │   ├── login.js              # Login screen entry point
+│   │   └── session.js            # Session signing, guards
+│   │
+│   ├── boot/                     # Startup side-effects
+│   │   ├── firstRun.js           # First-run welcome banner
+│   │   ├── i18nPulse.js          # Cascade animation on language change
+│   │   ├── keyboard.js           # Shortcuts (n, /)
 │   │   ├── stores.js             # Instantiates the three stores
 │   │   ├── theme.js              # Theme toggle, ripple, brand logo
-│   │   ├── userMenu.js           # Header dropdown wiring
-│   │   ├── i18nPulse.js          # Cascade animation on language change
-│   │   └── keyboard.js           # Shortcuts (n, /)
-│   ├── auth/
-│   │   ├── login.js              # Login screen entry point
-│   │   └── session.js            # Mock auth, session signing, guards
-│   ├── controllers/
+│   │   └── userMenu.js           # Header dropdown wiring
+│   │
+│   ├── controllers/              # Feature controllers
 │   │   ├── jobsController.js
 │   │   ├── refsController.js
 │   │   ├── modalsController.js
 │   │   ├── configController.js
 │   │   └── createRoleController.js
-│   ├── templates/
+│   │
+│   ├── templates/                # Card renderers (pure HTML strings)
 │   │   ├── jobCard.js
 │   │   ├── refCard.js
 │   │   └── steps.js
-│   └── ui/
-│       ├── dashboard.js          # Re-export shim
-│       ├── dashboard/            # One file per style
+│   │
+│   └── ui/                       # UI widgets
+│       ├── dashboard/            # Six dashboard styles
 │       │   ├── index.js          # Dispatcher + header wrapper
 │       │   ├── shared.js         # uid, sparkPath, summary
 │       │   ├── sparklines.js
@@ -357,19 +375,21 @@ plain Node environment, no jsdom needed.
 │       │   ├── compact.js
 │       │   ├── circular.js
 │       │   └── heatmap.js
-│       ├── combo.js              # Role picker
-│       ├── statusCombo.js        # Status picker
-│       ├── datePicker.js
-│       ├── workModePicker.js
-│       ├── currencyPicker.js
-│       ├── salaryModeChip.js
-│       ├── salaryInput.js
-│       ├── contactLinkPicker.js
-│       ├── chips.js
-│       ├── inputLimits.js
-│       ├── confirmModal.js
-│       ├── toast.js
-│       └── resetAnimation.js
+│       ├── form/                 # Form widgets
+│       │   ├── chips.js
+│       │   ├── combo.js          # Role picker
+│       │   ├── contactLinkPicker.js
+│       │   ├── currencyPicker.js
+│       │   ├── datePicker.js
+│       │   ├── inputLimits.js
+│       │   ├── salaryInput.js
+│       │   ├── salaryModeChip.js
+│       │   ├── statusCombo.js    # Status picker
+│       │   └── workModePicker.js
+│       └── feedback/             # Overlays
+│           ├── confirmModal.js
+│           ├── resetAnimation.js
+│           └── toast.js
 ├── css/
 │   ├── styles.css                # @imports only
 │   ├── tokens.css                # CSS variables (light + dark)
@@ -389,8 +409,10 @@ plain Node environment, no jsdom needed.
 │   ├── history.css
 │   ├── config.css
 │   ├── feedback.css
+│   ├── welcome.css
 │   ├── responsive.css
-│   └── auth.css
+│   ├── auth.css
+│   └── print.css
 └── tests/
     ├── selectors.test.js
     ├── utils.test.js
@@ -405,25 +427,39 @@ plain Node environment, no jsdom needed.
 A few conventions that have grown over time and are worth knowing before
 editing:
 
+- **`app/` is the domain + infra layer.** It contains the constants, the
+  store, the selectors, the migrations, the utils, the event bus, and the
+  undo helper. Nothing in `app/` imports from `ui/`, `controllers/`, or
+  `boot/` — the dependency direction is one-way.
 - **`main.js` orchestrates, `boot/*` does the work.** Adding a new
-  cross-cutting concern (shortcuts, a service worker, telemetry) usually means
-  a new file in `js/boot/` and one call from `main.js`.
-- **i18n is one interface, two dictionaries.** Consumers keep importing from
-  `js/i18n.js`. The ES/EN content lives in `js/i18n/{es,en}.js`. Adding a
-  language is one new file + one entry in `SUPPORTED_LANGS`.
-- **State derivations live in `selectors.js`.** Filters, sorts, statistics,
-  weekly trends, top-N helpers — anything pure that reads from state and
-  returns new data. Controllers call selectors, not the other way around.
-- **Dashboard styles are pluggable.** Each style is a function that receives
-  a container and a data object and renders into it. Adding a style is one new
-  file in `js/ui/dashboard/` plus a switch case in `index.js`.
-- **Events are typed.** Cross-module signals go through `js/events.js`. Raw
-  `document.dispatchEvent(new CustomEvent(...))` calls are not allowed outside
-  that file.
+  cross-cutting concern (shortcuts, a service worker, telemetry) usually
+  means a new file in `js/boot/` and one call from `main.js`.
+- **i18n is one interface, two dictionaries.** Consumers keep importing
+  from `js/i18n/index.js`. The ES/EN content lives in
+  `js/i18n/{es,en}.js`. Adding a language is one new file + one entry in
+  `SUPPORTED_LANGS`.
+- **State derivations live in `app/selectors.js`.** Filters, sorts,
+  statistics, weekly trends, top-N helpers — anything pure that reads
+  from state and returns new data. Controllers call selectors, not the
+  other way around.
+- **Dashboard styles are pluggable.** Each style is a function that
+  receives a container and a data object and renders into it. Adding a
+  style is one new file in `js/ui/dashboard/` plus a switch case in
+  `index.js`.
+- **UI widgets live under `ui/` by concern:** `ui/form/` for form
+  widgets, `ui/feedback/` for overlays, `ui/dashboard/` for the
+  dashboards. Nothing UI-related sits at the root of `js/ui/`.
+- **Events are typed.** Cross-module signals go through `js/app/events.js`.
+  Raw `document.dispatchEvent(new CustomEvent(...))` calls are not
+  allowed outside that file.
 - **Every migration is a pure function.** `migrateJob`, `migrateRef`,
-  `migrateConfig` take an old-shaped object and return a current-shaped one.
-  They're used both at boot and at backup import — that keeps the two paths in
-  sync automatically.
+  `migrateConfig` take an old-shaped object and return a current-shaped
+  one. They're used both at boot and at backup import — that keeps the
+  two paths in sync automatically.
+- **Undo is single-slot.** `js/app/undo.js` snapshots one or more stores
+  before running a mutation and shows an action toast with a 5-second
+  window. Starting a new action dismisses the previous toast so users
+  never restore an intermediate state.
 
 ---
 

@@ -25,7 +25,7 @@ function installLocalStorageMock() {
 
 installLocalStorageMock();
 
-const { Store } = await import('../js/store.js');
+const { Store } = await import('../js/app/store.js');
 
 // ------------------------------------------------------------
 // Fresh store
