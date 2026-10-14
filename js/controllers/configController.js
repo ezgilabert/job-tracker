@@ -5,6 +5,7 @@
 import { showToast } from '../ui/feedback/toast.js';
 import { showConfirm } from '../ui/feedback/confirmModal.js';
 import { ResetAnimation } from '../ui/feedback/resetAnimation.js';
+import { createModal } from '../ui/modal.js';
 import {
   ROLE_TAGS_LIST, ROLE_TAGS, DEFAULT_ROLES,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
@@ -17,17 +18,10 @@ import {
 } from '../app/constants.js';
 import { migrateJob, migrateRef, migrateConfig } from '../app/migrations.js';
 import { escapeHtml, cloneArray } from '../app/utils.js';
+import { icon } from '../app/icons.js';
 import {
   SUPPORTED_LANGS, t, tState, tStateShort,
 } from '../i18n/index.js';
-
-// ------------------------------------------------------------
-// SVG sprite helper (config panel templates)
-// ------------------------------------------------------------
-function icon(name) {
-  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
-}
 
 /**
  * @param {import('../app/store.js').Store} configStore
@@ -35,12 +29,7 @@ function icon(name) {
  * @param {import('../app/store.js').Store} refsStore
  */
 export function mountConfigController(configStore, jobsStore, refsStore) {
-  const modal = document.getElementById('configModal');
-  const unsavedModal = document.getElementById('unsavedModal');
   const unsavedBadge = document.getElementById('configUnsavedBadge');
-
-  const tabs = [...modal.querySelectorAll('.config-tab')];
-  const panels = [...modal.querySelectorAll('.config-panel')];
 
   const resetOverlay = document.getElementById('resetOverlay');
   const resetContent = document.getElementById('resetContent');
@@ -51,6 +40,29 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   let draft = null;
   let preferredDefaultStatus = null;
 
+  // ----------------------------------------------------------
+  // Modal lifecycle
+  // ----------------------------------------------------------
+  const configModal = createModal(document.getElementById('configModal'), {
+    // Escape and overlay click route through tryClose() so the
+    // unsaved dialog can intercept them.
+    escapeAction: () => tryClose(),
+    onClose: () => {
+      const saved = configStore.get();
+      applyBackground(saved.background || DEFAULT_BACKGROUND);
+      applyLogoToBrand(saved.logo || DEFAULT_LOGO);
+
+      draft = null;
+      preferredDefaultStatus = null;
+      unsavedBadge.classList.remove('visible');
+    },
+  });
+
+  const unsavedModal = createModal(document.getElementById('unsavedModal'));
+
+  // ----------------------------------------------------------
+  // Helpers
+  // ----------------------------------------------------------
   function cloneConfig(cfg) {
     return JSON.parse(JSON.stringify(cfg));
   }
@@ -122,6 +134,9 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     el.innerHTML = option.svg;
   }
 
+  // ----------------------------------------------------------
+  // Open / close flows
+  // ----------------------------------------------------------
   function open() {
     const stored = configStore.get();
     const defaults = getDefaultConfig();
@@ -139,19 +154,12 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     preferredDefaultStatus = draft.defaultInitialStatus || null;
 
-    modal.classList.add('open');
+    configModal.open();
     renderAll();
   }
 
   function closeDirect() {
-    const saved = configStore.get();
-    applyBackground(saved.background || DEFAULT_BACKGROUND);
-    applyLogoToBrand(saved.logo || DEFAULT_LOGO);
-
-    draft = null;
-    preferredDefaultStatus = null;
-    modal.classList.remove('open');
-    unsavedBadge.classList.remove('visible');
+    configModal.close();
   }
 
   function saveDraft() {
@@ -173,12 +181,15 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
   function tryClose() {
     if (isDraftDirty()) {
-      unsavedModal.classList.add('open');
+      unsavedModal.open();
     } else {
       closeDirect();
     }
   }
 
+  // ----------------------------------------------------------
+  // Header / footer button wiring
+  // ----------------------------------------------------------
   document.getElementById('configBtn').addEventListener('click', open);
   document.getElementById('closeConfigBtn').addEventListener('click', tryClose);
   document.getElementById('cancelConfigBtn').addEventListener('click', tryClose);
@@ -192,37 +203,19 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     showToast(t('toast.savedConfig'), 'icon-check');
   });
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) tryClose();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (resetOverlay && resetOverlay.classList.contains('active')) return;
-
-    if (unsavedModal.classList.contains('open')) {
-      unsavedModal.classList.remove('open');
-      return;
-    }
-    if (modal.classList.contains('open')) tryClose();
-  });
-
   document.getElementById('unsavedCloseBtn').addEventListener('click', () => {
-    unsavedModal.classList.remove('open');
+    unsavedModal.close();
   });
   document.getElementById('unsavedDiscard').addEventListener('click', () => {
-    unsavedModal.classList.remove('open');
+    unsavedModal.close();
     closeDirect();
     showToast(t('toast.discardedChanges'), 'icon-rotate-ccw');
   });
   document.getElementById('unsavedSave').addEventListener('click', () => {
-    unsavedModal.classList.remove('open');
+    unsavedModal.close();
     saveDraft();
     closeDirect();
     showToast(t('toast.savedConfig'), 'icon-check');
-  });
-  unsavedModal.addEventListener('click', (e) => {
-    if (e.target === unsavedModal) unsavedModal.classList.remove('open');
   });
 
   // ----------------------------------------------------------
@@ -243,7 +236,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     saveDraft();
     closeDirect();
-    unsavedModal.classList.remove('open');
+    unsavedModal.close();
 
     if (resetAnim) {
       await resetAnim.run(2400);
@@ -279,7 +272,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     refsStore.update(() => []);
 
     closeDirect();
-    unsavedModal.classList.remove('open');
+    unsavedModal.close();
 
     showToast(
       t('toast.dataReset', { jobs: jobsCount, refs: refsCount }),
@@ -314,7 +307,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     draft = getDefaultConfig();
     preferredDefaultStatus = draft.defaultInitialStatus || null;
     closeDirect();
-    unsavedModal.classList.remove('open');
+    unsavedModal.close();
 
     if (resetAnim) {
       await resetAnim.run(2400);
@@ -323,6 +316,13 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
+  // ----------------------------------------------------------
+  // Tab switching
+  // ----------------------------------------------------------
+  const modalEl = document.getElementById('configModal');
+  const tabs = [...modalEl.querySelectorAll('.config-tab')];
+  const panels = [...modalEl.querySelectorAll('.config-panel')];
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -333,6 +333,9 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
   });
 
+  // ----------------------------------------------------------
+  // renderAll + panels
+  // ----------------------------------------------------------
   function renderAll() {
     if (!draft) return;
     renderTags();
@@ -647,7 +650,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Appearance (logo)
+  // Panel: Appearance — logos
   // ------------------------------------------------------------
   function renderLogos() {
     const current = draft.logo || DEFAULT_LOGO;
@@ -682,7 +685,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Appearance (background)
+  // Panel: Appearance — backgrounds
   // ------------------------------------------------------------
   function renderBackgrounds() {
     const current = draft.background || DEFAULT_BACKGROUND;
@@ -1045,11 +1048,11 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   }
 
   document.addEventListener('i18n-changed', () => {
-    if (modal.classList.contains('open') && draft) renderAll();
+    if (configModal.isOpen() && draft) renderAll();
   });
 
   configStore.subscribe(() => {
-    if (modal.classList.contains('open') && draft) {
+    if (configModal.isOpen() && draft) {
       updateBadge();
     }
   });

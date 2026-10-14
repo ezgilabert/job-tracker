@@ -4,6 +4,7 @@
 
 import { DEFAULT_ROLES, ROLE_TAGS, NO_ROLE_VALUE } from '../../app/constants.js';
 import { escapeHtml } from '../../app/utils.js';
+import { icon } from '../../app/icons.js';
 import { t } from '../../i18n/index.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
@@ -11,11 +12,6 @@ const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?
 // ------------------------------------------------------------
 // Icon lookup
 // ------------------------------------------------------------
-function icon(name) {
-  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
-}
-
 // Category id → sprite id (matches ROLE_TAGS_LIST in constants.js)
 const TAG_ICON = {
   programmer: 'icon-monitor',
@@ -323,6 +319,9 @@ export class RoleCombo {
     } else if (e.key === 'Escape') {
       this.hide();
       this.input.blur();
+      // Prevent a parent modal from also reacting to the same
+      // Escape (its own stack-based handler listens on `document`).
+      e.stopPropagation();
     }
   }
 

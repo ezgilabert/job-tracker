@@ -10,18 +10,18 @@ import { DEFAULT_ROLES, ROLE_TAGS_LIST } from '../app/constants.js';
 import { escapeHtml } from '../app/utils.js';
 import { icon } from '../app/icons.js';
 import { t } from '../i18n/index.js';
+import { createModal } from '../ui/modal.js';
 
 /**
  * @param {import('../app/store.js').Store} configStore
  */
 export function mountCreateRoleController(configStore) {
-  const modal = document.getElementById('createRoleModal');
   const input = document.getElementById('createRoleName');
   const saveBtn = document.getElementById('saveCreateRole');
   const cancelBtn = document.getElementById('cancelCreateRole');
   const catsWrap = document.getElementById('createRoleCats');
 
-  if (!modal || !input) {
+  if (!input) {
     return {
       open: () => Promise.resolve(null),
       requestNewRole: () => Promise.resolve(null),
@@ -30,6 +30,19 @@ export function mountCreateRoleController(configStore) {
 
   let pendingResolve = null;
   let selectedCats = new Set();
+
+  // Any close that wasn't triggered by `commit()` resolves as
+  // `null` — the caller interprets that as "cancelled".
+  const modal = createModal(document.getElementById('createRoleModal'), {
+    escapeAction: () => close(null),
+    onClose: () => {
+      if (pendingResolve) {
+        const resolve = pendingResolve;
+        pendingResolve = null;
+        resolve(null);
+      }
+    },
+  });
 
   // ----------------------------------------------------------
   // Category chip rendering
@@ -63,10 +76,6 @@ export function mountCreateRoleController(configStore) {
   // ----------------------------------------------------------
   // Open / close
   // ----------------------------------------------------------
-  function isOpen() {
-    return modal.classList.contains('open');
-  }
-
   function open({ suggested = '', preSelectedCats = [] } = {}) {
     return new Promise((resolve) => {
       pendingResolve = resolve;
@@ -74,7 +83,7 @@ export function mountCreateRoleController(configStore) {
       saveBtn.disabled = !suggested.trim();
       selectedCats = new Set(preSelectedCats);
       renderCats();
-      modal.classList.add('open');
+      modal.open();
       setTimeout(() => {
         input.focus();
         input.select();
@@ -82,12 +91,15 @@ export function mountCreateRoleController(configStore) {
     });
   }
 
-  function close(result = null) {
-    modal.classList.remove('open');
+  function close(result) {
+    // Resolve first, then close. Clearing pendingResolve before
+    // close prevents the onClose handler from double-resolving.
     if (pendingResolve) {
-      pendingResolve(result);
+      const resolve = pendingResolve;
       pendingResolve = null;
+      resolve(result ?? null);
     }
+    modal.close();
   }
 
   function commit() {
@@ -105,26 +117,10 @@ export function mountCreateRoleController(configStore) {
       e.preventDefault();
       commit();
     }
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      close(null);
-    }
   });
 
   saveBtn.addEventListener('click', commit);
   cancelBtn.addEventListener('click', () => close(null));
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) close(null);
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (isOpen()) {
-      e.stopPropagation();
-      close(null);
-    }
-  }, true);
 
   // ----------------------------------------------------------
   // requestNewRole
@@ -140,7 +136,6 @@ export function mountCreateRoleController(configStore) {
 
     const { name, cats } = result;
 
-    const hidden = cfg.roles?.hidden || [];
     const isDefault = DEFAULT_ROLES.includes(name);
     const isCustom = custom.includes(name);
 

@@ -11,10 +11,9 @@
 // their DOM order, so a nested modal (e.g. unsaved on top of
 // config) always wins over its parent.
 //
-// Callers that need a custom Escape behaviour (like the config
-// modal, which routes to tryClose instead of a plain close) can
-// pass an `escapeAction` — the stack only calls it for the top
-// modal, so the priority logic is preserved.
+// Widgets that handle Escape themselves (the role picker, the
+// status picker) call `e.stopPropagation()` in their own
+// handlers so the modal-level listener doesn't also fire.
 // ============================================================
 
 // Modals currently open, oldest first. The last entry is "on top".
@@ -75,10 +74,9 @@ export function createModal(el, {
 
   if (closeOnOverlay) {
     el.addEventListener('click', (e) => {
-      // Overlay click closes the modal directly — including
-      // through the escape action when one is defined, so a
-      // custom Escape handler stays consistent with the click
-      // behaviour.
+      // Overlay click routes through the same action as Escape
+      // when one is defined, so custom close flows (config →
+      // unsaved dialog) stay consistent between the two.
       if (e.target === el) {
         if (entry.escapeAction) entry.escapeAction();
         else close();

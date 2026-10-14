@@ -62,6 +62,9 @@ export class StatusCombo {
       if (e.key === 'Escape') {
         this.hide();
         this.trigger.blur();
+        // Prevent a parent modal from also reacting to the same
+        // Escape (its own stack-based handler listens on `document`).
+        e.stopPropagation();
       } else if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
         e.preventDefault();
         if (!this.open) this.show();
