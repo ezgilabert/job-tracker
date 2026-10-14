@@ -14,6 +14,7 @@ import { uid, highlightAndScroll, escapeHtml, cloneArray, valueOf } from '../uti
 import { renderDashboard } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n.js';
 import { scrollToJob, onScrollToRef, onI18nChanged } from '../events.js';
+import { withUndo } from '../undo.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -322,8 +323,13 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       danger: true,
     });
     if (!confirmed) return;
-    refsStore.update(refs => refs.filter(x => x.id !== id));
-    showToast(t('toast.refDeleted'), '🗑️');
+
+    withUndo(
+      refsStore,
+      t('toast.refDeleted'),
+      () => refsStore.update(refs => refs.filter(x => x.id !== id)),
+      '🗑️'
+    );
   }
 
   // ----------------------------------------------------------
@@ -365,20 +371,25 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     if (!r) return;
     const prevStatus = r.status;
 
-    refsStore.update(refs => refs.map(x => {
-      if (x.id !== id) return x;
-      const history = cloneArray(x.history);
-      const entry = { status: nextStatus, date: new Date().toISOString() };
-      if (note) entry.note = note;
-      history.push(entry);
-      return { ...x, status: nextStatus, history };
-    }));
+    withUndo(
+      [refsStore, jobsStore],
+      t('toast.advanceTo', { name: r.name, status: tRefState(nextStatus) }),
+      () => {
+        refsStore.update(refs => refs.map(x => {
+          if (x.id !== id) return x;
+          const history = cloneArray(x.history);
+          const entry = { status: nextStatus, date: new Date().toISOString() };
+          if (note) entry.note = note;
+          history.push(entry);
+          return { ...x, status: nextStatus, history };
+        }));
 
-    showToast(t('toast.advanceTo', { name: r.name, status: tRefState(nextStatus) }), '→');
-
-    if (nextStatus === 'Hired' && r.linkedJobId) {
-      syncLinkedJobToOffer(r.linkedJobId, r.name);
-    }
+        if (nextStatus === 'Hired' && r.linkedJobId) {
+          syncLinkedJobToOffer(r.linkedJobId, r.name);
+        }
+      },
+      '→'
+    );
 
     if (nextStatus === 'In Process' && prevStatus !== 'In Process') {
       setTimeout(() => modals.onRefToJob(id), 400);
@@ -497,18 +508,21 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     });
     if (!confirmed) return;
 
-    refsStore.update(refs => refs.map(x => {
-      if (x.id !== id) return x;
-      const history = cloneArray(x.history);
-      history.push({
-        status: 'Not Applicable',
-        date: new Date().toISOString(),
-        reason: 'Not applicable',
-      });
-      return { ...x, status: 'Not Applicable', history };
-    }));
-
-    showToast(t('toast.refClosed', { name: r.name }), '🚫');
+    withUndo(
+      refsStore,
+      t('toast.refClosed', { name: r.name }),
+      () => refsStore.update(refs => refs.map(x => {
+        if (x.id !== id) return x;
+        const history = cloneArray(x.history);
+        history.push({
+          status: 'Not Applicable',
+          date: new Date().toISOString(),
+          reason: 'Not applicable',
+        });
+        return { ...x, status: 'Not Applicable', history };
+      })),
+      '🚫'
+    );
   }
 
   function reopenRef(id) {

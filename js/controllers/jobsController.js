@@ -23,6 +23,7 @@ import {
 } from '../utils.js';
 import { t, tState, tStateShort } from '../i18n.js';
 import { scrollToRef, onScrollToJob, onI18nChanged } from '../events.js';
+import { withUndo } from '../undo.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -459,14 +460,19 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
       danger: true,
     });
     if (!confirmed) return;
-    jobsStore.update(jobs => jobs.filter(j => j.id !== id));
 
-    refsStore.update(refs => refs.map(r => {
-      if (r.linkedJobId !== id) return r;
-      return { ...r, linkedJobId: null };
-    }));
-
-    showToast(t('toast.jobDeleted'), '🗑️');
+    withUndo(
+      [jobsStore, refsStore],
+      t('toast.jobDeleted'),
+      () => {
+        jobsStore.update(jobs => jobs.filter(j => j.id !== id));
+        refsStore.update(refs => refs.map(r => {
+          if (r.linkedJobId !== id) return r;
+          return { ...r, linkedJobId: null };
+        }));
+      },
+      '🗑️'
+    );
   }
 
   function reopenJob(id) {

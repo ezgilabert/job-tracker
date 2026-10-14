@@ -11,6 +11,7 @@ export const en = {
   'action.theme': 'Switch theme',
   'action.language': 'Switch language',
   'action.print': 'Print / PDF',
+  'action.undo': 'Undo',
 
   // ===== First-run welcome =====
   'welcome.title': 'Welcome to Job Tracker!',
@@ -456,6 +457,7 @@ export const en = {
   'toast.profileImageTooBig': 'Image is larger than 2 MB',
   'toast.dataReset': 'Data deleted · {jobs} applications · {refs} referrals',
   'toast.dataResetEmpty': 'No data to delete',
+  'toast.undone': 'Action undone',
 
   'reset.running': 'Restarting…',
   'reset.sub': 'Applying default values',

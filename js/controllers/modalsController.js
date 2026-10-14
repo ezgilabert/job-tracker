@@ -25,6 +25,7 @@ import {
   t, tState, tStateShort, tRefState, tRefStateShort,
 } from '../i18n.js';
 import { scrollToJob, onScrollToJob, onI18nChanged } from '../events.js';
+import { withUndo } from '../undo.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -248,23 +249,29 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
     const { id, status } = pendingClose;
     const closedJob = jobsStore.get().find(x => x.id === id);
+    const icons = { 'Rejected': '✕', 'Ghosted': '👻', 'Discarded': '🚫', 'Offer': '🎉' };
 
-    jobsStore.update(jobs => jobs.map(j => {
-      if (j.id !== id) return j;
-      const history = cloneArray(j.history);
-      history.push({ status, date: new Date().toISOString(), reason });
-      const patch = { ...j, status, history };
-      if (status === 'Offer') patch.offerConfirmed = true;
-      return patch;
-    }));
+    withUndo(
+      [jobsStore, refsStore],
+      t('toast.closedAs', { status: tState(status) }),
+      () => {
+        jobsStore.update(jobs => jobs.map(j => {
+          if (j.id !== id) return j;
+          const history = cloneArray(j.history);
+          history.push({ status, date: new Date().toISOString(), reason });
+          const patch = { ...j, status, history };
+          if (status === 'Offer') patch.offerConfirmed = true;
+          return patch;
+        }));
 
-    if (status === 'Offer') {
-      syncLinkedRefToHired(id, closedJob);
-    }
+        if (status === 'Offer') {
+          syncLinkedRefToHired(id, closedJob);
+        }
+      },
+      icons[status] || '✓'
+    );
 
     hideClose();
-    const icons = { 'Rejected': '✕', 'Ghosted': '👻', 'Discarded': '🚫', 'Offer': '🎉' };
-    showToast(t('toast.closedAs', { status: tState(status) }), icons[status] || '✓');
   });
 
   function syncLinkedRefToHired(jobId, job) {
@@ -491,23 +498,26 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
   function applyAdvance({ note } = {}) {
     if (!pendingAdvance) return;
     const { id, nextStatus, skipCurrent } = pendingAdvance;
-
-    jobsStore.update(jobs => jobs.map(j => {
-      if (j.id !== id) return j;
-      const skipped = cloneArray(j.skipped);
-      if (skipCurrent && !skipped.includes(j.status)) skipped.push(j.status);
-
-      const history = cloneArray(j.history);
-      const entry = { status: nextStatus, date: new Date().toISOString() };
-      if (note) entry.note = note;
-      history.push(entry);
-
-      return { ...j, status: nextStatus, skipped, history };
-    }));
-
     const j = jobsStore.get().find(x => x.id === id);
-    showToast(
-      t('toast.advanceTo', { name: j?.company ?? '', status: tState(nextStatus) }),
+    const name = j?.company ?? '';
+
+    withUndo(
+      jobsStore,
+      t('toast.advanceTo', { name, status: tState(nextStatus) }),
+      () => {
+        jobsStore.update(jobs => jobs.map(j => {
+          if (j.id !== id) return j;
+          const skipped = cloneArray(j.skipped);
+          if (skipCurrent && !skipped.includes(j.status)) skipped.push(j.status);
+
+          const history = cloneArray(j.history);
+          const entry = { status: nextStatus, date: new Date().toISOString() };
+          if (note) entry.note = note;
+          history.push(entry);
+
+          return { ...j, status: nextStatus, skipped, history };
+        }));
+      },
       skipCurrent ? '🚫' : '→'
     );
   }
