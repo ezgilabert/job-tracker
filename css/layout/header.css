@@ -82,21 +82,6 @@ header {
   animation: brandGradientSweep 1.2s ease infinite;
 }
 
-[data-theme="dark"] .brand:hover h1 {
-  background: linear-gradient(
-    90deg,
-    var(--text) 0%,
-    var(--text) 35%,
-    var(--accent) 50%,
-    var(--text) 65%,
-    var(--text) 100%
-  );
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 @keyframes brandGradientSweep {
   0%   { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
@@ -113,10 +98,6 @@ header {
 
 .brand:hover p {
   color: var(--accent);
-}
-
-.brand:not(:hover) h1 {
-  -webkit-text-fill-color: currentColor;
 }
 
 /* ============================================================

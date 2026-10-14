@@ -8,7 +8,7 @@
      3. layout     — page structure (header, menu, media queries)
      4. components — reusable widgets
      5. features   — domain-specific styles
-     6. pages      — full-page layouts (login screen)
+     6. pages      — full-page layouts (login, boot overlay)
      7. print      — scoped to @media print
    ============================================================ */
 
@@ -31,6 +31,7 @@
 @import url('./components/toolbar.css');
 @import url('./components/modals.css');
 @import url('./components/feedback.css');
+@import url('./components/empty-state.css');
 @import url('./components/welcome.css');
 
 /* --- Features --- */
@@ -43,6 +44,7 @@
 
 /* --- Pages --- */
 @import url('./pages/auth.css');
+@import url('./pages/boot.css');
 
 /* --- Print --- */
 @import url('./base/print.css');

@@ -1,0 +1,114 @@
+/* ============================================================
+   Boot overlay: the splash screen shown while the app hydrates.
+   Only the anti-FOUC shell stays inline in index.html; the rest
+   lives here so it follows the same @import convention.
+   ============================================================ */
+
+.loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  max-width: 440px;
+  width: 100%;
+  padding: 0 1.5rem;
+}
+
+.loading-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.loading-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent, #7c5cff), var(--accent-2, #a855f7));
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 26px var(--accent-glow, rgba(124,92,255,0.3));
+  flex-shrink: 0;
+}
+
+.loading-logo svg {
+  width: 30px;
+  height: 30px;
+  color: #ffffff;
+  display: block;
+}
+
+.loading-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text, #16182a);
+}
+
+.loading-rotating {
+  position: relative;
+  height: 28px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.loading-rotating span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  color: var(--text-muted, #5c6279);
+  opacity: 0;
+  animation: loadingRotateText 3s linear infinite;
+  font-weight: 500;
+}
+
+.loading-rotating span:nth-child(1) { animation-delay: 0s; }
+.loading-rotating span:nth-child(2) { animation-delay: 1s; }
+.loading-rotating span:nth-child(3) { animation-delay: 2s; }
+
+@keyframes loadingRotateText {
+  0%   { opacity: 0; transform: translateY(8px); }
+  5%   { opacity: 1; transform: translateY(0); }
+  30%  { opacity: 1; transform: translateY(0); }
+  35%  { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 0; transform: translateY(-8px); }
+}
+
+.loading-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--border, #e7e9f3);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme="dark"] .loading-bar {
+  background: rgba(255,255,255,0.08);
+}
+
+.loading-bar-fill {
+  position: absolute;
+  top: 0;
+  left: -40%;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--accent, #7c5cff), var(--accent-2, #a855f7), transparent);
+  border-radius: 6px;
+  animation: loadingBarSlide 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingBarSlide {
+  0%   { left: -40%; }
+  100% { left: 100%; }
+}

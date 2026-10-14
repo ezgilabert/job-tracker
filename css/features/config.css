@@ -11,8 +11,6 @@
 
 .config-modal::-webkit-scrollbar {
   display: none;
-  width: 0;
-  height: 0;
 }
 
 .config-modal h2 {
@@ -30,18 +28,6 @@
   font-size: 0.85rem;
   color: var(--text-muted);
   margin-bottom: 1.25rem;
-}
-
-.config-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-muted);
 }
 
 .unsaved-badge {
@@ -785,29 +771,8 @@
   color: white;
 }
 
-.unsaved-modal {
-  position: relative;
-}
-
 .unsaved-modal h2 {
   padding-right: 2.5rem;
-}
-
-.unsaved-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-muted);
-}
-
-.unsaved-close:hover {
-  background: var(--surface-hover);
-  color: var(--text);
 }
 
 /* ============================================================
@@ -1129,8 +1094,6 @@
   border-radius: 0;
   flex: 1;
 }
-
-.input-prefix input:focus { box-shadow: none !important; }
 
 .profile-hint {
   font-size: 0.72rem;

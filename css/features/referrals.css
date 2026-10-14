@@ -706,59 +706,6 @@ form.form-block {
 }
 
 /* ============================================================
-   Empty state (referrals) · OPTION C · 104px / 48px
-   ============================================================ */
-
-.empty-ref {
-  text-align: center;
-  padding: 3.25rem 1rem 3rem;
-  background: var(--surface);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius);
-}
-
-.empty-ref-visual {
-  margin: 0 auto 1.4rem;
-  width: 104px;
-  height: 104px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  display: grid;
-  place-items: center;
-  color: var(--accent);
-}
-
-.empty-ref-visual svg {
-  width: 48px;
-  height: 48px;
-  stroke-width: 1.8;
-  display: block;
-}
-
-[data-theme="dark"] .empty-ref-visual {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  color: var(--accent);
-}
-
-.empty-ref h3 {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  margin-bottom: 0.5rem;
-}
-
-.empty-ref p {
-  font-size: 0.92rem;
-  color: var(--text-muted);
-  max-width: 380px;
-  margin: 0 auto;
-  line-height: 1.55;
-}
-
-/* ============================================================
    Referral tags inside job cards
    ============================================================ */
 

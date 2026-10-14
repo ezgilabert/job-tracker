@@ -249,15 +249,33 @@
 .modal-lg { max-width: 540px; }
 .modal-xl { max-width: 560px; }
 
-/* Absolutely positioned close button.
+/* ============================================================
+   Absolutely positioned close button.
    Use together with .icon-btn:
-     <button class="icon-btn modal-close"> <svg><use/></svg> </button> */
+     <button class="icon-btn modal-close">…</button>
+   Add .ghost for the transparent variant (used by the config
+   and unsaved-changes modals, which have no visible chrome).
+   ============================================================ */
+
 .modal-close {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
   width: 32px;
   height: 32px;
+}
+
+.modal-close.ghost {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.modal-close.ghost:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  box-shadow: none;
 }
 
 /* Muted caption paragraph inside a modal (subtitle / help text). */

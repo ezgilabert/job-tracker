@@ -519,56 +519,6 @@
   border-left: 2px solid var(--danger-border);
 }
 
-/* ===== Empty state (applications) ===== */
-
-.empty-jobs {
-  text-align: center;
-  padding: 2.75rem 1rem 2.5rem;
-  background: var(--surface);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius);
-}
-
-.empty-jobs-visual {
-  margin: 0 auto 1.1rem;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  display: grid;
-  place-items: center;
-  color: var(--accent);
-}
-
-.empty-jobs-visual svg {
-  width: 34px;
-  height: 34px;
-  stroke-width: 1.8;
-  display: block;
-}
-
-[data-theme="dark"] .empty-jobs-visual {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  color: var(--accent);
-}
-
-.empty-jobs h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.4rem;
-}
-
-.empty-jobs p {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  max-width: 340px;
-  margin: 0 auto;
-  line-height: 1.5;
-}
-
 /* ============================================================
    Filters: align visually with referral filters
    (plain text, no emojis or decorative dots injected)
@@ -577,56 +527,4 @@
 #filters button::before,
 #filters button::after {
   content: none;
-}
-
-/* ============================================================
-   Empty filter (shared by jobs and referrals)
-   ============================================================ */
-
-.empty-filter {
-  text-align: center;
-  padding: 2.75rem 1rem 2.5rem;
-  background: var(--surface);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius);
-}
-
-.empty-filter-visual {
-  margin: 0 auto 1.1rem;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  display: grid;
-  place-items: center;
-  color: var(--accent);
-}
-
-.empty-filter-visual svg {
-  width: 34px;
-  height: 34px;
-  stroke-width: 1.8;
-  display: block;
-}
-
-[data-theme="dark"] .empty-filter-visual {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  color: var(--accent);
-}
-
-.empty-filter h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.4rem;
-}
-
-.empty-filter p {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  max-width: 340px;
-  margin: 0 auto;
-  line-height: 1.5;
 }

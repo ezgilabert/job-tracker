@@ -36,78 +36,20 @@
 <link rel="stylesheet" href="./css/styles.css">
 
 <style>
-  /* Boot overlay shown while the app hydrates */
+  /* Critical: only what must paint before styles.css loads.
+     Colors are hardcoded here on purpose — this rule runs before
+     tokens.css defines the variables, so it must not depend on them.
+     Everything else lives in css/pages/boot.css. */
   .loading-overlay {
     position: fixed;
     inset: 0;
     z-index: 9999;
     display: grid;
     place-items: center;
-    background: var(--bg-1, #f6f7fb);
+    background: #f6f7fb;
     transition: opacity 0.5s ease, visibility 0.5s ease;
   }
-  [data-theme="dark"] .loading-overlay { background: var(--bg-1, #0a0c18); }
-  .loading-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-  .loading-content {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 1.5rem; text-align: center; max-width: 440px;
-    width: 100%; padding: 0 1.5rem;
-  }
-
-  .loading-logo-row { display: flex; align-items: center; gap: 0.9rem; }
-
-  .loading-logo {
-    width: 56px; height: 56px; border-radius: 16px;
-    background: linear-gradient(135deg, var(--accent, #7c5cff), var(--accent-2, #a855f7));
-    display: grid; place-items: center;
-    box-shadow: 0 8px 26px var(--accent-glow, rgba(124,92,255,0.3));
-    flex-shrink: 0;
-  }
-
-  .loading-logo svg { width: 30px; height: 30px; color: #ffffff; display: block; }
-
-  .loading-brand {
-    font-size: 1.4rem; font-weight: 800;
-    letter-spacing: -0.025em; color: var(--text, #16182a);
-  }
-
-  .loading-rotating { position: relative; height: 28px; width: 100%; overflow: hidden; }
-
-  .loading-rotating span {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.05rem; color: var(--text-muted, #5c6279);
-    opacity: 0; animation: loadingRotateText 3s linear infinite;
-    font-weight: 500;
-  }
-
-  .loading-rotating span:nth-child(1) { animation-delay: 0s; }
-  .loading-rotating span:nth-child(2) { animation-delay: 1s; }
-  .loading-rotating span:nth-child(3) { animation-delay: 2s; }
-
-  @keyframes loadingRotateText {
-    0%   { opacity: 0; transform: translateY(8px); }
-    5%   { opacity: 1; transform: translateY(0); }
-    30%  { opacity: 1; transform: translateY(0); }
-    35%  { opacity: 0; transform: translateY(-8px); }
-    100% { opacity: 0; transform: translateY(-8px); }
-  }
-
-  .loading-bar {
-    width: 100%; height: 6px; background: var(--border, #e7e9f3);
-    border-radius: 6px; overflow: hidden; position: relative;
-  }
-  [data-theme="dark"] .loading-bar { background: rgba(255,255,255,0.08); }
-
-  .loading-bar-fill {
-    position: absolute; top: 0; left: -40%; height: 100%; width: 40%;
-    background: linear-gradient(90deg, transparent, var(--accent, #7c5cff), var(--accent-2, #a855f7), transparent);
-    border-radius: 6px;
-    animation: loadingBarSlide 1.5s ease-in-out infinite;
-  }
-
-  @keyframes loadingBarSlide { 0% { left: -40%; } 100% { left: 100%; } }
+  [data-theme="dark"] .loading-overlay { background: #0a0c18; }
 </style>
 </head>
 <body>
@@ -790,7 +732,7 @@
 <!-- Config modal -->
 <div class="modal-overlay" id="configModal" role="dialog" aria-modal="true" aria-labelledby="configModalTitle">
   <div class="modal config-modal modal-has-close">
-    <button type="button" class="icon-btn config-close modal-close" id="closeConfigBtn" title="Close" data-i18n-title="modal.close">
+    <button type="button" class="icon-btn modal-close ghost" id="closeConfigBtn" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
 
@@ -1093,7 +1035,7 @@
 <!-- Unsaved changes modal -->
 <div class="modal-overlay nested" id="unsavedModal" role="dialog" aria-modal="true" aria-labelledby="unsavedModalTitle">
   <div class="modal modal-md modal-has-close unsaved-modal">
-    <button type="button" class="icon-btn unsaved-close modal-close" id="unsavedCloseBtn" title="Close" data-i18n-title="modal.close">
+    <button type="button" class="icon-btn modal-close ghost" id="unsavedCloseBtn" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
     <h2 id="unsavedModalTitle" data-i18n="unsaved.title">⚠️ Unsaved changes</h2>

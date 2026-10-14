@@ -1,0 +1,96 @@
+/* ============================================================
+   Empty states — shared across jobs, referrals and filters.
+   Two size variants:
+     - small  → .empty-jobs / .empty-filter  (72px circle)
+     - large  → .empty-ref                   (104px circle)
+   ============================================================ */
+
+.empty-jobs,
+.empty-filter,
+.empty-ref {
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.empty-jobs,
+.empty-filter { padding: 2.75rem 1rem 2.5rem; }
+.empty-ref    { padding: 3.25rem 1rem 3rem; }
+
+/* ===== Circle visual ===== */
+
+.empty-jobs-visual,
+.empty-filter-visual,
+.empty-ref-visual {
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.empty-jobs-visual,
+.empty-filter-visual {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 1.1rem;
+}
+
+.empty-ref-visual {
+  width: 104px;
+  height: 104px;
+  margin-bottom: 1.4rem;
+}
+
+.empty-jobs-visual svg,
+.empty-filter-visual svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.8;
+  display: block;
+}
+
+.empty-ref-visual svg {
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.8;
+  display: block;
+}
+
+/* ===== Headings + copy ===== */
+
+.empty-jobs h3,
+.empty-filter h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.empty-ref h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-jobs p,
+.empty-filter p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.empty-ref p {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  max-width: 380px;
+  margin: 0 auto;
+  line-height: 1.55;
+}
