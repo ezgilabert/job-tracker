@@ -10,7 +10,9 @@ import {
 } from '../app/selectors.js';
 import { REF_WORKFLOW_STEPS } from '../app/constants.js';
 import { renderRefCard } from '../templates/refCard.js';
-import { uid, highlightAndScroll, escapeHtml, cloneArray, valueOf } from '../app/utils.js';
+import {
+  uid, highlightAndScroll, escapeHtml, valueOf, updateById, withHistoryEntry,
+} from '../app/utils.js';
 import { renderDashboard } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n/index.js';
 import { scrollToJob, onScrollToRef, onI18nChanged } from '../app/events.js';
@@ -368,14 +370,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       [refsStore, jobsStore],
       t('toast.advanceTo', { name: r.name, status: tRefState(nextStatus) }),
       () => {
-        refsStore.update(refs => refs.map(x => {
-          if (x.id !== id) return x;
-          const history = cloneArray(x.history);
-          const entry = { status: nextStatus, date: new Date().toISOString() };
-          if (note) entry.note = note;
-          history.push(entry);
-          return { ...x, status: nextStatus, history };
-        }));
+        updateById(refsStore, id, x => withHistoryEntry(
+          x,
+          { status: nextStatus },
+          note ? { status: nextStatus, note } : { status: nextStatus }
+        ));
 
         if (nextStatus === 'Hired' && r.linkedJobId) {
           syncLinkedJobToOffer(r.linkedJobId, r.name);
@@ -393,13 +392,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     jobsStore.update(jobs => jobs.map(j => {
       if (j.id !== jobId) return j;
       if (j.status === 'Offer') return j;
-      const history = cloneArray(j.history);
-      history.push({
-        status: 'Offer',
-        date: new Date().toISOString(),
-        reason: `Referral hired: ${refName}`,
-      });
-      return { ...j, status: 'Offer', history };
+      return withHistoryEntry(
+        j,
+        { status: 'Offer' },
+        { status: 'Offer', reason: `Referral hired: ${refName}` }
+      );
     }));
   }
 
@@ -473,16 +470,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
     const prevStatus = REF_WORKFLOW_STEPS[idx - 1].id;
 
-    refsStore.update(refs => refs.map(x => {
-      if (x.id !== id) return x;
-      const history = cloneArray(x.history);
-      history.push({
-        status: prevStatus,
-        date: new Date().toISOString(),
-        wentBack: true,
-      });
-      return { ...x, status: prevStatus, wentBack: true, history };
-    }));
+    updateById(refsStore, id, x => withHistoryEntry(
+      x,
+      { status: prevStatus, wentBack: true },
+      { status: prevStatus, wentBack: true }
+    ));
 
     showToast(t('toast.backTo', { name: r.name, status: tRefState(prevStatus) }), 'icon-arrow-left');
   }
@@ -504,16 +496,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     withUndo(
       refsStore,
       t('toast.refClosed', { name: r.name }),
-      () => refsStore.update(refs => refs.map(x => {
-        if (x.id !== id) return x;
-        const history = cloneArray(x.history);
-        history.push({
-          status: 'Not Applicable',
-          date: new Date().toISOString(),
-          reason: 'Not applicable',
-        });
-        return { ...x, status: 'Not Applicable', history };
-      })),
+      () => updateById(refsStore, id, x => withHistoryEntry(
+        x,
+        { status: 'Not Applicable' },
+        { status: 'Not Applicable', reason: 'Not applicable' }
+      )),
       'icon-ban'
     );
   }
@@ -522,16 +509,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     const r = refsStore.get().find(x => x.id === id);
     if (!r) return;
 
-    refsStore.update(refs => refs.map(x => {
-      if (x.id !== id) return x;
-      const history = cloneArray(x.history);
-      history.push({
-        status: 'Pending',
-        date: new Date().toISOString(),
-        reason: 'Reopen',
-      });
-      return { ...x, status: 'Pending', history };
-    }));
+    updateById(refsStore, id, x => withHistoryEntry(
+      x,
+      { status: 'Pending' },
+      { status: 'Pending', reason: 'Reopen' }
+    ));
 
     showToast(t('toast.refReopened'), 'icon-rotate-cw');
   }

@@ -8,13 +8,8 @@
 import { showToast } from '../ui/feedback/toast.js';
 import { DEFAULT_ROLES, ROLE_TAGS_LIST } from '../app/constants.js';
 import { escapeHtml } from '../app/utils.js';
+import { icon } from '../app/icons.js';
 import { t } from '../i18n/index.js';
-
-// Sprite helper: ROLE_TAGS_LIST now stores symbol names, not emojis.
-function icon(name) {
-  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
-}
 
 /**
  * @param {import('../app/store.js').Store} configStore
@@ -155,8 +150,6 @@ export function mountCreateRoleController(configStore) {
       const nextCustomTags = { ...(nextRoles.customTags || {}) };
       const nextHidden = [...(nextRoles.hidden || [])];
 
-      // If the role already exists as a default, do not duplicate it in
-      // custom. Just store its tags so it filters correctly.
       if (!isDefault && !isCustom) {
         nextCustom.push(name);
       }
@@ -167,7 +160,6 @@ export function mountCreateRoleController(configStore) {
         delete nextCustomTags[name];
       }
 
-      // Unhide if it was hidden.
       const hiddenIdx = nextHidden.indexOf(name);
       if (hiddenIdx >= 0) nextHidden.splice(hiddenIdx, 1);
 

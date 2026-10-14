@@ -17,9 +17,6 @@ export function escapeHtml(str) {
 
 // ------------------------------------------------------------
 // Date formatting — locale-aware.
-// The `Intl` locale id is derived from the current i18n language,
-// so switching to English reformats dates as `MMM DD, YYYY` on
-// the next render (templates re-render on `i18n-changed`).
 // ------------------------------------------------------------
 function currentLocale() {
   return getLanguage() === 'en' ? 'en-US' : 'es-AR';
@@ -115,4 +112,50 @@ export function valueOf(id) {
 export function setVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = val ?? '';
+}
+
+// ------------------------------------------------------------
+// Store mutation helpers
+// ------------------------------------------------------------
+
+/**
+ * Applies a patch function to the item with the given id inside
+ * a store. No-op if the item doesn't exist.
+ *
+ * Replaces the ubiquitous:
+ *
+ *   store.update(items => items.map(it =>
+ *     it.id === id ? { ...it, ...patch } : it
+ *   ));
+ *
+ * @param {import('./store.js').Store} store
+ * @param {number|string} id
+ * @param {(item: object) => object} patchFn
+ */
+export function updateById(store, id, patchFn) {
+  store.update(items => items.map(it =>
+    it.id === id ? patchFn(it) : it
+  ));
+}
+
+/**
+ * Returns a shallow copy of `item` with a new history entry
+ * appended. The entry always gets a `date` (ISO string) — the
+ * caller only supplies the rest of the fields.
+ *
+ * Replaces the ubiquitous:
+ *
+ *   const history = cloneArray(item.history);
+ *   history.push({ status, date: new Date().toISOString(), ...rest });
+ *   return { ...item, status, history };
+ *
+ * @param {object} item        item with a `.history` array
+ * @param {object} patch       properties to merge into the item
+ * @param {object} entry       history entry payload (without date)
+ * @returns {object}
+ */
+export function withHistoryEntry(item, patch, entry) {
+  const history = Array.isArray(item.history) ? [...item.history] : [];
+  history.push({ date: new Date().toISOString(), ...entry });
+  return { ...item, ...patch, history };
 }

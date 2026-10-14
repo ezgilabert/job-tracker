@@ -9,12 +9,8 @@
 
 import { WORKFLOW_STEPS, getStateIcon } from '../../app/constants.js';
 import { escapeHtml } from '../../app/utils.js';
+import { icon } from '../../app/icons.js';
 import { tState } from '../../i18n/index.js';
-
-function icon(name) {
-  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
-}
 
 export class StatusCombo {
   /**

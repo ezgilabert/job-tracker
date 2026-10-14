@@ -19,22 +19,14 @@ import {
 import { stepIndex, isClosed } from '../app/selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray,
-  formatDateTime, valueOf, setVal,
+  formatDateTime, valueOf, setVal, updateById, withHistoryEntry,
 } from '../app/utils.js';
 import {
   t, tState, tStateShort, tRefState, tRefStateShort,
 } from '../i18n/index.js';
 import { scrollToJob, onScrollToJob, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
-
-// ------------------------------------------------------------
-// SVG sprite helper (replaces the emoji that used to live in
-// STATE_ICONS before the migration).
-// ------------------------------------------------------------
-function icon(name) {
-  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
-}
+import { icon } from '../app/icons.js';
 
 // Undo/close-status → sprite names.
 const CLOSE_UNDO_ICON = {
@@ -271,14 +263,13 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       [jobsStore, refsStore],
       t('toast.closedAs', { status: tState(status) }),
       () => {
-        jobsStore.update(jobs => jobs.map(j => {
-          if (j.id !== id) return j;
-          const history = cloneArray(j.history);
-          history.push({ status, date: new Date().toISOString(), reason });
-          const patch = { ...j, status, history };
-          if (status === 'Offer') patch.offerConfirmed = true;
-          return patch;
-        }));
+        updateById(jobsStore, id, j => withHistoryEntry(
+          j,
+          status === 'Offer'
+            ? { status, offerConfirmed: true }
+            : { status },
+          { status, reason }
+        ));
 
         if (status === 'Offer') {
           syncLinkedRefToHired(id, closedJob);
@@ -296,16 +287,14 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       if (r.status === 'Not Applicable') return r;
       if (r.status === 'Hired') return r;
 
-      const history = cloneArray(r.history);
       const label = job
         ? `${job.role || '—'} · ${job.company || '—'}`
         : '—';
-      history.push({
-        status: 'Hired',
-        date: new Date().toISOString(),
-        reason: `Offer accepted: ${label}`,
-      });
-      return { ...r, status: 'Hired', history };
+      return withHistoryEntry(
+        r,
+        { status: 'Hired' },
+        { status: 'Hired', reason: `Offer accepted: ${label}` }
+      );
     }));
   }
 
@@ -521,18 +510,16 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       jobsStore,
       t('toast.advanceTo', { name, status: tState(nextStatus) }),
       () => {
-        jobsStore.update(jobs => jobs.map(j => {
-          if (j.id !== id) return j;
-          const skipped = cloneArray(j.skipped);
-          if (skipCurrent && !skipped.includes(j.status)) skipped.push(j.status);
+        updateById(jobsStore, id, job => {
+          const skipped = cloneArray(job.skipped);
+          if (skipCurrent && !skipped.includes(job.status)) skipped.push(job.status);
 
-          const history = cloneArray(j.history);
-          const entry = { status: nextStatus, date: new Date().toISOString() };
-          if (note) entry.note = note;
-          history.push(entry);
-
-          return { ...j, status: nextStatus, skipped, history };
-        }));
+          return withHistoryEntry(
+            job,
+            { status: nextStatus, skipped },
+            note ? { status: nextStatus, note } : { status: nextStatus }
+          );
+        });
       },
       skipCurrent ? 'icon-ban' : 'icon-arrow-right'
     );
@@ -874,12 +861,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     if (idx <= 0) return;
     const prevStatus = WORKFLOW_STEPS[idx - 1].id;
 
-    jobsStore.update(jobs => jobs.map(x => {
-      if (x.id !== id) return x;
-      const history = cloneArray(x.history);
-      history.push({ status: prevStatus, date: new Date().toISOString(), wentBack: true });
-      return { ...x, status: prevStatus, history, wentBack: true };
-    }));
+    updateById(jobsStore, id, x => withHistoryEntry(
+      x,
+      { status: prevStatus, wentBack: true },
+      { status: prevStatus, wentBack: true }
+    ));
+
     showToast(t('toast.backTo', { name: j.company, status: tState(prevStatus) }), 'icon-arrow-left');
   }
 }

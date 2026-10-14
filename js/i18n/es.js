@@ -178,7 +178,7 @@ export const es = {
   'job.editTitle': 'Editar',
   'job.deleteTitle': 'Borrar',
   'job.refChipTitle': 'Ver referido: {name}',
-  'job.offerRibbon': '🏆 Oferta',
+  'job.offerRibbon': ' Oferta',
   'job.noRole': 'No especificado',
   'job.contactoAbrirTitle': 'Abrir contacto: {name}',
   'job.contactoContactar': 'Contactar',

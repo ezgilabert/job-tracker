@@ -19,7 +19,7 @@ import {
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../app/constants.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
-  uid, cloneArray, escapeHtml, valueOf,
+  uid, escapeHtml, valueOf, updateById, withHistoryEntry,
 } from '../app/utils.js';
 import { t, tState, tStateShort } from '../i18n/index.js';
 import { scrollToRef, onScrollToJob, onI18nChanged } from '../app/events.js';
@@ -475,20 +475,16 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   }
 
   function reopenJob(id) {
-    jobsStore.update(jobs => jobs.map(j => {
-      if (j.id !== id) return j;
-      const history = cloneArray(j.history);
-      history.push({ status: 'Applied', date: new Date().toISOString() });
-      return { ...j, status: 'Applied', history, offerConfirmed: false };
-    }));
+    updateById(jobsStore, id, j => withHistoryEntry(
+      j,
+      { status: 'Applied', offerConfirmed: false },
+      { status: 'Applied' }
+    ));
     showToast(t('toast.jobReopened'), 'icon-rotate-cw');
   }
 
   function unconfirmOffer(id) {
-    jobsStore.update(jobs => jobs.map(j => {
-      if (j.id !== id) return j;
-      return { ...j, offerConfirmed: false };
-    }));
+    updateById(jobsStore, id, j => ({ ...j, offerConfirmed: false }));
     showToast(t('toast.offerUnconfirmed'), 'icon-rotate-ccw');
   }
 
