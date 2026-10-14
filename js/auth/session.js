@@ -1,5 +1,5 @@
 // ============================================================
-// Session: mocked auth (single valid user).
+// Session: mocked auth backed by the local users registry.
 //
 // CLIENT-SIDE ONLY. This is NOT real security: anyone with devtools
 // can bypass it. It's "raising the bar" until a backend exists.
@@ -7,7 +7,24 @@
 //   - validateCredentials() -> POST /auth/login
 //   - login()               -> store server httpOnly cookie
 //   - requireSession()      -> GET /auth/me
+//
+// Credentials live in js/auth/users.js (localStorage + per-user
+// salt). This module only handles rate limiting, session signing
+// and the guards.
 // ============================================================
+
+import {
+  findUserByUsername,
+  findUserByEmail,
+  verifyPassword,
+  createUser,
+  computeHash,
+} from './users.js';
+
+// Re-export so the README snippet
+//   await m.computeHash('salt', 'password')
+// keeps working from the login console.
+export { computeHash };
 
 const SESSION_KEY         = 'jobTrackerSession';
 const RATE_KEY            = 'jobTrackerLoginRate';
@@ -19,27 +36,6 @@ const LOCKOUT_MS      = 5 * 60 * 1000;   // 5 minutes lockout
 const SESSION_TTL_MS  = 30 * 60 * 1000;  // 30 min inactivity TTL
 
 // ------------------------------------------------------------
-// Credentials (SHA-256 hash of `${salt}:${password}`).
-//
-// WARNING: replace `passwordHash` with the real hash. To generate:
-//   1. Open login.html.
-//   2. In the console:
-//        const m = await import('./js/auth/session.js');
-//        await m.computeHash('a7f3d9e2c4b8a1f6', 'YOUR_PASSWORD');
-//   3. Paste the hex output into passwordHash. Never commit the
-//      plaintext password anywhere.
-// ------------------------------------------------------------
-const CREDENTIALS = [
-  {
-    username: 'egarcia',
-    salt: 'a7f3d9e2c4b8a1f6',
-    passwordHash: 'e7212870e33e35acd935ab00bd42e36c919caff49d2e69e2fd85d6a0b9465d8f',
-    name: 'E. García',
-    email: 'egarcia@jobtracker.local',
-  },
-];
-
-// ------------------------------------------------------------
 // Crypto helpers
 // ------------------------------------------------------------
 async function sha256Hex(text) {
@@ -48,11 +44,6 @@ async function sha256Hex(text) {
   return [...new Uint8Array(digest)]
     .map(b => b.toString(16).padStart(2, '0'))
     .join('');
-}
-
-/** Exposed so the hash can be generated from the console. */
-export async function computeHash(salt, password) {
-  return sha256Hex(`${salt}:${password}`);
 }
 
 /**
@@ -119,6 +110,8 @@ function clearRate() {
 // Credential validation (async because of the hash)
 // ------------------------------------------------------------
 /**
+ * @param {string} identifier  username or email, case-insensitive
+ * @param {string} password
  * @returns {Promise<
  *   | {locked:true}
  *   | {username:string,name:string,email:string}
@@ -128,24 +121,48 @@ function clearRate() {
 export async function validateCredentials(identifier, password) {
   if (getLockoutRemainingMs() > 0) return { locked: true };
 
-  const id = String(identifier || '').trim().toLowerCase();
+  const id = String(identifier || '').trim();
   const pw = String(password || '');
   if (!id || !pw) {
     registerFailure();
     return null;
   }
 
-  for (const u of CREDENTIALS) {
-    if (u.username.toLowerCase() !== id && u.email.toLowerCase() !== id) continue;
-    const hash = await computeHash(u.salt, pw);
-    if (hash === u.passwordHash) {
-      clearRate();
-      return { username: u.username, name: u.name, email: u.email };
-    }
+  const user = findUserByUsername(id) || findUserByEmail(id);
+  if (!user) {
+    registerFailure();
+    return null;
   }
 
-  registerFailure();
-  return null;
+  const ok = await verifyPassword(user, pw);
+  if (!ok) {
+    registerFailure();
+    return null;
+  }
+
+  clearRate();
+  return { username: user.username, name: user.name, email: user.email };
+}
+
+// ------------------------------------------------------------
+// Registration helper (creates the user and logs in)
+// ------------------------------------------------------------
+/**
+ * Creates a new user in the local registry and logs them in. The
+ * caller is responsible for validating the input first
+ * (`validateRegistration` from users.js).
+ *
+ * @param {{ username:string, email:string, name?:string, password:string }} input
+ * @returns {Promise<object>} the created user record
+ */
+export async function registerUser({ username, email, name = '', password }) {
+  const user = await createUser({ username, email, name, password });
+  await login({
+    username: user.username,
+    email: user.email,
+    name: user.name,
+  });
+  return user;
 }
 
 // ------------------------------------------------------------

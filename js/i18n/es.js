@@ -22,14 +22,14 @@ export const es = {
   'welcome.tip.settings': 'Hacé click en tu avatar para abrir Configuración',
   'welcome.dismiss': 'Entendido',
 
+  // ===== Auth =====
   'auth.documentTitle': 'Job Tracker · Acceso',
   'auth.tab.login': 'Iniciar sesión',
   'auth.tab.register': 'Crear cuenta',
-  'auth.tab.registerDisabled': 'Registro deshabilitado — pedí acceso al administrador',
   'auth.email': 'Email',
   'auth.email.placeholder': 'tu@email.com',
-  'auth.identifier': 'Usuario',
-  'auth.identifier.placeholder': 'Usuario',
+  'auth.identifier': 'Usuario o email',
+  'auth.identifier.placeholder': 'Usuario o email',
   'auth.password': 'Contraseña',
   'auth.password.placeholder': '••••••••',
   'auth.password.new.placeholder': 'Mínimo 8 caracteres',
@@ -49,13 +49,40 @@ export const es = {
   'auth.error.invalid': 'Usuario o contraseña incorrectos.',
   'auth.error.registerDisabled': 'El registro está deshabilitado. Pedí acceso al administrador.',
   'auth.error.locked': 'Demasiados intentos fallidos. Probá de nuevo en {min} min.',
+  'auth.error.unexpected': 'Error inesperado. Revisá la consola.',
 
+  // ===== Registration =====
+  'auth.register.username': 'Usuario',
+  'auth.register.username.placeholder': 'usuario',
+  'auth.register.name': 'Nombre (opcional)',
+  'auth.register.name.placeholder': 'Tu nombre',
+  'auth.register.password.placeholder': 'Mínimo 8 caracteres',
+  'auth.register.confirmPassword': 'Confirmá la contraseña',
+  'auth.register.confirmPassword.placeholder': 'Repetí la contraseña',
+  'auth.register.submit': 'Crear cuenta',
+  'auth.register.creating': 'Creando cuenta…',
+
+  'auth.error.register.usernameRequired': 'Ingresá un usuario',
+  'auth.error.register.usernameLength': 'El usuario debe tener entre 3 y 30 caracteres',
+  'auth.error.register.usernameFormat': 'Solo letras, números, guiones y guiones bajos',
+  'auth.error.register.usernameTaken': 'Ese usuario ya está en uso',
+  'auth.error.register.emailRequired': 'Ingresá un email',
+  'auth.error.register.emailFormat': 'Ingresá un email válido',
+  'auth.error.register.emailTaken': 'Ese email ya está registrado',
+  'auth.error.register.passwordTooShort': 'La contraseña debe tener al menos 8 caracteres',
+  'auth.error.register.passwordNeedsLetter': 'La contraseña debe contener una letra',
+  'auth.error.register.passwordNeedsNumber': 'La contraseña debe contener un número',
+  'auth.error.register.passwordsMismatch': 'Las contraseñas no coinciden',
+  'auth.error.register.failed': 'No se pudo crear la cuenta. Probá de nuevo.',
+
+  // ===== Stats =====
   'stats.total': 'Total',
   'stats.active': 'Activas',
   'stats.inProcess': 'En proceso',
   'stats.offers': 'Ofertas',
   'stats.closed': 'Cerradas',
 
+  // ===== Job form =====
   'form.title': 'Nueva postulación',
   'form.subtitle': 'Cargá una nueva oportunidad',
   'form.toggle': 'Mostrar/ocultar',
@@ -95,10 +122,12 @@ export const es = {
   'form.contactLink.error.whatsapp': 'Ingresá un número válido con al menos 8 dígitos',
   'form.contactLink.error.url': 'Ingresá una URL válida (ej: https://… o dominio.com)',
 
+  // ===== Jobs =====
   'jobs.title': 'Postulaciones',
   'jobs.subtitle': 'Tu historial de procesos',
   'jobs.search.placeholder': 'Buscar por puesto, empresa, nota...',
 
+  // ===== Refs =====
   'refs.title': 'Referidos',
   'refs.subtitle': 'Tu red de contactos que pueden recomendarte',
   'refs.new.title': 'Nuevo referido',
@@ -141,12 +170,14 @@ export const es = {
   'refFilter.Hired':          'Contratado',
   'refFilter.Not Applicable': 'No aplica',
 
+  // ===== DatePicker =====
   'dp.empty': 'Elegí una fecha',
   'dp.today': 'Hoy',
   'dp.yesterday': 'Ayer',
   'dp.lastWeek': '-1 sem',
   'dp.clear': 'Limpiar',
 
+  // ===== Job card =====
   'job.daysAgoOne': 'hace {n} día',
   'job.daysAgoMany': 'hace {n} días',
   'job.perHour': 'por hora',
@@ -178,7 +209,7 @@ export const es = {
   'job.editTitle': 'Editar',
   'job.deleteTitle': 'Borrar',
   'job.refChipTitle': 'Ver referido: {name}',
-  'job.offerRibbon': ' Oferta',
+  'job.offerRibbon': 'Oferta',
   'job.noRole': 'No especificado',
   'job.contactoAbrirTitle': 'Abrir contacto: {name}',
   'job.contactoContactar': 'Contactar',
@@ -189,6 +220,7 @@ export const es = {
   'job.offerConfirmed.status': 'Oferta confirmada',
   'job.unconfirmOffer': 'Desmarcar oferta',
 
+  // ===== Ref card =====
   'ref.link': 'Link',
   'ref.goToJob': 'Ir a la postulación en {company}',
   'ref.reopen': 'Reabrir',
@@ -209,6 +241,7 @@ export const es = {
   'refCard.markAs': 'Marcar como {step}',
   'refCard.history': 'Historial',
 
+  // ===== Empty states =====
   'empty.jobs.title': 'Todavía no cargaste postulaciones',
   'empty.jobs.subtitle': 'Empezá agregando una arriba para hacerle seguimiento',
   'empty.jobs.filter.title': 'Sin resultados en este filtro',
@@ -219,6 +252,7 @@ export const es = {
   'empty.refs.filter.subtitle': 'Probá con otro filtro o búsqueda',
   'empty.refToJob': 'No hay postulaciones cargadas todavía',
 
+  // ===== Modals =====
   'modal.edit.title': 'Editar postulación',
   'modal.edit.statusNote': 'El estado se cambia desde los botones del workflow de la tarjeta.',
   'modal.cancel': 'Cancelar',
@@ -231,29 +265,27 @@ export const es = {
   'close.reason.placeholder': 'Contá brevemente qué pasó...',
   'close.confirm': 'Confirmar cierre',
 
-  // ===== Close reasons (Offer) =====
+  // ===== Close reasons =====
   'close.reason.offer.accepted':           'Acepté la oferta',
   'close.reason.offer.better':             'Recibí una mejor oferta',
   'close.reason.offer.first':              'Fue mi primera opción',
 
-  // ===== Close reasons (Rejected) =====
   'close.reason.rejected.profile':         'No avanzó mi perfil',
   'close.reason.rejected.tech':            'Faltó experiencia técnica',
   'close.reason.rejected.other-candidate': 'Eligieron a otro candidato',
   'close.reason.rejected.requirements':    'No cumplía requisitos',
   'close.reason.rejected.salary':          'Pretensión salarial',
 
-  // ===== Close reasons (Ghosted) =====
   'close.reason.ghosted.silence':          'Dejaron de responder',
   'close.reason.ghosted.no-feedback':      'Nunca dieron feedback',
   'close.reason.ghosted.cold':             'Se enfrió el proceso',
 
-  // ===== Close reasons (Discarded) =====
   'close.reason.discarded.mind-change':    'Me arrepentí',
   'close.reason.discarded.company':        'No me convenció la empresa',
   'close.reason.discarded.paused':         'Pausé la búsqueda',
   'close.reason.discarded.location':       'La ubicación no servía',
 
+  // ===== History =====
   'hist.title': 'Historial de la postulación',
   'hist.refTitle': 'Historial del referido',
   'hist.empty': 'Sin entradas en el historial',
@@ -352,6 +384,7 @@ export const es = {
   'config.backup.jobs': 'postulaciones',
   'config.backup.refs': 'referidos',
 
+  // ===== Profile =====
   'profile.title': 'Editar perfil',
   'profile.subtitle': 'Actualizá tu información personal',
   'profile.firstName': 'Nombre',
@@ -369,6 +402,7 @@ export const es = {
   'profile.remove': 'Eliminar',
   'profile.formats': 'JPG, PNG o GIF · máx. 2 MB',
 
+  // ===== Unsaved =====
   'unsaved.title': 'Cambios sin guardar',
   'unsaved.message': 'Modificaste la configuración pero todavía no la guardaste.<br>¿Qué querés hacer?',
   'unsaved.keep': 'Seguir editando',
@@ -377,6 +411,7 @@ export const es = {
 
   'refEdit.title': 'Editar referido',
 
+  // ===== Ref → Job =====
   'refToJob.title': '¡Referido hecho!',
   'refToJob.message': '<strong>{name}</strong> ya te hizo el referido. ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?',
   'refToJob.createNew': 'Crear nueva postulación',
@@ -388,6 +423,7 @@ export const es = {
   'refToJob.link': 'Vincular',
   'refToJob.alreadyLinked': 'ya vinculado',
 
+  // ===== Note on advance =====
   'note.title': '¿Agregar un recordatorio?',
   'note.subtitle': 'Vas a pasar a <strong>{step}</strong> en <strong>{name}</strong>. ¿Querés dejar un recordatorio para esta etapa?',
   'note.label': 'Nota / PD (opcional)',
@@ -395,6 +431,7 @@ export const es = {
   'note.skip': 'Continuar sin nota',
   'note.save': 'Guardar y avanzar',
 
+  // ===== Confirm modal =====
   'confirm.cancel': 'Cancelar',
   'confirm.confirm': 'Confirmar',
 
@@ -426,6 +463,7 @@ export const es = {
   'confirm.resetAll.message': 'Vas a borrar TODA tu información: preferencias, postulaciones, referidos y tema.<br><br>📋 <strong>{jobs}</strong> postulaciones<br>🤝 <strong>{refs}</strong> referidos<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ Esta acción no se puede deshacer.</span>',
   'confirm.resetAll.confirm': 'Sí, restablecer todo',
 
+  // ===== Toasts =====
   'toast.savedConfig': 'Configuración guardada',
   'toast.discardedChanges': 'Cambios descartados',
   'toast.resetConfig': 'Configuración restablecida (recordá guardar)',

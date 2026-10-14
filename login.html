@@ -46,19 +46,13 @@
     <!-- Tabs -->
     <div class="auth-tabs">
       <button type="button" class="auth-tab active" data-auth-tab="login" data-i18n="auth.tab.login">Sign in</button>
-      <button type="button" class="auth-tab"
-              data-auth-tab="register"
-              data-i18n="auth.tab.register"
-              data-i18n-title="auth.tab.registerDisabled"
-              disabled>
-        Create account
-      </button>
+      <button type="button" class="auth-tab" data-auth-tab="register" data-i18n="auth.tab.register">Create account</button>
     </div>
 
     <!-- Login form -->
     <form id="loginForm" novalidate>
       <div class="field">
-        <label for="loginEmail" data-i18n="auth.identifier">Username</label>
+        <label for="loginEmail" data-i18n="auth.identifier">Username or email</label>
         <input type="text" id="loginEmail" name="username"
                autocomplete="username"
                autocapitalize="off" autocorrect="off" spellcheck="false"
@@ -87,30 +81,41 @@
       <button type="submit" class="btn btn-primary" data-i18n="auth.submit.login">Sign in</button>
     </form>
 
-    <!-- Register form (disabled in this mocked build).
-         The tab that reveals it is `disabled` above. To re-enable:
-         1. Remove `disabled` from the register tab button.
-         2. Remove `class="is-hidden"` from this form.
-         3. Implement real registration logic in js/auth/session.js. -->
+    <!-- Register form -->
     <form id="registerForm" novalidate class="is-hidden">
       <div class="field">
-        <label for="registerName" data-i18n="auth.name">Name</label>
-        <input type="text" id="registerName" name="name"
-               autocomplete="name"
-               placeholder="Your name" data-i18n-placeholder="auth.name.placeholder">
+        <label for="registerUsername" data-i18n="auth.register.username">Username</label>
+        <input type="text" id="registerUsername" name="username"
+               autocomplete="username"
+               autocapitalize="off" autocorrect="off" spellcheck="false"
+               maxlength="30"
+               placeholder="username"
+               data-i18n-placeholder="auth.register.username.placeholder">
       </div>
       <div class="field">
         <label for="registerEmail" data-i18n="auth.email">Email</label>
         <input type="email" id="registerEmail" name="email"
                autocomplete="email"
-               placeholder="you@email.com" data-i18n-placeholder="auth.email.placeholder">
+               maxlength="150"
+               placeholder="you@email.com"
+               data-i18n-placeholder="auth.email.placeholder">
+      </div>
+      <div class="field">
+        <label for="registerName" data-i18n="auth.register.name">Name (optional)</label>
+        <input type="text" id="registerName" name="name"
+               autocomplete="name"
+               maxlength="60"
+               placeholder="Your name"
+               data-i18n-placeholder="auth.register.name.placeholder">
       </div>
       <div class="field field-password">
         <label for="registerPassword" data-i18n="auth.password">Password</label>
         <div class="pw-input-wrap">
           <input type="password" id="registerPassword" name="password"
                  autocomplete="new-password"
-                 placeholder="At least 8 characters" data-i18n-placeholder="auth.password.new.placeholder">
+                 maxlength="128"
+                 placeholder="At least 8 characters"
+                 data-i18n-placeholder="auth.register.password.placeholder">
           <button type="button" class="pw-toggle"
                   aria-label="Show password"
                   title="Show password">
@@ -118,7 +123,22 @@
           </button>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" data-i18n="auth.submit.register">Create account</button>
+      <div class="field field-password">
+        <label for="registerPasswordConfirm" data-i18n="auth.register.confirmPassword">Confirm password</label>
+        <div class="pw-input-wrap">
+          <input type="password" id="registerPasswordConfirm" name="passwordConfirm"
+                 autocomplete="new-password"
+                 maxlength="128"
+                 placeholder="Repeat the password"
+                 data-i18n-placeholder="auth.register.confirmPassword.placeholder">
+          <button type="button" class="pw-toggle"
+                  aria-label="Show password"
+                  title="Show password">
+            <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-eye"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" data-i18n="auth.register.submit">Create account</button>
     </form>
 
     <!-- Social sign-in (stubs) -->

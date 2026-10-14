@@ -1,5 +1,5 @@
 // ============================================================
-// Entry point for the login screen (mocked single-user auth).
+// Entry point for the login screen (mocked local auth).
 // ============================================================
 
 import { applyI18n, setLanguage, t } from '../i18n/index.js';
@@ -9,8 +9,12 @@ import {
 } from '../app/constants.js';
 import {
   login, redirectIfAuthenticated, validateCredentials,
-  getLockoutRemainingMs,
+  getLockoutRemainingMs, registerUser,
 } from './session.js';
+import {
+  hasAnyUser,
+  validateRegistration,
+} from './users.js';
 import { mountInputLimits } from '../ui/form/inputLimits.js';
 import { onI18nChanged } from '../app/events.js';
 
@@ -22,7 +26,6 @@ function readConfig() {
     const raw = localStorage.getItem(STORAGE_KEYS.CONFIG);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
-    // Support both wrapped ({ version, data }) and flat shapes.
     return parsed && typeof parsed === 'object' && 'data' in parsed
       ? parsed.data
       : parsed;
@@ -75,6 +78,18 @@ function mountTabs() {
     }
   }
 
+  // On a fresh install there are no accounts yet. Open on the
+  // register tab and disable the login tab, which would be
+  // unusable anyway.
+  const firstRun = !hasAnyUser();
+  if (firstRun) {
+    const loginTab = document.querySelector('[data-auth-tab="login"]');
+    if (loginTab) loginTab.disabled = true;
+    switchTab('register');
+  } else {
+    switchTab('login');
+  }
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.authTab));
   });
@@ -85,13 +100,6 @@ function mountTabs() {
 // ------------------------------------------------------------
 // Password visibility toggles
 // ------------------------------------------------------------
-/**
- * Sets the toggle button's aria-label and title to match the
- * current state of the associated password field.
- *
- * @param {HTMLButtonElement} btn
- * @param {boolean} isHidden  true if the password is currently masked
- */
 function updatePwToggleLabel(btn, isHidden) {
   const key = isHidden ? 'auth.showPassword' : 'auth.hidePassword';
   const label = t(key);
@@ -101,8 +109,6 @@ function updatePwToggleLabel(btn, isHidden) {
 
 function mountPasswordToggles() {
   document.querySelectorAll('.pw-toggle').forEach(btn => {
-    // Initial state: the input starts as type="password", so the field
-    // is hidden and the button should say "Show password".
     updatePwToggleLabel(btn, true);
 
     btn.addEventListener('click', () => {
@@ -113,10 +119,6 @@ function mountPasswordToggles() {
       const wasHidden = input.type === 'password';
       input.type = wasHidden ? 'text' : 'password';
 
-      // Swap the icon in the <use> element. The button shows the icon
-      // that represents the NEXT action:
-      //   - currently hidden  → show "eye"      (click to reveal)
-      //   - currently visible → show "eye-off"  (click to hide)
       const use = btn.querySelector('use');
       if (use) {
         const iconId = wasHidden ? 'icon-eye-off' : 'icon-eye';
@@ -127,11 +129,6 @@ function mountPasswordToggles() {
     });
   });
 
-  // Defensive: if the language changes at runtime (e.g. a future
-  // language picker on the login screen), the toggle labels need to
-  // be re-translated. The login screen has no language switcher today,
-  // so this listener is currently inert — but it's cheap insurance
-  // and matches how jobsController/refsController handle the event.
   onI18nChanged(() => {
     document.querySelectorAll('.pw-toggle').forEach(btn => {
       const wrap = btn.closest('.pw-input-wrap') || btn.parentElement;
@@ -143,7 +140,7 @@ function mountPasswordToggles() {
 }
 
 // ------------------------------------------------------------
-// Error / lockout helpers
+// Error helpers
 // ------------------------------------------------------------
 function showError(form, message) {
   let box = form.querySelector('.auth-error');
@@ -170,6 +167,25 @@ function setLoginDisabled(disabled, reason = '') {
   const pass   = document.getElementById('loginPassword');
   [submit, email, pass].forEach(el => { if (el) el.disabled = disabled; });
   if (disabled && reason) showError(form, reason);
+}
+
+// ------------------------------------------------------------
+// Register error routing
+// ------------------------------------------------------------
+const REGISTER_FIELD_MAP = {
+  username:        'registerUsername',
+  email:           'registerEmail',
+  password:        'registerPassword',
+  confirmPassword: 'registerPasswordConfirm',
+};
+
+function showRegisterErrors(form, errors) {
+  const firstKey = Object.keys(errors)[0];
+  if (!firstKey) return;
+  showError(form, t(errors[firstKey]));
+  const inputId = REGISTER_FIELD_MAP[firstKey];
+  const input = inputId ? document.getElementById(inputId) : null;
+  if (input) input.focus();
 }
 
 // ------------------------------------------------------------
@@ -229,18 +245,47 @@ function mountForms() {
       window.location.href = './index.html';
     } catch (err) {
       console.error('[Login] submit failed', err);
-      showError(loginForm, 'Unexpected error. Check the console.');
+      showError(loginForm, t('auth.error.unexpected'));
     }
   });
 
-  // The register tab is disabled in the HTML, so this form can never
-  // be shown. Keep the submit handler as a safety net in case the tab
-  // is re-enabled in the future.
   if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       clearError(registerForm);
-      showError(registerForm, t('auth.error.registerDisabled'));
+
+      const username = (document.getElementById('registerUsername')?.value || '').trim();
+      const email    = (document.getElementById('registerEmail')?.value || '').trim();
+      const name     = (document.getElementById('registerName')?.value || '').trim();
+      const password = document.getElementById('registerPassword')?.value || '';
+      const confirmPassword = document.getElementById('registerPasswordConfirm')?.value || '';
+
+      const { valid, errors } = validateRegistration({
+        username, email, password, confirmPassword,
+      });
+      if (!valid) {
+        showRegisterErrors(registerForm, errors);
+        return;
+      }
+
+      const submitBtn = registerForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = t('auth.register.creating');
+      }
+
+      try {
+        await registerUser({ username, email, name, password });
+        window.location.href = './index.html';
+      } catch (err) {
+        console.error('[Register] failed', err);
+        showError(registerForm, t('auth.error.register.failed'));
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
     });
   }
 }

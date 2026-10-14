@@ -126,58 +126,108 @@ state, and closing prompts to discard or save.
 
 ## Authentication
 
-Single-user, client-side mock. **Not real security** — anyone with DevTools can
-bypass it. It's "raising the bar" until a backend exists.
+Single-device mock. **Not real security** — anyone with DevTools can bypass
+it. It's "raising the bar" until a backend exists.
 
-- Credentials are checked against a hard-coded **SHA-256 hash** in
-  `js/auth/session.js` (salt + password).
-- **Rate limiting**: 5 failed attempts → 5-minute lockout (persisted in
-  `localStorage`).
-- **Signed sessions**: each session is signed with a per-install secret stored
-  in `localStorage` (`jobTrackerInstallSecret`). Editing the session JSON in
-  `sessionStorage` isn't enough to forge a valid session.
-- **Session TTL**: 30 minutes of inactivity. A heartbeat in `main.js` checks
-  every 30s and logs out on expiry.
-- **Session storage**: currently `sessionStorage` only. Closing the tab logs
-  you out. The "Remember me" checkbox in the sign-in form is intentionally
-  rendered as `disabled` with a `title="Coming soon"` tooltip, since
-  `localStorage` persistence isn't implemented yet. Removing the `disabled`
-  attribute and wiring the `remember` flag through `login()` is the first
-  step when the feature lands.
-- The header has a **Sign out** button that clears the session and returns to
-  `login.html`.
+### User registry
 
-### Register tab
+Accounts live in `localStorage` under `jobTrackerUsers`. There is **no
+default account**: on a fresh install the store is empty and the login
+screen opens on the register tab. The first user who registers becomes
+the owner of that browser profile. Once at least one user exists, the
+login tab is re-enabled and the app behaves like a normal sign-in.
 
-The register **tab** itself is rendered with `disabled` and a localized
-tooltip (`data-i18n-title="auth.tab.registerDisabled"`), so it can't be
-clicked. The register form still exists in the DOM behind `.is-hidden`
-as a safety net — if you re-enable the tab in the future, remove the
-`disabled` attribute and the `is-hidden` class and wire real registration
-logic in `js/auth/session.js`.
-
-The **Create account** tab exists in the UI but is disabled: submitting shows a
-message telling the user to ask the administrator for access.
-
-### How the guards work
-
-- `login.html` runs `await redirectIfAuthenticated('./index.html')` on boot. If
-  a valid session exists, it redirects.
-- `index.html` runs `await requireSession('./login.html')` before mounting the
-  app. If no valid session exists, it redirects.
-- `logout()` clears the session from both storages.
-
-### Generating a new password hash
-
-From the login page's DevTools console:
+Each record looks like:
 
 ```js
-const m = await import('./js/auth/session.js');
+{
+  id,             // UUID
+  username,       // 3–30 chars, [a-zA-Z0-9_-], unique (case-insensitive)
+  email,          // unique (case-insensitive)
+  name,           // optional display name
+  salt,           // 16 random bytes, hex-encoded
+  passwordHash,   // SHA-256(`${salt}:${password}`), hex
+  createdAt,
+}
+```
+
+- Passwords are hashed with `crypto.subtle.digest('SHA-256', …)`.
+  The plain password never touches storage.
+- Salt is **per user**, so two accounts with the same password produce
+  different hashes.
+- Login accepts **username or email** as the identifier, both
+  case-insensitive.
+
+The registry API lives in `js/auth/users.js`:
+
+| Function | Purpose |
+| --- | --- |
+| `getUsers()` | Returns the raw array |
+| `hasAnyUser()` | True if at least one account exists |
+| `findUserByUsername(u)` / `findUserByEmail(e)` / `findUserById(id)` | Lookups |
+| `createUser({ username, email, name, password })` | Hashes + stores |
+| `verifyPassword(user, password)` | Constant-time-ish compare |
+| `validateRegistration({ ... })` | Field-level validation, returns i18n keys |
+| `computeHash(salt, pw)` | Utility |
+| `deleteUser(id)` | Removes a record |
+
+### Session layer (`js/auth/session.js`)
+
+- Signed sessions: each session payload is signed with a per-install
+  secret stored in `localStorage` (`jobTrackerInstallSecret`). Editing
+  the session JSON in `sessionStorage` isn't enough to forge a valid
+  session.
+- Session TTL: **30 minutes of inactivity**. A heartbeat in `main.js`
+  checks every 30s and logs out on expiry.
+- **Session storage**: `sessionStorage` only for now. Closing the tab
+  logs you out.
+- **Rate limiting**: 5 failed login attempts → 5-minute lockout
+  (persisted in `localStorage`). Rate limiting applies to login only,
+  not registration.
+
+### Registering a new account
+
+From the login screen's **Create account** tab. Fields:
+
+- Username (3–30 chars, letters / numbers / `_` / `-`)
+- Email
+- Name (optional)
+- Password (min 8, at least one letter and one number)
+- Confirm password
+
+On success the new user is automatically signed in and redirected to
+`index.html`. Registration is always available once at least one user
+exists, so multiple accounts can coexist on the same browser profile.
+
+### Backup & users
+
+The export/import flow only covers **data** (jobs, referrals, config,
+theme) — the user registry is intentionally left out. To move your
+data to a new device, register a fresh account there and import your
+backup file.
+
+### Generating a password hash manually
+
+If you ever need to seed an account from the console:
+
+```js
+const users = await import('./js/auth/users.js');
+await users.createUser({
+  username: 'me',
+  email: 'me@example.com',
+  name: 'Me',
+  password: 'correct horse battery staple',
+});
+```
+
+Or, to generate a hash without storing anything:
+
+```js
+const m = await import('./js/auth/users.js');
 await m.computeHash('a7f3d9e2c4b8a1f6', 'YOUR_PASSWORD');
 ```
 
-Paste the resulting hex into `CREDENTIALS[].passwordHash` in
-`js/auth/session.js`. Never leave the plain password in the repo.
+Never leave the plain password in the repo.
 
 ### Helper API (`js/auth/session.js`)
 
@@ -186,10 +236,11 @@ Paste the resulting hex into `CREDENTIALS[].passwordHash` in
 | `getSession()` | Returns the parsed session or `null` |
 | `isValidSession(s)` | Verifies signature + expiry |
 | `login({ username, email, name })` | Creates and signs a session |
+| `registerUser({ username, email, name, password })` | Creates the user and logs them in |
 | `logout()` | Clears the session |
-| `validateCredentials(id, pw)` | Checks against the hash, updates rate limit |
+| `validateCredentials(id, pw)` | Looks the user up, checks the hash, updates rate limit |
 | `getLockoutRemainingMs()` | Ms remaining until lockout expires |
-| `computeHash(salt, pw)` | Utility for generating password hashes |
+| `computeHash(salt, pw)` | Re-exported from `users.js` |
 | `requireSession(redirectTo)` | Guard for protected pages |
 | `redirectIfAuthenticated(redirectTo)` | Guard for `login.html` |
 | `startSessionHeartbeat(onExpire)` | Inactivity watchdog |
@@ -206,6 +257,7 @@ Three stores, each persisted under its own key via the `Store` class
 | `jobTrackerV2` | `jobs` | 5 | Array of applications |
 | `jobTrackerReferrals` | `refs` | 5 | Array of referrals |
 | `jobTrackerConfig` | `config` | 3 | User preferences |
+| `jobTrackerUsers` | — | — | Array of user accounts |
 | `jobTrackerTheme` | — | — | `'light'` \| `'dark'` |
 
 ### Application shape (abridged)
@@ -234,6 +286,20 @@ Three stores, each persisted under its own key via the `Store` class
   wentBack: false,
   createdAt,
   history: [{ status, date, reason?, note?, wentBack? }]
+}
+```
+
+### User shape (abridged)
+
+```js
+{
+  id,             // UUID
+  username,       // unique, case-insensitive
+  email,          // unique, case-insensitive
+  name,           // optional
+  salt,           // hex
+  passwordHash,   // SHA-256(salt:password), hex
+  createdAt,
 }
 ```
 
@@ -295,6 +361,10 @@ Danger zone (all irreversible):
 - **Delete data**: wipes applications + referrals. Config untouched.
 - **Reset everything**: config + data + theme → defaults.
 
+Note: the user registry is **not** part of the backup. Restoring a backup on a
+new device does not restore the accounts from the old one — you register a new
+account and then import the data.
+
 ---
 
 ## Run
@@ -309,15 +379,16 @@ npm start        # wraps: npx serve .
 
 Then open the printed URL (usually `http://localhost:3000`).
 
-Default credentials for the mock sign-in are in `js/auth/session.js`. Change
-the hash before shipping anything to a real user.
+There is no default account. On the first visit, register one from the
+**Create account** tab.
 
 ---
 
 ## Tests
 
-The pure modules (selectors, utils, migrations, store) have a smoke test suite
-built on Node's built-in test runner — no dependencies to install.
+The pure modules (selectors, utils, migrations, store, users, i18n) have a
+smoke test suite built on Node's built-in test runner — no dependencies to
+install.
 
 ```bash
 npm test
@@ -333,6 +404,9 @@ Expected output: everything green. The suite covers:
 | `tests/utils.test.js` | `escapeHtml`, date helpers, `uid`, array helpers |
 | `tests/migrations.test.js` | Every legacy → current schema map |
 | `tests/store.test.js` | Persistence, subscribe, versioning, migration |
+| `tests/users.test.js` | User registry: hash, lookups, validation |
+| `tests/constants.test.js` | Sprite names, workflow tables, defaults |
+| `tests/i18n.test.js` | Translations, interpolation, no residual emojis |
 
 The test files stub `localStorage` (a small in-memory Map) so they run in a
 plain Node environment, no jsdom needed.
@@ -344,7 +418,7 @@ plain Node environment, no jsdom needed.
 ```
 .
 ├── index.html                    # Main app shell
-├── login.html                    # Sign-in screen
+├── login.html                    # Sign-in / register screen
 ├── package.json                  # npm start / npm test
 ├── README.md
 ├── assets/
@@ -356,11 +430,12 @@ plain Node environment, no jsdom needed.
 │   ├── app/                      # Infra + domain
 │   │   ├── constants.js          # Workflow steps, states, defaults, options
 │   │   ├── events.js             # Typed event bus (scroll-to-*, i18n-changed)
+│   │   ├── icons.js              # icon() helper, sprite reference emitter
 │   │   ├── migrations.js         # Legacy → current schema maps
 │   │   ├── selectors.js          # Pure state selectors (filters, stats, trends)
 │   │   ├── store.js              # Reactive localStorage store w/ migrations
 │   │   ├── undo.js               # withUndo() helper
-│   │   └── utils.js              # Shared helpers (escapeHtml, dates, valueOf…)
+│   │   └── utils.js              # Shared helpers (+ updateById, withHistoryEntry)
 │   │
 │   ├── i18n/                     # Translations
 │   │   ├── index.js              # Public API (t, applyI18n, setLanguage…)
@@ -369,6 +444,7 @@ plain Node environment, no jsdom needed.
 │   │
 │   ├── auth/                     # Mock auth
 │   │   ├── login.js              # Login screen entry point
+│   │   ├── users.js              # Local user registry (hash + salt)
 │   │   └── session.js            # Session signing, guards
 │   │
 │   ├── boot/                     # Startup side-effects
@@ -387,74 +463,78 @@ plain Node environment, no jsdom needed.
 │   │   └── createRoleController.js
 │   │
 │   ├── templates/                # Card renderers (pure HTML strings)
-│   │   ├── icon.js               # Shared <svg><use/></svg> helper
+│   │   ├── icon.js               # Re-export of app/icons.js
 │   │   ├── jobCard.js
 │   │   ├── refCard.js
 │   │   └── steps.js
 │   │
 │   └── ui/                       # UI widgets
+│       ├── modal.js              # Shared modal lifecycle + Escape stack
 │       ├── dashboard/            # Six dashboard styles
-│       │   ├── index.js          # Dispatcher + header wrapper
-│       │   ├── shared.js         # uid, sparkPath, summary, icon
+│       │   ├── index.js
+│       │   ├── shared.js
 │       │   ├── sparklines.js
 │       │   ├── modular.js
 │       │   ├── minimal.js
 │       │   ├── compact.js
 │       │   ├── circular.js
 │       │   └── heatmap.js
-│       ├── form/                 # Form widgets
+│       ├── form/
 │       │   ├── chips.js
-│       │   ├── combo.js          # Role picker
+│       │   ├── combo.js
 │       │   ├── contactLinkPicker.js
 │       │   ├── currencyPicker.js
 │       │   ├── datePicker.js
 │       │   ├── inputLimits.js
 │       │   ├── salaryInput.js
 │       │   ├── salaryModeChip.js
-│       │   ├── statusCombo.js    # Status picker
+│       │   ├── statusCombo.js
 │       │   └── workModePicker.js
-│       └── feedback/             # Overlays
+│       └── feedback/
 │           ├── confirmModal.js
 │           ├── resetAnimation.js
 │           └── toast.js
 ├── css/
 │   ├── styles.css                # @imports only — the CSS entry point
-│   ├── base/                     # Document-wide
+│   ├── base/
 │   │   ├── tokens.css            # Variables (light + dark)
 │   │   ├── reset.css             # *, html, body, .container, .is-hidden,
 │   │   │                         #   :focus-visible global ring
 │   │   ├── motion.css            # @media (prefers-reduced-motion: reduce)
 │   │   └── print.css             # @media print
-│   ├── themes/                   # Body-level visual themes
+│   ├── themes/
 │   │   └── backgrounds.css       # 11 animated/static backgrounds
-│   ├── layout/                   # Page structure
-│   │   ├── header.css            # Header, brand, icon buttons
-│   │   ├── user-menu.css         # Dropdown, ripple, highlight pulse
-│   │   └── responsive.css        # Global media queries
-│   ├── components/               # Reusable widgets
-│   │   ├── buttons.css           # .btn and variants
-│   │   ├── forms.css             # Inputs, labels, combos, salary, notes
+│   ├── layout/
+│   │   ├── header.css
+│   │   ├── user-menu.css
+│   │   └── responsive.css
+│   ├── components/
+│   │   ├── buttons.css
+│   │   ├── forms.css             # Inputs scoped to .field
 │   │   ├── datepicker.css
-│   │   ├── toolbar.css           # Search + filters
-│   │   ├── modals.css            # Overlay, modals, .modal-close + .ghost
-│   │   ├── feedback.css          # Toasts, action toasts, reset overlay
-│   │   ├── empty-state.css       # .empty-jobs / .empty-filter / .empty-ref
-│   │   └── welcome.css           # First-run banner
-│   ├── features/                 # Domain-specific
+│   │   ├── toolbar.css
+│   │   ├── modals.css
+│   │   ├── feedback.css
+│   │   ├── empty-state.css
+│   │   └── welcome.css
+│   ├── features/
 │   │   ├── jobs.css
 │   │   ├── referrals.css
-│   │   ├── workflow.css          # Steps, progress, actions
-│   │   ├── history.css           # Timeline
-│   │   ├── dashboard.css         # Six styles + config previews
-│   │   └── config.css            # Settings modal
-│   └── pages/                    # Full-page layouts
-│       ├── auth.css              # Login screen
-│       └── boot.css              # Boot overlay (loading splash)
+│   │   ├── workflow.css
+│   │   ├── history.css
+│   │   ├── dashboard.css
+│   │   └── config.css
+│   └── pages/
+│       ├── auth.css
+│       └── boot.css
 └── tests/
     ├── selectors.test.js
     ├── utils.test.js
     ├── migrations.test.js
-    └── store.test.js
+    ├── store.test.js
+    ├── users.test.js
+    ├── constants.test.js
+    └── i18n.test.js
 ```
 
 ---
@@ -467,9 +547,9 @@ editing:
 ### JavaScript
 
 - **`app/` is the domain + infra layer.** It contains the constants, the
-  store, the selectors, the migrations, the utils, the event bus, and the
-  undo helper. Nothing in `app/` imports from `ui/`, `controllers/`, or
-  `boot/` — the dependency direction is one-way.
+  store, the selectors, the migrations, the utils, the event bus, the icons
+  helper and the undo helper. Nothing in `app/` imports from `ui/`,
+  `controllers/`, or `boot/` — the dependency direction is one-way.
 - **`main.js` orchestrates, `boot/*` does the work.** Adding a new
   cross-cutting concern (shortcuts, a service worker, telemetry) usually
   means a new file in `js/boot/` and one call from `main.js`.
@@ -487,7 +567,9 @@ editing:
   `index.js`.
 - **UI widgets live under `ui/` by concern:** `ui/form/` for form
   widgets, `ui/feedback/` for overlays, `ui/dashboard/` for the
-  dashboards. Nothing UI-related sits at the root of `js/ui/`.
+  dashboards. Nothing UI-related sits at the root of `js/ui/` except
+  `modal.js` (the shared modal lifecycle, which is a cross-cutting
+  primitive, not a component).
 - **Events are typed.** Cross-module signals go through `js/app/events.js`.
   Raw `document.dispatchEvent(new CustomEvent(...))` calls are not
   allowed outside that file.
@@ -499,6 +581,16 @@ editing:
   before running a mutation and shows an action toast with a 5-second
   window. Starting a new action dismisses the previous toast so users
   never restore an intermediate state.
+- **Shared mutation helpers.** `updateById(store, id, patchFn)` and
+  `withHistoryEntry(item, patch, entry)` (both in `utils.js`) cover the
+  two most common store mutations. Both are used across the three
+  controllers instead of hand-rolled `store.update(items => items.map(…))`.
+- **Modals use a shared lifecycle.** Every overlay goes through
+  `createModal(el, opts)` from `js/ui/modal.js`, which handles open /
+  close, overlay-click-to-close and a module-level Escape stack (only
+  the top-most modal reacts). Widgets that consume Escape themselves —
+  the role picker and the status picker — call `e.stopPropagation()`
+  so the parent modal doesn't also close.
 
 ### CSS
 
@@ -584,10 +676,10 @@ editing:
   (transparent close button used by the config and unsaved modals)
   instead of separate `.config-close` / `.unsaved-close`.
 - **Emitting icons from JS.** Use the shared `icon(name, className)`
-  helper from `js/templates/icon.js` (or `js/ui/dashboard/shared.js`
-  for dashboards). It runs the name through `^icon-[a-z0-9-]+$` before
-  emitting the sprite reference, so no state-derived string can inject
-  arbitrary markup.
+  helper from `js/app/icons.js` (re-exported from `js/templates/icon.js`
+  and `js/ui/dashboard/shared.js`). It runs the name through
+  `^icon-[a-z0-9-]+$` before emitting the sprite reference, so no
+  state-derived string can inject arbitrary markup.
 - **File size**: aim for under ~500 lines per file. When a module grows past
   that, split by concern rather than by size.
 - **No build step**: everything ships as-is over HTTP. Avoid adding a bundler
@@ -600,15 +692,17 @@ editing:
 The auth layer is **client-side only** and exists to gate the UI, not to
 protect data. Anyone who opens DevTools can:
 
-- Read the password hash from the bundle (it's SHA-256, so pre-image resistance
-  helps a little, but the salt is also in the bundle).
+- Read the password hashes from `localStorage` (SHA-256 with a per-user
+  salt raises the bar a little, but the salt is stored next to the hash).
 - Forge a session by re-signing it — the install secret lives in
   `localStorage` and is readable.
 - Skip the guards entirely by setting `sessionStorage` manually.
+- Register as many accounts as they want — there's no server-side gate.
 
 When a backend is ready, replace:
 
 - `validateCredentials()` → `POST /auth/login`
+- `registerUser()` → `POST /auth/register`
 - `login()` → store a server-issued httpOnly cookie
 - `requireSession()` → `GET /auth/me`
 - `startSessionHeartbeat()` → rely on server-side session expiry

@@ -22,14 +22,14 @@ export const en = {
   'welcome.tip.settings': 'Click your avatar to open Settings',
   'welcome.dismiss': 'Got it',
 
+  // ===== Auth =====
   'auth.documentTitle': 'Job Tracker · Sign in',
   'auth.tab.login': 'Sign in',
   'auth.tab.register': 'Create account',
-  'auth.tab.registerDisabled': 'Registration disabled — ask the administrator for access',
   'auth.email': 'Email',
   'auth.email.placeholder': 'you@email.com',
-  'auth.identifier': 'Username',
-  'auth.identifier.placeholder': 'Username',
+  'auth.identifier': 'Username or email',
+  'auth.identifier.placeholder': 'Username or email',
   'auth.password': 'Password',
   'auth.password.placeholder': '••••••••',
   'auth.password.new.placeholder': 'At least 8 characters',
@@ -49,13 +49,40 @@ export const en = {
   'auth.error.invalid': 'Invalid username or password.',
   'auth.error.registerDisabled': 'Registration is disabled. Ask the administrator for access.',
   'auth.error.locked': 'Too many failed attempts. Try again in {min} min.',
+  'auth.error.unexpected': 'Unexpected error. Check the console.',
 
+  // ===== Registration =====
+  'auth.register.username': 'Username',
+  'auth.register.username.placeholder': 'username',
+  'auth.register.name': 'Name (optional)',
+  'auth.register.name.placeholder': 'Your name',
+  'auth.register.password.placeholder': 'At least 8 characters',
+  'auth.register.confirmPassword': 'Confirm password',
+  'auth.register.confirmPassword.placeholder': 'Repeat the password',
+  'auth.register.submit': 'Create account',
+  'auth.register.creating': 'Creating account…',
+
+  'auth.error.register.usernameRequired': 'Enter a username',
+  'auth.error.register.usernameLength': 'Username must be 3–30 characters',
+  'auth.error.register.usernameFormat': 'Only letters, numbers, hyphens and underscores',
+  'auth.error.register.usernameTaken': 'That username is already taken',
+  'auth.error.register.emailRequired': 'Enter an email',
+  'auth.error.register.emailFormat': 'Enter a valid email',
+  'auth.error.register.emailTaken': 'That email is already registered',
+  'auth.error.register.passwordTooShort': 'Password must be at least 8 characters',
+  'auth.error.register.passwordNeedsLetter': 'Password must contain a letter',
+  'auth.error.register.passwordNeedsNumber': 'Password must contain a number',
+  'auth.error.register.passwordsMismatch': "Passwords don't match",
+  'auth.error.register.failed': "Couldn't create the account. Try again.",
+
+  // ===== Stats =====
   'stats.total': 'Total',
   'stats.active': 'Active',
   'stats.inProcess': 'In process',
   'stats.offers': 'Offers',
   'stats.closed': 'Closed',
 
+  // ===== Job form =====
   'form.title': 'New application',
   'form.subtitle': 'Add a new opportunity',
   'form.toggle': 'Show/hide',
@@ -95,10 +122,12 @@ export const en = {
   'form.contactLink.error.whatsapp': 'Enter a valid number with at least 8 digits',
   'form.contactLink.error.url': 'Enter a valid URL (ex: https://… or domain.com)',
 
+  // ===== Jobs =====
   'jobs.title': 'Applications',
   'jobs.subtitle': 'Your process history',
   'jobs.search.placeholder': 'Search by role, company, note...',
 
+  // ===== Refs =====
   'refs.title': 'Referrals',
   'refs.subtitle': 'Your network that can recommend you',
   'refs.new.title': 'New referral',
@@ -141,12 +170,14 @@ export const en = {
   'refFilter.Hired':          'Hired',
   'refFilter.Not Applicable': 'Not applicable',
 
+  // ===== DatePicker =====
   'dp.empty': 'Pick a date',
   'dp.today': 'Today',
   'dp.yesterday': 'Yesterday',
   'dp.lastWeek': '-1 week',
   'dp.clear': 'Clear',
 
+  // ===== Job card =====
   'job.daysAgoOne': '{n} day ago',
   'job.daysAgoMany': '{n} days ago',
   'job.perHour': 'per hour',
@@ -178,7 +209,7 @@ export const en = {
   'job.editTitle': 'Edit',
   'job.deleteTitle': 'Delete',
   'job.refChipTitle': 'View referral: {name}',
-  'job.offerRibbon': ' Offer',
+  'job.offerRibbon': 'Offer',
   'job.noRole': 'Not specified',
   'job.contactoAbrirTitle': 'Open contact: {name}',
   'job.contactoContactar': 'Contact',
@@ -189,6 +220,7 @@ export const en = {
   'job.offerConfirmed.status': 'Offer confirmed',
   'job.unconfirmOffer': 'Unmark offer',
 
+  // ===== Ref card =====
   'ref.link': 'Link',
   'ref.goToJob': 'Go to application at {company}',
   'ref.reopen': 'Reopen',
@@ -209,6 +241,7 @@ export const en = {
   'refCard.markAs': 'Mark as {step}',
   'refCard.history': 'History',
 
+  // ===== Empty states =====
   'empty.jobs.title': "You haven't added any applications yet",
   'empty.jobs.subtitle': 'Start by adding one above to track it',
   'empty.jobs.filter.title': 'No results for this filter',
@@ -219,6 +252,7 @@ export const en = {
   'empty.refs.filter.subtitle': 'Try another filter or search',
   'empty.refToJob': 'No applications loaded yet',
 
+  // ===== Modals =====
   'modal.edit.title': 'Edit application',
   'modal.edit.statusNote': 'Status changes from the workflow buttons on the card.',
   'modal.cancel': 'Cancel',
@@ -231,29 +265,27 @@ export const en = {
   'close.reason.placeholder': 'Briefly describe what happened...',
   'close.confirm': 'Confirm close',
 
-  // ===== Close reasons (Offer) =====
+  // ===== Close reasons =====
   'close.reason.offer.accepted':           'I accepted the offer',
   'close.reason.offer.better':             'Got a better offer',
   'close.reason.offer.first':              'It was my first choice',
 
-  // ===== Close reasons (Rejected) =====
   'close.reason.rejected.profile':         "They didn't move forward",
   'close.reason.rejected.tech':            'Lacked technical experience',
   'close.reason.rejected.other-candidate': 'Chose another candidate',
   'close.reason.rejected.requirements':    "Didn't meet requirements",
   'close.reason.rejected.salary':          'Salary expectations',
 
-  // ===== Close reasons (Ghosted) =====
   'close.reason.ghosted.silence':          'Stopped responding',
   'close.reason.ghosted.no-feedback':      'Never got feedback',
   'close.reason.ghosted.cold':             'The process went cold',
 
-  // ===== Close reasons (Discarded) =====
   'close.reason.discarded.mind-change':    'I changed my mind',
   'close.reason.discarded.company':        "I didn't like the company",
   'close.reason.discarded.paused':         'Paused my search',
   'close.reason.discarded.location':       'Location was a dealbreaker',
 
+  // ===== History =====
   'hist.title': 'Application history',
   'hist.refTitle': 'Referral history',
   'hist.empty': 'No history entries',
@@ -352,6 +384,7 @@ export const en = {
   'config.backup.jobs': 'applications',
   'config.backup.refs': 'referrals',
 
+  // ===== Profile =====
   'profile.title': 'Edit profile',
   'profile.subtitle': 'Update your personal information',
   'profile.firstName': 'First name',
@@ -369,6 +402,7 @@ export const en = {
   'profile.remove': 'Remove',
   'profile.formats': 'JPG, PNG or GIF · max 2 MB',
 
+  // ===== Unsaved =====
   'unsaved.title': 'Unsaved changes',
   'unsaved.message': "You modified the settings but haven't saved yet.<br>What do you want to do?",
   'unsaved.keep': 'Keep editing',
@@ -377,6 +411,7 @@ export const en = {
 
   'refEdit.title': 'Edit referral',
 
+  // ===== Ref → Job =====
   'refToJob.title': 'Referral done!',
   'refToJob.message': '<strong>{name}</strong> has referred you. Do you want to move it to <strong>Applications</strong> to track it?',
   'refToJob.createNew': 'Create new application',
@@ -388,6 +423,7 @@ export const en = {
   'refToJob.link': 'Link',
   'refToJob.alreadyLinked': 'already linked',
 
+  // ===== Note on advance =====
   'note.title': 'Add a reminder?',
   'note.subtitle': 'Moving to <strong>{step}</strong> at <strong>{name}</strong>. Want to leave a reminder for this stage?',
   'note.label': 'Note / To-do (optional)',
@@ -395,6 +431,7 @@ export const en = {
   'note.skip': 'Continue without note',
   'note.save': 'Save and advance',
 
+  // ===== Confirm modal =====
   'confirm.cancel': 'Cancel',
   'confirm.confirm': 'Confirm',
 
@@ -426,6 +463,7 @@ export const en = {
   'confirm.resetAll.message': 'You will delete ALL your information: preferences, applications, referrals and theme.<br><br>📋 <strong>{jobs}</strong> applications<br>🤝 <strong>{refs}</strong> referrals<br><br><span style="color:var(--danger-2);font-weight:600;">⚠️ This action cannot be undone.</span>',
   'confirm.resetAll.confirm': 'Yes, reset everything',
 
+  // ===== Toasts =====
   'toast.savedConfig': 'Settings saved',
   'toast.discardedChanges': 'Changes discarded',
   'toast.resetConfig': 'Settings reset (remember to save)',
