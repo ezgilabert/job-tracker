@@ -249,7 +249,7 @@ label.hourly-switch .track {
   border-radius: 20px;
   background: var(--border-strong);
   position: relative;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
   flex-shrink: 0;
   vertical-align: middle;
 }
@@ -293,7 +293,10 @@ input, select, textarea {
   color: var(--text);
   font-family: inherit;
   font-size: 0.9rem;
-  transition: all 0.2s ease;
+  transition:
+    border-color     0.2s ease,
+    box-shadow       0.2s ease,
+    background-color 0.2s ease;
 }
 
 [data-theme="dark"] input,
@@ -390,7 +393,7 @@ textarea {
   cursor: pointer;
   font-size: 0.86rem;
   color: var(--text);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
   border: none;
   background: transparent;
   width: 100%;
@@ -420,7 +423,10 @@ textarea {
   background: var(--surface-soft);
   border: 1px solid var(--border);
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease;
 }
 
 .combo-option:hover .combo-option-icon,
@@ -595,7 +601,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    color            0.18s ease,
+    box-shadow       0.18s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -687,7 +696,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   color: var(--text);
   font-family: inherit;
   font-size: 0.9rem;
-  transition: all 0.2s ease;
+  transition:
+    border-color     0.2s ease,
+    background-color 0.2s ease,
+    box-shadow       0.2s ease;
   outline: none;
 }
 
@@ -726,7 +738,10 @@ textarea:invalid:not(:placeholder-shown):focus {
   text-transform: uppercase;
   line-height: 1;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color     0.18s ease,
+    box-shadow       0.18s ease;
   white-space: nowrap;
 }
 
@@ -770,7 +785,9 @@ textarea:invalid:not(:placeholder-shown):focus {
   font-weight: 800;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color            0.15s ease;
   line-height: 1;
 }
 
@@ -825,7 +842,9 @@ textarea:invalid:not(:placeholder-shown):focus {
   border-radius: 10px;
   border: 1.5px solid var(--accent-border);
   background: linear-gradient(135deg, var(--accent-soft) 0%, transparent 60%);
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow   0.2s ease;
 }
 
 .notes-highlight:focus-within {
@@ -833,13 +852,16 @@ textarea:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
+/* Reset global input styling so the textarea blends with its wrapper.
+   No !important needed: this rule comes after the theme overrides in
+   the cascade and wins on source order at equal specificity (0,1,1). */
 .notes-highlight textarea {
   width: 100%;
   padding: 0.85rem 1rem;
   min-height: 130px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   border-radius: 10px;
   color: var(--text);
   font-family: inherit;
@@ -878,7 +900,11 @@ textarea:invalid:not(:placeholder-shown):focus {
   width: 100%;
   text-align: left;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    box-shadow       0.15s ease,
+    transform        0.15s ease;
   margin-top: 0.35rem;
 }
 
@@ -929,7 +955,11 @@ textarea:invalid:not(:placeholder-shown):focus {
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease,
+    box-shadow       0.15s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -991,7 +1021,9 @@ input[type="hidden"] { display: none; }
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow   0.2s ease;
 }
 
 [data-theme="dark"] .combo-trigger { background: var(--bg-1); }
@@ -1050,7 +1082,11 @@ input[type="hidden"] { display: none; }
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease,
+    box-shadow       0.15s ease;
 }
 
 .contact-chip:hover {
@@ -1149,7 +1185,12 @@ input[type="hidden"] { display: none; }
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease,
+    box-shadow       0.15s ease,
+    transform        0.15s ease;
   text-decoration: none;
   line-height: 1.4;
   max-width: 100%;

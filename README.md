@@ -102,6 +102,15 @@ state, and closing prompts to discard or save.
 - Empty states are SVG-based, not emoji: clipboard for jobs, link for
   referrals, funnel for "no results in this filter".
 - Card action buttons (edit / delete) use SVG icons with a soft-square style.
+- **Reduced-motion support** — a global `@media (prefers-reduced-motion:
+  reduce)` rule collapses every animation and transition to near-zero
+  duration (aurora drift, confetti, shimmer, loading splash, theme ripple).
+  `triggerThemeRipple()` also short-circuits when the OS setting is on, so
+  the theme flips synchronously instead of waiting for the animation.
+- **Keyboard focus ring** — a global `:focus-visible` rule draws a 2px
+  violet outline on every interactive element reached via `Tab`, without
+  affecting mouse clicks. Inputs, selects and textareas opt out because
+  they already render their own focus ring via `box-shadow`.
 - **Keyboard shortcuts**:
   - `n` — expand the "New application" section and focus the Company field.
   - `/` — focus the applications search box.
@@ -130,11 +139,22 @@ bypass it. It's "raising the bar" until a backend exists.
 - **Session TTL**: 30 minutes of inactivity. A heartbeat in `main.js` checks
   every 30s and logs out on expiry.
 - **Session storage**: currently `sessionStorage` only. Closing the tab logs
-  you out. (`localStorage` for "remember me" is planned but not implemented.)
+  you out. The "Remember me" checkbox in the sign-in form is intentionally
+  rendered as `disabled` with a `title="Coming soon"` tooltip, since
+  `localStorage` persistence isn't implemented yet. Removing the `disabled`
+  attribute and wiring the `remember` flag through `login()` is the first
+  step when the feature lands.
 - The header has a **Sign out** button that clears the session and returns to
   `login.html`.
 
 ### Register tab
+
+The register **tab** itself is rendered with `disabled` and a localized
+tooltip (`data-i18n-title="auth.tab.registerDisabled"`), so it can't be
+clicked. The register form still exists in the DOM behind `.is-hidden`
+as a safety net — if you re-enable the tab in the future, remove the
+`disabled` attribute and the `is-hidden` class and wire real registration
+logic in `js/auth/session.js`.
 
 The **Create account** tab exists in the UI but is disabled: submitting shows a
 message telling the user to ask the administrator for access.
@@ -400,7 +420,9 @@ plain Node environment, no jsdom needed.
 │   ├── styles.css                # @imports only — the CSS entry point
 │   ├── base/                     # Document-wide
 │   │   ├── tokens.css            # Variables (light + dark)
-│   │   ├── reset.css             # *, html, body, .container, .is-hidden
+│   │   ├── reset.css             # *, html, body, .container, .is-hidden,
+│   │   │                         #   :focus-visible global ring
+│   │   ├── motion.css            # @media (prefers-reduced-motion: reduce)
 │   │   └── print.css             # @media print
 │   ├── themes/                   # Body-level visual themes
 │   │   └── backgrounds.css       # 11 animated/static backgrounds
@@ -413,8 +435,9 @@ plain Node environment, no jsdom needed.
 │   │   ├── forms.css             # Inputs, labels, combos, salary, notes
 │   │   ├── datepicker.css
 │   │   ├── toolbar.css           # Search + filters
-│   │   ├── modals.css            # Overlay, modals, close, variants
+│   │   ├── modals.css            # Overlay, modals, .modal-close + .ghost
 │   │   ├── feedback.css          # Toasts, action toasts, reset overlay
+│   │   ├── empty-state.css       # .empty-jobs / .empty-filter / .empty-ref
 │   │   └── welcome.css           # First-run banner
 │   ├── features/                 # Domain-specific
 │   │   ├── jobs.css
@@ -424,7 +447,8 @@ plain Node environment, no jsdom needed.
 │   │   ├── dashboard.css         # Six styles + config previews
 │   │   └── config.css            # Settings modal
 │   └── pages/                    # Full-page layouts
-│       └── auth.css              # Login screen
+│       ├── auth.css              # Login screen
+│       └── boot.css              # Boot overlay (loading splash)
 └── tests/
     ├── selectors.test.js
     ├── utils.test.js
@@ -482,16 +506,22 @@ editing:
   the top of the file) matters: tokens first (defines the variables),
   then reset, then everything else.
 - **Folders mirror the JS organization:**
-  - `base/` — document-wide rules (variables, reset, print).
+  - `base/` — document-wide rules (variables, reset, reduced-motion, print).
   - `themes/` — visual themes applied to `body` (backgrounds).
   - `layout/` — page structure (header, user menu, media queries).
-  - `components/` — reusable widgets (buttons, forms, modals, feedback).
+  - `components/` — reusable widgets (buttons, forms, modals, feedback,
+    empty states).
   - `features/` — domain-specific (jobs, referrals, workflow, dashboard,
     config, history).
-  - `pages/` — full-page layouts (currently only the login screen).
+  - `pages/` — full-page layouts (login screen, boot overlay).
 - **CSS custom properties drive everything.** Light/dark themes are a
   swap of variables on `:root` / `[data-theme="dark"]`. Components never
   hard-code colors — they reference variables.
+- **Relationship colors use custom properties.** Referral cards and
+  relationship badges share a single set of per-relationship variables
+  (`--r-stripe-a/b`, `--r-badge-bg/fg/bd`) defined on
+  `[data-relationship="…"]`. Adding a new relationship is one block of
+  five variables + one dark override, no duplicated selectors.
 - **Utility classes are shared.** `.is-hidden` (toggles `display: none`)
   is toggled by JS instead of inline `style.display`. Adding new utility
   classes is fine, but keep them minimal and documented in
@@ -508,7 +538,9 @@ editing:
   not the module path. Templates that inject HTML into `index.html` use
   the same relative URL.
 - Icons inherit `currentColor`, so they follow light/dark theme, hover
-  state and any per-element color.
+  state and any per-element color. The sprite does **not** set
+  `stroke-width` on its paths, which means per-component `stroke-width`
+  rules in CSS (`.icon-btn svg`, `.action-btn svg`, …) win on inheritance.
 - Because the sprite is external, the app **must** be served over HTTP.
   `file://` will fail silently (icons won't render). This is the same
   constraint that ES modules already impose.
@@ -534,6 +566,10 @@ editing:
   (`data-status`, `data-relationship`, `.workmode-seg`, `.currency-chip`, …).
 - **CSS class naming**: kebab-case, block-scoped (`.job-card-header`,
   `.config-tab`). Variants use a modifier class (`.modal-sm`, `.is-hidden`).
+- **Modifiers over new classes.** When a component needs a variant, add a
+  modifier class instead of a new BEM block. E.g. `.modal-close.ghost`
+  (transparent close button used by the config and unsaved modals)
+  instead of separate `.config-close` / `.unsaved-close`.
 - **File size**: aim for under ~500 lines per file. When a module grows past
   that, split by concern rather than by size.
 - **No build step**: everything ships as-is over HTTP. Avoid adding a bundler

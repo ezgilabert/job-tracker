@@ -35,3 +35,27 @@ body {
 /* Generic hidden state. Use this instead of inline `display:none`
    so the JS and CSS agree on a single mechanism. */
 .is-hidden { display: none !important; }
+
+/* ============================================================
+   Focus ring
+   ------------------------------------------------------------
+   Only shown on keyboard navigation (Tab / arrow keys), not on
+   mouse clicks. Uses :focus-visible so it does not conflict with
+   the softer, per-component focus treatments already defined in
+   forms.css and modals.css.
+
+   Inputs, selects and textareas opt out because they already
+   render their own focus ring via box-shadow in forms.css —
+   adding an outline would double up.
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}

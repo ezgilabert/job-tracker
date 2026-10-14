@@ -1,0 +1,28 @@
+/* ============================================================
+   Reduced motion: honor the OS-level "Reduce motion" setting.
+
+   The app uses motion purely for decoration (aurora, confetti,
+   shimmer, blob float, loading splash). None of it conveys state
+   changes that would be lost by removing it, so we can safely
+   collapse every animation and transition to near-zero duration
+   instead of trying to cherry-pick.
+
+   Standard WCAG-compatible pattern:
+   - animation-duration: 0.01ms → animations complete instantly
+   - animation-iteration-count: 1 → infinite loops run once
+   - transition-duration: 0.01ms → transitions feel instant
+
+   To relax later (keep short opacity fades, remove transforms),
+   replace the universal rule with per-property overrides.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

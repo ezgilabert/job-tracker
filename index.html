@@ -201,7 +201,7 @@
                   <input type="hidden" id="status" value="">
                   <div class="combo-input-wrap">
                     <button type="button" class="combo-trigger" aria-haspopup="listbox" aria-expanded="false">
-                      <span class="combo-trigger-icon">🔖</span>
+                      <span class="combo-trigger-icon" aria-hidden="true">🔖</span>
                       <span class="combo-trigger-text">Saved</span>
                     </button>
                     <span class="combo-chevron">▾</span>
@@ -254,13 +254,13 @@
                     <span data-i18n="workMode.none">Undefined</span>
                   </button>
                   <button type="button" class="seg-btn workmode-btn" data-value="onsite">
-                    <span>🏢</span> <span data-i18n="workMode.onsite">On-site</span>
+                    <span aria-hidden="true">🏢</span> <span data-i18n="workMode.onsite">On-site</span>
                   </button>
                   <button type="button" class="seg-btn workmode-btn" data-value="remote">
-                    <span>🏠</span> <span data-i18n="workMode.remote">Remote</span>
+                    <span aria-hidden="true">🏠</span> <span data-i18n="workMode.remote">Remote</span>
                   </button>
                   <button type="button" class="seg-btn workmode-btn" data-value="hybrid">
-                    <span>🔄</span> <span data-i18n="workMode.hybrid">Hybrid</span>
+                    <span aria-hidden="true">🔄</span> <span data-i18n="workMode.hybrid">Hybrid</span>
                   </button>
                 </div>
                 <div class="hybrid-days" id="hybridDaysWrap">
@@ -542,7 +542,7 @@
         <div class="field third">
           <label data-i18n="form.status">Status</label>
           <div class="combo-trigger combo-trigger-readonly" id="editStatus">
-            <span class="combo-trigger-icon" data-status-icon>🔖</span>
+            <span class="combo-trigger-icon" aria-hidden="true" data-status-icon>🔖</span>
             <span class="combo-trigger-text" data-status-text>Saved</span>
           </div>
         </div>
@@ -591,13 +591,13 @@
               <span data-i18n="workMode.none">Undefined</span>
             </button>
             <button type="button" class="seg-btn workmode-btn" data-value="onsite">
-              <span>🏢</span> <span data-i18n="workMode.onsite">On-site</span>
+              <span aria-hidden="true">🏢</span> <span data-i18n="workMode.onsite">On-site</span>
             </button>
             <button type="button" class="seg-btn workmode-btn" data-value="remote">
-              <span>🏠</span> <span data-i18n="workMode.remote">Remote</span>
+              <span aria-hidden="true">🏠</span> <span data-i18n="workMode.remote">Remote</span>
             </button>
             <button type="button" class="seg-btn workmode-btn" data-value="hybrid">
-              <span>🔄</span> <span data-i18n="workMode.hybrid">Hybrid</span>
+              <span aria-hidden="true">🔄</span> <span data-i18n="workMode.hybrid">Hybrid</span>
             </button>
           </div>
           <div class="hybrid-days" id="editHybridDaysWrap">
@@ -745,46 +745,46 @@
     <div class="config-layout">
       <nav class="config-nav" role="tablist">
         <button type="button" class="config-tab active" data-tab="roles" role="tab">
-          <span class="config-tab-icon">💼</span>
+          <span class="config-tab-icon" aria-hidden="true">💼</span>
           <span class="config-tab-label" data-i18n="config.tab.roles">Roles</span>
         </button>
         <button type="button" class="config-tab" data-tab="statuses" role="tab">
-          <span class="config-tab-icon">🚩</span>
+          <span class="config-tab-icon" aria-hidden="true">🚩</span>
           <span class="config-tab-label" data-i18n="config.tab.statuses">Initial statuses</span>
         </button>
         <button type="button" class="config-tab" data-tab="filters" role="tab">
-          <span class="config-tab-icon">🎛️</span>
+          <span class="config-tab-icon" aria-hidden="true">🎛️</span>
           <span class="config-tab-label" data-i18n="config.tab.filters">Filters</span>
         </button>
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
         <button type="button" class="config-tab" data-tab="appearance" role="tab">
-          <span class="config-tab-icon">🎨</span>
+          <span class="config-tab-icon" aria-hidden="true">🎨</span>
           <span class="config-tab-label" data-i18n="config.tab.appearance">Appearance</span>
         </button>
 
         <button type="button" class="config-tab" data-tab="dashboard" role="tab">
-          <span class="config-tab-icon">📊</span>
+          <span class="config-tab-icon" aria-hidden="true">📊</span>
           <span class="config-tab-label" data-i18n="config.tab.dashboard">Dashboard</span>
         </button>
 
         <button type="button" class="config-tab" data-tab="language" role="tab">
-          <span class="config-tab-icon">🌐</span>
+          <span class="config-tab-icon" aria-hidden="true">🌐</span>
           <span class="config-tab-label" data-i18n="config.tab.language">Language</span>
         </button>
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
         <button type="button" class="config-tab" data-tab="profile" role="tab">
-          <span class="config-tab-icon">👤</span>
+          <span class="config-tab-icon" aria-hidden="true">👤</span>
           <span class="config-tab-label" data-i18n="config.tab.profile">Profile</span>
         </button>
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
         <button type="button" class="config-tab" data-tab="advanced" role="tab">
-          <span class="config-tab-icon">⚠️</span>
+          <span class="config-tab-icon" aria-hidden="true">⚠️</span>
           <span class="config-tab-label" data-i18n="config.tab.advanced">Advanced</span>
         </button>
       </nav>
@@ -957,7 +957,7 @@
             </div>
 
             <div class="config-backup-card">
-              <div class="config-backup-icon">📦</div>
+              <div class="config-backup-icon" aria-hidden="true">📦</div>
               <div class="config-backup-info">
                 <strong data-i18n="config.backup.exportTitle">Export data</strong>
                 <span data-i18n="config.backup.exportDesc">Download a JSON file with all your applications, referrals, settings and theme.</span>
@@ -965,20 +965,22 @@
               </div>
               <div class="config-backup-actions">
                 <button type="button" class="btn btn-primary" id="exportDataBtn">
-                  ⬇ <span data-i18n="config.backup.export">Export</span>
+                  <span aria-hidden="true">⬇</span>
+                  <span data-i18n="config.backup.export">Export</span>
                 </button>
               </div>
             </div>
 
             <div class="config-backup-card">
-              <div class="config-backup-icon danger">📥</div>
+              <div class="config-backup-icon danger" aria-hidden="true">📥</div>
               <div class="config-backup-info">
                 <strong data-i18n="config.backup.importTitle">Import data</strong>
                 <span data-i18n="config.backup.importDesc">Restore from a JSON file. Replaces all your current information (cannot be undone).</span>
               </div>
               <div class="config-backup-actions">
                 <button type="button" class="btn btn-ghost" id="importDataBtn">
-                  ⬆ <span data-i18n="config.backup.import">Import</span>
+                  <span aria-hidden="true">⬆</span>
+                  <span data-i18n="config.backup.import">Import</span>
                 </button>
                 <input type="file" id="importDataInput" accept="application/json,.json" class="is-hidden">
               </div>
@@ -993,20 +995,22 @@
 
             <div class="config-danger-cards">
               <div class="config-danger-card prefs">
-                <div class="danger-card-icon">⚙️</div>
+                <div class="danger-card-icon" aria-hidden="true">⚙️</div>
                 <h4 data-i18n="config.danger.reset.title">Reset preferences</h4>
                 <p data-i18n="config.danger.reset.desc">Restores roles, statuses, filters and appearance to their defaults. Not applied until you save.</p>
                 <button type="button" class="btn btn-warning-ghost" id="resetConfigBtn">
-                  ↺ <span data-i18n="config.danger.reset.button">Reset</span>
+                  <span aria-hidden="true">↺</span>
+                  <span data-i18n="config.danger.reset.button">Reset</span>
                 </button>
               </div>
 
               <div class="config-danger-card data">
-                <div class="danger-card-icon">🗑️</div>
+                <div class="danger-card-icon" aria-hidden="true">🗑️</div>
                 <h4 data-i18n="config.danger.data.title">Delete data</h4>
                 <p data-i18n="config.danger.data.desc">Permanently deletes your applications and referrals. This action cannot be undone.</p>
                 <button type="button" class="btn btn-danger-ghost" id="resetDataBtn">
-                  🗑️ <span data-i18n="config.danger.data.button">Delete data</span>
+                  <span aria-hidden="true">🗑️</span>
+                  <span data-i18n="config.danger.data.button">Delete data</span>
                 </button>
               </div>
             </div>

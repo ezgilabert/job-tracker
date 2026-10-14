@@ -3,7 +3,7 @@
    Imports only; styles live in the listed files.
 
    Load order:
-     1. base       — tokens first (variables), then reset
+     1. base       — tokens first (variables), then reset, then motion
      2. themes     — body-level backgrounds
      3. layout     — page structure (header, menu, media queries)
      4. components — reusable widgets
@@ -15,6 +15,7 @@
 /* --- Base --- */
 @import url('./base/tokens.css');
 @import url('./base/reset.css');
+@import url('./base/motion.css');
 
 /* --- Themes --- */
 @import url('./themes/backgrounds.css');

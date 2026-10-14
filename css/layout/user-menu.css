@@ -19,7 +19,11 @@
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
-  min-width: 320px;
+  /* At least 320px on normal viewports, but never wider than the
+     screen minus the two 1rem page paddings — this prevents the
+     dropdown from overflowing on 320–360px phones. */
+  min-width: min(320px, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
   background: var(--bg-2);
   border: 1px solid var(--border-strong);
   border-radius: 18px;

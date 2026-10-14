@@ -41,12 +41,22 @@ export function mountTheme() {
  * Plays a radial wipe from (x, y) and calls onPeak halfway through
  * so the theme attribute flips while the ripple is still growing.
  *
+ * When the OS-level "Reduce motion" setting is on, skip the ripple
+ * entirely and call onPeak synchronously. The theme still flips —
+ * the user just doesn't get the expanding gradient animation.
+ *
  * @param {number} x
  * @param {number} y
  * @param {string} nextTheme
  * @param {() => void} onPeak
  */
 export function triggerThemeRipple(x, y, nextTheme, onPeak) {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    if (typeof onPeak === 'function') onPeak();
+    return;
+  }
+
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 

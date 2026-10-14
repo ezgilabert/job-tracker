@@ -79,11 +79,6 @@ export function applyI18n(root = document) {
   root.querySelectorAll('[data-i18n-title]').forEach(el => {
     el.title = t(el.dataset.i18nTitle);
   });
-  // aria-label uses setAttribute because there is no reflected property
-  // that plays well with all supported browsers (el.ariaLabel is newer).
-  root.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
-    el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
-  });
   const docKey = document.documentElement.dataset.i18nTitleDoc;
   if (docKey) document.title = t(docKey);
   document.documentElement.lang = currentLang;

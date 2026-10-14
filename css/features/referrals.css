@@ -152,7 +152,11 @@ form.form-block {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease,
+    box-shadow       0.15s ease;
 }
 
 .ref-chip:hover {
@@ -211,7 +215,7 @@ form.form-block {
   flex: 1;
   min-width: 200px;
   max-width: 380px;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: var(--shadow-sm);
 }
 
@@ -262,7 +266,10 @@ form.form-block {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color            0.2s ease,
+    box-shadow       0.2s ease;
   font-family: inherit;
   white-space: nowrap;
 }
@@ -290,7 +297,10 @@ form.form-block {
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
-  transition: all 0.2s ease;
+  transition:
+    transform    0.2s ease,
+    border-color 0.2s ease,
+    box-shadow   0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -300,20 +310,95 @@ form.form-block {
   -webkit-backdrop-filter: blur(12px);
 }
 
+/* ============================================================
+   Relationship colors: single source of truth.
+   Each block defines 5 custom properties on BOTH the card
+   (for the accent stripe) and the badge, so a single
+   data-relationship attribute lights up both elements.
+
+     --r-stripe-a   top of the vertical accent stripe
+     --r-stripe-b   bottom of the vertical accent stripe
+     --r-badge-bg   badge background
+     --r-badge-fg   badge text
+     --r-badge-bd   badge border
+   ============================================================ */
+
+.referido[data-relationship="Friend"],
+.ref-relationship-badge[data-relationship="Friend"] {
+  --r-stripe-a: #fb923c;  --r-stripe-b: #f97316;
+  --r-badge-bg: #fff7ed;  --r-badge-fg: #c2410c;  --r-badge-bd: #fed7aa;
+}
+
+.referido[data-relationship="Ex-colleague"],
+.ref-relationship-badge[data-relationship="Ex-colleague"] {
+  --r-stripe-a: #60a5fa;  --r-stripe-b: #3b82f6;
+  --r-badge-bg: var(--info-soft);  --r-badge-fg: var(--info-2);  --r-badge-bd: var(--info-border);
+}
+
+.referido[data-relationship="Family"],
+.ref-relationship-badge[data-relationship="Family"] {
+  --r-stripe-a: #f472b6;  --r-stripe-b: #ec4899;
+  --r-badge-bg: #fdf2f8;  --r-badge-fg: #be185d;  --r-badge-bd: #fbcfe8;
+}
+
+.referido[data-relationship="Acquaintance"],
+.ref-relationship-badge[data-relationship="Acquaintance"] {
+  --r-stripe-a: #a78bfa;  --r-stripe-b: #8b5cf6;
+  --r-badge-bg: #f5f3ff;  --r-badge-fg: #6d28d9;  --r-badge-bd: #ddd6fe;
+}
+
+.referido[data-relationship="Recruiter"],
+.ref-relationship-badge[data-relationship="Recruiter"] {
+  --r-stripe-a: #34d399;  --r-stripe-b: #10b981;
+  --r-badge-bg: var(--success-soft);  --r-badge-fg: var(--success-2);  --r-badge-bd: var(--success-border);
+}
+
+.referido[data-relationship="Mentor"],
+.ref-relationship-badge[data-relationship="Mentor"] {
+  --r-stripe-a: #facc15;  --r-stripe-b: #eab308;
+  --r-badge-bg: #fefce8;  --r-badge-fg: #a16207;  --r-badge-bd: #fef08a;
+}
+
+/* Dark overrides: only the badge colors change. The stripe
+   keeps the same colors, which still read well on dark. */
+[data-theme="dark"] .referido[data-relationship="Friend"],
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Friend"] {
+  --r-badge-bg: rgba(249,115,22,0.16);  --r-badge-fg: #fb923c;  --r-badge-bd: transparent;
+}
+[data-theme="dark"] .referido[data-relationship="Ex-colleague"],
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Ex-colleague"] {
+  --r-badge-bg: var(--info-soft);  --r-badge-fg: #60a5fa;  --r-badge-bd: transparent;
+}
+[data-theme="dark"] .referido[data-relationship="Family"],
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Family"] {
+  --r-badge-bg: rgba(236,72,153,0.16);  --r-badge-fg: #f472b6;  --r-badge-bd: transparent;
+}
+[data-theme="dark"] .referido[data-relationship="Acquaintance"],
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Acquaintance"] {
+  --r-badge-bg: rgba(124,58,237,0.16);  --r-badge-fg: #a78bfa;  --r-badge-bd: transparent;
+}
+[data-theme="dark"] .referido[data-relationship="Recruiter"],
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Recruiter"] {
+  --r-badge-bg: var(--success-soft);  --r-badge-fg: #34d399;  --r-badge-bd: transparent;
+}
+[data-theme="dark"] .referido[data-relationship="Mentor"],
+[data-theme="dark"] .ref-relationship-badge[data-relationship="Mentor"] {
+  --r-badge-bg: rgba(234,179,8,0.16);  --r-badge-fg: #facc15;  --r-badge-bd: transparent;
+}
+
+/* Accent stripe consumes the relationship variables, falling
+   back to the app accent when no relationship is set. */
 .referido::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 3px;
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  background: linear-gradient(
+    180deg,
+    var(--r-stripe-a, var(--accent)),
+    var(--r-stripe-b, var(--accent-2))
+  );
 }
-
-.referido[data-relationship="Friend"]::before       { background: linear-gradient(180deg, #fb923c, #f97316); }
-.referido[data-relationship="Ex-colleague"]::before { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
-.referido[data-relationship="Family"]::before       { background: linear-gradient(180deg, #f472b6, #ec4899); }
-.referido[data-relationship="Acquaintance"]::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
-.referido[data-relationship="Recruiter"]::before    { background: linear-gradient(180deg, #34d399, #10b981); }
-.referido[data-relationship="Mentor"]::before       { background: linear-gradient(180deg, #facc15, #eab308); }
 
 .referido:hover {
   transform: translateY(-2px);
@@ -339,8 +424,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Relationship badge (multiselect)
-   Colors keyed by data-relationship ON THE BADGE ITSELF
+   Relationship badge (consumes the same custom properties)
    ============================================================ */
 
 .ref-relationship-badge {
@@ -352,24 +436,10 @@ form.form-block {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: var(--accent-soft);
-  color: var(--accent);
-  border: 1px solid var(--accent-border);
+  background: var(--r-badge-bg, var(--accent-soft));
+  color: var(--r-badge-fg, var(--accent));
+  border: 1px solid var(--r-badge-bd, var(--accent-border));
 }
-
-.ref-relationship-badge[data-relationship="Friend"]       { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-.ref-relationship-badge[data-relationship="Ex-colleague"] { background: var(--info-soft); color: var(--info-2); border-color: var(--info-border); }
-.ref-relationship-badge[data-relationship="Family"]       { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
-.ref-relationship-badge[data-relationship="Acquaintance"] { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
-.ref-relationship-badge[data-relationship="Recruiter"]    { background: var(--success-soft); color: var(--success-2); border-color: var(--success-border); }
-.ref-relationship-badge[data-relationship="Mentor"]       { background: #fefce8; color: #a16207; border-color: #fef08a; }
-
-[data-theme="dark"] .ref-relationship-badge[data-relationship="Friend"]       { background: rgba(249,115,22,0.16); color: #fb923c; border-color: transparent; }
-[data-theme="dark"] .ref-relationship-badge[data-relationship="Ex-colleague"] { background: var(--info-soft); color: #60a5fa; border-color: transparent; }
-[data-theme="dark"] .ref-relationship-badge[data-relationship="Family"]       { background: rgba(236,72,153,0.16); color: #f472b6; border-color: transparent; }
-[data-theme="dark"] .ref-relationship-badge[data-relationship="Acquaintance"] { background: rgba(124,58,237,0.16); color: #a78bfa; border-color: transparent; }
-[data-theme="dark"] .ref-relationship-badge[data-relationship="Recruiter"]    { background: var(--success-soft); color: #34d399; border-color: transparent; }
-[data-theme="dark"] .ref-relationship-badge[data-relationship="Mentor"]       { background: rgba(234,179,8,0.16); color: #facc15; border-color: transparent; }
 
 /* ============================================================
    Status badge
@@ -461,7 +531,12 @@ form.form-block {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease,
+    box-shadow       0.15s ease,
+    transform        0.15s ease;
   padding: 0;
   line-height: 1;
 }
@@ -565,7 +640,12 @@ form.form-block {
   font-size: 0.6rem;
   font-weight: 700;
   color: var(--text-dim);
-  transition: all 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    border-color     0.25s ease,
+    color            0.25s ease,
+    box-shadow       0.25s ease,
+    transform        0.25s ease;
   z-index: 2;
 }
 
@@ -750,7 +830,12 @@ form.form-block {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease,
+    box-shadow       0.15s ease,
+    transform        0.15s ease;
 }
 
 .job-ref-chip:hover {
