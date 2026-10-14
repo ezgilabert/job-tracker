@@ -1,291 +1,45 @@
 // ============================================================
-// Entry point: wires stores, controllers, and UI
+// Entry point: wires stores, controllers, and UI.
+//
+// The heavy lifting lives in ./boot/* — this file only
+// orchestrates.
 // ============================================================
 
-import { Store } from './store.js';
 import {
-  STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
-  SAMPLE_JOBS, getDefaultConfig, LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG,
-  BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, applyBackground,
-  DEFAULT_DASHBOARD_STYLE,
+  DEFAULT_LANG, DEFAULT_LOGO, DEFAULT_BACKGROUND, applyBackground,
 } from './constants.js';
-import { migrateJob, migrateRef, migrateConfig } from './migrations.js';
-import { mountJobsController } from './controllers/jobsController.js';
-import { mountRefsController } from './controllers/refsController.js';
-import { mountModalsController } from './controllers/modalsController.js';
-import { mountConfigController } from './controllers/configController.js';
-import { mountCreateRoleController } from './controllers/createRoleController.js';
-import { DatePicker } from './ui/datePicker.js';
-import { mountChips } from './ui/chips.js';
-import { mountInputLimits } from './ui/inputLimits.js';
-import { ensureArray } from './utils.js';
-import { applyI18n, setLanguage, getLanguage } from './i18n.js';
-import {
-  logout, getSession, requireSession, startSessionHeartbeat,
-} from './auth/session.js';
 
-// ============================================================
-// Boot
-// ============================================================
+import { createStores } from './boot/stores.js';
+import { mountTheme, applyLogo } from './boot/theme.js';
+import { mountUserMenu } from './boot/userMenu.js';
+import { pulseI18nTexts } from './boot/i18nPulse.js';
+
+import { mountJobsController }    from './controllers/jobsController.js';
+import { mountRefsController }    from './controllers/refsController.js';
+import { mountModalsController }  from './controllers/modalsController.js';
+import { mountConfigController }  from './controllers/configController.js';
+import { mountCreateRoleController } from './controllers/createRoleController.js';
+
+import { DatePicker }    from './ui/datePicker.js';
+import { mountChips }    from './ui/chips.js';
+import { mountInputLimits } from './ui/inputLimits.js';
+
+import { applyI18n, setLanguage, getLanguage } from './i18n.js';
+import { requireSession, startSessionHeartbeat } from './auth/session.js';
+
 boot();
 
 async function boot() {
   if (!(await requireSession('./login.html'))) return;
 
   // ----------------------------------------------------------
-  // Cascade pulse on language change (Web Animations API)
-  //   - New text is applied BEFORE animating (no flash).
-  //   - Each element slides up 24px with a fade.
-  //   - 60ms stagger between elements, ordered by visual position.
-  //   - 550ms per element, capped at 450ms of accumulated delay.
-  //   - Respects prefers-reduced-motion.
-  //   - Cancels any running animation on the same element first.
-  // ----------------------------------------------------------
-  function pulseI18nTexts() {
-    if (window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
-
-    const all = document.querySelectorAll(
-      '.container [data-i18n], .container [data-i18n-html]'
-    );
-
-    const visible = [];
-    all.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) visible.push(el);
-    });
-
-    if (!visible.length) return;
-
-    visible.sort((a, b) => {
-      const ra = a.getBoundingClientRect();
-      const rb = b.getBoundingClientRect();
-      if (Math.abs(ra.top - rb.top) > 8) return ra.top - rb.top;
-      return ra.left - rb.left;
-    });
-
-    const STAGGER = 60;
-    const MAX_STAGGER = 450;
-    const DURATION = 550;
-
-    visible.forEach((el, i) => {
-      if (typeof el.getAnimations === 'function') {
-        el.getAnimations().forEach(a => {
-          try { a.cancel(); } catch (_) { /* noop */ }
-        });
-      }
-
-      const delay = Math.min(i * STAGGER, MAX_STAGGER);
-      el.style.willChange = 'opacity, transform';
-
-      const anim = el.animate(
-        [
-          { opacity: 0, transform: 'translateY(24px)' },
-          { opacity: 1, transform: 'translateY(0)'    },
-        ],
-        {
-          duration: DURATION,
-          delay,
-          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-          fill: 'none',
-        }
-      );
-
-      const cleanup = () => { el.style.willChange = ''; };
-      anim.onfinish = cleanup;
-      anim.oncancel = cleanup;
-    });
-  }
-
-  // ----------------------------------------------------------
-  // Theme ripple (radial wipe) at click point
-  // ----------------------------------------------------------
-  function triggerThemeRipple(x, y, nextTheme, onPeak) {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-
-    const dx = Math.max(x, vw - x);
-    const dy = Math.max(y, vh - y);
-    const radius = Math.sqrt(dx * dx + dy * dy) * 1.05;
-    const size = radius * 2;
-
-    const ripple = document.createElement('div');
-    ripple.className = 'theme-ripple';
-    ripple.style.width  = size + 'px';
-    ripple.style.height = size + 'px';
-    ripple.style.left   = (x - radius) + 'px';
-    ripple.style.top    = (y - radius) + 'px';
-
-    document.body.appendChild(ripple);
-    void ripple.offsetWidth;
-    ripple.classList.add('run');
-
-    setTimeout(() => {
-      if (typeof onPeak === 'function') onPeak();
-    }, 380);
-
-    setTimeout(() => {
-      ripple.remove();
-    }, 900);
-  }
-
-  // ----------------------------------------------------------
-  // Theme
-  // ----------------------------------------------------------
-  function mountTheme() {
-    const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
-    document.documentElement.setAttribute('data-theme', saved);
-
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return;
-
-    btn.addEventListener('click', (e) => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-
-      const rect = btn.getBoundingClientRect();
-      const x = (typeof e.clientX === 'number' && e.clientX > 0)
-        ? e.clientX
-        : rect.left + rect.width / 2;
-      const y = (typeof e.clientY === 'number' && e.clientY > 0)
-        ? e.clientY
-        : rect.top + rect.height / 2;
-
-      triggerThemeRipple(x, y, next, () => {
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem(STORAGE_KEYS.THEME, next);
-      });
-    });
-  }
-
-  function applyLogo(logoId) {
-    const el = document.getElementById('brandLogo');
-    if (!el) return;
-    const option = LOGO_OPTIONS.find(o => o.id === logoId) || LOGO_OPTIONS[0];
-    el.innerHTML = option.svg;
-  }
-
-  // ----------------------------------------------------------
-  // User menu
-  // ----------------------------------------------------------
-  function mountUserMenu(configStore) {
-    const menu = document.getElementById('userMenu');
-    const btn = document.getElementById('userBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const configBtn = document.getElementById('configBtn');
-    const userHeader = document.getElementById('userMenuHeader');
-    const nameEl = document.getElementById('userMenuName');
-    const emailEl = document.getElementById('userMenuEmail');
-    const langBtn = document.getElementById('langToggle');
-
-    if (!menu || !btn) return;
-
-    function refresh() {
-      const session = getSession();
-      const logged = !!session;
-
-      if (logged) {
-        const displayName = session.name
-          || (session.email ? session.email.split('@')[0] : 'User');
-        const displayEmail = session.email || '';
-
-        if (nameEl) nameEl.textContent = displayName;
-        if (emailEl) emailEl.textContent = displayEmail;
-
-        if (userHeader) userHeader.style.display = '';
-        if (loginBtn)   loginBtn.style.display = 'none';
-        if (logoutBtn)  logoutBtn.style.display = '';
-      } else {
-        if (userHeader) userHeader.style.display = 'none';
-        if (loginBtn)   loginBtn.style.display = '';
-        if (logoutBtn)  logoutBtn.style.display = 'none';
-      }
-    }
-
-    refresh();
-
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (menu.classList.contains('open') && !menu.contains(e.target)) {
-        menu.classList.remove('open');
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menu.classList.contains('open')) {
-        menu.classList.remove('open');
-      }
-    });
-
-    if (configBtn) {
-      configBtn.addEventListener('click', () => {
-        menu.classList.remove('open');
-      });
-    }
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        logout();
-        menu.classList.remove('open');
-        window.location.href = './login.html';
-      });
-    }
-
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        window.location.href = './login.html';
-      });
-    }
-
-    if (langBtn) {
-      // Language change goes through the config store. The pulse is
-      // triggered by the store subscriber when it detects a lang change.
-      langBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const current = getLanguage();
-        const next = current === 'es' ? 'en' : 'es';
-        configStore.update(c => ({ ...c, lang: next }));
-      });
-    }
-
-    document.addEventListener('i18n-changed', refresh);
-  }
-
-  // ----------------------------------------------------------
   // Stores
   // ----------------------------------------------------------
-  const jobsStore = new Store(STORAGE_KEYS.JOBS, [], {
-    version: STORAGE_VERSION,
-    seed: () => SAMPLE_JOBS.map(j => ({ ...j })),
-    migrate: (data) => {
-      if (Array.isArray(data)) return data.map(migrateJob);
-      return data;
-    },
-  });
-
-  const refsStore = new Store(STORAGE_KEYS.REFS, [], {
-    version: STORAGE_VERSION,
-    migrate: (data) => {
-      if (Array.isArray(data)) return data.map(migrateRef);
-      return data;
-    },
-  });
-
-  const configStore = new Store(STORAGE_KEYS.CONFIG, getDefaultConfig(), {
-    version: CONFIG_VERSION,
-    seed: () => getDefaultConfig(),
-    migrate: migrateConfig,
-  });
+  const { jobsStore, refsStore, configStore } = createStores();
 
   // ----------------------------------------------------------
-  // i18n
+  // i18n boot: language + initial apply, plus a subscriber that
+  // reacts to config changes (logo, background, language).
   // ----------------------------------------------------------
   setLanguage(configStore.get().lang || DEFAULT_LANG);
   applyI18n(document);
@@ -304,7 +58,7 @@ async function boot() {
   });
 
   // ----------------------------------------------------------
-  // UI wiring
+  // Shared UI widgets
   // ----------------------------------------------------------
   const datePicker = new DatePicker(document.getElementById('datePicker'), {
     onChange: () => {},
@@ -318,25 +72,44 @@ async function boot() {
 
   mountInputLimits(document);
 
+  // ----------------------------------------------------------
+  // Controllers
+  // ----------------------------------------------------------
   const createRoleCtrl = mountCreateRoleController(configStore);
 
   mountConfigController(configStore, jobsStore, refsStore);
-  const modals = mountModalsController(jobsStore, refsStore, configStore, createRoleCtrl);
+
+  const modals = mountModalsController(
+    jobsStore, refsStore, configStore, createRoleCtrl
+  );
+
   const jobsCtrl = mountJobsController(
     jobsStore, refsStore, modals, datePicker, configStore, createRoleCtrl
   );
-  const refsCtrl = mountRefsController(jobsStore, refsStore, modals, configStore);
+
+  const refsCtrl = mountRefsController(
+    jobsStore, refsStore, modals, configStore
+  );
 
   refsCtrl.initChips(refRelationshipChips, refStatusChips);
 
+  // ----------------------------------------------------------
+  // Theme + header
+  // ----------------------------------------------------------
   mountTheme();
   mountUserMenu(configStore);
 
+  // ----------------------------------------------------------
+  // Session heartbeat
+  // ----------------------------------------------------------
   startSessionHeartbeat(() => {
     window.location.replace('./login.html');
   });
 
-  // Re-render lists on language change.
+  // ----------------------------------------------------------
+  // Re-render lists when the language changes (the pulse is
+  // triggered by the config subscriber above).
+  // ----------------------------------------------------------
   document.addEventListener('i18n-changed', () => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
