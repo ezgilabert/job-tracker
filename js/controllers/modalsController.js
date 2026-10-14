@@ -12,6 +12,7 @@ import { SalaryModeChip } from '../ui/form/salaryModeChip.js';
 import { SalaryInput } from '../ui/form/salaryInput.js';
 import { ContactLinkPicker } from '../ui/form/contactLinkPicker.js';
 import { mountChips } from '../ui/form/chips.js';
+import { createModal } from '../ui/modal.js';
 import {
   CLOSE_REASON_KEYS, WORKFLOW_STEPS,
   getStateIcon, getRefStateIcon,
@@ -28,7 +29,6 @@ import { scrollToJob, onScrollToJob, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
 import { icon } from '../app/icons.js';
 
-// Undo/close-status → sprite names.
 const CLOSE_UNDO_ICON = {
   Rejected:  'icon-x-circle',
   Ghosted:   'icon-ghost',
@@ -46,8 +46,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
   // ----------------------------------------------------------
   // Edit job
   // ----------------------------------------------------------
-  const editModal = document.getElementById('editModal');
-
   const editStatusEl = document.getElementById('editStatus');
   const editStatusIcon = editStatusEl
     ? editStatusEl.querySelector('[data-status-icon]')
@@ -64,6 +62,11 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
   const editHourlySalaryCheckbox = document.getElementById('editHourlySalary');
 
   let editingId = null;
+
+  const editModal = createModal(document.getElementById('editModal'), {
+    onClose: () => { editingId = null; },
+  });
+
   const editDate = new DatePicker(document.getElementById('editDatePicker'));
   const editRole = new RoleCombo(document.getElementById('editRoleCombo'), {
     getJobRoles: () => jobsStore.get().map(j => j.role),
@@ -134,18 +137,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     setVal('editNotes', j.notes || '');
     editWorkMode.setValue(j.workMode || '', j.hybridOfficeDays || 3);
 
-    editModal.classList.add('open');
+    editModal.open();
   }
 
-  function closeEdit() {
-    editModal.classList.remove('open');
-    editingId = null;
-  }
-
-  document.getElementById('cancelEdit').addEventListener('click', closeEdit);
-  editModal.addEventListener('click', (e) => {
-    if (e.target === editModal) closeEdit();
-  });
+  document.getElementById('cancelEdit').addEventListener('click', () => editModal.close());
 
   document.getElementById('saveEdit').addEventListener('click', () => {
     if (!editingId) return;
@@ -183,17 +178,20 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       };
     }));
 
-    closeEdit();
+    editModal.close();
     showToast(t('modal.saveChanges'), 'icon-check');
   });
 
   // ----------------------------------------------------------
   // Close job with reason
   // ----------------------------------------------------------
-  const closeModal = document.getElementById('closeModal');
   const closeReasonsEl = document.getElementById('closeReasons');
   const closeReasonInput = document.getElementById('closeReason');
   let pendingClose = null;
+
+  const closeModal = createModal(document.getElementById('closeModal'), {
+    onClose: () => { pendingClose = null; },
+  });
 
   function openClose(id, status) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -217,13 +215,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     closeReasonInput.style.borderColor = '';
     closeReasonInput.style.boxShadow = '';
 
-    closeModal.classList.add('open');
+    closeModal.open();
     setTimeout(() => closeReasonInput.focus(), 100);
-  }
-
-  function hideClose() {
-    closeModal.classList.remove('open');
-    pendingClose = null;
   }
 
   closeReasonsEl.addEventListener('click', (e) => {
@@ -240,10 +233,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     closeReasonInput.style.boxShadow = '';
   });
 
-  document.getElementById('cancelClose').addEventListener('click', hideClose);
-  closeModal.addEventListener('click', (e) => {
-    if (e.target === closeModal) hideClose();
-  });
+  document.getElementById('cancelClose').addEventListener('click', () => closeModal.close());
 
   document.getElementById('confirmClose').addEventListener('click', () => {
     if (!pendingClose) return;
@@ -278,7 +268,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       CLOSE_UNDO_ICON[status] || 'icon-check'
     );
 
-    hideClose();
+    closeModal.close();
   });
 
   function syncLinkedRefToHired(jobId, job) {
@@ -301,11 +291,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
   // ----------------------------------------------------------
   // History (jobs)
   // ----------------------------------------------------------
-  const historyModal = document.getElementById('historyModal');
   const historySubtitle = document.getElementById('historySubtitle');
   const historyTimeline = document.getElementById('historyTimeline');
   const historySkipped = document.getElementById('historySkipped');
   const historySkippedList = document.getElementById('historySkippedList');
+
+  const historyModal = createModal(document.getElementById('historyModal'));
 
   function openHistory(id) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -375,25 +366,19 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       historySkipped.classList.add('is-hidden');
     }
 
-    historyModal.classList.add('open');
+    historyModal.open();
   }
 
-  function closeHistory() {
-    historyModal.classList.remove('open');
-  }
-
-  document.getElementById('closeHistoryBtn').addEventListener('click', closeHistory);
-  document.getElementById('closeHistoryModal').addEventListener('click', closeHistory);
-  historyModal.addEventListener('click', (e) => {
-    if (e.target === historyModal) closeHistory();
-  });
+  document.getElementById('closeHistoryBtn').addEventListener('click', () => historyModal.close());
+  document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.close());
 
   // ----------------------------------------------------------
   // History (referrals)
   // ----------------------------------------------------------
-  const refHistoryModal = document.getElementById('refHistoryModal');
   const refHistorySubtitle = document.getElementById('refHistorySubtitle');
   const refHistoryTimeline = document.getElementById('refHistoryTimeline');
+
+  const refHistoryModal = createModal(document.getElementById('refHistoryModal'));
 
   function openRefHistory(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -450,32 +435,22 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       }).join('');
     }
 
-    refHistoryModal.classList.add('open');
+    refHistoryModal.open();
   }
 
-  function closeRefHistory() {
-    refHistoryModal.classList.remove('open');
-  }
-
-  document.getElementById('closeRefHistoryBtn').addEventListener('click', closeRefHistory);
-  document.getElementById('closeRefHistoryModal').addEventListener('click', closeRefHistory);
-  refHistoryModal.addEventListener('click', (e) => {
-    if (e.target === refHistoryModal) closeRefHistory();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (refHistoryModal.classList.contains('open')) closeRefHistory();
-    else if (historyModal.classList.contains('open')) closeHistory();
-  });
+  document.getElementById('closeRefHistoryBtn').addEventListener('click', () => refHistoryModal.close());
+  document.getElementById('closeRefHistoryModal').addEventListener('click', () => refHistoryModal.close());
 
   // ----------------------------------------------------------
   // Note on advance (jobs)
   // ----------------------------------------------------------
-  const noteModal = document.getElementById('noteModal');
   const stepNoteInput = document.getElementById('stepNoteInput');
   const noteSubtitle = document.getElementById('noteModalSubtitle');
   let pendingAdvance = null;
+
+  const noteModal = createModal(document.getElementById('noteModal'), {
+    onClose: () => { pendingAdvance = null; },
+  });
 
   function openNote(id, direction, opts = {}) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -496,7 +471,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     });
 
     stepNoteInput.value = '';
-    noteModal.classList.add('open');
+    noteModal.open();
     setTimeout(() => stepNoteInput.focus(), 80);
   }
 
@@ -525,35 +500,28 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     );
   }
 
-  function hideNote() {
-    noteModal.classList.remove('open');
-    pendingAdvance = null;
-  }
-
   document.getElementById('skipNote').addEventListener('click', () => {
     applyAdvance({ note: null });
-    hideNote();
+    noteModal.close();
   });
 
   document.getElementById('saveNote').addEventListener('click', () => {
     applyAdvance({ note: stepNoteInput.value.trim() || null });
-    hideNote();
+    noteModal.close();
   });
 
-  document.getElementById('closeNoteModal').addEventListener('click', hideNote);
-
-  noteModal.addEventListener('click', (e) => {
-    if (e.target === noteModal) {
-      applyAdvance({ note: null });
-      hideNote();
-    }
-  });
+  // Closing via the X, overlay click, or Escape cancels the
+  // advance. The user must press Skip or Save to move the job.
+  document.getElementById('closeNoteModal').addEventListener('click', () => noteModal.close());
 
   // ----------------------------------------------------------
   // Edit referral
   // ----------------------------------------------------------
-  const refEditModal = document.getElementById('refEditModal');
   let refEditingId = null;
+
+  const refEditModal = createModal(document.getElementById('refEditModal'), {
+    onClose: () => { refEditingId = null; },
+  });
 
   const refEditRelationship = mountChips(
     document.getElementById('refEditRelationshipChips'),
@@ -582,18 +550,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
     refEditStatus.setValue(r.status || 'Pending');
 
-    refEditModal.classList.add('open');
+    refEditModal.open();
   }
 
-  function closeRefEdit() {
-    refEditModal.classList.remove('open');
-    refEditingId = null;
-  }
-
-  document.getElementById('refCancelEdit').addEventListener('click', closeRefEdit);
-  refEditModal.addEventListener('click', (e) => {
-    if (e.target === refEditModal) closeRefEdit();
-  });
+  document.getElementById('refCancelEdit').addEventListener('click', () => refEditModal.close());
 
   document.getElementById('refSaveEdit').addEventListener('click', () => {
     if (!refEditingId) return;
@@ -614,20 +574,27 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       };
     }));
 
-    closeRefEdit();
+    refEditModal.close();
     showToast(t('toast.refUpdated'), 'icon-check');
   });
 
   // ----------------------------------------------------------
   // Move referral → applications
   // ----------------------------------------------------------
-  const refToJobModal = document.getElementById('refToJobModal');
   const refToJobLinkSection = document.getElementById('refToJobLinkSection');
   const refToJobList = document.getElementById('refToJobList');
   const refToJobConfirm = document.getElementById('refToJobConfirm');
   let refToJobPending = null;
   let refToJobMode = null;
   let refToJobSelectedId = null;
+
+  const refToJobModal = createModal(document.getElementById('refToJobModal'), {
+    onClose: () => {
+      refToJobPending = null;
+      refToJobMode = null;
+      refToJobSelectedId = null;
+    },
+  });
 
   function openRefToJob(refId) {
     const r = refsStore.get().find(x => x.id === refId);
@@ -642,20 +609,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     refToJobConfirm.classList.add('is-hidden');
     document.querySelectorAll('.ref-to-job-option').forEach(o => o.classList.remove('selected'));
 
-    refToJobModal.classList.add('open');
+    refToJobModal.open();
   }
 
-  function closeRefToJob() {
-    refToJobModal.classList.remove('open');
-    refToJobPending = null;
-    refToJobMode = null;
-    refToJobSelectedId = null;
-  }
-
-  document.getElementById('refToJobSkip').addEventListener('click', closeRefToJob);
-  refToJobModal.addEventListener('click', (e) => {
-    if (e.target === refToJobModal) closeRefToJob();
-  });
+  document.getElementById('refToJobSkip').addEventListener('click', () => refToJobModal.close());
 
   document.querySelectorAll('.ref-to-job-option').forEach(opt => {
     opt.addEventListener('click', () => {
@@ -666,7 +623,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       if (refToJobMode === 'new') {
         const r = refsStore.get().find(x => x.id === refToJobPending);
         if (r) createJobFromRef(r);
-        closeRefToJob();
+        refToJobModal.close();
       } else if (refToJobMode === 'link') {
         renderRefToJobList();
         refToJobLinkSection.classList.remove('is-hidden');
@@ -724,7 +681,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       return { ...r, linkedJobId: j.id };
     }));
 
-    closeRefToJob();
+    refToJobModal.close();
     showToast(t('toast.linkedTo', { company: j.company }), 'icon-chain');
     scrollToJob(j.id);
   });
@@ -766,7 +723,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       return { ...x, linkedJobId: newId };
     }));
 
-    closeRefToJob();
+    refToJobModal.close();
     showToast(t('toast.jobCreatedFromRef', { name: r.name }), 'icon-sparkle');
 
     setTimeout(() => {
@@ -797,7 +754,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
   // i18n
   // ----------------------------------------------------------
   onI18nChanged(() => {
-    if (editModal.classList.contains('open') && editingId) {
+    if (editModal.isOpen() && editingId) {
       const j = jobsStore.get().find(x => x.id === editingId);
       if (j) updateEditStatusDisplay(j.status);
     }

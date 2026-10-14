@@ -14,6 +14,7 @@ import {
   uid, highlightAndScroll, escapeHtml, valueOf, updateById, withHistoryEntry,
 } from '../app/utils.js';
 import { renderDashboard } from '../ui/dashboard.js';
+import { createModal } from '../ui/modal.js';
 import { t, tRefState, tRefStateShort } from '../i18n/index.js';
 import { scrollToJob, onScrollToRef, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
@@ -330,10 +331,13 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   // Advance: with note modal
   // ----------------------------------------------------------
-  const refNoteModal = document.getElementById('refNoteModal');
   const refStepNoteInput = document.getElementById('refStepNoteInput');
   const refNoteSubtitle = document.getElementById('refNoteModalSubtitle');
   let pendingRefAdvance = null;
+
+  const refNoteModal = createModal(document.getElementById('refNoteModal'), {
+    onClose: () => { pendingRefAdvance = null; },
+  });
 
   function requestMoveNext(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -354,7 +358,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     });
 
     refStepNoteInput.value = '';
-    refNoteModal.classList.add('open');
+    refNoteModal.open();
     setTimeout(() => refStepNoteInput.focus(), 80);
   }
 
@@ -400,29 +404,18 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     }));
   }
 
-  function hideRefNote() {
-    refNoteModal.classList.remove('open');
-    pendingRefAdvance = null;
-  }
-
   document.getElementById('skipRefNote').addEventListener('click', () => {
     applyRefAdvance({ note: null });
-    hideRefNote();
+    refNoteModal.close();
   });
 
   document.getElementById('saveRefNote').addEventListener('click', () => {
     applyRefAdvance({ note: refStepNoteInput.value.trim() || null });
-    hideRefNote();
+    refNoteModal.close();
   });
 
-  document.getElementById('closeRefNoteModal').addEventListener('click', hideRefNote);
-
-  refNoteModal.addEventListener('click', (e) => {
-    if (e.target === refNoteModal) {
-      applyRefAdvance({ note: null });
-      hideRefNote();
-    }
-  });
+  // Closing via the X, overlay click, or Escape cancels the advance.
+  document.getElementById('closeRefNoteModal').addEventListener('click', () => refNoteModal.close());
 
   // ----------------------------------------------------------
   // Backtrack: confirm, once per referral
