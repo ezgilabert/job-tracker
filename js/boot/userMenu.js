@@ -1,7 +1,7 @@
 // ============================================================
 // Boot: user menu (header dropdown).
 // Handles account display, theme/config shortcuts, login, logout,
-// and the ES/EN toggle.
+// the ES/EN toggle, and the print action.
 // ============================================================
 
 import { getSession, logout } from '../auth/session.js';
@@ -19,6 +19,7 @@ export function mountUserMenu(configStore) {
   const logoutBtn = document.getElementById('logoutBtn');
   const loginBtn = document.getElementById('loginBtn');
   const configBtn = document.getElementById('configBtn');
+  const printBtn = document.getElementById('printBtn');
   const userHeader = document.getElementById('userMenuHeader');
   const nameEl = document.getElementById('userMenuName');
   const emailEl = document.getElementById('userMenuEmail');
@@ -70,6 +71,19 @@ export function mountUserMenu(configStore) {
   if (configBtn) {
     configBtn.addEventListener('click', () => {
       menu.classList.remove('open');
+    });
+  }
+
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      menu.classList.remove('open');
+      // Close any open modal (edit, history, etc.) so the print
+      // output shows only the two lists.
+      document.querySelectorAll('.modal-overlay.open').forEach(el => {
+        el.classList.remove('open');
+      });
+      // Give the DOM a tick to repaint before opening the print dialog.
+      setTimeout(() => window.print(), 100);
     });
   }
 

@@ -5,7 +5,8 @@
    Order matters:
      tokens must load first (defines the variables every other
      file references). reset then normalizes. Everything else
-     can be reordered freely.
+     can be reordered freely. print.css is scoped inside an
+     @media print block, so its position doesn't matter.
    ============================================================ */
 
 @import url('./tokens.css');
@@ -28,3 +29,4 @@
 @import url('./feedback.css');
 @import url('./responsive.css');
 @import url('./auth.css');
+@import url('./print.css');

@@ -10,6 +10,7 @@ export const en = {
   'action.config': 'Settings',
   'action.theme': 'Switch theme',
   'action.language': 'Switch language',
+  'action.print': 'Print / PDF',
 
   'auth.documentTitle': 'Job Tracker · Sign in',
   'auth.tab.login': 'Sign in',

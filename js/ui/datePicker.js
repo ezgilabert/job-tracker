@@ -3,6 +3,7 @@
 // ============================================================
 
 import { t } from '../i18n.js';
+import { toLocalISO } from '../utils.js';
 
 /**
  * Usage:
@@ -113,7 +114,7 @@ export class DatePicker {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString().slice(0, 10);
+    const todayStr = toLocalISO(today);
 
     const isCurrentMonth =
       year === today.getFullYear() && month === today.getMonth();
@@ -204,7 +205,11 @@ export class DatePicker {
     }
     const d = new Date();
     if (s !== 'today') d.setDate(d.getDate() + parseInt(s, 10));
-    const dateStr = d.toISOString().slice(0, 10);
+
+    // Use the local date so shortcuts don't shift by one day near
+    // midnight in non-UTC timezones.
+    const dateStr = toLocalISO(d);
+
     this.viewMonth = new Date(dateStr + 'T00:00:00');
     this.viewMonth.setDate(1);
     this.setValue(dateStr);

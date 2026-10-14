@@ -1,0 +1,202 @@
+/* ============================================================
+   Print: stylesheet used when the user prints or saves to PDF.
+   Hides interactive chrome, keeps the two lists readable on
+   paper, avoids breaking cards across pages.
+   ============================================================ */
+
+@media print {
+  /* Force colors to render (badges, status bars). */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Page margins — keep it tight so more cards fit per page. */
+  @page {
+    margin: 1.25cm;
+  }
+
+  /* ============================================================
+     Reset backgrounds and shadows for paper.
+     ============================================================ */
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Kill decorative backgrounds (aurora, cosmos, etc.). */
+  body::before,
+  body::after {
+    display: none !important;
+  }
+
+  /* ============================================================
+     Hide the interactive chrome.
+     ============================================================ */
+  header,
+  .header-actions,
+  .user-menu,
+  .loading-overlay,
+  .toast-container,
+  .theme-ripple,
+  .reset-overlay,
+  .modal-overlay,
+  .dash-container,
+  .form-actions,
+  .toolbar,
+  .ref-toolbar,
+  .filters,
+  .ref-filters,
+  .section-card-actions,
+  .icon-btn,
+  .action-btn,
+  .drag-handle,
+  .job-actions,
+  .ref-actions,
+  .wf-section,
+  .workflow-status,
+  .ref-workflow,
+  .ref-top-progress,
+  .status-clickable,
+  .job-ref-chip,
+  .job-contact-chip .chip-arrow,
+  .job a[target="_blank"] {
+    display: none !important;
+  }
+
+  /* Remove the "New application" and "New referral" form sections
+     entirely — they don't belong in a printout. */
+  #jobForm,
+  #refForm,
+  #jobFormBody,
+  #refFormBody {
+    display: none !important;
+  }
+
+  /* Collapse the section-card header: the counter/chevron are gone,
+     so just show the title as a section heading. */
+  .section-card {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .section-card-header {
+    background: transparent !important;
+    border-bottom: 1.5px solid #cccccc !important;
+    padding: 0.25rem 0 0.6rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .section-icon {
+    background: transparent !important;
+    border: none !important;
+    color: #333333 !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .section-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .section-card-body {
+    padding: 0 !important;
+  }
+
+  /* ============================================================
+     Cards: keep them on one page when possible.
+     ============================================================ */
+  #list,
+  #refList {
+    display: block !important;
+    gap: 0 !important;
+  }
+
+  .job,
+  .referido {
+    background: #ffffff !important;
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    padding: 0.75rem 0.9rem 0.75rem 1.1rem !important;
+    margin-bottom: 0.75rem !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: visible !important;
+  }
+
+  /* Keep the left color strip visible (it encodes status). */
+  .job::before,
+  .referido::before {
+    width: 4px !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove the animation shimmer on the progress bar. */
+  .progress-fill {
+    animation: none !important;
+  }
+
+  /* ============================================================
+     Typography: readable at print sizes.
+     ============================================================ */
+  .job-info h3,
+  .ref-top h4 {
+    font-size: 12pt !important;
+    color: #111111 !important;
+  }
+
+  .job-info h3 .company {
+    font-size: 10.5pt !important;
+    color: #555555 !important;
+  }
+
+  .job-meta,
+  .ref-meta {
+    font-size: 9.5pt !important;
+    color: #444444 !important;
+  }
+
+  .job-notes,
+  .ref-notes {
+    font-size: 9.5pt !important;
+    color: #333333 !important;
+  }
+
+  .badge,
+  .ref-status-badge,
+  .ref-relationship-badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 8pt !important;
+  }
+
+  /* Links print as plain text with the URL in parentheses for reference. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #666666;
+  }
+
+  /* ============================================================
+     Timeline modal — if the user opens it before printing, keep it readable.
+     ============================================================ */
+  .modal {
+    box-shadow: none !important;
+    border: 1px solid #cccccc !important;
+    max-height: none !important;
+  }
+
+  /* ============================================================
+     Print page breaks between the two major sections.
+     ============================================================ */
+  .section-card + .section-card {
+    break-before: auto;
+  }
+}

@@ -40,10 +40,18 @@ export function formatDateTime(isoString) {
   });
 }
 
+/**
+ * Returns the local YYYY-MM-DD string for a given Date.
+ * Uses the timezone offset so the result matches the user's
+ * calendar day, not the UTC day.
+ */
+export function toLocalISO(date = new Date()) {
+  const off = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - off).toISOString().slice(0, 10);
+}
+
 export function todayISO() {
-  const d = new Date();
-  const off = d.getTimezoneOffset() * 60000;
-  return new Date(d.getTime() - off).toISOString().slice(0, 10);
+  return toLocalISO(new Date());
 }
 
 /**
