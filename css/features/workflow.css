@@ -392,3 +392,30 @@
   color: var(--text-muted);
   line-height: 1.4;
 }
+
+/* ============================================================
+   Workflow SVG icons
+   Used by jobCard.js + refCard.js (status clickable, actions).
+   The sprite is referenced via <use>, so sizing happens here.
+   ============================================================ */
+
+/* Status clickable ("View history") */
+.status-clickable > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Main workflow buttons (job + ref) */
+.wf-btn-big > svg,
+.wf-btn-secondary > svg,
+.wf-btn-skip > svg,
+.wf-close-btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: block;
+}

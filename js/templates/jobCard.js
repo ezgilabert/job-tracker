@@ -9,6 +9,7 @@ import {
 } from '../app/selectors.js';
 import { escapeHtml, daysSince, formatDate, ensureArray } from '../app/utils.js';
 import { renderSteps } from './steps.js';
+import { icon } from './icon.js';
 import { t, tState, tStateShort } from '../i18n/index.js';
 
 /**
@@ -21,14 +22,14 @@ export function renderJobCard(job, ctx = {}) {
 
   const days = daysSince(job.date);
   const daysTxt = days !== null
-    ? `<span>⏱️ ${t(days === 1 ? 'job.daysAgoOne' : 'job.daysAgoMany', { n: days })}</span>`
+    ? `<span>${icon('icon-clock')}${escapeHtml(t(days === 1 ? 'job.daysAgoOne' : 'job.daysAgoMany', { n: days }))}</span>`
     : '';
-  const dateTxt = job.date ? `<span>📅 ${formatDate(job.date)}</span>` : '';
+  const dateTxt = job.date ? `<span>${icon('icon-calendar')}${escapeHtml(formatDate(job.date))}</span>` : '';
   const salaryTxt = renderSalaryTag(job);
   const workModeTxt = renderWorkModeTag(job);
   const contactTxt = renderContactChip(job);
   const linkTxt = job.link
-    ? `<a href="${escapeHtml(job.link)}" target="_blank" rel="noopener">${escapeHtml(t('job.viewOffer'))} ↗</a>`
+    ? `<a href="${escapeHtml(job.link)}" target="_blank" rel="noopener">${escapeHtml(t('job.viewOffer'))}${icon('icon-external-link')}</a>`
     : '';
   const notesTxt = job.notes
     ? `<div class="job-notes">${escapeHtml(job.notes)}</div>`
@@ -67,7 +68,7 @@ export function renderJobCard(job, ctx = {}) {
   const confettiHtml = offerConfirmed ? renderConfetti() : '';
   const congratsBannerHtml = offerConfirmed
     ? `<div class="congrats-banner">
-         <span class="congrats-emoji">🎉</span>
+         <span class="congrats-emoji" aria-hidden="true">${icon('icon-star')}</span>
          <div class="congrats-text">
            <strong>${escapeHtml(t('job.offerConfirmed.title'))}</strong>
            <span>${escapeHtml(t('job.offerConfirmed.subtitle', { company: job.company }))}</span>
@@ -100,14 +101,15 @@ export function renderJobCard(job, ctx = {}) {
               class="status-clickable"
               data-action="history"
               title="${escapeHtml(t('job.historyTitle'))}">
-        🕒 ${escapeHtml(t('job.history'))} · <strong>${currentIdx + 1}/${WORKFLOW_STEPS.length}</strong> ${escapeHtml(t('job.historyStages'))}
+        ${icon('icon-clock')}
+        <span>${escapeHtml(t('job.history'))} · <strong>${currentIdx + 1}/${WORKFLOW_STEPS.length}</strong> ${escapeHtml(t('job.historyStages'))}</span>
       </button>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
     </div>
   `;
 
   const badgeHtml = offerConfirmed
-    ? `<span class="badge badge-confirmed" data-status="Offer">✓ ${escapeHtml(tState(job.status))}</span>`
+    ? `<span class="badge badge-confirmed" data-status="Offer">${escapeHtml(tState(job.status))}</span>`
     : `<span class="badge" data-status="${escapeHtml(job.status)}">${escapeHtml(tState(job.status))}</span>`;
 
   return `
@@ -118,7 +120,7 @@ export function renderJobCard(job, ctx = {}) {
          style="animation-delay:${Math.min(index * 40, 400)}ms">
 
       ${confettiHtml}
-      <div class="drag-handle" title="${escapeHtml(t('job.dragHandle'))}">⠿</div>
+      <div class="drag-handle" title="${escapeHtml(t('job.dragHandle'))}">${icon('icon-grip-vertical')}</div>
       ${offerRibbon}
 
       <div class="job-header">
@@ -128,10 +130,10 @@ export function renderJobCard(job, ctx = {}) {
         </div>
         <div class="job-actions">
           <button class="action-btn" title="${escapeHtml(t('job.editTitle'))}" data-action="edit" aria-label="${escapeHtml(t('job.editTitle'))}">
-            <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-pencil"/></svg>
+            ${icon('icon-pencil')}
           </button>
           <button class="action-btn danger" title="${escapeHtml(t('job.deleteTitle'))}" data-action="delete" aria-label="${escapeHtml(t('job.deleteTitle'))}">
-            <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-trash"/></svg>
+            ${icon('icon-trash')}
           </button>
         </div>
       </div>
@@ -153,9 +155,7 @@ export function renderJobCard(job, ctx = {}) {
 }
 
 // ------------------------------------------------------------
-// Salary: "💰 USD 3,000–4,000 · per hour"
-// Supports legacy data where the salary already includes the
-// currency code.
+// Salary
 // ------------------------------------------------------------
 function renderSalaryTag(job) {
   if (!job.salary) return '';
@@ -170,28 +170,28 @@ function renderSalaryTag(job) {
 
   const hourlyTxt = job.hourlySalary ? ' · ' + t('job.perHour') : '';
 
-  return `<span>💰 ${codePrefix}${escapeHtml(raw)}${hourlyTxt}</span>`;
+  return `<span>${icon('icon-dollar')}${codePrefix}${escapeHtml(raw)}${hourlyTxt}</span>`;
 }
 
 // ------------------------------------------------------------
-// Work mode: "🏢 On-site" / "🏠 Remote" / "🔄 Hybrid · 3d"
+// Work mode
 // ------------------------------------------------------------
 function renderWorkModeTag(job) {
   if (job.workMode === 'onsite') {
-    return `<span>🏢 ${escapeHtml(t('workMode.onsite'))}</span>`;
+    return `<span>${icon('icon-building')}${escapeHtml(t('workMode.onsite'))}</span>`;
   }
   if (job.workMode === 'remote') {
-    return `<span>🏠 ${escapeHtml(t('workMode.remote'))}</span>`;
+    return `<span>${icon('icon-home')}${escapeHtml(t('workMode.remote'))}</span>`;
   }
   if (job.workMode === 'hybrid') {
     const days = Number(job.hybridOfficeDays) || 3;
-    return `<span>🔄 ${escapeHtml(t('workMode.hybridShort', { n: days }))}</span>`;
+    return `<span>${icon('icon-refresh-cw')}${escapeHtml(t('workMode.hybridShort', { n: days }))}</span>`;
   }
   return '';
 }
 
 // ------------------------------------------------------------
-// Contact platform → sprite id
+// Contact
 // ------------------------------------------------------------
 const CONTACT_SPRITE_ID = {
   linkedin: 'icon-linkedin',
@@ -232,7 +232,7 @@ function renderContactChip(job) {
   const href = link ? buildContactHref(platform, link) : null;
 
   if (!href) {
-    return `<span>👤 ${escapeHtml(name || link)}</span>`;
+    return `<span>${icon('icon-account')}${escapeHtml(name || link)}</span>`;
   }
 
   const label = name || t('job.contactoContactar');
@@ -241,9 +241,9 @@ function renderContactChip(job) {
              target="_blank"
              rel="noopener"
              title="${escapeHtml(t('job.contactoAbrirTitle', { name: name || '' }))}">
-    <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#${spriteId}"/></svg>
+    ${icon(spriteId)}
     <span class="chip-name">${escapeHtml(label)}</span>
-    <span class="chip-arrow">↗</span>
+    <span class="chip-arrow">${icon('icon-external-link')}</span>
   </a>`;
 }
 
@@ -268,13 +268,14 @@ function renderOpenActions(job, currentIdx, offerConfirmed = false) {
         <div class="wf-section-label">${escapeHtml(t('job.offerConfirmed.label'))}</div>
         <div class="wf-main-actions">
           <div class="offer-confirmed-pill">
-            <span class="pill-emoji">🏆</span>
+            ${icon('icon-trophy')}
             <span>${escapeHtml(t('job.offerConfirmed.status'))}</span>
           </div>
         </div>
         <div class="wf-close-actions">
           <button class="wf-close-btn" data-action="unconfirm-offer">
-            ↺ ${escapeHtml(t('job.unconfirmOffer'))}
+            ${icon('icon-rotate-ccw')}
+            <span>${escapeHtml(t('job.unconfirmOffer'))}</span>
           </button>
         </div>
       </div>
@@ -348,7 +349,10 @@ function renderClosedActions(job) {
           ${escapeHtml(t('job.closedLabel'))} <strong>${escapeHtml(tState(job.status))}</strong>${date}
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-          <button class="status-clickable" data-action="history" title="${escapeHtml(t('job.historyTitle'))}">🕒 ${escapeHtml(t('job.history'))}</button>
+          <button class="status-clickable" data-action="history" title="${escapeHtml(t('job.historyTitle'))}">
+            ${icon('icon-clock')}
+            <span>${escapeHtml(t('job.history'))}</span>
+          </button>
           <button class="wf-btn-secondary" data-action="reopen">${escapeHtml(t('job.reopen'))}</button>
         </div>
       </div>

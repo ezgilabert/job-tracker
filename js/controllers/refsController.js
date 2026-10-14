@@ -27,18 +27,12 @@ import { withUndo } from '../app/undo.js';
  * @param {import('../app/store.js').Store} configStore
  */
 export function mountRefsController(jobsStore, refsStore, modals, configStore) {
-  // ----------------------------------------------------------
-  // Local UI state
-  // ----------------------------------------------------------
   let currentFilter = 'all';
   let searchTerm = '';
 
   let relationshipChips = null;
   let statusChips = null;
 
-  // ----------------------------------------------------------
-  // Collapsibles
-  // ----------------------------------------------------------
   const refFormToggleBtn = document.getElementById('refFormToggleBtn');
   const refFormBody = document.getElementById('refFormBody');
   const refToggleBtn = document.getElementById('refToggleBtn');
@@ -103,14 +97,13 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     renderDashboard(container, {
       style,
       kind: 'refs',
-      icon: '🤝',
       label: t('refs.title'),
       total,
       active,
       inProcess,
       closed: notApplicable,
       highlight: hired,
-      highlightIcon: '🎉',
+      highlightIcon: 'icon-user-check',
       highlightLabel: t('dash.refs.highlight'),
       highlightSub: t('dash.refs.highlightSub', { pct: conversionRate }),
       labels: {
@@ -127,7 +120,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       },
       heatmap,
       topLabel: t('dash.refs.top'),
-      topIcon: '🤝',
+      topIcon: 'icon-users',
       top,
       summary: t('dash.refs.summary', {
         total,
@@ -265,7 +258,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       refFormToggleBtn.classList.add('collapsed');
     }
 
-    showToast(t('toast.refAdded'), '✓');
+    showToast(t('toast.refAdded'), 'icon-check');
   });
 
   // ----------------------------------------------------------
@@ -328,7 +321,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       refsStore,
       t('toast.refDeleted'),
       () => refsStore.update(refs => refs.filter(x => x.id !== id)),
-      '🗑️'
+      'icon-trash'
     );
   }
 
@@ -388,7 +381,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
           syncLinkedJobToOffer(r.linkedJobId, r.name);
         }
       },
-      '→'
+      'icon-arrow-right'
     );
 
     if (nextStatus === 'In Process' && prevStatus !== 'In Process') {
@@ -442,12 +435,12 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     if (!r || isRefClosed(r.status)) return;
 
     if (r.linkedJobId) {
-      showToast(t('ref.lockedBackTitle'), '🔒');
+      showToast(t('ref.lockedBackTitle'), 'icon-lock');
       return;
     }
 
     if (r.wentBack) {
-      showToast(t('toast.alreadyWentBackRef'), '!');
+      showToast(t('toast.alreadyWentBackRef'), 'icon-alert-triangle');
       return;
     }
 
@@ -491,7 +484,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       return { ...x, status: prevStatus, wentBack: true, history };
     }));
 
-    showToast(t('toast.backTo', { name: r.name, status: tRefState(prevStatus) }), '←');
+    showToast(t('toast.backTo', { name: r.name, status: tRefState(prevStatus) }), 'icon-arrow-left');
   }
 
   // ----------------------------------------------------------
@@ -521,7 +514,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
         });
         return { ...x, status: 'Not Applicable', history };
       })),
-      '🚫'
+      'icon-ban'
     );
   }
 
@@ -540,7 +533,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       return { ...x, status: 'Pending', history };
     }));
 
-    showToast(t('toast.refReopened'), '↻');
+    showToast(t('toast.refReopened'), 'icon-rotate-cw');
   }
 
   // ----------------------------------------------------------
@@ -568,7 +561,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
     const target = refList.querySelector(`.referido[data-id="${refId}"]`);
     if (target) highlightAndScroll(target);
-    else showToast(t('toast.refNotFound'), '!');
+    else showToast(t('toast.refNotFound'), 'icon-alert-triangle');
   });
 
   // ----------------------------------------------------------

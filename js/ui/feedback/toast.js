@@ -5,6 +5,12 @@
 // Action toast: shows a single button, resolves on click or
 // timeout. Only one action toast should be live at a time — the
 // caller (js/app/undo.js) is responsible for that.
+//
+// The icon parameter accepts two shapes:
+//   - A sprite name:  'icon-check'  → renders an <svg><use>
+//   - Any string:     '✓'           → renders as text (backwards
+//                                      compatible with older call
+//                                      sites during migration)
 // ============================================================
 
 import { escapeHtml } from '../../app/utils.js';
@@ -23,19 +29,32 @@ function getContainer() {
 }
 
 /**
+ * Renders the toast icon slot: SVG sprite reference or plain text.
+ * The regex guard prevents any state-derived string from injecting
+ * arbitrary markup through the sprite path.
+ */
+function renderIcon(icon) {
+  if (typeof icon !== 'string' || !icon) return '';
+  if (/^icon-[a-z0-9-]+$/.test(icon)) {
+    return `<svg class="toast-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="./assets/icons.svg#${icon}"/></svg>`;
+  }
+  return `<span class="toast-icon" aria-hidden="true">${escapeHtml(icon)}</span>`;
+}
+
+/**
  * @param {string} message
- * @param {string} icon  short emoji
+ * @param {string} icon  sprite name ('icon-check') or short text ('✓')
  * @param {{ duration?: number }} opts
  * @returns {{ dismiss: () => void }}
  */
-export function showToast(message, icon = '✓', opts = {}) {
+export function showToast(message, icon = 'icon-check', opts = {}) {
   const { duration = 2200 } = opts;
   const container = getContainer();
 
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.innerHTML = `
-    <span class="toast-icon">${escapeHtml(icon)}</span>
+    ${renderIcon(icon)}
     <span class="toast-message">${escapeHtml(message)}</span>
   `;
   container.appendChild(toast);
@@ -57,10 +76,6 @@ export function showToast(message, icon = '✓', opts = {}) {
 /**
  * Action toast: message + one button.
  *
- * The button is the only interactive element. Clicking it runs
- * `onAction()` and dismisses the toast. The toast also auto-
- * dismisses after `duration` without running the action.
- *
  * @param {string} message
  * @param {string} icon
  * @param {{
@@ -78,7 +93,7 @@ export function showActionToast(message, icon, opts) {
   toast.className = 'toast toast-action';
   toast.style.setProperty('--toast-duration', `${duration}ms`);
   toast.innerHTML = `
-    <span class="toast-icon">${escapeHtml(icon)}</span>
+    ${renderIcon(icon)}
     <span class="toast-message">${escapeHtml(message)}</span>
     <button type="button" class="toast-action-btn">${escapeHtml(actionLabel)}</button>
   `;

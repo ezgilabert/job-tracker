@@ -3,74 +3,73 @@
 // ============================================================
 
 export const WORKFLOW_STEPS = [
-  { id: 'Saved',               short: 'Saved',       icon: '🔖' },
-  { id: 'Applied',             short: 'Applied',     icon: '📤' },
-  { id: 'Contact',             short: 'Contact',     icon: '💬' },
-  { id: 'HR Interview',        short: 'HR',          icon: '👤' },
-  { id: 'Technical Challenge', short: 'Challenge',   icon: '🧪' },
-  { id: 'Live Coding',         short: 'Live Coding', icon: '⌨️' },
-  { id: 'Technical Interview', short: 'Technical',   icon: '💻' },
-  { id: 'Client Interview',    short: 'Client Int.', icon: '🤝' },
-  { id: 'Client Chat',         short: 'Client Chat', icon: '☕' },
-  { id: 'Final Interview',     short: 'Final',       icon: '🎤' },
-  { id: 'References',          short: 'References',  icon: '📞' },
-  { id: 'Negotiation',         short: 'Negotiation', icon: '💼' },
-  { id: 'Offer',               short: 'Offer',       icon: '🎉' },
+  { id: 'Saved',               short: 'Saved',       icon: 'icon-bookmark' },
+  { id: 'Applied',             short: 'Applied',     icon: 'icon-send' },
+  { id: 'Contact',             short: 'Contact',     icon: 'icon-message-circle' },
+  { id: 'HR Interview',        short: 'HR',          icon: 'icon-account' },
+  { id: 'Technical Challenge', short: 'Challenge',   icon: 'icon-flask' },
+  { id: 'Live Coding',         short: 'Live Coding', icon: 'icon-keyboard' },
+  { id: 'Technical Interview', short: 'Technical',   icon: 'icon-monitor' },
+  { id: 'Client Interview',    short: 'Client Int.', icon: 'icon-users' },
+  { id: 'Client Chat',         short: 'Client Chat', icon: 'icon-coffee' },
+  { id: 'Final Interview',     short: 'Final',       icon: 'icon-mic' },
+  { id: 'References',          short: 'References',  icon: 'icon-phone' },
+  { id: 'Negotiation',         short: 'Negotiation', icon: 'icon-briefcase' },
+  { id: 'Offer',               short: 'Offer',       icon: 'icon-trophy' },
 ];
 
 export const CLOSED_STATES = ['Rejected', 'Ghosted', 'Discarded'];
 export const ALL_STATES = [...WORKFLOW_STEPS.map(s => s.id), ...CLOSED_STATES];
 
 export const STATE_ICONS = {
-  'Saved':               '🔖',
-  'Applied':             '📤',
-  'Contact':             '💬',
-  'HR Interview':        '👤',
-  'Technical Challenge': '🧪',
-  'Live Coding':         '⌨️',
-  'Technical Interview': '💻',
-  'Client Interview':    '🤝',
-  'Client Chat':         '☕',
-  'Final Interview':     '🎤',
-  'References':          '📞',
-  'Negotiation':         '💼',
-  'Offer':               '🎉',
-  'Rejected':            '✕',
-  'Ghosted':             '👻',
-  'Discarded':           '🚫',
+  'Saved':               'icon-bookmark',
+  'Applied':             'icon-send',
+  'Contact':             'icon-message-circle',
+  'HR Interview':        'icon-account',
+  'Technical Challenge': 'icon-flask',
+  'Live Coding':         'icon-keyboard',
+  'Technical Interview': 'icon-monitor',
+  'Client Interview':    'icon-users',
+  'Client Chat':         'icon-coffee',
+  'Final Interview':     'icon-mic',
+  'References':          'icon-phone',
+  'Negotiation':         'icon-briefcase',
+  'Offer':               'icon-trophy',
+  'Rejected':            'icon-x-circle',
+  'Ghosted':             'icon-ghost',
+  'Discarded':           'icon-ban',
 };
 
 export function getStateIcon(status) {
-  return STATE_ICONS[status] || '•';
+  return STATE_ICONS[status] || 'icon-sparkle';
 }
 
 export const REF_WORKFLOW_STEPS = [
-  { id: 'Pending',         short: 'Pending' },
-  { id: 'Contacted',       short: 'Contacted' },
-  { id: 'Referred',        short: 'Referred' },
-  { id: 'In Process',      short: 'In Process' },
-  { id: 'Hired',           short: 'Hired' },
+  { id: 'Pending',         short: 'Pending',   icon: 'icon-clock' },
+  { id: 'Contacted',       short: 'Contacted', icon: 'icon-message-circle' },
+  { id: 'Referred',        short: 'Referred',  icon: 'icon-check' },
+  { id: 'In Process',      short: 'In Process', icon: 'icon-refresh-cw' },
+  { id: 'Hired',           short: 'Hired',     icon: 'icon-user-check' },
 ];
 
 export const REF_CLOSED_STATES = ['Not Applicable'];
 export const REF_ALL_STATES = [...REF_WORKFLOW_STEPS.map(s => s.id), ...REF_CLOSED_STATES];
 
 export const REF_STATE_ICONS = {
-  'Pending':        '⏳',
-  'Contacted':      '💬',
-  'Referred':       '✅',
-  'In Process':     '⏱️',
-  'Hired':          '🎉',
-  'Not Applicable': '🚫',
+  'Pending':        'icon-clock',
+  'Contacted':      'icon-message-circle',
+  'Referred':       'icon-check',
+  'In Process':     'icon-refresh-cw',
+  'Hired':          'icon-user-check',
+  'Not Applicable': 'icon-ban',
 };
 
 export function getRefStateIcon(status) {
-  return REF_STATE_ICONS[status] || '•';
+  return REF_STATE_ICONS[status] || 'icon-sparkle';
 }
 
 // ============================================================
 // Close reasons: i18n keys per close status.
-// Actual strings live in js/i18n/es.js and js/i18n/en.js.
 // ============================================================
 export const CLOSE_REASON_KEYS = {
   'Offer': [
@@ -103,33 +102,18 @@ export const LOGO_OPTIONS = [
     id: 'target',
     label: 'Target',
     description: 'Arrow pointing to the center',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="9"/>
-      <circle cx="12" cy="12" r="5"/>
-      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-      <path d="M12 3 L19 10"/>
-      <path d="M15 4 L20 9 L19 10 L14 5 Z" fill="currentColor" stroke="none"/>
-    </svg>`,
+    svg: `<svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-target"/></svg>`,
   },
   {
     id: 'briefcase',
     label: 'Briefcase',
     description: 'Classic work icon',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="7" width="18" height="13" rx="2"/>
-      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-      <path d="M3 13h18"/>
-      <path d="M12 13v2"/>
-    </svg>`,
+    svg: `<svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-briefcase"/></svg>`,
   },
 ];
 
 export const DEFAULT_LOGO = 'target';
 export const DEFAULT_LANG = 'es';
-
-// ============================================================
-// Backgrounds
-// ============================================================
 
 export const BACKGROUND_OPTIONS = [
   { id: 'aurora',  label: 'Aurora',    description: 'Animated soft color blobs' },
@@ -155,22 +139,12 @@ export function applyBackground(bgId) {
   }
 }
 
-// ============================================================
-// Dashboard styles
-// ============================================================
-
 export const DASHBOARD_STYLES = [
-  'sparklines',
-  'modular',
-  'minimal',
-  'compact',
-  'circular',
-  'heatmap',
+  'sparklines', 'modular', 'minimal', 'compact', 'circular', 'heatmap',
 ];
 
 export const DEFAULT_DASHBOARD_STYLE = 'sparklines';
 
-/** Metadata used by the config panel to render the style picker. */
 export const DASHBOARD_STYLE_META = [
   { id: 'sparklines', labelKey: 'config.dashboard.sparklines', descKey: 'config.dashboard.sparklinesDesc', preview: 'dash-prev-spark' },
   { id: 'modular',    labelKey: 'config.dashboard.modular',    descKey: 'config.dashboard.modularDesc',    preview: 'dash-prev-mod' },
@@ -180,22 +154,18 @@ export const DASHBOARD_STYLE_META = [
   { id: 'heatmap',    labelKey: 'config.dashboard.heatmap',    descKey: 'config.dashboard.heatmapDesc',    preview: 'dash-prev-heatmap' },
 ];
 
-// ============================================================
-// Roles
-// ============================================================
-
 export const ROLE_TAGS_LIST = [
-  { id: 'programmer', label: 'Programmer',  icon: '💻' },
-  { id: 'frontend',   label: 'Frontend',    icon: '🎨' },
-  { id: 'backend',    label: 'Backend',     icon: '⚙️' },
-  { id: 'fullstack',  label: 'Full Stack',  icon: '🧩' },
-  { id: 'mobile',     label: 'Mobile',      icon: '📱' },
-  { id: 'qa',         label: 'QA',          icon: '🧪' },
-  { id: 'devops',     label: 'DevOps',      icon: '🚀' },
-  { id: 'data',       label: 'Data / AI',   icon: '📊' },
-  { id: 'security',   label: 'Security',    icon: '🔒' },
-  { id: 'leadership', label: 'Leadership',  icon: '👑' },
-  { id: 'gamedev',    label: 'Game Dev',    icon: '🎮' },
+  { id: 'programmer', label: 'Programmer',  icon: 'icon-monitor' },
+  { id: 'frontend',   label: 'Frontend',    icon: 'icon-palette' },
+  { id: 'backend',    label: 'Backend',     icon: 'icon-settings' },
+  { id: 'fullstack',  label: 'Full Stack',  icon: 'icon-package' },
+  { id: 'mobile',     label: 'Mobile',      icon: 'icon-keyboard' },
+  { id: 'qa',         label: 'QA',          icon: 'icon-flask' },
+  { id: 'devops',     label: 'DevOps',      icon: 'icon-refresh-cw' },
+  { id: 'data',       label: 'Data / AI',   icon: 'icon-bar-chart' },
+  { id: 'security',   label: 'Security',    icon: 'icon-lock' },
+  { id: 'leadership', label: 'Leadership',  icon: 'icon-trophy' },
+  { id: 'gamedev',    label: 'Game Dev',    icon: 'icon-flame' },
 ];
 
 export const NO_ROLE_VALUE = 'Not specified';
@@ -253,21 +223,12 @@ export const ROLE_TAGS = {
   'Tech Lead':                  ['leadership'],
 };
 
-export const ROLE_ICONS = {
-  'Frontend': '🎨', 'Backend': '⚙️', 'Full Stack': '🧩', 'Mobile': '📱',
-  'QA': '🧪', 'DevOps': '🚀', 'SRE': '🛠️', 'Data': '📊',
-  'Machine Learning': '🤖', 'AI': '🧠', 'Product Manager': '📋',
-  'Product Owner': '📋', 'Project Manager': '📋', 'Product Designer': '🎯',
-  'UX': '🎨', 'UI': '🎨', 'Tech Lead': '👑', 'Engineering Manager': '👔',
-  'CTO': '🏆', 'Scrum Master': '🔄', 'Business Analyst': '📈',
-  'Solutions Architect': '🏗️', 'Security': '🔒', 'Cloud': '☁️',
-  'Platform': '🧱',
-};
+export const ROLE_ICONS = {};
 
 export const CONFIG_FILTER_META = {
-  'all':    { label: 'All',    icon: '🗂️' },
-  'active': { label: 'Active', icon: '🔥' },
-  'closed': { label: 'Closed', icon: '📦' },
+  'all':    { label: 'All',    icon: 'icon-clipboard' },
+  'active': { label: 'Active', icon: 'icon-flame' },
+  'closed': { label: 'Closed', icon: 'icon-x-circle' },
 };
 
 export function getDefaultConfig() {
@@ -322,13 +283,9 @@ export const STORAGE_KEYS = {
 export const STORAGE_VERSION = 5;
 export const CONFIG_VERSION = 3;
 
-// ============================================================
-// Backup / Import
-// ============================================================
 export const BACKUP_APP_ID = 'jobTracker';
 export const BACKUP_VERSION = 1;
 
-// Sample data shown to first-time users.
 export const SAMPLE_JOBS = [
   {
     id: 1,

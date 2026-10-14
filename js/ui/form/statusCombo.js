@@ -11,6 +11,11 @@ import { WORKFLOW_STEPS, getStateIcon } from '../../app/constants.js';
 import { escapeHtml } from '../../app/utils.js';
 import { tState } from '../../i18n/index.js';
 
+function icon(name) {
+  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
+}
+
 export class StatusCombo {
   /**
    * @param {HTMLElement} comboEl  root .combo
@@ -121,9 +126,9 @@ export class StatusCombo {
   }
 
   _renderTrigger() {
-    const icon = getStateIcon(this.value);
+    const iconName = getStateIcon(this.value);
     const label = tState(this.value);
-    if (this.triggerIcon) this.triggerIcon.textContent = icon;
+    if (this.triggerIcon) this.triggerIcon.innerHTML = icon(iconName);
     if (this.triggerText) this.triggerText.textContent = label;
   }
 
@@ -132,7 +137,7 @@ export class StatusCombo {
     const current = this.value;
 
     this.dropdown.innerHTML = statuses.map(id => {
-      const icon = getStateIcon(id);
+      const iconName = getStateIcon(id);
       const label = tState(id);
       const isSelected = id === current;
       return `
@@ -141,7 +146,7 @@ export class StatusCombo {
                 data-value="${escapeHtml(id)}"
                 role="option"
                 aria-selected="${isSelected ? 'true' : 'false'}">
-          <span class="combo-option-icon">${icon}</span>
+          <span class="combo-option-icon">${icon(iconName)}</span>
           <span class="combo-option-text">${escapeHtml(label)}</span>
         </button>
       `;

@@ -15,6 +15,22 @@ export function uid(prefix = 'd') {
 }
 
 /**
+ * Renders an SVG sprite reference as an inline HTML string.
+ * Centralizes the sprite path and prevents accidental XSS if a
+ * caller ever passes a value from state — only names that match
+ * `icon-xxx` survive the regex guard.
+ *
+ * @param {string} name       e.g. 'icon-clipboard'
+ * @param {string} [className] optional class on the <svg>
+ * @returns {string} inline HTML string (or '' if name is invalid)
+ */
+export function icon(name, className = '') {
+  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
+  const cls = className ? ` class="${className}"` : '';
+  return `<svg${cls} viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
+}
+
+/**
  * Builds the SVG path for a sparkline from an array of numbers.
  * Smooth curve using quadratic segments between points.
  */
@@ -45,6 +61,8 @@ export function buildSparkPath(values, width = 100, height = 32) {
  * Summary strip shown below the dashboard body (all 6 styles).
  * The `data.summary` field is trusted HTML (built by the caller
  * via i18n with escaped placeholders).
+ *
+ * Icon is a sprite reference (was an emoji span before).
  */
 export function renderSummary(container, data) {
   if (!data.summary) return;
@@ -52,7 +70,7 @@ export function renderSummary(container, data) {
   const strip = document.createElement('div');
   strip.className = 'dash-strip';
   strip.innerHTML = `
-    <span class="dash-strip-icon">📈</span>
+    <svg class="dash-strip-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-trending-up"/></svg>
     <span class="dash-strip-text">${data.summary}</span>
   `;
   container.appendChild(strip);

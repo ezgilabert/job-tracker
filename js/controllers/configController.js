@@ -21,6 +21,14 @@ import {
   SUPPORTED_LANGS, t, tState, tStateShort,
 } from '../i18n/index.js';
 
+// ------------------------------------------------------------
+// SVG sprite helper (config panel templates)
+// ------------------------------------------------------------
+function icon(name) {
+  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
+}
+
 /**
  * @param {import('../app/store.js').Store} configStore
  * @param {import('../app/store.js').Store} jobsStore
@@ -69,10 +77,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     return true;
   }
 
-  /**
-   * Normalizes ordering-sensitive arrays so the dirty check doesn't
-   * flag a change when the user just reorders the same set of items.
-   */
   function normalizeForDirtyCheck(cfg) {
     const copy = cloneConfig(cfg || {});
     if (copy.roles) {
@@ -185,7 +189,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     }
     saveDraft();
     closeDirect();
-    showToast(t('toast.savedConfig'), '✓');
+    showToast(t('toast.savedConfig'), 'icon-check');
   });
 
   modal.addEventListener('click', (e) => {
@@ -209,23 +213,20 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   document.getElementById('unsavedDiscard').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
     closeDirect();
-    showToast(t('toast.discardedChanges'), '↺');
+    showToast(t('toast.discardedChanges'), 'icon-rotate-ccw');
   });
   document.getElementById('unsavedSave').addEventListener('click', () => {
     unsavedModal.classList.remove('open');
     saveDraft();
     closeDirect();
-    showToast(t('toast.savedConfig'), '✓');
+    showToast(t('toast.savedConfig'), 'icon-check');
   });
   unsavedModal.addEventListener('click', (e) => {
     if (e.target === unsavedModal) unsavedModal.classList.remove('open');
   });
 
   // ----------------------------------------------------------
-  // Reset preferences (config only)
-  //   No page reload: resets the in-memory stores so subscribers
-  //   re-render. This avoids passing through the auth guard and
-  //   being redirected to login.html.
+  // Reset preferences
   // ----------------------------------------------------------
   document.getElementById('resetConfigBtn').addEventListener('click', async () => {
     const ok = await showConfirm({
@@ -253,14 +254,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ----------------------------------------------------------
-  // Delete data (jobs + refs). Config untouched. No reload.
+  // Delete data
   // ----------------------------------------------------------
   document.getElementById('resetDataBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
     const refsCount = (refsStore.get() || []).length;
 
     if (jobsCount === 0 && refsCount === 0) {
-      showToast(t('toast.dataResetEmpty'), '—');
+      showToast(t('toast.dataResetEmpty'), 'icon-alert-triangle');
       return;
     }
 
@@ -272,7 +273,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // Persist any pending config edits before closing.
     saveDraft();
 
     jobsStore.update(() => []);
@@ -283,14 +283,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     showToast(
       t('toast.dataReset', { jobs: jobsCount, refs: refsCount }),
-      '🗑️'
+      'icon-trash'
     );
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // ----------------------------------------------------------
-  // Reset everything (config + data + theme). No reload.
+  // Reset everything
   // ----------------------------------------------------------
   document.getElementById('resetAllBtn').addEventListener('click', async () => {
     const jobsCount = (jobsStore.get() || []).length;
@@ -304,7 +304,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     });
     if (!ok) return;
 
-    // Theme lives outside the config store, reset it manually.
     try { localStorage.setItem(STORAGE_KEYS.THEME, 'light'); } catch (_) {}
     document.documentElement.setAttribute('data-theme', 'light');
 
@@ -363,7 +362,8 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
         <button type="button"
                 class="config-tag ${isSelected ? 'selected' : ''}"
                 data-tag="${escapeHtml(tag.id)}">
-          <span>${tag.icon}</span> ${escapeHtml(tag.label)}
+          ${icon(tag.icon)}
+          <span>${escapeHtml(tag.label)}</span>
         </button>
       `;
     }).join('');
@@ -487,14 +487,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (!value) return;
     const alreadyExists = (draft.roles.custom || []).includes(value) || DEFAULT_ROLES.includes(value);
     if (alreadyExists) {
-      showToast(t('toast.roleExists'), '!');
+      showToast(t('toast.roleExists'), 'icon-alert-triangle');
       return;
     }
     draft.roles.custom = [...(draft.roles.custom || []), value];
     draft.roles.hidden = (draft.roles.hidden || []).filter(p => p !== value);
     newRoleInput.value = '';
     renderAll();
-    showToast(t('toast.roleAdded'), '✓');
+    showToast(t('toast.roleAdded'), 'icon-check');
   }
 
   document.getElementById('configAddRole').addEventListener('click', addCustomRole);
@@ -512,7 +512,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       return `
         <label class="config-check ${checked ? 'checked' : ''}">
           <input type="checkbox" data-status="${escapeHtml(s.id)}" ${checked ? 'checked' : ''}>
-          <span class="icon">${s.icon}</span>
+          ${icon(s.icon)}
           <span>${escapeHtml(tState(s.id))}</span>
         </label>
       `;
@@ -554,13 +554,14 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     container.innerHTML = active.map(id => {
       const step = WORKFLOW_STEPS.find(s => s.id === id);
-      const icon = step ? step.icon : '•';
+      const iconName = step ? step.icon : 'icon-sparkle';
       const isSelected = id === draft.defaultInitialStatus ? 'selected' : '';
       return `
         <button type="button"
                 class="config-default-btn ${isSelected}"
                 data-status="${escapeHtml(id)}">
-          ${icon} ${escapeHtml(tState(id))}
+          ${icon(iconName)}
+          <span>${escapeHtml(tState(id))}</span>
         </button>
       `;
     }).join('');
@@ -582,17 +583,17 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (meta) return { label: t('filter.' + id), icon: meta.icon, builtin: true };
     const step = WORKFLOW_STEPS.find(s => s.id === id);
     if (step) return { label: tStateShort(id), icon: step.icon, builtin: false };
-    return { label: id, icon: '•', builtin: false };
+    return { label: id, icon: 'icon-sparkle', builtin: false };
   }
 
   function renderFilters() {
     const filters = draft.filters || [];
     document.getElementById('configFilters').innerHTML = filters.map((f, idx) => {
-      const { label, icon, builtin } = getFilterLabel(f.id);
+      const { label, icon: iconName, builtin } = getFilterLabel(f.id);
       return `
         <div class="config-filter-item ${f.visible ? '' : 'hidden'}">
           <div class="drag-info">
-            <span class="icon">${icon}</span>
+            ${icon(iconName)}
             <span>${escapeHtml(label)}</span>
             ${builtin ? `<span class="builtin-tag">${escapeHtml(t('config.fixed'))}</span>` : ''}
           </div>
@@ -613,7 +614,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
                     class="config-icon-btn ${f.visible ? 'eye-on' : 'eye-off'}"
                     data-toggle="${idx}"
                     title="${f.visible ? t('config.hideFilter') : t('config.showFilter')}">
-              ${f.visible ? '👁' : '🚫'}
+              ${icon(f.visible ? 'icon-eye' : 'icon-eye-off')}
             </button>
           </div>
         </div>
@@ -719,7 +720,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   });
 
   // ------------------------------------------------------------
-  // Panel: Dashboard (jobs + refs)
+  // Panel: Dashboard
   // ------------------------------------------------------------
   const NEW_STYLES = ['minimal', 'compact', 'circular', 'heatmap'];
 
@@ -877,7 +878,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
       const file = profileFileInput.files?.[0];
       if (!file) return;
       if (file.size > 2 * 1024 * 1024) {
-        showToast(t('toast.profileImageTooBig'), '!');
+        showToast(t('toast.profileImageTooBig'), 'icon-alert-triangle');
         profileFileInput.value = '';
         return;
       }
@@ -906,7 +907,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
   }
 
   // ------------------------------------------------------------
-  // Panel: Data & Backup (Advanced)
+  // Panel: Data & Backup
   // ------------------------------------------------------------
   function renderBackupStats() {
     const container = document.getElementById('configBackupStats');
@@ -918,8 +919,8 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const refsCount = Array.isArray(refs) ? refs.length : 0;
 
     container.innerHTML = `
-      <span class="config-backup-stat">📋 ${jobsCount} ${escapeHtml(t('config.backup.jobs'))}</span>
-      <span class="config-backup-stat">🤝 ${refsCount} ${escapeHtml(t('config.backup.refs'))}</span>
+      <span class="config-backup-stat">${icon('icon-clipboard')} ${jobsCount} ${escapeHtml(t('config.backup.jobs'))}</span>
+      <span class="config-backup-stat">${icon('icon-users')} ${refsCount} ${escapeHtml(t('config.backup.refs'))}</span>
     `;
   }
 
@@ -959,7 +960,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast(t('toast.backupExported'), '⬇');
+    showToast(t('toast.backupExported'), 'icon-arrow-down');
   }
 
   function validateBackup(parsed) {
@@ -974,7 +975,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     try {
       text = await file.text();
     } catch {
-      showToast(t('toast.backupInvalid'), '⚠️');
+      showToast(t('toast.backupInvalid'), 'icon-alert-triangle');
       return;
     }
 
@@ -982,20 +983,17 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     try {
       parsed = JSON.parse(text);
     } catch {
-      showToast(t('toast.backupInvalid'), '⚠️');
+      showToast(t('toast.backupInvalid'), 'icon-alert-triangle');
       return;
     }
 
     if (!validateBackup(parsed)) {
-      showToast(t('toast.backupInvalid'), '⚠️');
+      showToast(t('toast.backupInvalid'), 'icon-alert-triangle');
       return;
     }
 
     const data = parsed.data || {};
 
-    // Route everything through the migration pipeline so backups
-    // made by older builds (Spanish keys / values) land in the
-    // current schema.
     const nextConfig = migrateConfig(data.config || {});
     const nextRefs   = Array.isArray(data.refs) ? data.refs.map(migrateRef) : [];
     const nextJobs   = Array.isArray(data.jobs) ? data.jobs.map(migrateJob) : [];
@@ -1027,7 +1025,7 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
 
     showToast(
       t('toast.backupImported', { jobs: jobsCount, refs: refsCount }),
-      '⬆'
+      'icon-arrow-up'
     );
   }
 
@@ -1050,10 +1048,6 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     if (modal.classList.contains('open') && draft) renderAll();
   });
 
-  // If the config store changes underneath while the modal is open
-  // (e.g. the role picker adds a role from outside), refresh the
-  // dirty badge so it reflects the current draft against the new
-  // stored value.
   configStore.subscribe(() => {
     if (modal.classList.contains('open') && draft) {
       updateBadge();

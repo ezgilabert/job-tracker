@@ -2,24 +2,71 @@
 // RoleCombo: filterable role dropdown.
 // ============================================================
 
-import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS, NO_ROLE_VALUE } from '../../app/constants.js';
+import { DEFAULT_ROLES, ROLE_TAGS, NO_ROLE_VALUE } from '../../app/constants.js';
 import { escapeHtml } from '../../app/utils.js';
 import { t } from '../../i18n/index.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
 
-function getRoleIcon(role) {
-  if (role === NO_ROLE_VALUE) return '❔';
-  for (const key in ROLE_ICONS) {
-    if (role.toLowerCase().includes(key.toLowerCase())) return ROLE_ICONS[key];
+// ------------------------------------------------------------
+// Icon lookup
+// ------------------------------------------------------------
+function icon(name) {
+  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
+}
+
+// Category id → sprite id (matches ROLE_TAGS_LIST in constants.js)
+const TAG_ICON = {
+  programmer: 'icon-monitor',
+  frontend:   'icon-palette',
+  backend:    'icon-settings',
+  fullstack:  'icon-package',
+  mobile:     'icon-keyboard',
+  qa:         'icon-flask',
+  devops:     'icon-refresh-cw',
+  data:       'icon-bar-chart',
+  security:   'icon-lock',
+  leadership: 'icon-trophy',
+  gamedev:    'icon-flame',
+};
+
+/**
+ * Derives the sprite id for a role. Checks (in order):
+ *   1. Custom tags stored in config.roles.customTags[role]
+ *   2. Built-in ROLE_TAGS[role]
+ *   3. A keyword heuristic on the role name
+ *   4. Fallback: briefcase
+ */
+function getRoleIcon(role, config) {
+  if (role === NO_ROLE_VALUE) return 'icon-sparkle';
+
+  const customTags = config?.roles?.customTags?.[role] || [];
+  const builtinTags = ROLE_TAGS[role] || [];
+  const tags = [...builtinTags, ...customTags];
+
+  for (const tag of tags) {
+    if (TAG_ICON[tag]) return TAG_ICON[tag];
   }
-  return '💼';
+
+  const lower = role.toLowerCase();
+  if (/front|ui|ux/.test(lower)) return 'icon-palette';
+  if (/full[\s-]?stack/.test(lower)) return 'icon-package';
+  if (/mobile|ios|android/.test(lower)) return 'icon-keyboard';
+  if (/back[\s-]?end|server|api/.test(lower)) return 'icon-settings';
+  if (/qa|test/.test(lower)) return 'icon-flask';
+  if (/devops|sre|cloud|platform/.test(lower)) return 'icon-refresh-cw';
+  if (/data|machine|ml|ai|analytics/.test(lower)) return 'icon-bar-chart';
+  if (/security|infosec/.test(lower)) return 'icon-lock';
+  if (/lead|manager|cto|director|head/.test(lower)) return 'icon-trophy';
+  if (/game/.test(lower)) return 'icon-flame';
+
+  return 'icon-briefcase';
 }
 
 /**
  * Builds the list of roles according to the user config.
  * Custom roles may carry their own tags in config.roles.customTags.
- * "Not specified" is always available unless the user hid it explicitly.
  */
 export function getAvailableRoles(config) {
   if (!config || !config.roles) return [...DEFAULT_ROLES];
@@ -41,7 +88,6 @@ export function getAvailableRoles(config) {
 
   const filteredCustoms = custom.filter(p => {
     if (hiddenSet.has(p)) return false;
-    // Custom roles without tags are always visible.
     const tags = tagsFor(p);
     if (tags.length === 0) return true;
     if (activeSet.size === 0) return true;
@@ -205,7 +251,7 @@ export class RoleCombo {
       roles.forEach((p, idx) => {
         const isNoRole = p === NO_ROLE_VALUE;
         const isRecent = !isNoRole && used.has(p) && !available.has(p);
-        const icon = getRoleIcon(p);
+        const iconName = getRoleIcon(p, config);
         const isSelected = this.input.value === p;
         const isHighlighted = idx === this.highlightedIdx;
 
@@ -227,7 +273,7 @@ export class RoleCombo {
                   class="combo-option ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${isRecent ? 'recent' : ''} ${isNoRole ? 'generic' : ''}"
                   data-value="${escapeHtml(p)}"
                   data-idx="${idx}">
-            <span class="combo-option-icon">${icon}</span>
+            <span class="combo-option-icon">${icon(iconName)}</span>
             <span class="combo-option-text">${escapeHtml(p)}</span>
             ${tag ? `<span class="combo-option-tag">${tag}</span>` : ''}
           </button>

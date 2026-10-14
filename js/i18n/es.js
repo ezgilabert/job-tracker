@@ -219,7 +219,7 @@ export const es = {
   'empty.refs.filter.subtitle': 'Probá con otro filtro o búsqueda',
   'empty.refToJob': 'No hay postulaciones cargadas todavía',
 
-  'modal.edit.title': '✏️ Editar postulación',
+  'modal.edit.title': 'Editar postulación',
   'modal.edit.statusNote': 'El estado se cambia desde los botones del workflow de la tarjeta.',
   'modal.cancel': 'Cancelar',
   'modal.saveChanges': 'Guardar cambios',
@@ -254,8 +254,8 @@ export const es = {
   'close.reason.discarded.paused':         'Pausé la búsqueda',
   'close.reason.discarded.location':       'La ubicación no servía',
 
-  'hist.title': '🕒 Historial de la postulación',
-  'hist.refTitle': '🕒 Historial del referido',
+  'hist.title': 'Historial de la postulación',
+  'hist.refTitle': 'Historial del referido',
   'hist.empty': 'Sin entradas en el historial',
   'hist.current': 'Actual',
   'hist.backward': '↺ Retroceso',
@@ -266,7 +266,7 @@ export const es = {
   'hist.skipped': 'Etapas no aplicables',
 
   // ===== Config =====
-  'config.title': '⚙️ Configuración',
+  'config.title': 'Configuración',
   'config.unsaved': 'Sin guardar',
   'config.subtitle': 'Personalizá tu Job Tracker',
   'config.tab.roles': 'Puestos',
@@ -318,7 +318,7 @@ export const es = {
   'config.lang.desc': 'Elegí el idioma de los textos de la app. Los datos guardados no se modifican.',
   'config.reset': '↺ Restablecer',
   'config.reset.short': 'Restablecer todo',
-  'config.save': '💾 Guardar cambios',
+  'config.save': 'Guardar cambios',
   'config.moveUp': 'Subir',
   'config.moveDown': 'Bajar',
   'config.hideFilter': 'Ocultar filtro',
@@ -329,7 +329,7 @@ export const es = {
   'config.noRoles': 'No hay puestos con las categorías activas. Activá alguna o agregá uno custom.',
   'config.noStates': 'Activá al menos un estado arriba.',
 
-  'config.danger.title': '⚠️ Zona de peligro',
+  'config.danger.title': 'Zona de peligro',
   'config.danger.desc': 'Estas acciones no se pueden deshacer.',
   'config.danger.reset.title': 'Restablecer preferencias',
   'config.danger.reset.desc': 'Vuelve puestos, estados, filtros y apariencia a sus valores por defecto. No se aplica hasta que guardes.',
@@ -337,11 +337,11 @@ export const es = {
   'config.danger.data.title': 'Borrar datos',
   'config.danger.data.desc': 'Elimina permanentemente postulaciones y referidos. Esta acción no se puede deshacer.',
   'config.danger.data.button': 'Borrar datos',
-  'config.danger.all.title': '⚠️ Empezar de cero',
+  'config.danger.all.title': 'Empezar de cero',
   'config.danger.all.desc': 'Borra todas las preferencias y todos los datos. Deja la app como recién instalada.',
   'config.danger.all.button': 'Restablecer todo',
 
-  'config.backup.title': '💾 Datos y respaldo',
+  'config.backup.title': 'Datos y respaldo',
   'config.backup.desc': 'Exportá un backup completo o restaurá desde un archivo. Útil si cambiás de dispositivo o querés prevenir pérdidas.',
   'config.backup.exportTitle': 'Exportar datos',
   'config.backup.exportDesc': 'Descargá un archivo JSON con todas tus postulaciones, referidos, configuración y tema.',
@@ -352,7 +352,7 @@ export const es = {
   'config.backup.jobs': 'postulaciones',
   'config.backup.refs': 'referidos',
 
-  'profile.title': '👤 Editar perfil',
+  'profile.title': 'Editar perfil',
   'profile.subtitle': 'Actualizá tu información personal',
   'profile.firstName': 'Nombre',
   'profile.firstName.placeholder': 'Tu nombre',
@@ -369,15 +369,15 @@ export const es = {
   'profile.remove': 'Eliminar',
   'profile.formats': 'JPG, PNG o GIF · máx. 2 MB',
 
-  'unsaved.title': '⚠️ Cambios sin guardar',
+  'unsaved.title': 'Cambios sin guardar',
   'unsaved.message': 'Modificaste la configuración pero todavía no la guardaste.<br>¿Qué querés hacer?',
   'unsaved.keep': 'Seguir editando',
   'unsaved.discard': 'Descartar',
   'unsaved.save': 'Guardar y salir',
 
-  'refEdit.title': '✏️ Editar referido',
+  'refEdit.title': 'Editar referido',
 
-  'refToJob.title': '🎉 ¡Referido hecho!',
+  'refToJob.title': '¡Referido hecho!',
   'refToJob.message': '<strong>{name}</strong> ya te hizo el referido. ¿Querés moverlo a <strong>Postulaciones</strong> para hacerle seguimiento?',
   'refToJob.createNew': 'Crear nueva postulación',
   'refToJob.createNewDesc': 'Se precarga con los datos del referido',
@@ -388,7 +388,7 @@ export const es = {
   'refToJob.link': 'Vincular',
   'refToJob.alreadyLinked': 'ya vinculado',
 
-  'note.title': '📝 ¿Agregar un recordatorio?',
+  'note.title': '¿Agregar un recordatorio?',
   'note.subtitle': 'Vas a pasar a <strong>{step}</strong> en <strong>{name}</strong>. ¿Querés dejar un recordatorio para esta etapa?',
   'note.label': 'Nota / PD (opcional)',
   'note.placeholder': 'Ej: Preparar preguntas sobre el stack, revisar el challenge...',
@@ -526,7 +526,7 @@ export const es = {
 
   'combo.create': 'Crear nuevo puesto',
   'combo.createNamed': 'Crear "{name}"',
-  'createRole.title': '➕ Nuevo puesto',
+  'createRole.title': 'Nuevo puesto',
   'createRole.subtitle': 'Agregá un puesto a tu lista. Se va a sugerir en el buscador.',
   'createRole.name': 'Nombre del puesto',
   'createRole.name.placeholder': 'Ej: Rust Developer',

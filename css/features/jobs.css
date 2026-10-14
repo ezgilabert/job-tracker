@@ -527,14 +527,62 @@
 }
 
 /* ============================================================
-   Filters: align visually with referral filters
-   (plain text, no emojis or decorative dots injected)
-
-   TODO(batch-2): verify no code path injects ::before/::after
-   into filter buttons. If confirmed dead, remove this block.
+   Template SVG icons — jobCard.js only
+   Small inline sprites sized to sit next to text labels.
    ============================================================ */
 
-#filters button::before,
-#filters button::after {
-  content: none;
+/* job-meta: date, days, salary, work mode, contact */
+.job-meta span > svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 0.3rem;
+}
+
+/* job-contact-chip: sprite + arrow */
+.job-contact-chip .chip-arrow > svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.4;
+  display: block;
+}
+
+/* external link in the "View job" anchor */
+.job a > svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: -1px;
+  margin-left: 0.25rem;
+}
+
+/* drag handle */
+.drag-handle > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.6;
+  display: block;
+}
+
+/* congrats banner: sparkle icon */
+.congrats-emoji > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  color: var(--gold);
+  display: block;
+}
+
+/* Offer confirmed pill */
+.offer-confirmed-pill > svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
 }

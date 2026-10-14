@@ -8,6 +8,7 @@ import { REF_WORKFLOW_STEPS } from '../app/constants.js';
 import { isRefClosed, refStepIndex } from '../app/selectors.js';
 import { escapeHtml, ensureArray } from '../app/utils.js';
 import { renderSteps } from './steps.js';
+import { icon } from './icon.js';
 import { t, tRefState, tRefStateShort } from '../i18n/index.js';
 
 /**
@@ -24,9 +25,6 @@ export function renderRefCard(ref /*, ctx = {} */) {
     ? Math.round(((currentIdx + 1) / totalSteps) * 100)
     : 0;
 
-  // ------------------------------------------------------------
-  // Relationships: normalize to array (supports legacy string)
-  // ------------------------------------------------------------
   const relationships = Array.isArray(ref.relationship)
     ? ref.relationship
     : (ref.relationship ? [ref.relationship] : []);
@@ -37,15 +35,14 @@ export function renderRefCard(ref /*, ctx = {} */) {
     .map(rel => `<span class="ref-relationship-badge" data-relationship="${escapeHtml(rel)}">${escapeHtml(rel)}</span>`)
     .join('');
 
-  // Inline meta
   const linkTxt = ref.link
-    ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))} ↗</a>`
+    ? `<a href="${escapeHtml(ref.link)}" target="_blank" rel="noopener">${escapeHtml(t('ref.link'))}${icon('icon-external-link')}</a>`
     : '';
   const contactTxt = ref.contact
-    ? `<span>✉️ ${escapeHtml(ref.contact)}</span>`
+    ? `<span>${icon('icon-email')}${escapeHtml(ref.contact)}</span>`
     : '';
   const roleTxt = ref.role
-    ? `<span>💼 ${escapeHtml(ref.role)}</span>`
+    ? `<span>${icon('icon-briefcase')}${escapeHtml(ref.role)}</span>`
     : '';
   const metaHtml = (roleTxt || contactTxt || linkTxt)
     ? `<div class="ref-meta">${roleTxt}${contactTxt}${linkTxt}</div>`
@@ -63,7 +60,6 @@ export function renderRefCard(ref /*, ctx = {} */) {
         kind: 'ref',
       });
 
-  // Top progress block (only when not closed).
   const topProgressHtml = refClosed
     ? ''
     : `<div class="ref-top-progress">
@@ -74,7 +70,7 @@ export function renderRefCard(ref /*, ctx = {} */) {
                  data-action="ref-history"
                  title="${escapeHtml(t('ref.historyTitle'))}"
                  aria-label="${escapeHtml(t('ref.historyTitle'))}">
-           🕒
+           ${icon('icon-clock')}
          </button>
        </div>`;
 
@@ -116,10 +112,10 @@ export function renderRefCard(ref /*, ctx = {} */) {
 
       <div class="ref-actions">
         <button class="action-btn" title="${escapeHtml(t('ref.editTitle'))}" data-action="edit-ref" aria-label="${escapeHtml(t('ref.editTitle'))}">
-          <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-pencil"/></svg>
+          ${icon('icon-pencil')}
         </button>
         <button class="action-btn danger" title="${escapeHtml(t('ref.deleteTitle'))}" data-action="delete-ref" aria-label="${escapeHtml(t('ref.deleteTitle'))}">
-          <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-trash"/></svg>
+          ${icon('icon-trash')}
         </button>
       </div>
     </div>
@@ -142,21 +138,24 @@ function renderOpenActions(ref, currentIdx) {
     ? `<button class="wf-btn-big primary"
               data-action="move-ref-next"
               title="${escapeHtml(t('ref.nextTitle', { step: tRefStateShort(nextStep.id) }))}">
-         → ${escapeHtml(tRefStateShort(nextStep.id))}
+         ${icon('icon-arrow-right')}
+         <span>${escapeHtml(tRefStateShort(nextStep.id))}</span>
        </button>`
     : `<button class="wf-btn-big success" disabled
               title="${escapeHtml(t('ref.hiredTitle'))}">
-         ✓ ${escapeHtml(t('ref.hired'))}
+         ${icon('icon-check')}
+         <span>${escapeHtml(t('ref.hired'))}</span>
        </button>`;
 
   let backBtn = '';
   if (prevStep) {
-    const label = `← ${escapeHtml(tRefStateShort(prevStep.id))}`;
+    const label = tRefStateShort(prevStep.id);
     if (!backLocked) {
       backBtn = `<button class="wf-btn-secondary"
                         data-action="move-ref-prev"
                         title="${escapeHtml(t('ref.prevTitle', { step: tRefStateShort(prevStep.id) }))}">
-                   ${label}
+                   ${icon('icon-arrow-left')}
+                   <span>${escapeHtml(label)}</span>
                  </button>`;
     } else {
       const lockTitle = hasLinkedJob
@@ -164,17 +163,21 @@ function renderOpenActions(ref, currentIdx) {
         : t('toast.alreadyWentBackRef');
       backBtn = `<button class="wf-btn-secondary" disabled
                         title="${escapeHtml(lockTitle)}">
-                   🔒 ${label}
+                   ${icon('icon-lock')}
+                   <span>${escapeHtml(label)}</span>
                  </button>`;
     }
   } else {
-    backBtn = `<button class="wf-btn-secondary" disabled>← ${escapeHtml(t('job.firstStep'))}</button>`;
+    backBtn = `<button class="wf-btn-secondary" disabled>
+                 ${icon('icon-arrow-left')}
+                 <span>${escapeHtml(t('job.firstStep'))}</span>
+               </button>`;
   }
 
   const closeBtn = `<button class="wf-btn-secondary danger"
                             data-action="close-ref"
                             title="${escapeHtml(t('ref.notApplicableTitle'))}">
-                      ${escapeHtml(t('ref.notApplicable'))}
+                      <span>${escapeHtml(t('ref.notApplicable'))}</span>
                     </button>`;
 
   return `
@@ -193,7 +196,8 @@ function renderClosedActions() {
   return `
     <div class="ref-wf-main-actions">
       <button class="wf-btn-big primary" data-action="reopen-ref">
-        ↻ ${escapeHtml(t('ref.reopen'))}
+        ${icon('icon-rotate-cw')}
+        <span>${escapeHtml(t('ref.reopen'))}</span>
       </button>
     </div>
   `;

@@ -38,9 +38,23 @@
   background: var(--bg-2);
 }
 
+/* Icon slot — text glyph (backwards compat with emoji callers) */
 .toast .toast-icon {
   font-size: 1rem;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Icon slot — sprite reference (new call sites) */
+.toast svg.toast-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+  color: var(--accent);
+  display: block;
 }
 
 .toast .toast-message {
@@ -97,7 +111,7 @@
   transform: translateY(1px);
 }
 
-/* Countdown bar: shrinks from 100% to 0 across the toast lifetime. */
+/* Countdown bar */
 .toast.toast-action::after {
   content: '';
   position: absolute;
@@ -116,7 +130,6 @@
 
 /* ============================================================
    Reset animation: full-screen overlay with a progress ring
-   Scale C (~1.5x) · consistent with the boot overlay
    ============================================================ */
 
 .reset-overlay {
@@ -155,7 +168,6 @@
   max-width: 520px;
 }
 
-/* --- Ring --- */
 .reset-ring {
   width: 144px;
   height: 144px;
@@ -180,7 +192,7 @@
 
 .reset-ring-progress {
   stroke: url(#reset-ring-grad);
-  stroke-dasharray: 283; /* 2πr, r=45 */
+  stroke-dasharray: 283;
   stroke-dashoffset: 283;
   animation: resetRingProgress 2.4s ease-in-out forwards;
 }
@@ -202,7 +214,6 @@
   letter-spacing: -0.02em;
 }
 
-/* --- Labels --- */
 .reset-label {
   font-size: 1.4rem;
   font-weight: 800;

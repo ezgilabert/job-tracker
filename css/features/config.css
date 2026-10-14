@@ -28,6 +28,14 @@
   flex-wrap: wrap;
 }
 
+.config-modal h2 > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
 .config-subtitle {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -120,11 +128,11 @@
 }
 
 .config-tab-icon {
-  font-size: 1rem;
-  line-height: 1;
-  flex-shrink: 0;
   width: 20px;
-  text-align: center;
+  height: 20px;
+  flex-shrink: 0;
+  stroke-width: 1.8;
+  display: block;
 }
 
 .config-tab-label {
@@ -170,6 +178,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.config-section-head h3 > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .config-section-head p {
@@ -518,6 +534,16 @@
   flex-wrap: wrap;
 }
 
+/* SVG icons inside config buttons (backup / danger / save) */
+.config-actions .btn > svg,
+.config-danger-card .btn > svg,
+.config-backup-actions .btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+}
+
 /* ============================================================
    Danger zone · 2 cards + full reset
    ============================================================ */
@@ -566,8 +592,14 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 1.05rem;
   flex-shrink: 0;
+}
+
+.danger-card-icon > svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  display: block;
 }
 
 .config-danger-card.prefs .danger-card-icon {
@@ -625,6 +657,15 @@
   font-weight: 700;
   color: var(--danger-2);
   margin-bottom: 0.15rem;
+}
+
+.config-danger-all-info strong > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+  vertical-align: -2px;
+  margin-right: 0.3rem;
+  display: inline-block;
 }
 
 .config-danger-all-info span {
@@ -694,11 +735,17 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  font-size: 1.25rem;
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   color: var(--accent);
   flex-shrink: 0;
+}
+
+.config-backup-icon > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  display: block;
 }
 
 .config-backup-icon.danger {
@@ -757,6 +804,14 @@
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-muted);
+}
+
+.config-backup-stat > svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: block;
 }
 
 @media (max-width: 640px) {
@@ -1132,10 +1187,6 @@
   border-right: 1px solid var(--border);
 }
 
-/* Reset global input styling for the prefix input.
-   No !important needed: config.css loads after forms.css, so at
-   equal specificity this rule wins on source order (see comments
-   in forms.css → .notes-highlight textarea). */
 .input-prefix input {
   border: none;
   background: transparent;
@@ -1342,4 +1393,52 @@
   font-weight: 800;
   color: white;
   line-height: 1;
+}
+
+/* ============================================================
+   Config · SVG icon sizing for panel templates
+   ============================================================ */
+
+/* Category tags (Roles tab) */
+.config-tag > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Status checkboxes (Initial statuses tab) */
+.config-check > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Default status buttons */
+.config-default-btn > svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Filter reorder list icons */
+.config-filter-item .drag-info > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Filter action buttons (eye / eye-off) */
+.config-icon-btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  display: block;
 }

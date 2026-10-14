@@ -12,6 +12,7 @@ import {
   getLockoutRemainingMs,
 } from './session.js';
 import { mountInputLimits } from '../ui/form/inputLimits.js';
+import { onI18nChanged } from '../app/events.js';
 
 // ------------------------------------------------------------
 // Persisted config reader (logo, language, background)
@@ -123,6 +124,20 @@ function mountPasswordToggles() {
       }
 
       updatePwToggleLabel(btn, !wasHidden);
+    });
+  });
+
+  // Defensive: if the language changes at runtime (e.g. a future
+  // language picker on the login screen), the toggle labels need to
+  // be re-translated. The login screen has no language switcher today,
+  // so this listener is currently inert — but it's cheap insurance
+  // and matches how jobsController/refsController handle the event.
+  onI18nChanged(() => {
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+      const wrap = btn.closest('.pw-input-wrap') || btn.parentElement;
+      const input = wrap ? wrap.querySelector('input') : null;
+      if (!input) return;
+      updatePwToggleLabel(btn, input.type === 'password');
     });
   });
 }

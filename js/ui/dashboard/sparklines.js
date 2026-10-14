@@ -3,14 +3,14 @@
 // Four cards with mini trend graphs.
 // ============================================================
 
-import { escapeHtml, uid, buildSparkPath } from './shared.js';
+import { escapeHtml, uid, buildSparkPath, icon } from './shared.js';
 
 export function renderSparklines(container, data) {
   const cards = [
-    { label: '📋 ' + data.labels.total, num: data.total, values: data.trend.total, color: '#8b6cff', grad: '#b975ff' },
-    { label: '🔥 ' + data.labels.active, num: data.active, values: data.trend.active, color: '#f59e0b', grad: '#f97316' },
-    { label: data.highlightIcon + ' ' + data.highlightLabel, num: data.highlight, values: data.trend.highlight, color: '#10b981', grad: '#14b8a6' },
-    { label: '❌ ' + data.labels.closed, num: data.closed, values: data.trend.closed, color: '#ef4444', grad: '#f87171' },
+    { iconName: 'icon-clipboard',    label: data.labels.total,     num: data.total,     values: data.trend.total,     color: '#8b6cff', grad: '#b975ff' },
+    { iconName: 'icon-flame',        label: data.labels.active,    num: data.active,    values: data.trend.active,    color: '#f59e0b', grad: '#f97316' },
+    { iconName: data.highlightIcon,  label: data.highlightLabel,   num: data.highlight, values: data.trend.highlight, color: '#10b981', grad: '#14b8a6' },
+    { iconName: 'icon-x-circle',     label: data.labels.closed,    num: data.closed,    values: data.trend.closed,    color: '#ef4444', grad: '#f87171' },
   ];
 
   const grid = document.createElement('div');
@@ -31,7 +31,7 @@ export function renderSparklines(container, data) {
     return `
       <div class="dash-spark-card">
         <div class="dash-spark-head">
-          <div class="dash-spark-label">${escapeHtml(c.label)}</div>
+          <div class="dash-spark-label">${icon(c.iconName)}<span>${escapeHtml(c.label)}</span></div>
           <div class="dash-spark-delta ${deltaCls}">${deltaIcon} ${Math.abs(deltaPct)}%</div>
         </div>
         <div class="dash-spark-num">${c.num}</div>

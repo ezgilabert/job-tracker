@@ -613,6 +613,15 @@ textarea:invalid:not(:placeholder-shown):focus {
   min-width: 0;
 }
 
+/* Icon inside the segmented button is now an SVG sprite reference. */
+.seg-btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+  flex-shrink: 0;
+  display: block;
+}
+
 .seg-btn:hover { background: var(--surface); color: var(--text); }
 
 .seg-btn.selected {
@@ -1249,3 +1258,22 @@ input[type="hidden"] { display: none; }
 }
 
 .required-mark { color: var(--danger); font-weight: 700; }
+
+/* ============================================================
+   StatusCombo · SVG icons
+   Trigger + dropdown option icons are sprite references now.
+   ============================================================ */
+
+.combo-trigger-icon > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  display: block;
+}
+
+.combo-option-icon > svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+  display: block;
+}

@@ -111,14 +111,13 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     renderDashboard(container, {
       style,
       kind: 'jobs',
-      icon: '📋',
       label: t('jobs.title'),
       total,
       active,
       inProcess,
       closed,
       highlight: offers,
-      highlightIcon: '🏆',
+      highlightIcon: 'icon-trophy',
       highlightLabel: t('dash.jobs.highlight'),
       highlightSub: t('dash.jobs.highlightSub', { pct: successRate }),
       labels: {
@@ -135,7 +134,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
       },
       heatmap,
       topLabel: t('dash.jobs.top'),
-      topIcon: '🏢',
+      topIcon: 'icon-building',
       top,
       summary: t('dash.jobs.summary', {
         total,
@@ -228,10 +227,10 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   // ----------------------------------------------------------
   function getFilterLabel(id) {
     const meta = CONFIG_FILTER_META[id];
-    if (meta) return { label: t('filter.' + id), icon: meta.icon };
+    if (meta) return t('filter.' + id);
     const step = WORKFLOW_STEPS.find(s => s.id === id);
-    if (step) return { label: tStateShort(id), icon: step.icon };
-    return { label: id, icon: '•' };
+    if (step) return tStateShort(id);
+    return id;
   }
 
   function renderFilters() {
@@ -244,7 +243,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     }
 
     container.innerHTML = filters.map(f => {
-      const { label } = getFilterLabel(f.id);
+      const label = getFilterLabel(f.id);
       const active = f.id === currentFilter ? 'active' : '';
       return `<button data-filter="${escapeHtml(f.id)}" class="${active}">${escapeHtml(label)}</button>`;
     }).join('');
@@ -352,7 +351,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     const roleValue = valueOf('role');
 
     if (!roleValue && initialState !== 'Saved') {
-      showToast(t('toast.roleRequired'), '!');
+      showToast(t('toast.roleRequired'), 'icon-alert-triangle');
       if (roleInput) roleInput.focus();
       return;
     }
@@ -361,7 +360,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     if (!contactValidation.valid) {
       contactLinkPicker.markTouched();
       contactLinkPicker.focus();
-      showToast(t(contactValidation.errorKey), '!');
+      showToast(t(contactValidation.errorKey), 'icon-alert-triangle');
       return;
     }
 
@@ -404,7 +403,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     refreshRoleOptionalHint();
 
     expandJobs();
-    showToast(t('toast.jobAdded'), '✓');
+    showToast(t('toast.jobAdded'), 'icon-check');
   });
 
   // ----------------------------------------------------------
@@ -471,7 +470,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
           return { ...r, linkedJobId: null };
         }));
       },
-      '🗑️'
+      'icon-trash'
     );
   }
 
@@ -482,7 +481,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
       history.push({ status: 'Applied', date: new Date().toISOString() });
       return { ...j, status: 'Applied', history, offerConfirmed: false };
     }));
-    showToast(t('toast.jobReopened'), '↻');
+    showToast(t('toast.jobReopened'), 'icon-rotate-cw');
   }
 
   function unconfirmOffer(id) {
@@ -490,7 +489,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
       if (j.id !== id) return j;
       return { ...j, offerConfirmed: false };
     }));
-    showToast(t('toast.offerUnconfirmed'), '↺');
+    showToast(t('toast.offerUnconfirmed'), 'icon-rotate-ccw');
   }
 
   // ----------------------------------------------------------
@@ -552,7 +551,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
       return ordered;
     });
 
-    showToast(t('toast.orderUpdated'), '⠿');
+    showToast(t('toast.orderUpdated'), 'icon-grip-vertical');
   });
 
   // ----------------------------------------------------------

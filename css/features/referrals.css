@@ -861,3 +861,31 @@ form.form-block {
 .job-ref-chip[data-status="In Process"]     .job-ref-status-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .job-ref-chip[data-status="Hired"]          .job-ref-status-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
 .job-ref-chip[data-status="Not Applicable"] .job-ref-status-dot { background: var(--danger);  box-shadow: 0 0 6px var(--danger); }
+
+/* ============================================================
+   Referral SVG icons
+   Used by refCard.js (history button, meta inline sprites).
+   ============================================================ */
+
+.ref-history-btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  display: block;
+}
+
+.ref-meta span > svg,
+.ref-meta a > svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 0.25rem;
+}
+
+.ref-meta a > svg {
+  margin-right: 0;
+  margin-left: 0.25rem;
+}

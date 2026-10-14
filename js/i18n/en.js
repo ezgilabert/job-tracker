@@ -219,7 +219,7 @@ export const en = {
   'empty.refs.filter.subtitle': 'Try another filter or search',
   'empty.refToJob': 'No applications loaded yet',
 
-  'modal.edit.title': '✏️ Edit application',
+  'modal.edit.title': 'Edit application',
   'modal.edit.statusNote': 'Status changes from the workflow buttons on the card.',
   'modal.cancel': 'Cancel',
   'modal.saveChanges': 'Save changes',
@@ -254,8 +254,8 @@ export const en = {
   'close.reason.discarded.paused':         'Paused my search',
   'close.reason.discarded.location':       'Location was a dealbreaker',
 
-  'hist.title': '🕒 Application history',
-  'hist.refTitle': '🕒 Referral history',
+  'hist.title': 'Application history',
+  'hist.refTitle': 'Referral history',
   'hist.empty': 'No history entries',
   'hist.current': 'Current',
   'hist.backward': '↺ Went back',
@@ -266,7 +266,7 @@ export const en = {
   'hist.skipped': 'Skipped stages',
 
   // ===== Config =====
-  'config.title': '⚙️ Settings',
+  'config.title': 'Settings',
   'config.unsaved': 'Unsaved',
   'config.subtitle': 'Customize your Job Tracker',
   'config.tab.roles': 'Roles',
@@ -318,7 +318,7 @@ export const en = {
   'config.lang.desc': 'Choose the language of the app texts. Saved data is not modified.',
   'config.reset': '↺ Reset',
   'config.reset.short': 'Reset all',
-  'config.save': '💾 Save changes',
+  'config.save': 'Save changes',
   'config.moveUp': 'Move up',
   'config.moveDown': 'Move down',
   'config.hideFilter': 'Hide filter',
@@ -329,7 +329,7 @@ export const en = {
   'config.noRoles': 'No roles with active categories. Enable one or add a custom role.',
   'config.noStates': 'Enable at least one status above.',
 
-  'config.danger.title': '⚠️ Danger zone',
+  'config.danger.title': 'Danger zone',
   'config.danger.desc': "These actions can't be undone.",
   'config.danger.reset.title': 'Reset preferences',
   'config.danger.reset.desc': 'Restores roles, statuses, filters and appearance to their defaults. Not applied until you save.',
@@ -337,11 +337,11 @@ export const en = {
   'config.danger.data.title': 'Delete data',
   'config.danger.data.desc': 'Permanently deletes your applications and referrals. This action cannot be undone.',
   'config.danger.data.button': 'Delete data',
-  'config.danger.all.title': '⚠️ Start over',
+  'config.danger.all.title': 'Start over',
   'config.danger.all.desc': 'Deletes all preferences and all data. Leaves the app as freshly installed.',
   'config.danger.all.button': 'Reset everything',
 
-  'config.backup.title': '💾 Data & backup',
+  'config.backup.title': 'Data & backup',
   'config.backup.desc': 'Export a full backup or restore from a file. Useful when switching devices or preventing data loss.',
   'config.backup.exportTitle': 'Export data',
   'config.backup.exportDesc': 'Download a JSON file with all your applications, referrals, settings and theme.',
@@ -352,7 +352,7 @@ export const en = {
   'config.backup.jobs': 'applications',
   'config.backup.refs': 'referrals',
 
-  'profile.title': '👤 Edit profile',
+  'profile.title': 'Edit profile',
   'profile.subtitle': 'Update your personal information',
   'profile.firstName': 'First name',
   'profile.firstName.placeholder': 'Your first name',
@@ -369,15 +369,15 @@ export const en = {
   'profile.remove': 'Remove',
   'profile.formats': 'JPG, PNG or GIF · max 2 MB',
 
-  'unsaved.title': '⚠️ Unsaved changes',
+  'unsaved.title': 'Unsaved changes',
   'unsaved.message': "You modified the settings but haven't saved yet.<br>What do you want to do?",
   'unsaved.keep': 'Keep editing',
   'unsaved.discard': 'Discard',
   'unsaved.save': 'Save and exit',
 
-  'refEdit.title': '✏️ Edit referral',
+  'refEdit.title': 'Edit referral',
 
-  'refToJob.title': '🎉 Referral done!',
+  'refToJob.title': 'Referral done!',
   'refToJob.message': '<strong>{name}</strong> has referred you. Do you want to move it to <strong>Applications</strong> to track it?',
   'refToJob.createNew': 'Create new application',
   'refToJob.createNewDesc': 'Pre-filled with the referral data',
@@ -388,7 +388,7 @@ export const en = {
   'refToJob.link': 'Link',
   'refToJob.alreadyLinked': 'already linked',
 
-  'note.title': '📝 Add a reminder?',
+  'note.title': 'Add a reminder?',
   'note.subtitle': 'Moving to <strong>{step}</strong> at <strong>{name}</strong>. Want to leave a reminder for this stage?',
   'note.label': 'Note / To-do (optional)',
   'note.placeholder': 'Ex: Prepare stack questions, review the challenge...',
@@ -526,7 +526,7 @@ export const en = {
 
   'combo.create': 'Create new role',
   'combo.createNamed': 'Create "{name}"',
-  'createRole.title': '➕ New role',
+  'createRole.title': 'New role',
   'createRole.subtitle': 'Add a role to your list. It will be suggested in the picker.',
   'createRole.name': 'Role name',
   'createRole.name.placeholder': 'Ex: Rust Developer',
