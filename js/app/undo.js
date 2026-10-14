@@ -23,9 +23,9 @@ let activeUndo = null;
  * @param {import('./store.js').Store | import('./store.js').Store[]} stores
  * @param {string} message       the toast message, already translated
  * @param {() => void} mutation  performs the change
- * @param {string} [icon]        short emoji for the toast
+ * @param {string} [icon]        sprite name ('icon-rotate-ccw') or text glyph
  */
-export function withUndo(stores, message, mutation, icon = '↺') {
+export function withUndo(stores, message, mutation, icon = 'icon-rotate-ccw') {
   // Only one undo slot at a time.
   if (activeUndo) {
     activeUndo.dismiss();
@@ -43,7 +43,7 @@ export function withUndo(stores, message, mutation, icon = '↺') {
     onAction: () => {
       arr.forEach((s, i) => s.update(() => snapshots[i]));
       activeUndo = null;
-      showToast(t('toast.undone'), '↺');
+      showToast(t('toast.undone'), 'icon-rotate-ccw');
     },
   });
 }

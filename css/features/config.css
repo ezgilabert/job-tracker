@@ -1408,6 +1408,15 @@
   display: block;
 }
 
+/* Category chips (New role modal) */
+.create-cat-chip > svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
 /* Status checkboxes (Initial statuses tab) */
 .config-check > svg {
   width: 16px;

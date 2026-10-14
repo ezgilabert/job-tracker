@@ -156,10 +156,19 @@ export function filterRefs(refs, filter, searchTerm = '') {
   return out;
 }
 
-export function refsForCompany(refs, company) {
-  return refs.filter(r =>
-    Array.isArray(r.linkedCompanies) && r.linkedCompanies.includes(company)
-  );
+/**
+ * Returns the referrals linked to a given job id.
+ * Replaces the old refsForCompany(refs, company) which matched on
+ * the legacy `linkedCompanies` field — nothing writes to that
+ * anymore, so the section was always empty for current data.
+ *
+ * @param {object[]} refs
+ * @param {number|string} jobId
+ * @returns {object[]}
+ */
+export function refsForJob(refs, jobId) {
+  if (jobId === undefined || jobId === null) return [];
+  return refs.filter(r => r.linkedJobId === jobId);
 }
 
 // ============================================================

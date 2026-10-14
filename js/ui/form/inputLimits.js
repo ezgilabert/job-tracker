@@ -55,10 +55,11 @@ function mountCounter(textarea, max) {
 
   update();
   textarea.addEventListener('input', update);
-  textarea.addEventListener('change', update);
 
-  // If the value is set programmatically (e.g. opening the edit modal),
-  // the input event does not fire. Watch the length with a timer.
+  // If the value is set programmatically (e.g. opening the edit
+  // modal) the input event does not fire. Watch the length with a
+  // timer. The interval stops on blur OR change, so it never leaks
+  // when the user saves without blurring first.
   let lastLen = textarea.value.length;
   const observer = setInterval(() => {
     if (textarea.value.length !== lastLen) {
@@ -66,7 +67,10 @@ function mountCounter(textarea, max) {
       update();
     }
   }, 400);
-  textarea.addEventListener('blur', () => clearInterval(observer));
+
+  const stopObserver = () => clearInterval(observer);
+  textarea.addEventListener('blur', stopObserver);
+  textarea.addEventListener('change', stopObserver);
 }
 
 /**

@@ -4,6 +4,8 @@
 // reset.
 // ============================================================
 
+import { t } from '../../i18n/index.js';
+
 export class ResetAnimation {
   /**
    * @param {HTMLElement} overlayEl  wrapper .reset-overlay
@@ -68,8 +70,8 @@ export class ResetAnimation {
         </svg>
         <div class="reset-ring-percent" data-reset-percent>0%</div>
       </div>
-      <div class="reset-label">Restarting…</div>
-      <div class="reset-sub">Applying default values</div>
+      <div class="reset-label">${t('reset.running')}</div>
+      <div class="reset-sub">${t('reset.sub')}</div>
     `;
   }
 
@@ -80,15 +82,15 @@ export class ResetAnimation {
     const start = performance.now();
 
     const tick = (now) => {
-      const t = Math.min(1, (now - start) / duration);
+      const progress = Math.min(1, (now - start) / duration);
       // ease-in-out
-      const eased = t < 0.5
-        ? 2 * t * t
-        : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const eased = progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
       el.textContent = Math.round(eased * 100) + '%';
 
-      if (t < 1) requestAnimationFrame(tick);
+      if (progress < 1) requestAnimationFrame(tick);
     };
 
     requestAnimationFrame(tick);

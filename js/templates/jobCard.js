@@ -5,7 +5,7 @@
 import { WORKFLOW_STEPS } from '../app/constants.js';
 import {
   isClosed, stepIndex, progressPct,
-  currentStepNote, lastHistoryEntry, refsForCompany,
+  currentStepNote, lastHistoryEntry, refsForJob,
 } from '../app/selectors.js';
 import { escapeHtml, daysSince, formatDate, ensureArray } from '../app/utils.js';
 import { renderSteps } from './steps.js';
@@ -37,10 +37,15 @@ export function renderJobCard(job, ctx = {}) {
 
   const roleDisplay = job.role || t('job.noRole');
 
-  const linkedRefs = refsForCompany(referrals, job.company);
+  // Refs are matched by `linkedJobId` — the "Referral → Application"
+  // flow writes to that field, not to the legacy `linkedCompanies`.
+  const linkedRefs = refsForJob(referrals, job.id);
   const refsHtml = linkedRefs.length
     ? `<div class="job-refs">
-         <span class="job-refs-label">${escapeHtml(t(linkedRefs.length === 1 ? 'job.referralOne' : 'job.referralMany'))}</span>
+         <span class="job-refs-label">
+           ${icon('icon-users')}
+           <span>${escapeHtml(t(linkedRefs.length === 1 ? 'job.referralOne' : 'job.referralMany'))}</span>
+         </span>
          ${linkedRefs.map(r => `
            <button type="button"
                    class="job-ref-chip"
@@ -155,7 +160,9 @@ export function renderJobCard(job, ctx = {}) {
 }
 
 // ------------------------------------------------------------
-// Salary
+// Salary: "💰 USD 3,000–4,000 · per hour"
+// Supports legacy data where the salary already includes the
+// currency code.
 // ------------------------------------------------------------
 function renderSalaryTag(job) {
   if (!job.salary) return '';
@@ -174,7 +181,7 @@ function renderSalaryTag(job) {
 }
 
 // ------------------------------------------------------------
-// Work mode
+// Work mode: "🏢 On-site" / "🏠 Remote" / "🔄 Hybrid · 3d"
 // ------------------------------------------------------------
 function renderWorkModeTag(job) {
   if (job.workMode === 'onsite') {
@@ -191,7 +198,7 @@ function renderWorkModeTag(job) {
 }
 
 // ------------------------------------------------------------
-// Contact
+// Contact platform → sprite id
 // ------------------------------------------------------------
 const CONTACT_SPRITE_ID = {
   linkedin: 'icon-linkedin',

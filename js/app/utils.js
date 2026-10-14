@@ -2,6 +2,8 @@
 // Shared helpers
 // ============================================================
 
+import { getLanguage } from '../i18n/index.js';
+
 export function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str).replace(/[&<>"']/g, c => ({
@@ -13,6 +15,16 @@ export function escapeHtml(str) {
   }[c]));
 }
 
+// ------------------------------------------------------------
+// Date formatting — locale-aware.
+// The `Intl` locale id is derived from the current i18n language,
+// so switching to English reformats dates as `MMM DD, YYYY` on
+// the next render (templates re-render on `i18n-changed`).
+// ------------------------------------------------------------
+function currentLocale() {
+  return getLanguage() === 'en' ? 'en-US' : 'es-AR';
+}
+
 export function daysSince(date) {
   if (!date) return null;
   const iso = date.length === 10 ? date + 'T00:00:00' : date;
@@ -22,7 +34,7 @@ export function daysSince(date) {
 export function formatDate(date) {
   if (!date) return '';
   const iso = date.length === 10 ? date + 'T00:00:00' : date;
-  return new Date(iso).toLocaleDateString('es-AR', {
+  return new Date(iso).toLocaleDateString(currentLocale(), {
     day: '2-digit', month: 'short', year: 'numeric',
   });
 }
@@ -31,7 +43,7 @@ export function formatDateTime(isoString) {
   if (!isoString) return '';
   const d = new Date(isoString);
   if (isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('es-AR', {
+  return d.toLocaleDateString(currentLocale(), {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

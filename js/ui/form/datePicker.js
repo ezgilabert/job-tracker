@@ -2,8 +2,33 @@
 // DatePicker: custom date selector
 // ============================================================
 
-import { t } from '../../i18n/index.js';
+import { t, getLanguage } from '../../i18n/index.js';
 import { toLocalISO } from '../../app/utils.js';
+import { icon } from '../../templates/icon.js';
+
+// ------------------------------------------------------------
+// Locale-aware helpers.
+// The `Intl` locale id is derived from the current i18n language,
+// so switching to English reformats the trigger date and the
+// month header on the next render (the component re-renders on
+// the `i18n-changed` event).
+// ------------------------------------------------------------
+function currentLocale() {
+  return getLanguage() === 'en' ? 'en-US' : 'es-AR';
+}
+
+// Weekday initials per language. Index 0 = Monday.
+// We don't use Intl.DateTimeFormat('narrow') because some locales
+// return two-letter initials or single letters without separators
+// that don't match the layout. Hardcoding keeps them short.
+const WEEKDAY_LABELS = {
+  es: ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'],
+  en: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+};
+
+function weekdayLabels() {
+  return WEEKDAY_LABELS[getLanguage()] || WEEKDAY_LABELS.es;
+}
 
 /**
  * Usage:
@@ -87,23 +112,24 @@ export class DatePicker {
   }
 
   renderTrigger() {
+    const iconHtml = icon('icon-calendar');
     if (this.value) {
       const d = new Date(this.value + 'T00:00:00');
-      const txt = d.toLocaleDateString('es-AR', {
+      const txt = d.toLocaleDateString(currentLocale(), {
         day: '2-digit', month: 'short', year: 'numeric',
       });
       this.trigger.classList.remove('empty');
-      this.trigger.innerHTML = `<span>${txt}</span><span class="icon">📅</span>`;
+      this.trigger.innerHTML = `<span>${txt}</span><span class="icon">${iconHtml}</span>`;
     } else {
       this.trigger.classList.add('empty');
-      this.trigger.innerHTML = `<span>${t('dp.empty')}</span><span class="icon">📅</span>`;
+      this.trigger.innerHTML = `<span>${t('dp.empty')}</span><span class="icon">${iconHtml}</span>`;
     }
   }
 
   renderPopover() {
     const year = this.viewMonth.getFullYear();
     const month = this.viewMonth.getMonth();
-    const monthName = this.viewMonth.toLocaleDateString('es-AR', {
+    const monthName = this.viewMonth.toLocaleDateString(currentLocale(), {
       month: 'long', year: 'numeric',
     });
 
@@ -147,6 +173,10 @@ export class DatePicker {
       daysHtml += `<button type="button" class="dp-day other-month" disabled>${d}</button>`;
     }
 
+    const weekdays = weekdayLabels()
+      .map(label => `<span>${label}</span>`)
+      .join('');
+
     this.popover.innerHTML = `
       <div class="dp-header">
         <div class="dp-month">${monthName}</div>
@@ -155,9 +185,7 @@ export class DatePicker {
           <button type="button" data-nav="next" aria-label="Next" ${isCurrentMonth ? 'disabled' : ''}>›</button>
         </div>
       </div>
-      <div class="dp-weekdays">
-        <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
-      </div>
+      <div class="dp-weekdays">${weekdays}</div>
       <div class="dp-grid">${daysHtml}</div>
       <div class="dp-shortcuts">
         <button type="button" data-shortcut="today">${t('dp.today')}</button>

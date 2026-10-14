@@ -10,6 +10,12 @@ import { DEFAULT_ROLES, ROLE_TAGS_LIST } from '../app/constants.js';
 import { escapeHtml } from '../app/utils.js';
 import { t } from '../i18n/index.js';
 
+// Sprite helper: ROLE_TAGS_LIST now stores symbol names, not emojis.
+function icon(name) {
+  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
+}
+
 /**
  * @param {import('../app/store.js').Store} configStore
  */
@@ -41,7 +47,7 @@ export function mountCreateRoleController(configStore) {
         <button type="button"
                 class="create-cat-chip ${isSelected ? 'selected' : ''}"
                 data-cat="${escapeHtml(cat.id)}">
-          <span>${cat.icon}</span>
+          ${icon(cat.icon)}
           <span>${escapeHtml(cat.label)}</span>
         </button>
       `;
@@ -173,7 +179,7 @@ export function mountCreateRoleController(configStore) {
     });
 
     if (!isDefault && !isCustom) {
-      showToast(t('toast.roleCreated', { name }), '✨');
+      showToast(t('toast.roleCreated', { name }), 'icon-sparkle');
     }
 
     return name;

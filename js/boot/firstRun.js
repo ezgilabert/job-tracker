@@ -12,6 +12,7 @@
 // ============================================================
 
 import { onI18nChanged } from '../app/events.js';
+import { icon } from '../templates/icon.js';
 
 const STORAGE_KEY = 'jobTrackerWelcomeDismissed';
 
@@ -33,25 +34,25 @@ function markDismissed() {
 
 function buildContent(t) {
   return `
-    <div class="welcome-icon" aria-hidden="true">👋</div>
+    <div class="welcome-icon" aria-hidden="true">${icon('icon-sparkle')}</div>
     <div class="welcome-body">
       <h3>${t('welcome.title')}</h3>
       <p class="welcome-subtitle">${t('welcome.subtitle')}</p>
       <ul class="welcome-tips">
         <li>
-          <span class="welcome-tip-icon">⚡</span>
+          <span class="welcome-tip-icon">${icon('icon-sparkle')}</span>
           <span>${t('welcome.tip.new')}</span>
         </li>
         <li>
-          <span class="welcome-tip-icon">🔍</span>
+          <span class="welcome-tip-icon">${icon('icon-search')}</span>
           <span>${t('welcome.tip.search')}</span>
         </li>
         <li>
-          <span class="welcome-tip-icon">⠿</span>
+          <span class="welcome-tip-icon">${icon('icon-grip-vertical')}</span>
           <span>${t('welcome.tip.drag')}</span>
         </li>
         <li>
-          <span class="welcome-tip-icon">⚙️</span>
+          <span class="welcome-tip-icon">${icon('icon-settings')}</span>
           <span>${t('welcome.tip.settings')}</span>
         </li>
       </ul>

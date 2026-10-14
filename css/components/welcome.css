@@ -156,3 +156,26 @@
 
   .welcome-tips li { font-size: 0.78rem; }
 }
+
+/* ============================================================
+   Welcome banner SVG icons
+   The welcome and tip markers used to hold emoji glyphs; they
+   now hold sprite references, so sizing moves from font-size to
+   width/height.
+   ============================================================ */
+
+.welcome-icon > svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+  color: var(--accent);
+  display: block;
+}
+
+.welcome-tip-icon > svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+  color: var(--accent);
+  display: block;
+}
