@@ -46,8 +46,20 @@ export function todayISO() {
   return new Date(d.getTime() - off).toISOString().slice(0, 10);
 }
 
+/**
+ * Monotonic ID generator.
+ *
+ * Uses Date.now() as the base, and bumps by 1 whenever the
+ * previous call happened in the same millisecond. This
+ * guarantees unique, strictly increasing numbers even when the
+ * generator is called in a tight loop. Suitable for the local,
+ * single-user model of the app.
+ */
+let _lastUid = 0;
 export function uid() {
-  return Date.now() + Math.floor(Math.random() * 1000);
+  const now = Date.now();
+  _lastUid = now > _lastUid ? now : _lastUid + 1;
+  return _lastUid;
 }
 
 export function highlightAndScroll(el, duration = 1800) {

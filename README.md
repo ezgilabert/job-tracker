@@ -1,4 +1,3 @@
-# README.md
 # Job Tracker
 
 Local app for tracking a job search: applications, process stages, and referrals.
@@ -19,7 +18,7 @@ folder over HTTP.
   Technical Challenge → Live Coding → Technical Interview → Client Interview →
   Client Chat → Final Interview → References → Negotiation → Offer.
 - **Close with a reason**: Rejected, Ghosted, Discarded, Offer. Each close
-  state comes with preset reason chips and a free-text field.
+  state comes with preset reason chips (localized) and a free-text field.
 - **Advance with a note**: when moving a stage forward you can leave a reminder
   for that step (shown as a "PD" on the card).
 - **Skip a stage**: mark the current step as "Not applicable" and jump to the
@@ -92,10 +91,15 @@ state, and closing prompts to discard or save.
 - Eleven animated/static background styles.
 - Toast notifications, custom confirm modals, and a progress-ring reset
   animation.
-- All UI is fully internationalized (Spanish / English).
+- All UI is fully internationalized (Spanish / English). Reason chips, empty
+  states, and every label come from the dictionary — no hardcoded strings.
 - Empty states are SVG-based, not emoji: clipboard for jobs, link for
   referrals, funnel for "no results in this filter".
 - Card action buttons (edit / delete) use SVG icons with a soft-square style.
+- **Keyboard shortcuts**:
+  - `n` — expand the "New application" section and focus the Company field.
+  - `/` — focus the applications search box.
+  - `Esc` — close any open modal.
 
 ---
 
@@ -149,7 +153,6 @@ Paste the resulting hex into `CREDENTIALS[].passwordHash` in
 | --- | --- |
 | `getSession()` | Returns the parsed session or `null` |
 | `isValidSession(s)` | Verifies signature + expiry |
-| `isLoggedIn()` | `true` if a valid session exists |
 | `login({ username, email, name })` | Creates and signs a session |
 | `logout()` | Clears the session |
 | `validateCredentials(id, pw)` | Checks against the hash, updates rate limit |
@@ -218,13 +221,21 @@ Three stores, each persisted under its own key via the `Store` class
 
 ### Migration
 
-`main.js` registers a `migrate` function on each store that:
+`js/migrations.js` owns every legacy → current conversion and is used from two
+places:
+
+- **Boot** — each `Store` receives a `migrate` function that runs once when a
+  stored payload's version is older than the current one.
+- **Backup import** — `configController` routes imported data through the same
+  functions so files exported by older builds keep working.
+
+The migration pipeline:
 
 - Backfills missing fields on legacy records.
-- Maps legacy Spanish keys to their English equivalents (`empresa` → `company`,
-  `puesto` → `role`, `estado` → `status`, etc.).
-- Maps legacy Spanish state values to their English equivalents
-  (`Guardado` → `Saved`, `Oferta` → `Offer`, `Pendiente` → `Pending`, …).
+- Maps legacy Spanish keys to English (`empresa` → `company`, `puesto` → `role`,
+  `estado` → `status`, …).
+- Maps legacy Spanish state values to English (`Guardado` → `Saved`,
+  `Oferta` → `Offer`, `Pendiente` → `Pending`, …).
 - Maps the legacy referral state `'Me va a referir'` → `'Contacted'`.
 - Splits the old single `dashboardStyle` into `dashboardStyleJobs` +
   `dashboardStyleRefs`.
@@ -242,7 +253,8 @@ From **Settings → Advanced**:
 
 - **Export**: downloads a JSON file with jobs, referrals, config, and theme.
 - **Import**: replaces all current data from a backup file. Validates the
-  `app` field (`jobTracker`) before applying.
+  `app` field (`jobTracker`) and runs the migration pipeline before applying,
+  so backups from older builds are upgraded on import.
 
 Danger zone (all irreversible):
 
@@ -259,13 +271,38 @@ The app uses ES modules, so you need an HTTP server rather than opening
 `index.html` directly (file:// will fail on CORS).
 
 ```bash
-npx serve .
+npm start        # wraps: npx serve .
 ```
 
 Then open the printed URL (usually `http://localhost:3000`).
 
 Default credentials for the mock sign-in are in `js/auth/session.js`. Change
 the hash before shipping anything to a real user.
+
+---
+
+## Tests
+
+The pure modules (selectors, utils, migrations, store) have a smoke test suite
+built on Node's built-in test runner — no dependencies to install.
+
+```bash
+npm test
+```
+
+Requires **Node 20 or later** (uses `node --test`).
+
+Expected output: everything green. The suite covers:
+
+| File | Coverage |
+| --- | --- |
+| `tests/selectors.test.js` | Filters, sort, stats, dashboard helpers |
+| `tests/utils.test.js` | `escapeHtml`, date helpers, `uid`, array helpers |
+| `tests/migrations.test.js` | Every legacy → current schema map |
+| `tests/store.test.js` | Persistence, subscribe, versioning, migration |
+
+The test files stub `localStorage` (a small in-memory Map) so they run in a
+plain Node environment, no jsdom needed.
 
 ---
 
@@ -276,14 +313,26 @@ the hash before shipping anything to a real user.
 ├── index.html                    # Main app shell
 ├── login.html                    # Sign-in screen
 ├── favicon.svg
+├── package.json                  # npm start / npm test
 ├── README.md
 ├── js/
-│   ├── main.js                   # Boot: stores, controllers, theme, session
+│   ├── main.js                   # Boot orchestration only (~120 lines)
 │   ├── constants.js              # Workflow steps, states, defaults, options
 │   ├── store.js                  # Reactive localStorage store w/ migrations
-│   ├── selectors.js              # Pure state selectors (filters, stats)
-│   ├── utils.js                  # Shared helpers (escapeHtml, dates…)
-│   ├── i18n.js                   # ES / EN translations + applyI18n
+│   ├── selectors.js              # Pure state selectors (filters, stats, trends)
+│   ├── utils.js                  # Shared helpers (escapeHtml, dates, valueOf…)
+│   ├── events.js                 # Typed event bus (scroll-to-*, i18n-changed)
+│   ├── migrations.js             # Legacy → current schema maps
+│   ├── i18n.js                   # Public i18n API (t, applyI18n, setLanguage)
+│   ├── i18n/
+│   │   ├── es.js                 # Spanish dictionary
+│   │   └── en.js                 # English dictionary
+│   ├── boot/
+│   │   ├── stores.js             # Instantiates the three stores
+│   │   ├── theme.js              # Theme toggle, ripple, brand logo
+│   │   ├── userMenu.js           # Header dropdown wiring
+│   │   ├── i18nPulse.js          # Cascade animation on language change
+│   │   └── keyboard.js           # Shortcuts (n, /)
 │   ├── auth/
 │   │   ├── login.js              # Login screen entry point
 │   │   └── session.js            # Mock auth, session signing, guards
@@ -298,6 +347,16 @@ the hash before shipping anything to a real user.
 │   │   ├── refCard.js
 │   │   └── steps.js
 │   └── ui/
+│       ├── dashboard.js          # Re-export shim
+│       ├── dashboard/            # One file per style
+│       │   ├── index.js          # Dispatcher + header wrapper
+│       │   ├── shared.js         # uid, sparkPath, summary
+│       │   ├── sparklines.js
+│       │   ├── modular.js
+│       │   ├── minimal.js
+│       │   ├── compact.js
+│       │   ├── circular.js
+│       │   └── heatmap.js
 │       ├── combo.js              # Role picker
 │       ├── statusCombo.js        # Status picker
 │       ├── datePicker.js
@@ -307,44 +366,81 @@ the hash before shipping anything to a real user.
 │       ├── salaryInput.js
 │       ├── contactLinkPicker.js
 │       ├── chips.js
-│       ├── companiesChips.js     # (unused after referral changes)
-│       ├── dashboard.js
 │       ├── inputLimits.js
 │       ├── confirmModal.js
 │       ├── toast.js
 │       └── resetAnimation.js
-└── css/
-    ├── styles.css                # @imports only
-    ├── base.css
-    ├── backgrounds.css
-    ├── dashboard.css
-    ├── forms.css
-    ├── buttons.css
-    ├── toolbar.css
-    ├── jobs.css
-    ├── workflow.css
-    ├── datepicker.css
-    ├── referrals.css
-    ├── modals.css
-    ├── history.css
-    ├── config.css
-    ├── feedback.css
-    ├── responsive.css
-    └── auth.css
+├── css/
+│   ├── styles.css                # @imports only
+│   ├── tokens.css                # CSS variables (light + dark)
+│   ├── reset.css                 # *, html, body, .container
+│   ├── header.css                # header, brand, icon buttons
+│   ├── user-menu.css             # Dropdown, ripple, highlight pulse
+│   ├── backgrounds.css
+│   ├── dashboard.css
+│   ├── forms.css
+│   ├── buttons.css
+│   ├── toolbar.css
+│   ├── jobs.css
+│   ├── workflow.css
+│   ├── datepicker.css
+│   ├── referrals.css
+│   ├── modals.css
+│   ├── history.css
+│   ├── config.css
+│   ├── feedback.css
+│   ├── responsive.css
+│   └── auth.css
+└── tests/
+    ├── selectors.test.js
+    ├── utils.test.js
+    ├── migrations.test.js
+    └── store.test.js
 ```
+
+---
+
+## Architecture notes
+
+A few conventions that have grown over time and are worth knowing before
+editing:
+
+- **`main.js` orchestrates, `boot/*` does the work.** Adding a new
+  cross-cutting concern (shortcuts, a service worker, telemetry) usually means
+  a new file in `js/boot/` and one call from `main.js`.
+- **i18n is one interface, two dictionaries.** Consumers keep importing from
+  `js/i18n.js`. The ES/EN content lives in `js/i18n/{es,en}.js`. Adding a
+  language is one new file + one entry in `SUPPORTED_LANGS`.
+- **State derivations live in `selectors.js`.** Filters, sorts, statistics,
+  weekly trends, top-N helpers — anything pure that reads from state and
+  returns new data. Controllers call selectors, not the other way around.
+- **Dashboard styles are pluggable.** Each style is a function that receives
+  a container and a data object and renders into it. Adding a style is one new
+  file in `js/ui/dashboard/` plus a switch case in `index.js`.
+- **Events are typed.** Cross-module signals go through `js/events.js`. Raw
+  `document.dispatchEvent(new CustomEvent(...))` calls are not allowed outside
+  that file.
+- **Every migration is a pure function.** `migrateJob`, `migrateRef`,
+  `migrateConfig` take an old-shaped object and return a current-shaped one.
+  They're used both at boot and at backup import — that keeps the two paths in
+  sync automatically.
 
 ---
 
 ## Coding conventions
 
 - **Language**: all identifiers, comments, and internal log messages are in
-  English. User-facing strings live in `js/i18n.js` and are the only place
-  Spanish is allowed.
+  English. User-facing strings live in `js/i18n/{es,en}.js` — that's the only
+  place Spanish is allowed.
 - **Data keys**: everything stored in `localStorage` uses English keys
   (`company`, `role`, `status`, `date`, …) and English values for enum-like
   fields (`Saved`, `Applied`, `Offer`, `Pending`, `Hired`, …).
 - **CSS**: class names and any `data-*` attributes are English
   (`data-status`, `data-relationship`, `.workmode-seg`, `.currency-chip`, …).
+- **File size**: aim for under ~500 lines per file. When a module grows past
+  that, split by concern rather than by size.
+- **No build step**: everything ships as-is over HTTP. Avoid adding a bundler
+  or TypeScript unless the scope grows significantly.
 
 ---
 

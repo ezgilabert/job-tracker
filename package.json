@@ -1,0 +1,14 @@
+{
+  "name": "job-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local app for tracking a job search: applications, process stages, and referrals.",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
