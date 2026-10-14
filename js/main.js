@@ -19,7 +19,7 @@ import { mountFirstRun }   from './boot/firstRun.js';
 import { mountJobsController }      from './controllers/jobsController.js';
 import { mountRefsController }      from './controllers/refsController.js';
 import { mountModalsController }    from './controllers/modals/index.js';
-import { mountConfigController }    from './controllers/configController.js';
+import { mountConfigController }    from './controllers/config/index.js';
 import { mountCreateRoleController } from './controllers/createRoleController.js';
 
 import { DatePicker }       from './ui/form/datePicker.js';
