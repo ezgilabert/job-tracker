@@ -4,7 +4,7 @@
 
 import {
   STORAGE_KEYS, LOGO_OPTIONS,
-} from '../constants.js';
+} from '../app/constants.js';
 
 /**
  * Mounts the theme toggle button. Reads the persisted theme on

@@ -2,7 +2,7 @@
 // ConfirmModal: reusable confirmation dialog
 // ============================================================
 
-import { t } from '../i18n.js';
+import { t } from '../../i18n/index.js';
 
 const modal = document.getElementById('confirmModal');
 const titleEl = document.getElementById('confirmTitle');

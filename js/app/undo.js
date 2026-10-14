@@ -11,8 +11,8 @@
 // intermediate state.
 // ============================================================
 
-import { showToast, showActionToast } from './ui/toast.js';
-import { t } from './i18n.js';
+import { showToast, showActionToast } from '../ui/feedback/toast.js';
+import { t } from '../i18n/index.js';
 
 let activeUndo = null;
 

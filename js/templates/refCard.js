@@ -4,11 +4,11 @@
 // Relationship multi-select.
 // ============================================================
 
-import { REF_WORKFLOW_STEPS } from '../constants.js';
-import { isRefClosed, refStepIndex } from '../selectors.js';
-import { escapeHtml, ensureArray } from '../utils.js';
+import { REF_WORKFLOW_STEPS } from '../app/constants.js';
+import { isRefClosed, refStepIndex } from '../app/selectors.js';
+import { escapeHtml, ensureArray } from '../app/utils.js';
 import { renderSteps } from './steps.js';
-import { t, tRefState, tRefStateShort } from '../i18n.js';
+import { t, tRefState, tRefStateShort } from '../i18n/index.js';
 
 /**
  * @param {object} ref

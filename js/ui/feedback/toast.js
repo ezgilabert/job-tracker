@@ -4,10 +4,10 @@
 // Plain toast: no interaction, auto-dismisses after `duration`.
 // Action toast: shows a single button, resolves on click or
 // timeout. Only one action toast should be live at a time — the
-// caller (js/undo.js) is responsible for that.
+// caller (js/app/undo.js) is responsible for that.
 // ============================================================
 
-import { escapeHtml } from '../utils.js';
+import { escapeHtml } from '../../app/utils.js';
 
 const CONTAINER_ID = 'toasts';
 

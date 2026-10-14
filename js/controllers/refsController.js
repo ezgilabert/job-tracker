@@ -2,29 +2,29 @@
 // Controller: referrals
 // ============================================================
 
-import { showToast } from '../ui/toast.js';
-import { showConfirm } from '../ui/confirmModal.js';
+import { showToast } from '../ui/feedback/toast.js';
+import { showConfirm } from '../ui/feedback/confirmModal.js';
 import {
   filterRefs, refStepIndex, isRefClosed,
   topByCount, buildWeeklyTrend, buildDailyActivity,
-} from '../selectors.js';
-import { REF_WORKFLOW_STEPS } from '../constants.js';
+} from '../app/selectors.js';
+import { REF_WORKFLOW_STEPS } from '../app/constants.js';
 import { renderRefCard } from '../templates/refCard.js';
-import { uid, highlightAndScroll, escapeHtml, cloneArray, valueOf } from '../utils.js';
+import { uid, highlightAndScroll, escapeHtml, cloneArray, valueOf } from '../app/utils.js';
 import { renderDashboard } from '../ui/dashboard.js';
-import { t, tRefState, tRefStateShort } from '../i18n.js';
-import { scrollToJob, onScrollToRef, onI18nChanged } from '../events.js';
-import { withUndo } from '../undo.js';
+import { t, tRefState, tRefStateShort } from '../i18n/index.js';
+import { scrollToJob, onScrollToRef, onI18nChanged } from '../app/events.js';
+import { withUndo } from '../app/undo.js';
 
 /**
- * @param {import('../store.js').Store} jobsStore
- * @param {import('../store.js').Store} refsStore
+ * @param {import('../app/store.js').Store} jobsStore
+ * @param {import('../app/store.js').Store} refsStore
  * @param {{
  *   onOpenRefEdit:   (id:number)=>void,
  *   onRefToJob:      (refId:number)=>void,
  *   onOpenRefHistory:(id:number)=>void,
  * }} modals
- * @param {import('../store.js').Store} configStore
+ * @param {import('../app/store.js').Store} configStore
  */
 export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------

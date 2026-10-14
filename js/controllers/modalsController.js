@@ -2,35 +2,35 @@
 // Controller: modals
 // ============================================================
 
-import { showToast } from '../ui/toast.js';
-import { showConfirm } from '../ui/confirmModal.js';
-import { DatePicker } from '../ui/datePicker.js';
-import { RoleCombo } from '../ui/combo.js';
-import { WorkModePicker } from '../ui/workModePicker.js';
-import { CurrencyPicker } from '../ui/currencyPicker.js';
-import { SalaryModeChip } from '../ui/salaryModeChip.js';
-import { SalaryInput } from '../ui/salaryInput.js';
-import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
-import { mountChips } from '../ui/chips.js';
+import { showToast } from '../ui/feedback/toast.js';
+import { showConfirm } from '../ui/feedback/confirmModal.js';
+import { DatePicker } from '../ui/form/datePicker.js';
+import { RoleCombo } from '../ui/form/combo.js';
+import { WorkModePicker } from '../ui/form/workModePicker.js';
+import { CurrencyPicker } from '../ui/form/currencyPicker.js';
+import { SalaryModeChip } from '../ui/form/salaryModeChip.js';
+import { SalaryInput } from '../ui/form/salaryInput.js';
+import { ContactLinkPicker } from '../ui/form/contactLinkPicker.js';
+import { mountChips } from '../ui/form/chips.js';
 import {
   CLOSE_REASON_KEYS, WORKFLOW_STEPS,
   getStateIcon, getRefStateIcon,
-} from '../constants.js';
-import { stepIndex, isClosed } from '../selectors.js';
+} from '../app/constants.js';
+import { stepIndex, isClosed } from '../app/selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray,
   formatDateTime, valueOf, setVal,
-} from '../utils.js';
+} from '../app/utils.js';
 import {
   t, tState, tStateShort, tRefState, tRefStateShort,
-} from '../i18n.js';
-import { scrollToJob, onScrollToJob, onI18nChanged } from '../events.js';
-import { withUndo } from '../undo.js';
+} from '../i18n/index.js';
+import { scrollToJob, onScrollToJob, onI18nChanged } from '../app/events.js';
+import { withUndo } from '../app/undo.js';
 
 /**
- * @param {import('../store.js').Store} jobsStore
- * @param {import('../store.js').Store} refsStore
- * @param {import('../store.js').Store} configStore
+ * @param {import('../app/store.js').Store} jobsStore
+ * @param {import('../app/store.js').Store} refsStore
+ * @param {import('../app/store.js').Store} configStore
  * @param {{ requestNewRole: (suggested:string)=>Promise<string|null> }} createRoleCtrl
  */
 export function mountModalsController(jobsStore, refsStore, configStore, createRoleCtrl) {

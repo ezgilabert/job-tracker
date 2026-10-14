@@ -2,16 +2,16 @@
 // Entry point for the login screen (mocked single-user auth).
 // ============================================================
 
-import { applyI18n, setLanguage, t } from '../i18n.js';
+import { applyI18n, setLanguage, t } from '../i18n/index.js';
 import {
   LOGO_OPTIONS, DEFAULT_LOGO, DEFAULT_LANG, STORAGE_KEYS,
   DEFAULT_BACKGROUND, applyBackground,
-} from '../constants.js';
+} from '../app/constants.js';
 import {
   login, redirectIfAuthenticated, validateCredentials,
   getLockoutRemainingMs,
 } from './session.js';
-import { mountInputLimits } from '../ui/inputLimits.js';
+import { mountInputLimits } from '../ui/form/inputLimits.js';
 
 // ------------------------------------------------------------
 // Persisted config reader (logo, language, background)

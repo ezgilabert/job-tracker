@@ -2,9 +2,9 @@
 // Controller: config
 // ============================================================
 
-import { showToast } from '../ui/toast.js';
-import { showConfirm } from '../ui/confirmModal.js';
-import { ResetAnimation } from '../ui/resetAnimation.js';
+import { showToast } from '../ui/feedback/toast.js';
+import { showConfirm } from '../ui/feedback/confirmModal.js';
+import { ResetAnimation } from '../ui/feedback/resetAnimation.js';
 import {
   ROLE_TAGS_LIST, ROLE_TAGS, DEFAULT_ROLES,
   WORKFLOW_STEPS, CONFIG_FILTER_META, getDefaultConfig,
@@ -14,17 +14,17 @@ import {
   NO_ROLE_VALUE,
   BACKUP_APP_ID, BACKUP_VERSION,
   STORAGE_KEYS,
-} from '../constants.js';
-import { migrateJob, migrateRef, migrateConfig } from '../migrations.js';
-import { escapeHtml, cloneArray } from '../utils.js';
+} from '../app/constants.js';
+import { migrateJob, migrateRef, migrateConfig } from '../app/migrations.js';
+import { escapeHtml, cloneArray } from '../app/utils.js';
 import {
   SUPPORTED_LANGS, t, tState, tStateShort,
-} from '../i18n.js';
+} from '../i18n/index.js';
 
 /**
- * @param {import('../store.js').Store} configStore
- * @param {import('../store.js').Store} jobsStore
- * @param {import('../store.js').Store} refsStore
+ * @param {import('../app/store.js').Store} configStore
+ * @param {import('../app/store.js').Store} jobsStore
+ * @param {import('../app/store.js').Store} refsStore
  */
 export function mountConfigController(configStore, jobsStore, refsStore) {
   const modal = document.getElementById('configModal');

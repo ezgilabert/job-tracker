@@ -2,35 +2,35 @@
 // Controller: jobs
 // ============================================================
 
-import { showToast } from '../ui/toast.js';
-import { showConfirm } from '../ui/confirmModal.js';
-import { RoleCombo } from '../ui/combo.js';
-import { StatusCombo } from '../ui/statusCombo.js';
-import { WorkModePicker } from '../ui/workModePicker.js';
-import { CurrencyPicker } from '../ui/currencyPicker.js';
-import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
-import { SalaryInput } from '../ui/salaryInput.js';
-import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
+import { showToast } from '../ui/feedback/toast.js';
+import { showConfirm } from '../ui/feedback/confirmModal.js';
+import { RoleCombo } from '../ui/form/combo.js';
+import { StatusCombo } from '../ui/form/statusCombo.js';
+import { WorkModePicker } from '../ui/form/workModePicker.js';
+import { CurrencyPicker } from '../ui/form/currencyPicker.js';
+import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/form/salaryModeChip.js';
+import { SalaryInput } from '../ui/form/salaryInput.js';
+import { ContactLinkPicker } from '../ui/form/contactLinkPicker.js';
 import { renderDashboard } from '../ui/dashboard.js';
 import {
   computeStats, filterJobs, sortJobs, isClosed,
   topByCount, buildWeeklyTrend, buildDailyActivity,
-} from '../selectors.js';
-import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
+} from '../app/selectors.js';
+import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../app/constants.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
   uid, cloneArray, escapeHtml, valueOf,
-} from '../utils.js';
-import { t, tState, tStateShort } from '../i18n.js';
-import { scrollToRef, onScrollToJob, onI18nChanged } from '../events.js';
-import { withUndo } from '../undo.js';
+} from '../app/utils.js';
+import { t, tState, tStateShort } from '../i18n/index.js';
+import { scrollToRef, onScrollToJob, onI18nChanged } from '../app/events.js';
+import { withUndo } from '../app/undo.js';
 
 /**
- * @param {import('../store.js').Store} jobsStore
- * @param {import('../store.js').Store} refsStore
+ * @param {import('../app/store.js').Store} jobsStore
+ * @param {import('../app/store.js').Store} refsStore
  * @param {{ onOpenEdit, onClose, onAdvance, onOpenHistory }} modals
- * @param {import('../ui/datePicker.js').DatePicker} datePicker
- * @param {import('../store.js').Store} configStore
+ * @param {import('../ui/form/datePicker.js').DatePicker} datePicker
+ * @param {import('../app/store.js').Store} configStore
  * @param {{ requestNewRole: (suggested:string)=>Promise<string|null> }} createRoleCtrl
  */
 export function mountJobsController(jobsStore, refsStore, modals, datePicker, configStore, createRoleCtrl) {

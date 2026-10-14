@@ -7,7 +7,7 @@
 
 import {
   DEFAULT_LANG, DEFAULT_LOGO, DEFAULT_BACKGROUND, applyBackground,
-} from './constants.js';
+} from './app/constants.js';
 
 import { createStores }    from './boot/stores.js';
 import { mountTheme, applyLogo } from './boot/theme.js';
@@ -22,13 +22,13 @@ import { mountModalsController }    from './controllers/modalsController.js';
 import { mountConfigController }    from './controllers/configController.js';
 import { mountCreateRoleController } from './controllers/createRoleController.js';
 
-import { DatePicker }       from './ui/datePicker.js';
-import { mountChips }       from './ui/chips.js';
-import { mountInputLimits } from './ui/inputLimits.js';
+import { DatePicker }       from './ui/form/datePicker.js';
+import { mountChips }       from './ui/form/chips.js';
+import { mountInputLimits } from './ui/form/inputLimits.js';
 
-import { applyI18n, setLanguage, getLanguage } from './i18n.js';
+import { applyI18n, setLanguage, getLanguage } from './i18n/index.js';
 import { requireSession, startSessionHeartbeat } from './auth/session.js';
-import { emitI18nChanged, onI18nChanged } from './events.js';
+import { emitI18nChanged, onI18nChanged } from './app/events.js';
 
 // ------------------------------------------------------------
 // Global error handlers — surface anything that slips through.

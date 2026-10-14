@@ -2,16 +2,16 @@
 // Boot: instantiate the three reactive stores.
 //
 // Each store owns its localStorage key, version, seed and
-// migration chain. Migrations live in js/migrations.js and are
-// shared with the backup-import path.
+// migration chain. Migrations live in js/app/migrations.js and
+// are shared with the backup-import path.
 // ============================================================
 
-import { Store } from '../store.js';
+import { Store } from '../app/store.js';
 import {
   STORAGE_KEYS, STORAGE_VERSION, CONFIG_VERSION,
   SAMPLE_JOBS, getDefaultConfig,
-} from '../constants.js';
-import { migrateJob, migrateRef, migrateConfig } from '../migrations.js';
+} from '../app/constants.js';
+import { migrateJob, migrateRef, migrateConfig } from '../app/migrations.js';
 
 /**
  * @returns {{

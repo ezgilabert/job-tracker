@@ -5,13 +5,13 @@
 // ============================================================
 
 import { getSession, logout } from '../auth/session.js';
-import { getLanguage } from '../i18n.js';
+import { getLanguage } from '../i18n/index.js';
 
 /**
  * Wires up the header user menu.
  *
- * @param {import('../store.js').Store} configStore  used by the
- *        language toggle (language change goes through config).
+ * @param {import('../app/store.js').Store} configStore  used by
+ *        the language toggle (language change goes through config).
  */
 export function mountUserMenu(configStore) {
   const menu = document.getElementById('userMenu');
@@ -82,7 +82,6 @@ export function mountUserMenu(configStore) {
       document.querySelectorAll('.modal-overlay.open').forEach(el => {
         el.classList.remove('open');
       });
-      // Give the DOM a tick to repaint before opening the print dialog.
       setTimeout(() => window.print(), 100);
     });
   }

@@ -11,7 +11,7 @@
 // in sync when the user switches language.
 // ============================================================
 
-import { onI18nChanged } from '../events.js';
+import { onI18nChanged } from '../app/events.js';
 
 const STORAGE_KEY = 'jobTrackerWelcomeDismissed';
 
@@ -63,8 +63,8 @@ function buildContent(t) {
 }
 
 /**
- * @param {import('../store.js').Store} jobsStore
- * @param {import('../store.js').Store} refsStore
+ * @param {import('../app/store.js').Store} jobsStore
+ * @param {import('../app/store.js').Store} refsStore
  */
 export function mountFirstRun(jobsStore, refsStore) {
   if (isDismissed()) return;
@@ -75,7 +75,7 @@ export function mountFirstRun(jobsStore, refsStore) {
   banner.setAttribute('aria-label', 'Welcome');
 
   // Pull the current translator lazily so the module does not need
-  // to import from i18n.js at the top level.
+  // to import from i18n at the top level.
   let tFn = (k) => k;
 
   const render = () => {
@@ -106,7 +106,7 @@ export function mountFirstRun(jobsStore, refsStore) {
 
   // Load the translator and render. This is deferred so the rest of
   // boot is not blocked on an extra dynamic import.
-  import('../i18n.js').then(({ t }) => {
+  import('../i18n/index.js').then(({ t }) => {
     tFn = t;
     render();
 

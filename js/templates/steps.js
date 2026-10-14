@@ -2,8 +2,8 @@
 // Template: workflow step bar (jobs and referrals)
 // ============================================================
 
-import { escapeHtml } from '../utils.js';
-import { t, tStateShort, tRefStateShort } from '../i18n.js';
+import { escapeHtml } from '../app/utils.js';
+import { t, tStateShort, tRefStateShort } from '../i18n/index.js';
 
 /**
  * @param {Array<{ id: string, short: string }>} steps

@@ -2,14 +2,14 @@
 // Template: job card
 // ============================================================
 
-import { WORKFLOW_STEPS } from '../constants.js';
+import { WORKFLOW_STEPS } from '../app/constants.js';
 import {
   isClosed, stepIndex, progressPct,
   currentStepNote, lastHistoryEntry, refsForCompany,
-} from '../selectors.js';
-import { escapeHtml, daysSince, formatDate, ensureArray } from '../utils.js';
+} from '../app/selectors.js';
+import { escapeHtml, daysSince, formatDate, ensureArray } from '../app/utils.js';
 import { renderSteps } from './steps.js';
-import { t, tState, tStateShort } from '../i18n.js';
+import { t, tState, tStateShort } from '../i18n/index.js';
 
 /**
  * @param {object} job

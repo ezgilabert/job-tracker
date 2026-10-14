@@ -5,13 +5,13 @@
 // config.roles.customTags.
 // ============================================================
 
-import { showToast } from '../ui/toast.js';
-import { DEFAULT_ROLES, ROLE_TAGS_LIST } from '../constants.js';
-import { escapeHtml } from '../utils.js';
-import { t } from '../i18n.js';
+import { showToast } from '../ui/feedback/toast.js';
+import { DEFAULT_ROLES, ROLE_TAGS_LIST } from '../app/constants.js';
+import { escapeHtml } from '../app/utils.js';
+import { t } from '../i18n/index.js';
 
 /**
- * @param {import('../store.js').Store} configStore
+ * @param {import('../app/store.js').Store} configStore
  */
 export function mountCreateRoleController(configStore) {
   const modal = document.getElementById('createRoleModal');

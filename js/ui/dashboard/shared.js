@@ -1,11 +1,11 @@
 // ============================================================
 // Dashboard: shared utilities used by every style.
 //
-// Trend/activity helpers live in js/selectors.js now — they are
-// derivations of state, not dashboard presentation.
+// Trend/activity helpers live in js/app/selectors.js now —
+// they are derivations of state, not dashboard presentation.
 // ============================================================
 
-import { escapeHtml } from '../../utils.js';
+import { escapeHtml } from '../../app/utils.js';
 
 // ------------------------------------------------------------
 // Small uid helper (for unique SVG gradient ids)

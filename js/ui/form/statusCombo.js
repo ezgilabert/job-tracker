@@ -7,9 +7,9 @@
 // read the value exactly like before.
 // ============================================================
 
-import { WORKFLOW_STEPS, getStateIcon } from '../constants.js';
-import { escapeHtml } from '../utils.js';
-import { tState } from '../i18n.js';
+import { WORKFLOW_STEPS, getStateIcon } from '../../app/constants.js';
+import { escapeHtml } from '../../app/utils.js';
+import { tState } from '../../i18n/index.js';
 
 export class StatusCombo {
   /**

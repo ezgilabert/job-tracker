@@ -2,9 +2,9 @@
 // RoleCombo: filterable role dropdown.
 // ============================================================
 
-import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS, NO_ROLE_VALUE } from '../constants.js';
-import { escapeHtml } from '../utils.js';
-import { t } from '../i18n.js';
+import { DEFAULT_ROLES, ROLE_TAGS, ROLE_ICONS, NO_ROLE_VALUE } from '../../app/constants.js';
+import { escapeHtml } from '../../app/utils.js';
+import { t } from '../../i18n/index.js';
 
 const DEVELOPER_ROLE = /\b(developer|engineer|sre|tech lead|software|front[\s-]?end|back[\s-]?end|full[\s-]?stack)\b/i;
 

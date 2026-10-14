@@ -2,8 +2,8 @@
 // DatePicker: custom date selector
 // ============================================================
 
-import { t } from '../i18n.js';
-import { toLocalISO } from '../utils.js';
+import { t } from '../../i18n/index.js';
+import { toLocalISO } from '../../app/utils.js';
 
 /**
  * Usage:

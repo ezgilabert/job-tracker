@@ -6,8 +6,8 @@
 // transparent — no other module needs to change.
 // ============================================================
 
-import { es } from './i18n/es.js';
-import { en } from './i18n/en.js';
+import { es } from './es.js';
+import { en } from './en.js';
 
 // ------------------------------------------------------------
 // Supported languages (metadata for the config picker)

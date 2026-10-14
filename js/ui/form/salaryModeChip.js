@@ -7,7 +7,7 @@
 // No color change when toggling; only the label text changes.
 // ============================================================
 
-import { t } from '../i18n.js';
+import { t } from '../../i18n/index.js';
 
 export const SALARY_MODES = ['range', 'single'];
 export const DEFAULT_SALARY_MODE = 'range';
