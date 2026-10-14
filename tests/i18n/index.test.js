@@ -9,7 +9,7 @@ import {
   t, setLanguage, getLanguage,
   tState, tStateShort, tRefState, tRefStateShort,
   SUPPORTED_LANGS, AVAILABLE_LANGS,
-} from '../js/i18n/index.js';
+} from '../../js/i18n/index.js';
 
 // ------------------------------------------------------------
 // Language registry

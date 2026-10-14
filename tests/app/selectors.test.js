@@ -10,7 +10,7 @@ import {
   filterJobs, sortJobs, currentStepNote, lastHistoryEntry,
   isRefClosed, refStepIndex, filterRefs, refsForJob,
   topByCount, buildWeeklyTrend, buildDailyActivity,
-} from '../js/app/selectors.js';
+} from '../../js/app/selectors.js';
 
 // ------------------------------------------------------------
 // isClosed / stepIndex / progressPct

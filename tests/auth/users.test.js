@@ -30,7 +30,7 @@ const {
   createUser, verifyPassword, deleteUser,
   validateRegistration,
   computeHash, isValidUsername, isValidEmail,
-} = await import('../js/auth/users.js');
+} = await import('../../js/auth/users.js');
 
 const STORAGE_KEY = 'jobTrackerUsers';
 

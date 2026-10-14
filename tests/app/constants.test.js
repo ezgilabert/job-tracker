@@ -15,7 +15,7 @@ import {
   LOGO_OPTIONS, DEFAULT_LOGO,
   BACKGROUND_OPTIONS, DEFAULT_BACKGROUND,
   DASHBOARD_STYLES, DEFAULT_DASHBOARD_STYLE,
-} from '../js/app/constants.js';
+} from '../../js/app/constants.js';
 
 const SPRITE_NAME = /^icon-[a-z0-9-]+$/;
 

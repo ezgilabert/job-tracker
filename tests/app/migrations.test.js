@@ -27,7 +27,7 @@ const {
   migrateJob, migrateRef, migrateConfig, migrateLegacyStorage,
   mapJobStatus, mapRefStatus, mapWorkMode, mapContactPlatform, mapRelationship,
   mapFilterId,
-} = await import('../js/app/migrations.js');
+} = await import('../../js/app/migrations.js');
 
 // ------------------------------------------------------------
 // Small mappers

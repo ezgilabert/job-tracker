@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import {
   escapeHtml, daysSince, formatDate, formatDateTime,
   todayISO, uid, ensureArray, cloneArray,
-} from '../js/app/utils.js';
+} from '../../js/app/utils.js';
 
 // Builds the local YYYY-MM-DD string for a given Date (or now).
 // Matches what todayISO() does internally, so the tests are
