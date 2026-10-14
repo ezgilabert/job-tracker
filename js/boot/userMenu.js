@@ -38,15 +38,11 @@ export function mountUserMenu(configStore) {
 
       if (nameEl) nameEl.textContent = displayName;
       if (emailEl) emailEl.textContent = displayEmail;
-
-      if (userHeader) userHeader.style.display = '';
-      if (loginBtn)   loginBtn.style.display = 'none';
-      if (logoutBtn)  logoutBtn.style.display = '';
-    } else {
-      if (userHeader) userHeader.style.display = 'none';
-      if (loginBtn)   loginBtn.style.display = '';
-      if (logoutBtn)  logoutBtn.style.display = 'none';
     }
+
+    if (userHeader) userHeader.classList.toggle('is-hidden', !logged);
+    if (loginBtn)   loginBtn.classList.toggle('is-hidden', logged);
+    if (logoutBtn)  logoutBtn.classList.toggle('is-hidden', !logged);
   }
 
   refresh();

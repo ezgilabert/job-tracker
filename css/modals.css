@@ -238,3 +238,80 @@
   font-size: 0.82rem;
   font-style: italic;
 }
+
+/* ============================================================
+   Modal size variants
+   ============================================================ */
+
+.modal-xs { max-width: 420px; }
+.modal-sm { max-width: 440px; }
+.modal-md { max-width: 480px; }
+.modal-lg { max-width: 540px; }
+.modal-xl { max-width: 560px; }
+
+/* Absolutely positioned close button.
+   Use together with .icon-btn:
+     <button class="icon-btn modal-close"> <svg><use/></svg> </button> */
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+}
+
+/* Muted caption paragraph inside a modal (subtitle / help text). */
+.modal-caption {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* Slightly larger modal paragraph (intro text). */
+.modal-paragraph {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Accent-colored heading inside a modal. */
+.modal-heading-accent { color: var(--accent); }
+
+/* Single-column form grid inside a modal. */
+.form-grid.single { grid-template-columns: 1fr; }
+
+/* Modal-actions with extra top spacing. */
+.modal-actions.spaced { margin-top: 1.5rem; }
+.modal-actions.tight  { margin-top: 1.25rem; }
+
+/* Reason chips row (close-job modal). */
+.close-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Danger-styled confirm button. Overrides .btn-primary. */
+.btn.btn-danger-confirm {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+.btn.btn-danger-confirm:hover {
+  background: var(--danger-2);
+  border-color: var(--danger-2);
+  box-shadow: 0 4px 12px rgba(239,68,68,0.35);
+}
+
+/* Small uppercase label above a list (e.g. ref-to-job picker). */
+.list-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+/* Modals that host an absolutely-positioned .modal-close */
+.modal-has-close { position: relative; }

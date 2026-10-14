@@ -459,10 +459,10 @@ export function mountConfigController(configStore, jobsStore, refsStore) {
     const container = document.getElementById('configHiddenList');
 
     if (hidden.length === 0) {
-      section.style.display = 'none';
+      section.classList.add('is-hidden');
       return;
     }
-    section.style.display = 'block';
+    section.classList.remove('is-hidden');
 
     container.innerHTML = hidden.map(p => `
       <div class="config-role-item hidden-role">

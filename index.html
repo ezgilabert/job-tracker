@@ -150,13 +150,13 @@
 
     <div class="header-actions">
       <div class="user-menu" id="userMenu">
-        <button class="icon-btn" id="userBtn" title="Account" data-i18n-title="auth.account">
+        <button type="button" class="icon-btn" id="userBtn" title="Account" data-i18n-title="auth.account">
           <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-account"/></svg>
         </button>
 
-        <div class="user-menu-dropdown" id="userMenuDropdown">
-          <div class="user-menu-header" id="userMenuHeader" style="display:none;">
-            <div class="user-menu-avatar" id="userMenuAvatar" aria-hidden="true">
+        <div class="user-menu-dropdown">
+          <div class="user-menu-header is-hidden" id="userMenuHeader">
+            <div class="user-menu-avatar" aria-hidden="true">
               <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-account"/></svg>
             </div>
             <div class="user-menu-info">
@@ -187,12 +187,12 @@
 
           <div class="user-menu-sep"></div>
 
-          <button type="button" class="user-menu-item" id="loginBtn" style="display:none;">
+          <button type="button" class="user-menu-item is-hidden" id="loginBtn">
             <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-login"/></svg>
             <span data-i18n="auth.login">Sign in</span>
           </button>
 
-          <button type="button" class="user-menu-item danger" id="logoutBtn" style="display:none;">
+          <button type="button" class="user-menu-item danger is-hidden" id="logoutBtn">
             <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-logout"/></svg>
             <span data-i18n="auth.logout">Sign out</span>
           </button>
@@ -217,7 +217,7 @@
         </div>
       </div>
       <div class="section-card-actions">
-        <button class="icon-btn" id="jobFormToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
+        <button type="button" class="icon-btn" id="jobFormToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
           <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-chevron-down"/></svg>
         </button>
       </div>
@@ -246,7 +246,7 @@
                     <input type="text" id="role" maxlength="100" placeholder="Choose or type a role" data-i18n-placeholder="form.role.placeholder" autocomplete="off">
                     <span class="combo-chevron">▾</span>
                   </div>
-                  <div class="combo-dropdown" id="roleDropdown"></div>
+                  <div class="combo-dropdown"></div>
                 </div>
               </div>
               <div class="field third">
@@ -258,14 +258,13 @@
                 <div class="combo combo-status" id="statusCombo">
                   <input type="hidden" id="status" value="">
                   <div class="combo-input-wrap">
-                    <button type="button" class="combo-trigger" id="statusTrigger"
-                            aria-haspopup="listbox" aria-expanded="false">
-                      <span class="combo-trigger-icon" id="statusTriggerIcon">🔖</span>
-                      <span class="combo-trigger-text" id="statusTriggerText">Saved</span>
+                    <button type="button" class="combo-trigger" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="combo-trigger-icon">🔖</span>
+                      <span class="combo-trigger-text">Saved</span>
                     </button>
                     <span class="combo-chevron">▾</span>
                   </div>
-                  <div class="combo-dropdown" id="statusDropdown" role="listbox"></div>
+                  <div class="combo-dropdown" role="listbox"></div>
                 </div>
               </div>
               <div class="field third">
@@ -351,7 +350,7 @@
 
               <div class="field full contact-link-picker" id="contactLinkPicker">
                 <label data-i18n="form.contactPlatform">How do you reach them?</label>
-                <div class="contact-chips" id="contactPlatformChips">
+                <div class="contact-chips">
                   <button type="button" class="contact-chip selected" data-platform="linkedin" data-placeholder="https://linkedin.com/in/mary-smith">
                     <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-linkedin"/></svg>
                     <span data-i18n="contact.platform.linkedin">LinkedIn</span>
@@ -369,9 +368,9 @@
                     <span data-i18n="contact.platform.other">Other</span>
                   </button>
                 </div>
-                <input type="hidden" id="contactPlatform" value="linkedin">
+                <input type="hidden" value="linkedin">
                 <div class="platform-input">
-                  <span class="platform-icon" id="contactPlatformIcon"></span>
+                  <span class="platform-icon"></span>
                   <input type="text" id="contactLink" maxlength="500" placeholder="https://linkedin.com/in/mary-smith">
                 </div>
                 <small class="contact-link-error"></small>
@@ -408,7 +407,7 @@
       </div>
       <div class="section-card-actions">
         <span class="job-counter" id="jobCounter">0</span>
-        <button class="icon-btn" id="jobsToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
+        <button type="button" class="icon-btn" id="jobsToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
           <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-chevron-down"/></svg>
         </button>
       </div>
@@ -445,7 +444,7 @@
         </div>
       </div>
       <div class="section-card-actions">
-        <button class="icon-btn collapsed" id="refFormToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
+        <button type="button" class="icon-btn collapsed" id="refFormToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
           <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-chevron-down"/></svg>
         </button>
       </div>
@@ -537,7 +536,7 @@
       </div>
       <div class="section-card-actions">
         <span class="ref-counter" id="refCounter">0</span>
-        <button class="icon-btn" id="refToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
+        <button type="button" class="icon-btn" id="refToggleBtn" title="Show/hide" data-i18n-title="form.toggle">
           <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-chevron-down"/></svg>
         </button>
       </div>
@@ -551,13 +550,13 @@
             <input type="text" id="refSearch" maxlength="120" placeholder="Search by name, company, note..." data-i18n-placeholder="refs.search.placeholder">
           </div>
           <div class="ref-filters" id="refFilters">
-            <button data-filter="all" class="active" data-i18n="refFilter.all">All</button>
-            <button data-filter="Pending"        data-i18n="refFilter.Pending">Pending</button>
-            <button data-filter="Contacted"      data-i18n="refFilter.Contacted">Contacted</button>
-            <button data-filter="Referred"       data-i18n="refFilter.Referred">Referred</button>
-            <button data-filter="In Process"     data-i18n="refFilter.In Process">In process</button>
-            <button data-filter="Hired"          data-i18n="refFilter.Hired">Hired</button>
-            <button data-filter="Not Applicable" data-i18n="refFilter.Not Applicable">Not applicable</button>
+            <button type="button" data-filter="all" class="active" data-i18n="refFilter.all">All</button>
+            <button type="button" data-filter="Pending"        data-i18n="refFilter.Pending">Pending</button>
+            <button type="button" data-filter="Contacted"      data-i18n="refFilter.Contacted">Contacted</button>
+            <button type="button" data-filter="Referred"       data-i18n="refFilter.Referred">Referred</button>
+            <button type="button" data-filter="In Process"     data-i18n="refFilter.In Process">In process</button>
+            <button type="button" data-filter="Hired"          data-i18n="refFilter.Hired">Hired</button>
+            <button type="button" data-filter="Not Applicable" data-i18n="refFilter.Not Applicable">Not applicable</button>
           </div>
         </div>
 
@@ -568,9 +567,9 @@
 </div>
 
 <!-- ===== Edit job modal ===== -->
-<div class="modal-overlay" id="editModal">
+<div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
   <div class="modal modal-v3">
-    <h2 data-i18n="modal.edit.title">✏️ Edit application</h2>
+    <h2 id="editModalTitle" data-i18n="modal.edit.title">✏️ Edit application</h2>
 
     <div class="v3-section">
       <div class="sec-head">
@@ -581,17 +580,17 @@
       </div>
       <div class="v3-grid">
         <div class="field half">
-          <label data-i18n="form.company">Company</label>
+          <label for="editCompany" data-i18n="form.company">Company</label>
           <input type="text" id="editCompany" maxlength="100">
         </div>
         <div class="field half">
-          <label data-i18n="form.role">Role</label>
+          <label for="editRole" data-i18n="form.role">Role</label>
           <div class="combo" id="editRoleCombo">
             <div class="combo-input-wrap">
               <input type="text" id="editRole" maxlength="100" autocomplete="off">
               <span class="combo-chevron">▾</span>
             </div>
-            <div class="combo-dropdown" id="editRoleDropdown"></div>
+            <div class="combo-dropdown"></div>
           </div>
         </div>
         <div class="field third">
@@ -606,7 +605,7 @@
           </div>
         </div>
         <div class="field third">
-          <label data-i18n="form.link">Link</label>
+          <label for="editLink" data-i18n="form.link">Link</label>
           <input type="url" id="editLink" maxlength="500">
         </div>
       </div>
@@ -682,13 +681,13 @@
       </div>
       <div class="v3-grid">
         <div class="field full">
-          <label data-i18n="form.contact">Contact</label>
+          <label for="editContact" data-i18n="form.contact">Contact</label>
           <input type="text" id="editContact" maxlength="120" placeholder="Name and role">
         </div>
 
         <div class="field full contact-link-picker" id="editContactLinkPicker">
           <label data-i18n="form.contactPlatform">How do you reach them?</label>
-          <div class="contact-chips" id="editContactPlatformChips">
+          <div class="contact-chips">
             <button type="button" class="contact-chip selected" data-platform="linkedin" data-placeholder="https://linkedin.com/in/mary-smith">
               <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-linkedin"/></svg>
               <span data-i18n="contact.platform.linkedin">LinkedIn</span>
@@ -706,16 +705,16 @@
               <span data-i18n="contact.platform.other">Other</span>
             </button>
           </div>
-          <input type="hidden" id="editContactPlatform" value="linkedin">
+          <input type="hidden" value="linkedin">
           <div class="platform-input">
-            <span class="platform-icon" id="editContactPlatformIcon"></span>
+            <span class="platform-icon"></span>
             <input type="text" id="editContactLink" maxlength="500" placeholder="https://linkedin.com/in/mary-smith">
           </div>
           <small class="contact-link-error"></small>
         </div>
 
         <div class="field full">
-          <label data-i18n="form.notes">Notes</label>
+          <label for="editNotes" data-i18n="form.notes">Notes</label>
           <div class="notes-highlight">
             <textarea id="editNotes" maxlength="2000" placeholder="Contact, next step, referrals..."></textarea>
           </div>
@@ -724,82 +723,78 @@
     </div>
 
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="cancelEdit" data-i18n="modal.cancel">Cancel</button>
-      <button class="btn btn-primary" id="saveEdit" data-i18n="modal.saveChanges">Save changes</button>
+      <button type="button" class="btn btn-ghost" id="cancelEdit" data-i18n="modal.cancel">Cancel</button>
+      <button type="button" class="btn btn-primary" id="saveEdit" data-i18n="modal.saveChanges">Save changes</button>
     </div>
   </div>
 </div>
 
 <!-- Close job modal -->
-<div class="modal-overlay" id="closeModal">
-  <div class="modal" style="max-width: 480px;">
+<div class="modal-overlay" id="closeModal" role="dialog" aria-modal="true" aria-labelledby="closeModalTitle">
+  <div class="modal modal-md">
     <h2 id="closeModalTitle" data-i18n="close.titleDefault">Close application</h2>
-    <p id="closeModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;"></p>
-    <div class="form-grid" style="grid-template-columns:1fr;">
+    <p id="closeModalSubtitle" class="modal-caption field-mb"></p>
+    <div class="form-grid single">
       <div class="field full">
         <label>
           <span data-i18n="close.reason">Reason</span>
-          <span style="color:var(--danger);font-weight:700;">*</span>
+          <span class="required-mark">*</span>
         </label>
-        <div id="closeReasons" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;"></div>
-        <textarea id="closeReason" maxlength="500" placeholder="Briefly describe what happened..." data-i18n-placeholder="close.reason.placeholder" style="min-height:80px;"></textarea>
+        <div id="closeReasons" class="close-reasons"></div>
+        <textarea id="closeReason" maxlength="500" placeholder="Briefly describe what happened..." data-i18n-placeholder="close.reason.placeholder" class="textarea-compact"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="cancelClose" data-i18n="modal.cancel">Cancel</button>
-      <button class="btn btn-primary" id="confirmClose" style="background:var(--danger);" data-i18n="close.confirm">Confirm close</button>
+      <button type="button" class="btn btn-ghost" id="cancelClose" data-i18n="modal.cancel">Cancel</button>
+      <button type="button" class="btn btn-primary btn-danger-confirm" id="confirmClose" data-i18n="close.confirm">Confirm close</button>
     </div>
   </div>
 </div>
 
 <!-- Job history modal -->
-<div class="modal-overlay" id="historyModal">
-  <div class="modal" style="max-width: 560px; position: relative;">
-    <button class="icon-btn" id="closeHistoryModal"
-            style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Close" data-i18n-title="modal.close">
+<div class="modal-overlay" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+  <div class="modal modal-xl modal-has-close">
+    <button type="button" class="icon-btn modal-close" id="closeHistoryModal" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
 
-    <h2 data-i18n="hist.title">🕒 Application history</h2>
+    <h2 id="historyModalTitle" data-i18n="hist.title">🕒 Application history</h2>
     <p id="historySubtitle" class="history-subtitle"></p>
     <div class="history-timeline" id="historyTimeline"></div>
-    <div class="history-skipped" id="historySkipped" style="display:none;">
+    <div class="history-skipped is-hidden" id="historySkipped">
       <div class="history-skipped-title" data-i18n="hist.skipped">Skipped stages</div>
       <div class="history-skipped-list" id="historySkippedList"></div>
     </div>
-    <div class="modal-actions" style="margin-top:1.5rem;">
-      <button class="btn btn-primary" id="closeHistoryBtn" data-i18n="modal.close">Close</button>
+    <div class="modal-actions spaced">
+      <button type="button" class="btn btn-primary" id="closeHistoryBtn" data-i18n="modal.close">Close</button>
     </div>
   </div>
 </div>
 
 <!-- Referral history modal -->
-<div class="modal-overlay" id="refHistoryModal">
-  <div class="modal" style="max-width: 560px; position: relative;">
-    <button class="icon-btn" id="closeRefHistoryModal"
-            style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Close" data-i18n-title="modal.close">
+<div class="modal-overlay" id="refHistoryModal" role="dialog" aria-modal="true" aria-labelledby="refHistoryModalTitle">
+  <div class="modal modal-xl modal-has-close">
+    <button type="button" class="icon-btn modal-close" id="closeRefHistoryModal" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
 
-    <h2 data-i18n="hist.refTitle">🕒 Referral history</h2>
+    <h2 id="refHistoryModalTitle" data-i18n="hist.refTitle">🕒 Referral history</h2>
     <p id="refHistorySubtitle" class="history-subtitle"></p>
     <div class="history-timeline" id="refHistoryTimeline"></div>
-    <div class="modal-actions" style="margin-top:1.5rem;">
-      <button class="btn btn-primary" id="closeRefHistoryBtn" data-i18n="modal.close">Close</button>
+    <div class="modal-actions spaced">
+      <button type="button" class="btn btn-primary" id="closeRefHistoryBtn" data-i18n="modal.close">Close</button>
     </div>
   </div>
 </div>
 
 <!-- Config modal -->
-<div class="modal-overlay" id="configModal">
-  <div class="modal config-modal">
-    <button class="icon-btn config-close" id="closeConfigBtn" title="Close" data-i18n-title="modal.close">
+<div class="modal-overlay" id="configModal" role="dialog" aria-modal="true" aria-labelledby="configModalTitle">
+  <div class="modal config-modal modal-has-close">
+    <button type="button" class="icon-btn config-close modal-close" id="closeConfigBtn" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
 
-    <h2>
+    <h2 id="configModalTitle">
       <span data-i18n="config.title">⚙️ Settings</span>
       <span class="unsaved-badge" id="configUnsavedBadge" data-i18n="config.unsaved">Unsaved</span>
     </h2>
@@ -807,46 +802,46 @@
 
     <div class="config-layout">
       <nav class="config-nav" role="tablist">
-        <button class="config-tab active" data-tab="roles" role="tab">
+        <button type="button" class="config-tab active" data-tab="roles" role="tab">
           <span class="config-tab-icon">💼</span>
           <span class="config-tab-label" data-i18n="config.tab.roles">Roles</span>
         </button>
-        <button class="config-tab" data-tab="statuses" role="tab">
+        <button type="button" class="config-tab" data-tab="statuses" role="tab">
           <span class="config-tab-icon">🚩</span>
           <span class="config-tab-label" data-i18n="config.tab.statuses">Initial statuses</span>
         </button>
-        <button class="config-tab" data-tab="filters" role="tab">
+        <button type="button" class="config-tab" data-tab="filters" role="tab">
           <span class="config-tab-icon">🎛️</span>
           <span class="config-tab-label" data-i18n="config.tab.filters">Filters</span>
         </button>
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <button class="config-tab" data-tab="appearance" role="tab">
+        <button type="button" class="config-tab" data-tab="appearance" role="tab">
           <span class="config-tab-icon">🎨</span>
           <span class="config-tab-label" data-i18n="config.tab.appearance">Appearance</span>
         </button>
 
-        <button class="config-tab" data-tab="dashboard" role="tab">
+        <button type="button" class="config-tab" data-tab="dashboard" role="tab">
           <span class="config-tab-icon">📊</span>
           <span class="config-tab-label" data-i18n="config.tab.dashboard">Dashboard</span>
         </button>
 
-        <button class="config-tab" data-tab="language" role="tab">
+        <button type="button" class="config-tab" data-tab="language" role="tab">
           <span class="config-tab-icon">🌐</span>
           <span class="config-tab-label" data-i18n="config.tab.language">Language</span>
         </button>
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <button class="config-tab" data-tab="profile" role="tab">
+        <button type="button" class="config-tab" data-tab="profile" role="tab">
           <span class="config-tab-icon">👤</span>
           <span class="config-tab-label" data-i18n="config.tab.profile">Profile</span>
         </button>
 
         <div class="config-nav-sep" aria-hidden="true"></div>
 
-        <button class="config-tab" data-tab="advanced" role="tab">
+        <button type="button" class="config-tab" data-tab="advanced" role="tab">
           <span class="config-tab-icon">⚠️</span>
           <span class="config-tab-label" data-i18n="config.tab.advanced">Advanced</span>
         </button>
@@ -868,7 +863,7 @@
             </div>
             <div class="config-add-row">
               <input type="text" id="configNewRole" maxlength="80" placeholder="Ex: Rust Developer" data-i18n-placeholder="config.custom.placeholder">
-              <button class="btn btn-primary" id="configAddRole" data-i18n="config.custom.add">Add</button>
+              <button type="button" class="btn btn-primary" id="configAddRole" data-i18n="config.custom.add">Add</button>
             </div>
           </div>
 
@@ -883,7 +878,7 @@
             <div class="config-roles-list" id="configRolesList"></div>
           </div>
 
-          <div class="config-section" id="configHiddenSection" style="display:none;">
+          <div class="config-section is-hidden" id="configHiddenSection">
             <div class="config-section-head">
               <h3 data-i18n="config.hidden.title">Hidden roles</h3>
               <p data-i18n="config.hidden.desc">Restore the ones you want back.</p>
@@ -972,7 +967,7 @@
                 <button type="button" class="danger" id="configProfileRemove" data-i18n="profile.remove">Remove</button>
               </div>
               <span class="profile-avatar-hint" data-i18n="profile.formats">JPG, PNG or GIF · max 2 MB</span>
-              <input type="file" id="configProfileFileInput" accept="image/*" style="display:none;">
+              <input type="file" id="configProfileFileInput" accept="image/*" class="is-hidden">
             </div>
 
             <div class="field">
@@ -1043,7 +1038,7 @@
                 <button type="button" class="btn btn-ghost" id="importDataBtn">
                   ⬆ <span data-i18n="config.backup.import">Import</span>
                 </button>
-                <input type="file" id="importDataInput" accept="application/json,.json" style="display:none;">
+                <input type="file" id="importDataInput" accept="application/json,.json" class="is-hidden">
               </div>
             </div>
           </div>
@@ -1089,46 +1084,46 @@
     </div>
 
     <div class="config-actions">
-      <button class="btn btn-ghost" id="cancelConfigBtn" data-i18n="modal.cancel">Cancel</button>
-      <button class="btn btn-primary" id="saveConfigBtn" data-i18n="config.save">💾 Save changes</button>
+      <button type="button" class="btn btn-ghost" id="cancelConfigBtn" data-i18n="modal.cancel">Cancel</button>
+      <button type="button" class="btn btn-primary" id="saveConfigBtn" data-i18n="config.save">💾 Save changes</button>
     </div>
   </div>
 </div>
 
 <!-- Unsaved changes modal -->
-<div class="modal-overlay nested" id="unsavedModal">
-  <div class="modal unsaved-modal" style="max-width: 460px;">
-    <button class="icon-btn unsaved-close" id="unsavedCloseBtn" title="Close" data-i18n-title="modal.close">
+<div class="modal-overlay nested" id="unsavedModal" role="dialog" aria-modal="true" aria-labelledby="unsavedModalTitle">
+  <div class="modal modal-md modal-has-close unsaved-modal">
+    <button type="button" class="icon-btn unsaved-close modal-close" id="unsavedCloseBtn" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
-    <h2 data-i18n="unsaved.title">⚠️ Unsaved changes</h2>
-    <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.75rem;" data-i18n-html="unsaved.message">You modified the settings but haven't saved yet.<br>What do you want to do?</p>
+    <h2 id="unsavedModalTitle" data-i18n="unsaved.title">⚠️ Unsaved changes</h2>
+    <p class="modal-paragraph" data-i18n-html="unsaved.message">You modified the settings but haven't saved yet.<br>What do you want to do?</p>
     <div class="unsaved-actions">
-      <button class="btn btn-danger-ghost" id="unsavedDiscard" data-i18n="unsaved.discard">Discard</button>
-      <button class="btn btn-primary" id="unsavedSave" data-i18n="unsaved.save">Save and exit</button>
+      <button type="button" class="btn btn-danger-ghost" id="unsavedDiscard" data-i18n="unsaved.discard">Discard</button>
+      <button type="button" class="btn btn-primary" id="unsavedSave" data-i18n="unsaved.save">Save and exit</button>
     </div>
   </div>
 </div>
 
 <!-- Edit referral modal -->
-<div class="modal-overlay" id="refEditModal">
+<div class="modal-overlay" id="refEditModal" role="dialog" aria-modal="true" aria-labelledby="refEditModalTitle">
   <div class="modal">
-    <h2 data-i18n="refEdit.title">✏️ Edit referral</h2>
+    <h2 id="refEditModalTitle" data-i18n="refEdit.title">✏️ Edit referral</h2>
     <div class="form-grid">
       <div class="field">
-        <label data-i18n="refs.name">Name</label>
+        <label for="refEditName" data-i18n="refs.name">Name</label>
         <input type="text" id="refEditName" maxlength="80">
       </div>
       <div class="field">
-        <label data-i18n="refs.role">Role / Company</label>
+        <label for="refEditRole" data-i18n="refs.role">Role / Company</label>
         <input type="text" id="refEditRole" maxlength="120">
       </div>
       <div class="field">
-        <label data-i18n="refs.contact">Contact</label>
+        <label for="refEditContact" data-i18n="refs.contact">Contact</label>
         <input type="text" id="refEditContact" maxlength="200">
       </div>
       <div class="field">
-        <label data-i18n="refs.link">Link</label>
+        <label for="refEditLink" data-i18n="refs.link">Link</label>
         <input type="url" id="refEditLink" maxlength="500">
       </div>
       <div class="field full">
@@ -1154,23 +1149,23 @@
         </div>
       </div>
       <div class="field full">
-        <label data-i18n="refs.notes">Notes</label>
-        <textarea id="refEditNotes" maxlength="2000" style="min-height:80px"></textarea>
+        <label for="refEditNotes" data-i18n="refs.notes">Notes</label>
+        <textarea id="refEditNotes" maxlength="2000" class="textarea-compact"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="refCancelEdit" data-i18n="modal.cancel">Cancel</button>
-      <button class="btn btn-primary" id="refSaveEdit" data-i18n="modal.saveChanges">Save changes</button>
+      <button type="button" class="btn btn-ghost" id="refCancelEdit" data-i18n="modal.cancel">Cancel</button>
+      <button type="button" class="btn btn-primary" id="refSaveEdit" data-i18n="modal.saveChanges">Save changes</button>
     </div>
   </div>
 </div>
 
 <!-- Move referral to applications modal -->
-<div class="modal-overlay" id="refToJobModal">
-  <div class="modal" style="max-width: 540px;">
-    <h2 style="color:var(--accent);" data-i18n="refToJob.title">🎉 Referral done!</h2>
-    <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">
-      <strong id="refToJobName" style="color:var(--text);"></strong>
+<div class="modal-overlay" id="refToJobModal" role="dialog" aria-modal="true" aria-labelledby="refToJobModalTitle">
+  <div class="modal modal-lg">
+    <h2 id="refToJobModalTitle" class="modal-heading-accent" data-i18n="refToJob.title">🎉 Referral done!</h2>
+    <p class="modal-paragraph field-mb">
+      <strong id="refToJobName"></strong>
       <span data-i18n-html="refToJob.message"> has referred you. Do you want to move it to <strong>Applications</strong> to track it?</span>
     </p>
 
@@ -1191,80 +1186,76 @@
       </button>
     </div>
 
-    <div id="refToJobLinkSection" style="display:none; margin-top:1rem;">
-      <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;" data-i18n="refToJob.available">
+    <div id="refToJobLinkSection" class="field-spaced is-hidden">
+      <label class="list-label" data-i18n="refToJob.available">
         Available applications
       </label>
       <div class="ref-to-job-list" id="refToJobList"></div>
     </div>
 
-    <div class="modal-actions" style="margin-top:1.25rem;">
-      <button class="btn btn-ghost" id="refToJobSkip" data-i18n="refToJob.notNow">Not now</button>
-      <button class="btn btn-primary" id="refToJobConfirm" style="display:none;" data-i18n="refToJob.link">Link</button>
+    <div class="modal-actions tight">
+      <button type="button" class="btn btn-ghost" id="refToJobSkip" data-i18n="refToJob.notNow">Not now</button>
+      <button type="button" class="btn btn-primary is-hidden" id="refToJobConfirm" data-i18n="refToJob.link">Link</button>
     </div>
   </div>
 </div>
 
 <!-- Note on advance modal (jobs) -->
-<div class="modal-overlay" id="noteModal">
-  <div class="modal" style="max-width: 440px; position: relative;">
-    <button class="icon-btn" id="closeNoteModal"
-            style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Close" data-i18n-title="modal.close">
+<div class="modal-overlay" id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
+  <div class="modal modal-sm modal-has-close">
+    <button type="button" class="icon-btn modal-close" id="closeNoteModal" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
 
-    <h2 style="color:var(--accent);" data-i18n="note.title">📝 Add a reminder?</h2>
-    <p id="noteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
-    <div class="field" style="margin-bottom:1.25rem;">
+    <h2 id="noteModalTitle" class="modal-heading-accent" data-i18n="note.title">📝 Add a reminder?</h2>
+    <p id="noteModalSubtitle" class="modal-caption field-mb"></p>
+    <div class="field field-mb">
       <label for="stepNoteInput" data-i18n="note.label">Note / To-do (optional)</label>
-      <textarea id="stepNoteInput" maxlength="500" placeholder="Ex: Prepare stack questions, review the challenge..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
+      <textarea id="stepNoteInput" maxlength="500" placeholder="Ex: Prepare stack questions, review the challenge..." data-i18n-placeholder="note.placeholder" class="textarea-note"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="skipNote" data-i18n="note.skip">Continue without note</button>
-      <button class="btn btn-primary" id="saveNote" data-i18n="note.save">Save and advance</button>
+      <button type="button" class="btn btn-ghost" id="skipNote" data-i18n="note.skip">Continue without note</button>
+      <button type="button" class="btn btn-primary" id="saveNote" data-i18n="note.save">Save and advance</button>
     </div>
   </div>
 </div>
 
 <!-- Note on advance modal (referrals) -->
-<div class="modal-overlay" id="refNoteModal">
-  <div class="modal" style="max-width: 440px; position: relative;">
-    <button class="icon-btn" id="closeRefNoteModal"
-            style="position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px; border: none; background: transparent; box-shadow: none; color: var(--text-muted);"
-            title="Close" data-i18n-title="modal.close">
+<div class="modal-overlay" id="refNoteModal" role="dialog" aria-modal="true" aria-labelledby="refNoteModalTitle">
+  <div class="modal modal-sm modal-has-close">
+    <button type="button" class="icon-btn modal-close" id="closeRefNoteModal" title="Close" data-i18n-title="modal.close">
       <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-close"/></svg>
     </button>
 
-    <h2 style="color:var(--accent);" data-i18n="note.title">📝 Add a reminder?</h2>
-    <p id="refNoteModalSubtitle" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;"></p>
-    <div class="field" style="margin-bottom:1.25rem;">
+    <h2 id="refNoteModalTitle" class="modal-heading-accent" data-i18n="note.title">📝 Add a reminder?</h2>
+    <p id="refNoteModalSubtitle" class="modal-caption field-mb"></p>
+    <div class="field field-mb">
       <label for="refStepNoteInput" data-i18n="note.label">Note / To-do (optional)</label>
-      <textarea id="refStepNoteInput" maxlength="500" placeholder="Ex: Send a message to coordinate, thank them for the referral..." data-i18n-placeholder="note.placeholder" style="min-height:90px"></textarea>
+      <textarea id="refStepNoteInput" maxlength="500" placeholder="Ex: Send a message to coordinate, thank them for the referral..." data-i18n-placeholder="note.placeholder" class="textarea-note"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="skipRefNote" data-i18n="note.skip">Continue without note</button>
-      <button class="btn btn-primary" id="saveRefNote" data-i18n="note.save">Save and advance</button>
+      <button type="button" class="btn btn-ghost" id="skipRefNote" data-i18n="note.skip">Continue without note</button>
+      <button type="button" class="btn btn-primary" id="saveRefNote" data-i18n="note.save">Save and advance</button>
     </div>
   </div>
 </div>
 
 <!-- Confirm modal -->
-<div class="modal-overlay" id="confirmModal">
-  <div class="modal" style="max-width: 420px;">
+<div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal modal-xs">
     <h2 id="confirmTitle"></h2>
-    <p id="confirmMessage" style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.5rem;"></p>
+    <p id="confirmMessage" class="modal-paragraph spaced"></p>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="confirmBtnCancel" data-i18n="confirm.cancel">Cancel</button>
-      <button class="btn btn-primary" id="confirmBtnConfirm" data-i18n="confirm.confirm">Confirm</button>
+      <button type="button" class="btn btn-ghost" id="confirmBtnCancel" data-i18n="confirm.cancel">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmBtnConfirm" data-i18n="confirm.confirm">Confirm</button>
     </div>
   </div>
 </div>
 
 <!-- Create role modal -->
-<div class="modal-overlay" id="createRoleModal">
-  <div class="modal" style="max-width: 480px;">
-    <h2 data-i18n="createRole.title">➕ New role</h2>
+<div class="modal-overlay" id="createRoleModal" role="dialog" aria-modal="true" aria-labelledby="createRoleModalTitle">
+  <div class="modal modal-md">
+    <h2 id="createRoleModalTitle" data-i18n="createRole.title">➕ New role</h2>
     <p class="modal-subtitle" data-i18n="createRole.subtitle">
       Add a role to your list. It will be suggested in the picker.
     </p>
@@ -1277,8 +1268,8 @@
              autocomplete="off">
     </div>
 
-    <div class="field" style="margin-top: 1rem;">
-      <label style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+    <div class="field field-spaced">
+      <label class="field-label-row">
         <span data-i18n="createRole.categories">Categories</span>
         <span class="create-cat-optional" data-i18n="createRole.categoriesOptional">optional</span>
       </label>

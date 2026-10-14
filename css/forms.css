@@ -1181,3 +1181,36 @@ input[type="hidden"] { display: none; }
 }
 
 .job-contact-chip:hover .chip-arrow { transform: translateX(2px); opacity: 1; }
+
+
+/* ============================================================
+   Field utilities
+   ============================================================ */
+
+/* Small helper text under a field, muted. */
+.field-caption {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* Field with a top margin (used when a field follows another block). */
+.field-spaced { margin-top: 1rem; }
+
+/* Field with a bottom margin (used in inline modals). */
+.field-mb { margin-bottom: 1.25rem; }
+
+/* Compact textarea used inside modals. */
+.textarea-compact { min-height: 80px; }
+
+/* Standard textarea used for notes/reminders. */
+.textarea-note { min-height: 90px; }
+
+/* Label with a two-column split: left label, right helper. */
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.required-mark { color: var(--danger); font-weight: 700; }

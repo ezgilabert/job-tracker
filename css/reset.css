@@ -27,3 +27,11 @@ body {
   max-width: 1180px;
   margin: 0 auto;
 }
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+
+/* Generic hidden state. Use this instead of inline `display:none`
+   so the JS and CSS agree on a single mechanism. */
+.is-hidden { display: none !important; }

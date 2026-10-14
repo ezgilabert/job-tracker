@@ -362,12 +362,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
     const skipped = ensureArray(j.skipped);
     if (skipped.length) {
-      historySkipped.style.display = 'block';
+      historySkipped.classList.remove('is-hidden');
       historySkippedList.innerHTML = skipped
         .map(s => `<span class="history-skipped-tag">${escapeHtml(tState(s))}</span>`)
         .join('');
     } else {
-      historySkipped.style.display = 'none';
+      historySkipped.classList.add('is-hidden');
     }
 
     historyModal.classList.add('open');
@@ -635,8 +635,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     refToJobSelectedId = null;
 
     document.getElementById('refToJobName').textContent = r.name;
-    refToJobLinkSection.style.display = 'none';
-    refToJobConfirm.style.display = 'none';
+    refToJobLinkSection.classList.add('is-hidden');
+    refToJobConfirm.classList.add('is-hidden');
     document.querySelectorAll('.ref-to-job-option').forEach(o => o.classList.remove('selected'));
 
     refToJobModal.classList.add('open');
@@ -666,8 +666,8 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
         closeRefToJob();
       } else if (refToJobMode === 'link') {
         renderRefToJobList();
-        refToJobLinkSection.style.display = 'block';
-        refToJobConfirm.style.display = 'inline-flex';
+        refToJobLinkSection.classList.remove('is-hidden');
+        refToJobConfirm.classList.remove('is-hidden');
       }
     });
   });
