@@ -551,10 +551,28 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   });
 
   // ----------------------------------------------------------
-  // scroll-to-job (from other modules)
+  // scroll-to-job
   // ----------------------------------------------------------
-  onScrollToJob(() => {
+  // Fired by other modules (e.g. refsController's "Go to job").
+  // Expands the list, resets the filter if needed, and highlights
+  // the target card.
+  onScrollToJob((e) => {
     expandJobs();
+
+    const { jobId } = e.detail;
+
+    // Reset the filter to "all" so the target is visible.
+    const btn = document.querySelector('#filters button[data-filter="all"]');
+    if (btn && !btn.classList.contains('active')) btn.click();
+
+    const target = list.querySelector(`.job[data-id="${jobId}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('highlighted');
+      void target.offsetWidth;
+      target.classList.add('highlighted');
+      setTimeout(() => target.classList.remove('highlighted'), 1800);
+    }
   });
 
   // ----------------------------------------------------------

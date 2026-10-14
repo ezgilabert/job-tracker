@@ -18,7 +18,7 @@ import { mountFirstRun }   from './boot/firstRun.js';
 
 import { mountJobsController }      from './controllers/jobsController.js';
 import { mountRefsController }      from './controllers/refsController.js';
-import { mountModalsController }    from './controllers/modalsController.js';
+import { mountModalsController }    from './controllers/modals/index.js';
 import { mountConfigController }    from './controllers/configController.js';
 import { mountCreateRoleController } from './controllers/createRoleController.js';
 
