@@ -232,11 +232,18 @@ form.form-block {
   stroke-width: 2;
 }
 
+/* The input used to inherit from the global `input { ... }` rule.
+   Now that only `.field input` gets the base styling, the search
+   input needs its own minimal reset — the wrapper owns the visual
+   chrome (border, background, focus ring). */
 .ref-search input {
   border: none;
+  border-radius: 0;
   background: transparent;
   padding: 0;
   font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text);
   width: 100%;
 }
 
@@ -245,6 +252,8 @@ form.form-block {
   box-shadow: none;
   border: none;
 }
+
+.ref-search input::placeholder { color: var(--text-dim); }
 
 .ref-filters {
   display: flex;
@@ -315,12 +324,6 @@ form.form-block {
    Each block defines 5 custom properties on BOTH the card
    (for the accent stripe) and the badge, so a single
    data-relationship attribute lights up both elements.
-
-     --r-stripe-a   top of the vertical accent stripe
-     --r-stripe-b   bottom of the vertical accent stripe
-     --r-badge-bg   badge background
-     --r-badge-fg   badge text
-     --r-badge-bd   badge border
    ============================================================ */
 
 .referido[data-relationship="Friend"],
@@ -359,8 +362,7 @@ form.form-block {
   --r-badge-bg: #fefce8;  --r-badge-fg: #a16207;  --r-badge-bd: #fef08a;
 }
 
-/* Dark overrides: only the badge colors change. The stripe
-   keeps the same colors, which still read well on dark. */
+/* Dark overrides: only the badge colors change. */
 [data-theme="dark"] .referido[data-relationship="Friend"],
 [data-theme="dark"] .ref-relationship-badge[data-relationship="Friend"] {
   --r-badge-bg: rgba(249,115,22,0.16);  --r-badge-fg: #fb923c;  --r-badge-bd: transparent;
@@ -812,9 +814,13 @@ form.form-block {
   gap: 0.3rem;
 }
 
-.job-refs-label::before {
-  content: '🤝';
-  font-size: 0.85rem;
+/* Icon is now an SVG sprite reference (was an emoji ::before). */
+.job-refs-label > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
 }
 
 .job-ref-chip {

@@ -46,11 +46,18 @@
   stroke-width: 2;
 }
 
+/* The input used to inherit from the global `input { ... }` rule.
+   Now that only `.field input` gets the base styling, the search
+   input needs its own minimal reset — the wrapper owns the visual
+   chrome (border, background, focus ring). */
 .jobs-search input {
   border: none;
+  border-radius: 0;
   background: transparent;
   padding: 0;
   font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text);
   width: 100%;
 }
 
@@ -59,6 +66,8 @@
   box-shadow: none;
   border: none;
 }
+
+.jobs-search input::placeholder { color: var(--text-dim); }
 
 /* ============================================================
    Filter chips

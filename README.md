@@ -387,6 +387,7 @@ plain Node environment, no jsdom needed.
 │   │   └── createRoleController.js
 │   │
 │   ├── templates/                # Card renderers (pure HTML strings)
+│   │   ├── icon.js               # Shared <svg><use/></svg> helper
 │   │   ├── jobCard.js
 │   │   ├── refCard.js
 │   │   └── steps.js
@@ -394,7 +395,7 @@ plain Node environment, no jsdom needed.
 │   └── ui/                       # UI widgets
 │       ├── dashboard/            # Six dashboard styles
 │       │   ├── index.js          # Dispatcher + header wrapper
-│       │   ├── shared.js         # uid, sparkPath, summary
+│       │   ├── shared.js         # uid, sparkPath, summary, icon
 │       │   ├── sparklines.js
 │       │   ├── modular.js
 │       │   ├── minimal.js
@@ -526,6 +527,13 @@ editing:
   is toggled by JS instead of inline `style.display`. Adding new utility
   classes is fine, but keep them minimal and documented in
   `base/reset.css`.
+- **Form inputs are scoped to `.field`.** Only inputs inside a
+  `<div class="field">` get the full-width padded look from
+  `components/forms.css`. Component inputs (search boxes, prefix
+  wrappers, salary wrapper, the datepicker trigger, etc.) define their
+  own styles from scratch instead of resetting the global rule. When
+  adding a new input outside a form field, remember it will have no
+  padding, border or background until you give it one.
 
 ### Assets
 
@@ -534,6 +542,11 @@ editing:
   ```html
   <svg viewBox="0 0 24 24"><use href="./assets/icons.svg#icon-name"/></svg>
   ```
+- **No emojis in the chrome.** Every button, tab, badge and card
+  accent uses the sprite. The only text glyphs left are typographic:
+  the `✓` / `—` / step number inside workflow dots, and the `—` / `+`
+  in the heatmap legend. Those read as characters, not icons, so they
+  don't belong in the sprite.
 - The `<use href>` uses the **document** path (relative to the HTML file),
   not the module path. Templates that inject HTML into `index.html` use
   the same relative URL.
@@ -570,6 +583,11 @@ editing:
   modifier class instead of a new BEM block. E.g. `.modal-close.ghost`
   (transparent close button used by the config and unsaved modals)
   instead of separate `.config-close` / `.unsaved-close`.
+- **Emitting icons from JS.** Use the shared `icon(name, className)`
+  helper from `js/templates/icon.js` (or `js/ui/dashboard/shared.js`
+  for dashboards). It runs the name through `^icon-[a-z0-9-]+$` before
+  emitting the sprite reference, so no state-derived string can inject
+  arbitrary markup.
 - **File size**: aim for under ~500 lines per file. When a module grows past
   that, split by concern rather than by size.
 - **No build step**: everything ships as-is over HTTP. Avoid adding a bundler
