@@ -68,11 +68,34 @@ export function getRefStateIcon(status) {
   return REF_STATE_ICONS[status] || '•';
 }
 
-export const CLOSE_REASONS = {
-  'Offer':     ['I accepted the offer', 'Got a better offer', 'It was my first choice'],
-  'Rejected':  ["They didn't move forward", 'Lacked technical experience', 'Chose another candidate', "Didn't meet requirements", 'Salary expectations'],
-  'Ghosted':   ['Stopped responding', 'Never got feedback', 'The process went cold'],
-  'Discarded': ['I changed my mind', "I didn't like the company", 'Paused my search', 'Location was a dealbreaker'],
+// ============================================================
+// Close reasons: i18n keys per close status.
+// Actual strings live in js/i18n/es.js and js/i18n/en.js.
+// ============================================================
+export const CLOSE_REASON_KEYS = {
+  'Offer': [
+    'close.reason.offer.accepted',
+    'close.reason.offer.better',
+    'close.reason.offer.first',
+  ],
+  'Rejected': [
+    'close.reason.rejected.profile',
+    'close.reason.rejected.tech',
+    'close.reason.rejected.other-candidate',
+    'close.reason.rejected.requirements',
+    'close.reason.rejected.salary',
+  ],
+  'Ghosted': [
+    'close.reason.ghosted.silence',
+    'close.reason.ghosted.no-feedback',
+    'close.reason.ghosted.cold',
+  ],
+  'Discarded': [
+    'close.reason.discarded.mind-change',
+    'close.reason.discarded.company',
+    'close.reason.discarded.paused',
+    'close.reason.discarded.location',
+  ],
 };
 
 export const LOGO_OPTIONS = [
@@ -314,7 +337,7 @@ export const SAMPLE_JOBS = [
     date: '2025-01-15',
     status: 'Applied',
     link: 'https://example.com/jobs/frontend-developer',
-    salary: 'USD 4.000 – 5.500',
+    salary: 'USD 4,000 – 5,500',
     hourlySalary: false,
     salaryIsRange: true,
     currency: 'usd',

@@ -218,6 +218,29 @@ export const es = {
   'close.reason.placeholder': 'Contá brevemente qué pasó...',
   'close.confirm': 'Confirmar cierre',
 
+  // ===== Close reasons (Offer) =====
+  'close.reason.offer.accepted':           'Acepté la oferta',
+  'close.reason.offer.better':             'Recibí una mejor oferta',
+  'close.reason.offer.first':              'Fue mi primera opción',
+
+  // ===== Close reasons (Rejected) =====
+  'close.reason.rejected.profile':         'No avanzó mi perfil',
+  'close.reason.rejected.tech':            'Faltó experiencia técnica',
+  'close.reason.rejected.other-candidate': 'Eligieron a otro candidato',
+  'close.reason.rejected.requirements':    'No cumplía requisitos',
+  'close.reason.rejected.salary':          'Pretensión salarial',
+
+  // ===== Close reasons (Ghosted) =====
+  'close.reason.ghosted.silence':          'Dejaron de responder',
+  'close.reason.ghosted.no-feedback':      'Nunca dieron feedback',
+  'close.reason.ghosted.cold':             'Se enfrió el proceso',
+
+  // ===== Close reasons (Discarded) =====
+  'close.reason.discarded.mind-change':    'Me arrepentí',
+  'close.reason.discarded.company':        'No me convenció la empresa',
+  'close.reason.discarded.paused':         'Pausé la búsqueda',
+  'close.reason.discarded.location':       'La ubicación no servía',
+
   'hist.title': '🕒 Historial de la postulación',
   'hist.refTitle': '🕒 Historial del referido',
   'hist.empty': 'Sin entradas en el historial',

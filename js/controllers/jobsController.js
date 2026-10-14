@@ -6,7 +6,7 @@ import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { RoleCombo } from '../ui/combo.js';
 import { StatusCombo } from '../ui/statusCombo.js';
-import { WorkModePicker } from '../ui/WorkModePicker.js';
+import { WorkModePicker } from '../ui/workModePicker.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
@@ -18,9 +18,10 @@ import {
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../constants.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
-  uid, cloneArray, escapeHtml,
+  uid, cloneArray, escapeHtml, valueOf,
 } from '../utils.js';
 import { t, tState, tStateShort } from '../i18n.js';
+import { scrollToRef, onScrollToJob, onI18nChanged } from '../events.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -492,10 +493,6 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     showToast(t('toast.offerUnconfirmed'), '↺');
   }
 
-  function scrollToRef(refId) {
-    document.dispatchEvent(new CustomEvent('scroll-to-ref', { detail: { refId } }));
-  }
-
   // ----------------------------------------------------------
   // Drag & drop reordering
   // ----------------------------------------------------------
@@ -559,16 +556,16 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   });
 
   // ----------------------------------------------------------
-  // scroll-to-job
+  // scroll-to-job (from other modules)
   // ----------------------------------------------------------
-  document.addEventListener('scroll-to-job', () => {
+  onScrollToJob(() => {
     expandJobs();
   });
 
   // ----------------------------------------------------------
   // i18n
   // ----------------------------------------------------------
-  document.addEventListener('i18n-changed', () => {
+  onI18nChanged(() => {
     renderFilters();
     renderInitialStatuses();
     statusCombo.refresh();
@@ -578,14 +575,6 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     renderJobsDash();
     renderList();
   });
-
-  // ----------------------------------------------------------
-  // Helpers
-  // ----------------------------------------------------------
-  function valueOf(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : '';
-  }
 
   // ----------------------------------------------------------
   // Role combo

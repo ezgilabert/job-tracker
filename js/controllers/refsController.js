@@ -7,9 +7,10 @@ import { showConfirm } from '../ui/confirmModal.js';
 import { filterRefs, refStepIndex, isRefClosed } from '../selectors.js';
 import { REF_WORKFLOW_STEPS } from '../constants.js';
 import { renderRefCard } from '../templates/refCard.js';
-import { uid, highlightAndScroll, escapeHtml, cloneArray } from '../utils.js';
+import { uid, highlightAndScroll, escapeHtml, cloneArray, valueOf } from '../utils.js';
 import { renderDashboard, buildWeeklyTrend, buildDailyActivity } from '../ui/dashboard.js';
 import { t, tRefState, tRefStateShort } from '../i18n.js';
+import { scrollToJob, onScrollToRef, onI18nChanged } from '../events.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -251,7 +252,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       link: valueOf('refLink'),
       relationship: Array.isArray(relationshipValue) ? relationshipValue : [],
       status: initialState,
-      // Internal fields set by the "Referral done" flow.
       linkedCompanies: [],
       linkedJobId: null,
       notes: valueOf('refNotes'),
@@ -266,7 +266,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     relationshipChips?.setValue([]);
     statusChips?.setValue('Pending');
 
-    // Expand the list and collapse the form.
     expandRefsList();
     if (refFormBody && refFormToggleBtn) {
       refFormBody.classList.add('collapsed');
@@ -538,14 +537,10 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     showToast(t('toast.refReopened'), '↻');
   }
 
-  function scrollToJob(jobId) {
-    document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId } }));
-  }
-
   // ----------------------------------------------------------
   // scroll-to-ref (from jobsController)
   // ----------------------------------------------------------
-  document.addEventListener('scroll-to-ref', (e) => {
+  onScrollToRef((e) => {
     const { refId } = e.detail;
 
     expandRefsList();
@@ -573,18 +568,10 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   // i18n
   // ----------------------------------------------------------
-  document.addEventListener('i18n-changed', () => {
+  onI18nChanged(() => {
     renderRefsDash();
     renderRefs();
   });
-
-  // ----------------------------------------------------------
-  // Helpers
-  // ----------------------------------------------------------
-  function valueOf(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : '';
-  }
 
   return { renderRefs, initChips };
 }

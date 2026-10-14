@@ -66,3 +66,21 @@ export function ensureArray(value) {
 export function cloneArray(value) {
   return Array.isArray(value) ? [...value] : [];
 }
+
+/**
+ * Reads and trims the value of an input/textarea by DOM id.
+ * Returns '' when the element does not exist.
+ */
+export function valueOf(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+/**
+ * Writes a value into an input/textarea by DOM id.
+ * Safe no-op when the element is missing.
+ */
+export function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val ?? '';
+}

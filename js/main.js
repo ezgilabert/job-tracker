@@ -9,23 +9,36 @@ import {
   DEFAULT_LANG, DEFAULT_LOGO, DEFAULT_BACKGROUND, applyBackground,
 } from './constants.js';
 
-import { createStores } from './boot/stores.js';
+import { createStores }    from './boot/stores.js';
 import { mountTheme, applyLogo } from './boot/theme.js';
-import { mountUserMenu } from './boot/userMenu.js';
-import { pulseI18nTexts } from './boot/i18nPulse.js';
+import { mountUserMenu }   from './boot/userMenu.js';
+import { pulseI18nTexts }  from './boot/i18nPulse.js';
 
-import { mountJobsController }    from './controllers/jobsController.js';
-import { mountRefsController }    from './controllers/refsController.js';
-import { mountModalsController }  from './controllers/modalsController.js';
-import { mountConfigController }  from './controllers/configController.js';
+import { mountJobsController }      from './controllers/jobsController.js';
+import { mountRefsController }      from './controllers/refsController.js';
+import { mountModalsController }    from './controllers/modalsController.js';
+import { mountConfigController }    from './controllers/configController.js';
 import { mountCreateRoleController } from './controllers/createRoleController.js';
 
-import { DatePicker }    from './ui/datePicker.js';
-import { mountChips }    from './ui/chips.js';
+import { DatePicker }       from './ui/datePicker.js';
+import { mountChips }       from './ui/chips.js';
 import { mountInputLimits } from './ui/inputLimits.js';
 
 import { applyI18n, setLanguage, getLanguage } from './i18n.js';
 import { requireSession, startSessionHeartbeat } from './auth/session.js';
+import { emitI18nChanged, onI18nChanged } from './events.js';
+
+// ------------------------------------------------------------
+// Global error handlers — surface anything that slips through.
+// Installed at module load, before boot() runs.
+// ------------------------------------------------------------
+window.addEventListener('error', (e) => {
+  console.error('[Global error]', e.error || e.message, e);
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[Unhandled promise rejection]', e.reason);
+});
 
 boot();
 
@@ -53,7 +66,7 @@ async function boot() {
       setLanguage(lang);
       applyI18n(document);
       pulseI18nTexts();
-      document.dispatchEvent(new CustomEvent('i18n-changed'));
+      emitI18nChanged();
     }
   });
 
@@ -110,7 +123,7 @@ async function boot() {
   // Re-render lists when the language changes (the pulse is
   // triggered by the config subscriber above).
   // ----------------------------------------------------------
-  document.addEventListener('i18n-changed', () => {
+  onI18nChanged(() => {
     if (jobsCtrl?.renderList) jobsCtrl.renderList();
     if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
   });

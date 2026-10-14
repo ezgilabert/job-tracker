@@ -6,24 +6,25 @@ import { showToast } from '../ui/toast.js';
 import { showConfirm } from '../ui/confirmModal.js';
 import { DatePicker } from '../ui/datePicker.js';
 import { RoleCombo } from '../ui/combo.js';
-import { WorkModePicker } from '../ui/WorkModePicker.js';
+import { WorkModePicker } from '../ui/workModePicker.js';
 import { CurrencyPicker } from '../ui/currencyPicker.js';
 import { SalaryModeChip } from '../ui/salaryModeChip.js';
 import { SalaryInput } from '../ui/salaryInput.js';
 import { ContactLinkPicker } from '../ui/contactLinkPicker.js';
 import { mountChips } from '../ui/chips.js';
 import {
-  CLOSE_REASONS, WORKFLOW_STEPS,
+  CLOSE_REASON_KEYS, WORKFLOW_STEPS,
   getStateIcon, getRefStateIcon,
 } from '../constants.js';
 import { stepIndex, isClosed } from '../selectors.js';
 import {
   escapeHtml, todayISO, cloneArray, ensureArray,
-  formatDateTime,
+  formatDateTime, valueOf, setVal,
 } from '../utils.js';
 import {
   t, tState, tStateShort, tRefState, tRefStateShort,
 } from '../i18n.js';
+import { scrollToJob, onScrollToJob, onI18nChanged } from '../events.js';
 
 /**
  * @param {import('../store.js').Store} jobsStore
@@ -194,9 +195,12 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     document.getElementById('closeModalSubtitle').innerHTML =
       `<strong>${escapeHtml(j.role)}</strong> · ${escapeHtml(j.company)}`;
 
-    const reasons = CLOSE_REASONS[status] || [];
-    closeReasonsEl.innerHTML = reasons
-      .map(r => `<button type="button" class="close-reason-chip" data-reason="${escapeHtml(r)}">${escapeHtml(r)}</button>`)
+    const reasonKeys = CLOSE_REASON_KEYS[status] || [];
+    closeReasonsEl.innerHTML = reasonKeys
+      .map(key => {
+        const label = t(key);
+        return `<button type="button" class="close-reason-chip" data-reason="${escapeHtml(label)}">${escapeHtml(label)}</button>`;
+      })
       .join('');
 
     closeReasonInput.value = '';
@@ -558,7 +562,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     setVal('refEditLink', r.link || '');
     setVal('refEditNotes', r.notes || '');
 
-    // relationship: legacy may be a string, new format is an array.
     const relationshipValue = Array.isArray(r.relationship)
       ? r.relationship
       : (r.relationship ? [r.relationship] : []);
@@ -710,7 +713,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
     closeRefToJob();
     showToast(t('toast.linkedTo', { company: j.company }), '🔗');
-    document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: j.id } }));
+    scrollToJob(j.id);
   });
 
   // ----------------------------------------------------------
@@ -755,23 +758,14 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
     setTimeout(() => {
       openEdit(newId);
-      document.dispatchEvent(new CustomEvent('scroll-to-job', { detail: { jobId: newId } }));
+      scrollToJob(newId);
     }, 400);
   }
 
   // ----------------------------------------------------------
-  // Helpers
+  // scroll-to-job (both from the refs controller and internally)
   // ----------------------------------------------------------
-  function setVal(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.value = val ?? '';
-  }
-  function valueOf(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : '';
-  }
-
-  document.addEventListener('scroll-to-job', (e) => {
+  onScrollToJob((e) => {
     const { jobId } = e.detail;
     const btn = document.querySelector('#filters button[data-filter="all"]');
     if (btn && !btn.classList.contains('active')) btn.click();
@@ -786,7 +780,10 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     }
   });
 
-  document.addEventListener('i18n-changed', () => {
+  // ----------------------------------------------------------
+  // i18n
+  // ----------------------------------------------------------
+  onI18nChanged(() => {
     if (editModal.classList.contains('open') && editingId) {
       const j = jobsStore.get().find(x => x.id === editingId);
       if (j) updateEditStatusDisplay(j.status);

@@ -218,6 +218,29 @@ export const en = {
   'close.reason.placeholder': 'Briefly describe what happened...',
   'close.confirm': 'Confirm close',
 
+  // ===== Close reasons (Offer) =====
+  'close.reason.offer.accepted':           'I accepted the offer',
+  'close.reason.offer.better':             'Got a better offer',
+  'close.reason.offer.first':              'It was my first choice',
+
+  // ===== Close reasons (Rejected) =====
+  'close.reason.rejected.profile':         "They didn't move forward",
+  'close.reason.rejected.tech':            'Lacked technical experience',
+  'close.reason.rejected.other-candidate': 'Chose another candidate',
+  'close.reason.rejected.requirements':    "Didn't meet requirements",
+  'close.reason.rejected.salary':          'Salary expectations',
+
+  // ===== Close reasons (Ghosted) =====
+  'close.reason.ghosted.silence':          'Stopped responding',
+  'close.reason.ghosted.no-feedback':      'Never got feedback',
+  'close.reason.ghosted.cold':             'The process went cold',
+
+  // ===== Close reasons (Discarded) =====
+  'close.reason.discarded.mind-change':    'I changed my mind',
+  'close.reason.discarded.company':        "I didn't like the company",
+  'close.reason.discarded.paused':         'Paused my search',
+  'close.reason.discarded.location':       'Location was a dealbreaker',
+
   'hist.title': '🕒 Application history',
   'hist.refTitle': '🕒 Referral history',
   'hist.empty': 'No history entries',
