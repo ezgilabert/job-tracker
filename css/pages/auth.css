@@ -2,7 +2,11 @@
    Auth: sign-in / sign-up screen
    ============================================================ */
 
-.auth-body { min-height: 100vh; padding: 0; }
+.auth-body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0;
+}
 
 .auth-theme-toggle {
   position: fixed;
@@ -14,6 +18,7 @@
 /* ===== Screen ===== */
 .auth-screen {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,8 +110,24 @@
   box-shadow: 0 3px 10px var(--accent-glow);
 }
 
-/* ===== Password field ===== */
-.field-password { position: relative; }
+.auth-tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  color: var(--text-dim);
+}
+
+.auth-tab:disabled:hover {
+  color: var(--text-dim);
+  background: transparent;
+}
+
+/* ===== Password field =====
+   The wrapper holds the input + toggle so the button can be
+   positioned relative to the input alone (not the whole field,
+   which also includes the label). No magic offsets needed. */
+
+.pw-input-wrap { position: relative; }
+
 .field-password input { padding-right: 2.75rem; }
 
 .pw-toggle {
@@ -124,7 +145,6 @@
   place-items: center;
   border-radius: 8px;
   transition: all 0.15s ease;
-  margin-top: 0.55rem;
 }
 
 .pw-toggle:hover { color: var(--accent); background: var(--accent-soft); }
@@ -156,6 +176,15 @@
   accent-color: var(--accent);
   margin: 0;
   cursor: pointer;
+}
+
+.checkbox-label:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.checkbox-label:has(input:disabled) input {
+  cursor: not-allowed;
 }
 
 .link-muted {
@@ -271,7 +300,7 @@
 .auth-guest-btn:hover::after { transform: translateX(3px); }
 
 /* ============================================================
-   Auth: inline helpers moved out of login.html
+   Auth: inline helpers (formerly in login.html)
    ============================================================ */
 
 .auth-error {

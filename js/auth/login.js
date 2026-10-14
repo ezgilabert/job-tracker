@@ -66,11 +66,11 @@ function mountTabs() {
   function switchTab(target) {
     tabs.forEach(t => t.classList.toggle('active', t.dataset.authTab === target));
     if (target === 'login') {
-      loginForm.style.display = 'block';
-      registerForm.style.display = 'none';
+      loginForm.classList.remove('is-hidden');
+      registerForm.classList.add('is-hidden');
     } else {
-      loginForm.style.display = 'none';
-      registerForm.style.display = 'block';
+      loginForm.classList.add('is-hidden');
+      registerForm.classList.remove('is-hidden');
     }
   }
 
@@ -84,14 +84,45 @@ function mountTabs() {
 // ------------------------------------------------------------
 // Password visibility toggles
 // ------------------------------------------------------------
+/**
+ * Sets the toggle button's aria-label and title to match the
+ * current state of the associated password field.
+ *
+ * @param {HTMLButtonElement} btn
+ * @param {boolean} isHidden  true if the password is currently masked
+ */
+function updatePwToggleLabel(btn, isHidden) {
+  const key = isHidden ? 'auth.showPassword' : 'auth.hidePassword';
+  const label = t(key);
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
+}
+
 function mountPasswordToggles() {
   document.querySelectorAll('.pw-toggle').forEach(btn => {
+    // Initial state: the input starts as type="password", so the field
+    // is hidden and the button should say "Show password".
+    updatePwToggleLabel(btn, true);
+
     btn.addEventListener('click', () => {
-      const input = btn.parentElement.querySelector('input');
+      const wrap = btn.closest('.pw-input-wrap') || btn.parentElement;
+      const input = wrap ? wrap.querySelector('input') : null;
       if (!input) return;
-      const isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      btn.style.color = isPassword ? 'var(--accent)' : '';
+
+      const wasHidden = input.type === 'password';
+      input.type = wasHidden ? 'text' : 'password';
+
+      // Swap the icon in the <use> element. The button shows the icon
+      // that represents the NEXT action:
+      //   - currently hidden  → show "eye"      (click to reveal)
+      //   - currently visible → show "eye-off"  (click to hide)
+      const use = btn.querySelector('use');
+      if (use) {
+        const iconId = wasHidden ? 'icon-eye-off' : 'icon-eye';
+        use.setAttribute('href', `./assets/icons.svg#${iconId}`);
+      }
+
+      updatePwToggleLabel(btn, !wasHidden);
     });
   });
 }
@@ -187,6 +218,9 @@ function mountForms() {
     }
   });
 
+  // The register tab is disabled in the HTML, so this form can never
+  // be shown. Keep the submit handler as a safety net in case the tab
+  // is re-enabled in the future.
   if (registerForm) {
     registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
