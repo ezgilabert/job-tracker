@@ -27,6 +27,23 @@ import {
 import { scrollToJob, onScrollToJob, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
 
+// ------------------------------------------------------------
+// SVG sprite helper (replaces the emoji that used to live in
+// STATE_ICONS before the migration).
+// ------------------------------------------------------------
+function icon(name) {
+  if (typeof name !== 'string' || !/^icon-[a-z0-9-]+$/.test(name)) return '';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#${name}"/></svg>`;
+}
+
+// Undo/close-status → sprite names.
+const CLOSE_UNDO_ICON = {
+  Rejected:  'icon-x-circle',
+  Ghosted:   'icon-ghost',
+  Discarded: 'icon-ban',
+  Offer:     'icon-trophy',
+};
+
 /**
  * @param {import('../app/store.js').Store} jobsStore
  * @param {import('../app/store.js').Store} refsStore
@@ -48,7 +65,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     : null;
 
   function updateEditStatusDisplay(status) {
-    if (editStatusIcon) editStatusIcon.textContent = getStateIcon(status);
+    if (editStatusIcon) editStatusIcon.innerHTML = icon(getStateIcon(status));
     if (editStatusText) editStatusText.textContent = tState(status);
   }
 
@@ -175,7 +192,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     }));
 
     closeEdit();
-    showToast(t('modal.saveChanges'), '✓');
+    showToast(t('modal.saveChanges'), 'icon-check');
   });
 
   // ----------------------------------------------------------
@@ -249,7 +266,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
     const { id, status } = pendingClose;
     const closedJob = jobsStore.get().find(x => x.id === id);
-    const icons = { 'Rejected': '✕', 'Ghosted': '👻', 'Discarded': '🚫', 'Offer': '🎉' };
 
     withUndo(
       [jobsStore, refsStore],
@@ -268,7 +284,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
           syncLinkedRefToHired(id, closedJob);
         }
       },
-      icons[status] || '✓'
+      CLOSE_UNDO_ICON[status] || 'icon-check'
     );
 
     hideClose();
@@ -345,7 +361,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
         return `
           <div class="${itemClass}">
-            <div class="history-dot">${getStateIcon(entry.status)}</div>
+            <div class="history-dot">${icon(getStateIcon(entry.status))}</div>
             <div class="history-content">
               <div class="history-status">
                 ${escapeHtml(tState(entry.status))}
@@ -430,7 +446,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
 
         return `
           <div class="${itemClass}">
-            <div class="history-dot">${getRefStateIcon(entry.status)}</div>
+            <div class="history-dot">${icon(getRefStateIcon(entry.status))}</div>
             <div class="history-content">
               <div class="history-status">
                 ${escapeHtml(tRefState(entry.status))}
@@ -518,7 +534,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
           return { ...j, status: nextStatus, skipped, history };
         }));
       },
-      skipCurrent ? '🚫' : '→'
+      skipCurrent ? 'icon-ban' : 'icon-arrow-right'
     );
   }
 
@@ -612,7 +628,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     }));
 
     closeRefEdit();
-    showToast(t('toast.refUpdated'), '✓');
+    showToast(t('toast.refUpdated'), 'icon-check');
   });
 
   // ----------------------------------------------------------
@@ -722,7 +738,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     }));
 
     closeRefToJob();
-    showToast(t('toast.linkedTo', { company: j.company }), '🔗');
+    showToast(t('toast.linkedTo', { company: j.company }), 'icon-chain');
     scrollToJob(j.id);
   });
 
@@ -764,7 +780,7 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
     }));
 
     closeRefToJob();
-    showToast(t('toast.jobCreatedFromRef', { name: r.name }), '✨');
+    showToast(t('toast.jobCreatedFromRef', { name: r.name }), 'icon-sparkle');
 
     setTimeout(() => {
       openEdit(newId);
@@ -864,6 +880,6 @@ export function mountModalsController(jobsStore, refsStore, configStore, createR
       history.push({ status: prevStatus, date: new Date().toISOString(), wentBack: true });
       return { ...x, status: prevStatus, history, wentBack: true };
     }));
-    showToast(t('toast.backTo', { name: j.company, status: tState(prevStatus) }), '←');
+    showToast(t('toast.backTo', { name: j.company, status: tState(prevStatus) }), 'icon-arrow-left');
   }
 }

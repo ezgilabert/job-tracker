@@ -257,3 +257,16 @@
   font-size: 0.85rem;
   font-style: italic;
 }
+
+/* ============================================================
+    History dot icon
+    The dot used to hold an emoji. It now holds a sprite
+   reference, so the sizing moves from font-size to width/height.
+    ============================================================ */
+ 
+ .history-dot > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  display: block;
+}

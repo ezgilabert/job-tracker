@@ -28,7 +28,7 @@ import { mountInputLimits } from './ui/form/inputLimits.js';
 
 import { applyI18n, setLanguage, getLanguage } from './i18n/index.js';
 import { requireSession, startSessionHeartbeat } from './auth/session.js';
-import { emitI18nChanged, onI18nChanged } from './app/events.js';
+import { emitI18nChanged } from './app/events.js';
 
 // ------------------------------------------------------------
 // Global error handlers — surface anything that slips through.
@@ -98,7 +98,7 @@ async function boot() {
     jobsStore, refsStore, configStore, createRoleCtrl
   );
 
-  const jobsCtrl = mountJobsController(
+  mountJobsController(
     jobsStore, refsStore, modals, datePicker, configStore, createRoleCtrl
   );
 
@@ -124,11 +124,8 @@ async function boot() {
   });
 
   // ----------------------------------------------------------
-  // Re-render lists when the language changes (the pulse is
-  // triggered by the config subscriber above).
+  // Note: language-change re-renders are handled by each
+  // controller's own `onI18nChanged` subscriber (jobs, refs,
+  // config). No global re-render is needed here.
   // ----------------------------------------------------------
-  onI18nChanged(() => {
-    if (jobsCtrl?.renderList) jobsCtrl.renderList();
-    if (refsCtrl?.renderRefs) refsCtrl.renderRefs();
-  });
 }
