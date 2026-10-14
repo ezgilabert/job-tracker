@@ -476,11 +476,11 @@ form.form-block {
 
 [data-theme="dark"] .ref-status-badge { border-color: transparent; }
 [data-theme="dark"] .ref-status-badge[data-status="Pending"]        { background: rgba(100,116,139,0.18); color: #94a3b8; }
-[data-theme="dark"] .ref-status-badge[data-status="Contacted"]      { background: var(--info-soft); color: #60a5fa; }
+[data-theme="dark"] .ref-status-badge[data-status="Contacted"]      { background: var(--info-soft); color: var(--info-2); }
 [data-theme="dark"] .ref-status-badge[data-status="Referred"]       { background: var(--accent-soft); color: #a78bfa; }
-[data-theme="dark"] .ref-status-badge[data-status="In Process"]     { background: var(--warning-soft); color: #fbbf24; }
-[data-theme="dark"] .ref-status-badge[data-status="Hired"]          { background: var(--success-soft); color: #34d399; }
-[data-theme="dark"] .ref-status-badge[data-status="Not Applicable"] { background: var(--danger-soft); color: #f87171; }
+[data-theme="dark"] .ref-status-badge[data-status="In Process"]     { background: var(--warning-soft); color: var(--warning-2); }
+[data-theme="dark"] .ref-status-badge[data-status="Hired"]          { background: var(--success-soft); color: var(--success-2); }
+[data-theme="dark"] .ref-status-badge[data-status="Not Applicable"] { background: var(--danger-soft); color: var(--danger-2); }
 
 /* ============================================================
    V3 · Progress bar pinned to the top
@@ -856,8 +856,8 @@ form.form-block {
 }
 
 .job-ref-chip[data-status="Pending"]        .job-ref-status-dot { background: #64748b; box-shadow: 0 0 6px #64748b; }
-.job-ref-chip[data-status="Contacted"]      .job-ref-status-dot { background: var(--info); box-shadow: 0 0 6px var(--info); }
-.job-ref-chip[data-status="Referred"]       .job-ref-status-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.job-ref-chip[data-status="Contacted"]      .job-ref-status-dot { background: var(--info);    box-shadow: 0 0 6px var(--info); }
+.job-ref-chip[data-status="Referred"]       .job-ref-status-dot { background: var(--accent);  box-shadow: 0 0 6px var(--accent); }
 .job-ref-chip[data-status="In Process"]     .job-ref-status-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .job-ref-chip[data-status="Hired"]          .job-ref-status-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
-.job-ref-chip[data-status="Not Applicable"] .job-ref-status-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.job-ref-chip[data-status="Not Applicable"] .job-ref-status-dot { background: var(--danger);  box-shadow: 0 0 6px var(--danger); }

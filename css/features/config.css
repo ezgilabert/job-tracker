@@ -9,6 +9,10 @@
   -ms-overflow-style: none;
 }
 
+/* The config modal is the only modal large enough to need a
+   scrollbar. Hide it visually (the modal still scrolls) to avoid
+   a stray UI element inside the panel. Other modals use the
+   browser default. */
 .config-modal::-webkit-scrollbar {
   display: none;
 }
