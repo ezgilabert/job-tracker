@@ -64,10 +64,30 @@
 
 .modal .form-grid .full { grid-column: 1 / -1; }
 
+/* ============================================================
+   Modal actions row
+   ------------------------------------------------------------
+   The base rule owns a default top margin so the buttons are
+   never flush against the content above them. Modals whose
+   content already provides its own bottom spacing (e.g. via
+   .form-grid's margin-bottom, or .field-mb on the last field)
+   end up with a slightly larger visual gap, because margins
+   collapse to the larger of the two — that is the desired
+   behaviour and keeps the row legible in every modal.
+
+   Modifier classes:
+     .spaced → historical alias for the default; kept so
+               existing markup keeps working. No visual change
+               compared to the base rule.
+     .tight  → 1.25rem, for modals that intentionally want a
+               denser footer (ref-to-job picker).
+   ============================================================ */
+
 .modal-actions {
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
+  margin-top: 1.5rem;
 }
 
 /* ===== Close modal ===== */
@@ -306,8 +326,12 @@
 /* Single-column form grid inside a modal. */
 .form-grid.single { grid-template-columns: 1fr; }
 
-/* Modal-actions with extra top spacing. */
+/* Modal-actions modifier: kept for backwards compatibility with
+   existing markup. Now visually identical to the base rule. */
 .modal-actions.spaced { margin-top: 1.5rem; }
+
+/* Denser footer, for modals that intentionally want a tighter
+   button row (ref-to-job picker). */
 .modal-actions.tight  { margin-top: 1.25rem; }
 
 /* Reason chips row (close-job modal). */
