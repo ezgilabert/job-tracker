@@ -25,6 +25,7 @@
   display: flex;
   align-items: center;
   gap: 0.9rem;
+  cursor: pointer;
 }
 
 .loading-logo {
@@ -36,6 +37,10 @@
   place-items: center;
   box-shadow: 0 8px 26px var(--accent-glow, rgba(124,92,255,0.3));
   flex-shrink: 0;
+  overflow: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .loading-logo svg {
@@ -50,6 +55,9 @@
   font-weight: 800;
   letter-spacing: -0.025em;
   color: var(--text, #16182a);
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+  transition: color 0.3s ease;
 }
 
 .loading-rotating {
@@ -111,4 +119,41 @@
 @keyframes loadingBarSlide {
   0%   { left: -40%; }
   100% { left: 100%; }
+}
+
+/* ============================================================
+   Brand hover effect
+   ------------------------------------------------------------
+   Mirrors the effect defined for .brand in layout/header.css
+   and for .auth-brand in pages/auth.css:
+     - logo scales up slightly with a soft violet glow
+     - the brand text gets a gradient sweep animation
+   The @keyframes brandGradientSweep is defined in header.css
+   and is available globally (CSS @keyframes are not scoped),
+   so we don't need to redefine it here.
+   ============================================================ */
+
+.loading-logo-row:hover .loading-logo {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(124,92,255,0.45);
+}
+
+[data-theme="dark"] .loading-logo-row:hover .loading-logo {
+  box-shadow: 0 14px 36px var(--accent-glow, rgba(139,108,255,0.5));
+}
+
+.loading-logo-row:hover .loading-brand {
+  background: linear-gradient(
+    90deg,
+    var(--text, #16182a) 0%,
+    var(--text, #16182a) 35%,
+    var(--accent, #7c5cff) 50%,
+    var(--text, #16182a) 65%,
+    var(--text, #16182a) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brandGradientSweep 1.2s ease infinite;
 }
