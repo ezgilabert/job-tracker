@@ -77,6 +77,59 @@
   display: block;
 }
 
+/* ============================================================
+   Brand hover effect
+   ------------------------------------------------------------
+   Mirrors the effect defined for .brand in layout/header.css:
+     - logo scales up slightly with a soft violet glow
+     - the title gets a gradient sweep animation
+     - the subtitle tints to the accent colour
+   The @keyframes brandGradientSweep is defined in header.css
+   and is available globally (CSS @keyframes are not scoped),
+   so we don't need to redefine it here.
+   ============================================================ */
+
+/* Base state: pre-set the background-size / position on the
+   title so the transition into the gradient is smooth when the
+   hover kicks in. The subtitle needs its own transition. */
+.auth-brand h1 {
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+}
+
+.auth-brand p {
+  transition: color 0.3s ease;
+}
+
+.auth-brand:hover h1 {
+  background: linear-gradient(
+    90deg,
+    var(--text) 0%,
+    var(--text) 35%,
+    var(--accent) 50%,
+    var(--text) 65%,
+    var(--text) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brandGradientSweep 1.2s ease infinite;
+}
+
+.auth-brand:hover .brand-logo {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(124,92,255,0.45);
+}
+
+[data-theme="dark"] .auth-brand:hover .brand-logo {
+  box-shadow: 0 14px 36px var(--accent-glow);
+}
+
+.auth-brand:hover p {
+  color: var(--accent);
+}
+
 /* ===== Tabs ===== */
 .auth-tabs {
   display: flex;
