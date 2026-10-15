@@ -50,16 +50,41 @@ form.form-block {
 }
 
 .ref-hero-input {
-  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
   min-width: 0;
 }
 
 .ref-hero-input input {
+  flex: 1 1 180px;
+  min-width: 0;
+  width: 100%;
   font-size: 1.1rem;
   font-weight: 700;
-  padding: 0.85rem 5.5rem 0.85rem 1rem;
+  padding: 0.85rem 1rem;
   border-radius: 12px;
   letter-spacing: -0.01em;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-family: inherit;
+  transition:
+    border-color     0.2s ease,
+    background-color 0.2s ease,
+    box-shadow       0.2s ease;
+}
+
+[data-theme="dark"] .ref-hero-input input {
+  background: var(--bg-1);
+}
+
+.ref-hero-input input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .ref-hero-input input::placeholder {
@@ -70,22 +95,19 @@ form.form-block {
 }
 
 .ref-hero-hint {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  flex: 0 0 auto;
   font-size: 0.65rem;
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  pointer-events: none;
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
-  padding: 0.2rem 0.5rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 6px;
   line-height: 1;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 @media (max-width: 520px) {
@@ -104,12 +126,11 @@ form.form-block {
   }
   .ref-hero-input input {
     font-size: 1rem;
-    padding: 0.8rem 4.8rem 0.8rem 0.9rem;
+    padding: 0.8rem 0.9rem;
   }
   .ref-hero-hint {
     font-size: 0.58rem;
-    padding: 0.15rem 0.4rem;
-    right: 0.75rem;
+    padding: 0.22rem 0.5rem;
   }
 }
 
@@ -232,10 +253,6 @@ form.form-block {
   stroke-width: 2;
 }
 
-/* The input used to inherit from the global `input { ... }` rule.
-   Now that only `.field input` gets the base styling, the search
-   input needs its own minimal reset — the wrapper owns the visual
-   chrome (border, background, focus ring). */
 .ref-search input {
   border: none;
   border-radius: 0;
@@ -320,10 +337,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Relationship colors: single source of truth.
-   Each block defines 5 custom properties on BOTH the card
-   (for the accent stripe) and the badge, so a single
-   data-relationship attribute lights up both elements.
+   Relationship colors
    ============================================================ */
 
 .referido[data-relationship="Friend"],
@@ -362,7 +376,6 @@ form.form-block {
   --r-badge-bg: #fefce8;  --r-badge-fg: #a16207;  --r-badge-bd: #fef08a;
 }
 
-/* Dark overrides: only the badge colors change. */
 [data-theme="dark"] .referido[data-relationship="Friend"],
 [data-theme="dark"] .ref-relationship-badge[data-relationship="Friend"] {
   --r-badge-bg: rgba(249,115,22,0.16);  --r-badge-fg: #fb923c;  --r-badge-bd: transparent;
@@ -388,8 +401,6 @@ form.form-block {
   --r-badge-bg: rgba(234,179,8,0.16);  --r-badge-fg: #facc15;  --r-badge-bd: transparent;
 }
 
-/* Accent stripe consumes the relationship variables, falling
-   back to the app accent when no relationship is set. */
 .referido::before {
   content: '';
   position: absolute;
@@ -426,7 +437,7 @@ form.form-block {
 }
 
 /* ============================================================
-   Relationship badge (consumes the same custom properties)
+   Relationship badge
    ============================================================ */
 
 .ref-relationship-badge {
@@ -485,7 +496,7 @@ form.form-block {
 [data-theme="dark"] .ref-status-badge[data-status="Not Applicable"] { background: var(--danger-soft); color: var(--danger-2); }
 
 /* ============================================================
-   V3 · Progress bar pinned to the top
+   V3 · Progress bar
    ============================================================ */
 
 .ref-top-progress {
@@ -721,6 +732,7 @@ form.form-block {
   flex-wrap: wrap;
   align-items: stretch;
   margin-top: 0.5rem;
+  width: 100%;
 }
 
 .ref-wf-main-actions .wf-btn-big {
@@ -748,26 +760,6 @@ form.form-block {
 }
 
 /* ============================================================
-   Mobile: stack the large buttons
-   ============================================================ */
-
-@media (max-width: 640px) {
-  .ref-wf-main-actions {
-    flex-direction: column;
-  }
-  .ref-wf-main-actions .wf-btn-big {
-    min-width: 0;
-    width: 100%;
-  }
-  .ref-wf-main-actions .wf-btn-secondary {
-    width: 100%;
-  }
-  .ref-top-progress .stage-count {
-    font-size: 0.68rem;
-  }
-}
-
-/* ============================================================
    Card side actions
    ============================================================ */
 
@@ -780,12 +772,6 @@ form.form-block {
 }
 
 .referido:hover .ref-actions { opacity: 1; }
-
-@media (max-width: 640px) {
-  .ref-actions { opacity: 1; }
-  .ref-toolbar { flex-direction: column; align-items: stretch; }
-  .ref-search { max-width: 100%; }
-}
 
 /* ============================================================
    Referral tags inside job cards
@@ -814,7 +800,6 @@ form.form-block {
   gap: 0.3rem;
 }
 
-/* Icon is now an SVG sprite reference (was an emoji ::before). */
 .job-refs-label > svg {
   width: 14px;
   height: 14px;
@@ -870,7 +855,6 @@ form.form-block {
 
 /* ============================================================
    Referral SVG icons
-   Used by refCard.js (history button, meta inline sprites).
    ============================================================ */
 
 .ref-history-btn > svg {
@@ -894,4 +878,259 @@ form.form-block {
 .ref-meta a > svg {
   margin-right: 0;
   margin-left: 0.25rem;
+}
+
+/* ============================================================
+   Mobile (≤640px) · Referral card — full width layout
+   ------------------------------------------------------------
+   THE REAL FIX for "the card leaves a blank area on the right":
+
+   On desktop .referido is a flex row:
+     [ .ref-body (flex: 1) ] [ .ref-actions (auto width) ]
+   The .ref-actions column reserves horizontal space along the
+   entire height of the card, so .ref-body never reaches the
+   right edge. That reserved strip is what looks like empty
+   space, and it also squeezes the workflow strip and the
+   action buttons into the left half of the card.
+
+   On mobile we switch to a stacked layout:
+     - .referido becomes display:block + position:relative
+     - .ref-body stretches to 100% width
+     - .ref-actions is absolutely positioned in the top-right
+       corner, floating over the card instead of stealing
+       horizontal space
+     - .ref-top reserves right-side padding so the title and
+       badges never collide with the floating buttons
+
+   Additionally:
+     - The workflow strip switches to a number-only layout.
+       Five text labels (CONTACTADO, EN PROCESO, …) can't fit
+       legibly on a 375–412px viewport; the current stage is
+       already shown in the status badge ("PENDIENTE") and
+       the count ("1 / 5"), so no information is lost.
+     - The section-card-body loses its 28px side padding
+       (defined in forms.css for desktop) so the card can use
+       the full viewport width.
+   ============================================================ */
+@media (max-width: 640px) {
+  /* --- Reclaim horizontal space on the outer section body --- */
+  .section-card:has(#refList) .section-card-body {
+    padding: 1rem 0.6rem 1.15rem;
+  }
+
+  /* --- Kill the flex row, switch to block + relative --- */
+  .referido {
+    display: block;
+    position: relative;
+    padding: 0.9rem 0.85rem 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .referido:last-child { margin-bottom: 0; }
+
+  /* --- Body takes the full card width --- */
+  .ref-body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* --- Actions float in the top-right corner --- */
+  .ref-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    opacity: 1;
+    gap: 0.25rem;
+    z-index: 2;
+  }
+
+  /* --- Reserve room so the title never runs under the buttons.
+         2 buttons × 34px + gap ≈ 76px, + some breathing room --- */
+  .ref-top {
+    padding-right: 84px;
+    min-height: 34px;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .ref-top h4 {
+    font-size: 0.95rem;
+  }
+
+  .ref-relationship-badge,
+  .ref-status-badge {
+    font-size: 0.58rem;
+    padding: 0.16rem 0.45rem;
+    letter-spacing: 0.04em;
+  }
+
+  .ref-status-badge::before {
+    width: 5px;
+    height: 5px;
+  }
+
+  /* --- Progress row: tighter --- */
+  .ref-top-progress {
+    gap: 0.45rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ref-top-progress .stage-count {
+    font-size: 0.65rem;
+  }
+
+  .ref-history-btn {
+    width: 24px;
+    height: 24px;
+  }
+  .ref-history-btn > svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* --- Meta rows --- */
+  .ref-meta {
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.35rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .ref-meta span > svg,
+  .ref-meta a > svg {
+    width: 11px;
+    height: 11px;
+    margin-right: 0.2rem;
+  }
+
+  .ref-notes {
+    font-size: 0.78rem;
+    padding-left: 0.55rem;
+    margin-top: 0.4rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* --- Workflow: number-only strip, 5 equal columns --- */
+  .ref-workflow {
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ref-steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    overflow: visible;
+    padding-bottom: 0;
+    align-items: center;
+    height: 26px;
+  }
+
+  .ref-step {
+    min-width: 0;
+    max-width: 100%;
+    flex-shrink: 1;
+    gap: 0;
+    justify-content: center;
+  }
+
+  /* Hide text labels — the strip is positional only. */
+  .ref-step-label {
+    display: none;
+  }
+
+  .ref-step-dot {
+    width: 22px;
+    height: 22px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    border-width: 2px;
+  }
+
+  .ref-step-line {
+    top: 11px;
+    height: 2px;
+  }
+
+  .ref-step.current .ref-step-dot {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 3px var(--accent-soft-2), 0 0 12px var(--accent-glow);
+  }
+
+  /* --- Workflow buttons: stack and stretch edge-to-edge --- */
+  .ref-wf-main-actions {
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ref-wf-main-actions > .wf-btn-big,
+  .ref-wf-main-actions > .wf-btn-secondary,
+  .ref-wf-main-actions > .wf-btn-skip {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+  }
+
+  /* --- Toolbar: search full width above the filter chips --- */
+  .ref-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+  .ref-search { max-width: 100%; }
+}
+
+/* ============================================================
+   Tablet (641–720px) · Number-only workflow strip
+   ------------------------------------------------------------
+   On mid-sized viewports the card is a bit wider but still not
+   enough for five full-length labels on one line. Use the same
+   number-only strip for consistency.
+   ============================================================ */
+@media (max-width: 720px) and (min-width: 641px) {
+  .ref-steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    overflow: visible;
+    align-items: center;
+  }
+
+  .ref-step {
+    min-width: 0;
+    flex-shrink: 1;
+    gap: 0;
+  }
+
+  .ref-step-label {
+    display: none;
+  }
+
+  .ref-step-dot {
+    width: 22px;
+    height: 22px;
+    font-size: 0.62rem;
+    border-width: 2px;
+  }
+
+  .ref-step-line {
+    top: 11px;
+    height: 2px;
+  }
 }

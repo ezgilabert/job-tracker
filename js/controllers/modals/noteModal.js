@@ -6,6 +6,10 @@
 //
 // Closing via the X, Escape or overlay click CANCELS the advance.
 // Only the Skip and Save buttons apply it.
+//
+// The "Save and advance" button is disabled until the textarea
+// has at least one non-whitespace character. "Continue without
+// note" is always enabled as the escape hatch.
 // ============================================================
 
 import { createModal } from '../../ui/modal.js';
@@ -20,11 +24,29 @@ import { withUndo } from '../../app/undo.js';
 export function mountNoteModal(jobsStore) {
   const noteInput = document.getElementById('stepNoteInput');
   const subtitle = document.getElementById('noteModalSubtitle');
+  const saveBtn = document.getElementById('saveNote');
   let pending = null;
 
   const modal = createModal(document.getElementById('noteModal'), {
     onClose: () => { pending = null; },
   });
+
+  // ----------------------------------------------------------
+  // Save button guard
+  // ----------------------------------------------------------
+  // The button is enabled only when the textarea contains at
+  // least one non-whitespace character. The "input" event covers
+  // typing, pasting and deleting; the manual call inside open()
+  // covers the programmatic reset when the modal is reopened.
+  function syncSaveButton() {
+    saveBtn.disabled = noteInput.value.trim().length === 0;
+  }
+
+  noteInput.addEventListener('input', syncSaveButton);
+
+  // Make sure the button starts disabled before the first open,
+  // in case the textarea somehow has content from the HTML.
+  syncSaveButton();
 
   function open(id, opts = {}) {
     const j = jobsStore.get().find(x => x.id === id);
@@ -45,6 +67,7 @@ export function mountNoteModal(jobsStore) {
     });
 
     noteInput.value = '';
+    syncSaveButton();                 // ← reset to disabled on open
     modal.open();
     setTimeout(() => noteInput.focus(), 80);
   }
@@ -80,7 +103,11 @@ export function mountNoteModal(jobsStore) {
   });
 
   document.getElementById('saveNote').addEventListener('click', () => {
-    apply({ note: noteInput.value.trim() || null });
+    // Defensive: if something re-enables the button without
+    // content (e.g. a future refactor), bail out instead of
+    // saving an empty note.
+    if (noteInput.value.trim().length === 0) return;
+    apply({ note: noteInput.value.trim() });
     modal.close();
   });
 
