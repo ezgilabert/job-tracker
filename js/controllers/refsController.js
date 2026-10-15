@@ -330,14 +330,28 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
 
   // ----------------------------------------------------------
   // Advance: with note modal
+  //
+  // The "Save and advance" button is disabled until the textarea
+  // has at least one non-whitespace character. "Continue without
+  // note" is always enabled as the escape hatch.
   // ----------------------------------------------------------
   const refStepNoteInput = document.getElementById('refStepNoteInput');
   const refNoteSubtitle = document.getElementById('refNoteModalSubtitle');
+  const refSaveNoteBtn = document.getElementById('saveRefNote');
   let pendingRefAdvance = null;
 
   const refNoteModal = createModal(document.getElementById('refNoteModal'), {
     onClose: () => { pendingRefAdvance = null; },
   });
+
+  function syncRefSaveButton() {
+    refSaveNoteBtn.disabled = refStepNoteInput.value.trim().length === 0;
+  }
+
+  refStepNoteInput.addEventListener('input', syncRefSaveButton);
+
+  // Initial state: disabled (in case the textarea starts with content).
+  syncRefSaveButton();
 
   function requestMoveNext(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -358,6 +372,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     });
 
     refStepNoteInput.value = '';
+    syncRefSaveButton();              // ← reset to disabled on open
     refNoteModal.open();
     setTimeout(() => refStepNoteInput.focus(), 80);
   }
@@ -410,7 +425,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   });
 
   document.getElementById('saveRefNote').addEventListener('click', () => {
-    applyRefAdvance({ note: refStepNoteInput.value.trim() || null });
+    // Defensive guard: if something re-enables the button without
+    // content (e.g. a future refactor), bail out instead of
+    // saving an empty note.
+    if (refStepNoteInput.value.trim().length === 0) return;
+    applyRefAdvance({ note: refStepNoteInput.value.trim() });
     refNoteModal.close();
   });
 
