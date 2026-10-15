@@ -4,7 +4,6 @@
 
 @media (max-width: 720px) {
   body { padding: 1.25rem 0.75rem 3rem; }
-  .brand h1 { font-size: 1.25rem; }
   .stat .num { font-size: 1.6rem; }
   .modal .form-grid { grid-template-columns: 1fr; }
   .job { padding: 1rem; }
@@ -18,80 +17,81 @@
   .job .drag-handle { opacity: 0.6; }
 
   /* ==========================================================
-     Config modal: sidebar becomes a 4-column grid of icons
+     Header on mobile
+     ----------------------------------------------------------
+     Keep the brand and the user button on the same row. If
+     the brand text overflows, it ellipsises — it never forces
+     the header-actions to a second line, which would put the
+     user menu (and its dropdown, anchored with `right: 0`)
+     in the wrong place.
      ========================================================== */
-  .config-modal { padding: 1.25rem; }
-  .config-layout {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  /* Nav as a grid of icons */
-  .config-nav {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: minmax(58px, auto);
-    gap: 0.35rem;
-    padding: 0.4rem;
-    background: var(--surface-soft);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    position: static;
-    align-self: auto;
-    overflow: visible;
-  }
-
-  /* Desktop vertical separators don't apply inside the grid */
-  .config-nav-sep { display: none; }
-
-  /* Tab as a grid cell: icon on top, label below */
-  .config-tab {
-    flex-direction: column;
+  header {
+    flex-wrap: nowrap;
     align-items: center;
-    justify-content: center;
-    gap: 0.15rem;
-    padding: 0.5rem 0.25rem;
-    border-radius: 9px;
-    width: 100%;
-    height: 100%;
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-align: center;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
   }
 
-  .config-tab-icon {
-    width: auto;
+  .brand {
+    gap: 0.6rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .brand > div { min-width: 0; }
+
+  .brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .brand-logo svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .brand h1 {
     font-size: 1.05rem;
-    line-height: 1;
-    margin-bottom: 0.05rem;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .config-tab-label {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    font-size: 0.6rem;
+  .brand p {
+    font-size: 0.72rem;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .config-tab.active {
-    box-shadow: 0 3px 10px var(--accent-glow);
+  .header-actions { flex-shrink: 0; }
+
+  #userBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
   }
+  #userBtn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .user-menu-dropdown {
+    min-width: min(320px, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+  }
+
+  /* NOTE: the config modal (Settings) mobile layout lives in
+     css/features/config.css, at the bottom, because responsive.css
+     is imported BEFORE config.css and the desktop rules there
+     would win. Keeping them here does nothing on mobile. */
 
   /* ==========================================================
-     Rest of the config: unchanged
+     Toolbar: stack search above filters.
      ========================================================== */
-  .config-checks { grid-template-columns: 1fr; }
-  .config-actions { flex-direction: column-reverse; align-items: stretch; }
-  .config-actions .btn { width: 100%; }
-  .config-actions-right { flex-direction: column; margin-left: 0; width: 100%; }
-  .config-add-row { flex-direction: column; }
-  .config-add-row .btn { width: 100%; padding: 0.7rem; }
-  .unsaved-actions { flex-direction: column-reverse; }
-  .unsaved-actions .btn { width: 100%; }
-
-  /* Toolbar: stack search above filters */
   .toolbar {
     flex-direction: column;
     align-items: stretch;
