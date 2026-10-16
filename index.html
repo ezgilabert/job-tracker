@@ -415,20 +415,32 @@
 
           <div class="v3-grid">
             <div class="field half">
-              <label for="refRole" data-i18n="refs.role">Role / Company</label>
+              <label for="refRole">
+                <span data-i18n="refs.role">Role / Company</span>
+                <span class="required-mark">*</span>
+              </label>
               <input type="text" id="refRole" maxlength="120" placeholder="Ex: Tech Lead @ Google" data-i18n-placeholder="refs.role.placeholder">
             </div>
             <div class="field half">
-              <label for="refContact" data-i18n="refs.contact">Contact</label>
+              <label for="refContact">
+                <span data-i18n="refs.contact">Contact</span>
+                <span class="required-mark">*</span>
+              </label>
               <input type="text" id="refContact" maxlength="200" placeholder="Email, phone, @handle..." data-i18n-placeholder="refs.contact.placeholder">
             </div>
             <div class="field full">
-              <label for="refLink" data-i18n="refs.link">Link</label>
+              <label for="refLink">
+                <span data-i18n="refs.link">Link</span>
+                <span class="required-mark">*</span>
+              </label>
               <input type="url" id="refLink" maxlength="500" placeholder="https://...">
             </div>
 
             <div class="field full">
-              <label data-i18n="refs.relationship">Relationship</label>
+              <label>
+                <span data-i18n="refs.relationship">Relationship</span>
+                <span class="required-mark">*</span>
+              </label>
               <div class="ref-chips" id="refRelationshipChips">
                 <button type="button" class="ref-chip" data-value="Friend"       data-i18n="rel.Friend">Friend</button>
                 <button type="button" class="ref-chip" data-value="Ex-colleague"  data-i18n="rel.Ex-colleague">Ex-colleague</button>
@@ -440,7 +452,10 @@
             </div>
 
             <div class="field full">
-              <label data-i18n="refs.status">Referral status</label>
+              <label>
+                <span data-i18n="refs.status">Referral status</span>
+                <span class="required-mark">*</span>
+              </label>
               <div class="ref-chips ref-status-chips" id="refStatusChips">
                 <button type="button" class="ref-chip selected" data-value="Pending"        data-i18n="refState.Pending">Pending</button>
                 <button type="button" class="ref-chip"          data-value="Contacted"      data-i18n="refState.Contacted">Contacted</button>

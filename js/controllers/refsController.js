@@ -226,20 +226,55 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   refForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const name = valueOf('refName');
-    if (!name) return;
+    // ---- 1. Name (HTML5 blocks empty submits, but keep a
+    //         defensive check with a toast for consistency). ----
+    const name = (valueOf('refName') || '').trim();
+    if (!name) {
+      showToast(t('toast.refNameRequired'), 'icon-alert-triangle');
+      document.getElementById('refName')?.focus();
+      return;
+    }
 
-    const initialState = statusChips?.getValue() || 'Pending';
+    // ---- 2. Role / Company (required) ----
+    const roleValue = (valueOf('refRole') || '').trim();
+    if (!roleValue) {
+      showToast(t('toast.refRoleRequired'), 'icon-alert-triangle');
+      document.getElementById('refRole')?.focus();
+      return;
+    }
+
+    // ---- 3. Contact OR Link (at least one required) ----
+    const contactValue = (valueOf('refContact') || '').trim();
+    const linkValue = (valueOf('refLink') || '').trim();
+    if (!contactValue && !linkValue) {
+      showToast(t('toast.refContactOrLinkRequired'), 'icon-alert-triangle');
+      document.getElementById('refContact')?.focus();
+      return;
+    }
+
+    // ---- 4. Relationship (at least one chip selected) ----
     const relationshipValue = relationshipChips?.getValue() || [];
+    if (!Array.isArray(relationshipValue) || relationshipValue.length === 0) {
+      showToast(t('toast.refRelationshipRequired'), 'icon-alert-triangle');
+      return;
+    }
+
+    // ---- 5. Status (defensive — chips have a default of Pending) ----
+    const initialState = statusChips?.getValue();
+    if (!initialState) {
+      showToast(t('toast.refStatusRequired'), 'icon-alert-triangle');
+      return;
+    }
+
     const now = new Date().toISOString();
 
     const newRef = {
       id: uid(),
       name,
-      role: valueOf('refRole'),
-      contact: valueOf('refContact'),
-      link: valueOf('refLink'),
-      relationship: Array.isArray(relationshipValue) ? relationshipValue : [],
+      role: roleValue,
+      contact: contactValue,
+      link: linkValue,
+      relationship: [...relationshipValue],
       status: initialState,
       linkedCompanies: [],
       linkedJobId: null,
