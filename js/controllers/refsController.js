@@ -11,13 +11,14 @@ import {
 import { REF_WORKFLOW_STEPS } from '../app/constants.js';
 import { renderRefCard } from '../templates/refCard.js';
 import {
-  uid, highlightAndScroll, escapeHtml, valueOf, updateById, withHistoryEntry,
+  uid, highlightAndScroll, escapeHtml, valueOf, updateById, withHistoryEntry, debounce,
 } from '../app/utils.js';
 import { renderDashboard } from '../ui/dashboard.js';
 import { createModal } from '../ui/modal.js';
 import { t, tRefState, tRefStateShort } from '../i18n/index.js';
 import { scrollToJob, onScrollToRef, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
+import { validateRefPayload } from '../app/validators.js';
 
 /**
  * @param {import('../app/store.js').Store} jobsStore
@@ -226,43 +227,25 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   refForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // ---- 1. Name (HTML5 blocks empty submits, but keep a
-    //         defensive check with a toast for consistency). ----
     const name = (valueOf('refName') || '').trim();
-    if (!name) {
-      showToast(t('toast.refNameRequired'), 'icon-alert-triangle');
-      document.getElementById('refName')?.focus();
-      return;
-    }
-
-    // ---- 2. Role / Company (required) ----
     const roleValue = (valueOf('refRole') || '').trim();
-    if (!roleValue) {
-      showToast(t('toast.refRoleRequired'), 'icon-alert-triangle');
-      document.getElementById('refRole')?.focus();
-      return;
-    }
-
-    // ---- 3. Contact OR Link (at least one required) ----
     const contactValue = (valueOf('refContact') || '').trim();
     const linkValue = (valueOf('refLink') || '').trim();
-    if (!contactValue && !linkValue) {
-      showToast(t('toast.refContactOrLinkRequired'), 'icon-alert-triangle');
-      document.getElementById('refContact')?.focus();
-      return;
-    }
-
-    // ---- 4. Relationship (at least one chip selected) ----
     const relationshipValue = relationshipChips?.getValue() || [];
-    if (!Array.isArray(relationshipValue) || relationshipValue.length === 0) {
-      showToast(t('toast.refRelationshipRequired'), 'icon-alert-triangle');
-      return;
-    }
-
-    // ---- 5. Status (defensive — chips have a default of Pending) ----
     const initialState = statusChips?.getValue();
-    if (!initialState) {
-      showToast(t('toast.refStatusRequired'), 'icon-alert-triangle');
+
+    const validation = validateRefPayload({
+      name,
+      role: roleValue,
+      contact: contactValue,
+      link: linkValue,
+      relationship: relationshipValue,
+      status: initialState,
+    });
+
+    if (!validation.valid) {
+      if (validation.field) document.getElementById(validation.field)?.focus();
+      showToast(t(validation.errorKey), 'icon-alert-triangle');
       return;
     }
 
@@ -302,10 +285,11 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   // Search and filters
   // ----------------------------------------------------------
-  document.getElementById('refSearch').addEventListener('input', (e) => {
-    searchTerm = e.target.value;
+  const onRefSearchInput = debounce((val) => {
+    searchTerm = val;
     renderRefs();
-  });
+  }, 150);
+  document.getElementById('refSearch').addEventListener('input', (e) => onRefSearchInput(e.target.value));
 
   document.getElementById('refFilters').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-filter]');

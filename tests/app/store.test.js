@@ -111,6 +111,19 @@ test('Store: unsubscribe stops updates', () => {
   assert.deepEqual(seen, [0, 1]);
 });
 
+test('Store: errors in one subscriber do not prevent other subscribers from firing', () => {
+  localStorage.clear();
+  const store = new Store('k9_err', { v: 0 });
+  const seen = [];
+  store.subscribe(() => {
+    // will throw on update, not on initial call
+    if (seen.length > 0) throw new Error('Subscriber exploded');
+  });
+  store.subscribe(s => seen.push(s.v));
+  store.update(s => ({ v: 1 }));
+  assert.deepEqual(seen, [0, 1]);
+});
+
 // ------------------------------------------------------------
 // Versioning + migration
 // ------------------------------------------------------------

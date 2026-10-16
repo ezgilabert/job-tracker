@@ -19,11 +19,12 @@ import {
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../app/constants.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
-  uid, escapeHtml, valueOf, updateById, withHistoryEntry, todayISO,
+  uid, escapeHtml, valueOf, updateById, withHistoryEntry, todayISO, debounce,
 } from '../app/utils.js';
 import { t, tState, tStateShort } from '../i18n/index.js';
 import { scrollToRef, onScrollToJob, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
+import { validateJobPayload } from '../app/validators.js';
 
 /**
  * @param {import('../app/store.js').Store} jobsStore
@@ -268,10 +269,11 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   // Search
   // ----------------------------------------------------------
   const searchInput = document.getElementById('jobSearch');
-  searchInput.addEventListener('input', (e) => {
-    searchTerm = e.target.value;
+  const onSearchInput = debounce((val) => {
+    searchTerm = val;
     renderList();
-  });
+  }, 150);
+  searchInput.addEventListener('input', (e) => onSearchInput(e.target.value));
 
   // ----------------------------------------------------------
   // Work mode + currency + salary controls
@@ -356,54 +358,34 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
 
     const initialState = statusCombo.getValue();
     const roleValue = (valueOf('role') || '').trim();
-
-    // ---- 1. Role (unless "Saved") ----
-    if (!roleValue && initialState !== 'Saved') {
-      showToast(t('toast.roleRequired'), 'icon-alert-triangle');
-      if (roleInput) roleInput.focus();
-      return;
-    }
-
-    // ---- 2. Contact link format (if filled) ----
-    // Run this before the "link or contact" check so a malformed
-    // contact link surfaces its specific error, not the generic one.
-    const contactValidation = contactLinkPicker.validate();
-    if (!contactValidation.valid) {
-      contactLinkPicker.markTouched();
-      contactLinkPicker.focus();
-      showToast(t(contactValidation.errorKey), 'icon-alert-triangle');
-      return;
-    }
-
-    // ---- 3. Date required ----
-    const dateValue = (datePicker?.getValue() || '').trim();
-    if (!dateValue) {
-      showToast(t('toast.dateRequired'), 'icon-alert-triangle');
-      return;
-    }
-
-    // ---- 4. Salary required ----
-    const salaryValue = (salaryInput.getValue() || '').trim();
-    if (!salaryValue) {
-      showToast(t('toast.salaryRequired'), 'icon-alert-triangle');
-      document.getElementById('salary')?.focus();
-      return;
-    }
-
-    // ---- 5. Must have either the job link OR a complete contact ----
-    // "Complete contact" = name + a valid contact link (platform
-    // already has a default). Notes are excluded on purpose.
     const linkValue = (valueOf('link') || '').trim();
     const contactNameValue = (valueOf('contact') || '').trim();
+    const dateValue = (datePicker?.getValue() || '').trim();
+    const salaryValue = (salaryInput.getValue() || '').trim();
     const contactData = contactLinkPicker.getValue();
-    const contactLinkValue = (contactData.link || '').trim();
 
-    const hasLink = Boolean(linkValue);
-    const hasFullContact = Boolean(contactNameValue) && Boolean(contactLinkValue);
+    const validation = validateJobPayload({
+      company: valueOf('company'),
+      role: roleValue,
+      status: initialState,
+      date: dateValue,
+      salary: salaryValue,
+      link: linkValue,
+      contact: contactNameValue,
+      contactLink: contactData.link,
+      contactPlatform: contactData.platform,
+    });
 
-    if (!hasLink && !hasFullContact) {
-      showToast(t('toast.linkOrContactRequired'), 'icon-alert-triangle');
-      document.getElementById('link')?.focus();
+    if (!validation.valid) {
+      if (validation.field === 'contactLink') {
+        contactLinkPicker.markTouched();
+        contactLinkPicker.focus();
+      } else if (validation.field === 'role') {
+        if (roleInput) roleInput.focus();
+      } else if (validation.field) {
+        document.getElementById(validation.field)?.focus();
+      }
+      showToast(t(validation.errorKey), 'icon-alert-triangle');
       return;
     }
 

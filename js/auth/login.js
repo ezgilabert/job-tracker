@@ -17,6 +17,7 @@ import {
 } from './users.js';
 import { mountInputLimits } from '../ui/form/inputLimits.js';
 import { onI18nChanged } from '../app/events.js';
+import { showToast } from '../ui/feedback/toast.js';
 
 // ------------------------------------------------------------
 // Persisted config reader
@@ -303,9 +304,18 @@ function mountSocials() {
   document.querySelectorAll('.btn-social').forEach(btn => {
     btn.addEventListener('click', () => {
       const provider = btn.dataset.provider || 'social';
-      console.info(`[Auth] "${provider}" sign-in is not implemented yet`);
+      const name = provider.charAt(0).toUpperCase() + provider.slice(1);
+      showToast(t('auth.socialStub', { provider: name }), 'icon-lock');
     });
   });
+
+  const forgotBtn = document.getElementById('loginForgot');
+  if (forgotBtn) {
+    forgotBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast(t('auth.forgotNotice'), 'icon-lock', { duration: 4500 });
+    });
+  }
 }
 
 // ------------------------------------------------------------

@@ -93,6 +93,12 @@ export class Store {
   }
 
   #emit() {
-    for (const fn of this.listeners) fn(this.state.data);
+    for (const fn of this.listeners) {
+      try {
+        fn(this.state.data);
+      } catch (err) {
+        console.error(`[Store:${this.key}] subscriber error:`, err);
+      }
+    }
   }
 }

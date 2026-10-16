@@ -5,6 +5,7 @@
 import { t, getLanguage } from '../../i18n/index.js';
 import { toLocalISO } from '../../app/utils.js';
 import { icon } from '../../templates/icon.js';
+import { onI18nChanged } from '../../app/events.js';
 
 // ------------------------------------------------------------
 // Locale-aware helpers.
@@ -68,7 +69,7 @@ export class DatePicker {
     this.popover.addEventListener('click', (e) => this._handlePopoverClick(e));
 
     // Re-render the trigger on language change.
-    document.addEventListener('i18n-changed', () => {
+    this._unsubI18n = onI18nChanged(() => {
       this.renderTrigger();
       if (this.open) this.renderPopover();
     });
@@ -78,6 +79,10 @@ export class DatePicker {
 
   destroy() {
     document.removeEventListener('click', this._outsideClick);
+    if (this._unsubI18n) {
+      this._unsubI18n();
+      this._unsubI18n = null;
+    }
   }
 
   setValue(v) {

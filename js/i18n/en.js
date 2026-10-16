@@ -50,6 +50,8 @@ export const en = {
   'auth.error.registerDisabled': 'Registration is disabled. Ask the administrator for access.',
   'auth.error.locked': 'Too many failed attempts. Try again in {min} min.',
   'auth.error.unexpected': 'Unexpected error. Check the console.',
+  'auth.socialStub': '{provider} sign-in is not available in this local-only mode.',
+  'auth.forgotNotice': 'In this local-only mode, data is saved in your browser. If you forgot your password, please register a new account or clear your browser data.',
 
   // ===== Registration =====
   'auth.register.username': 'Username',

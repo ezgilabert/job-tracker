@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 
 import {
   escapeHtml, daysSince, formatDate, formatDateTime,
-  todayISO, uid, ensureArray, cloneArray,
+  todayISO, uid, ensureArray, cloneArray, debounce,
 } from '../../js/app/utils.js';
 
 // Builds the local YYYY-MM-DD string for a given Date (or now).
@@ -133,4 +133,38 @@ test('cloneArray: returns a new array', () => {
 test('cloneArray: non-arrays → []', () => {
   assert.deepEqual(cloneArray(null), []);
   assert.deepEqual(cloneArray('x'), []);
+});
+
+// ------------------------------------------------------------
+// debounce
+// ------------------------------------------------------------
+test('debounce: delays execution and cancels trailing calls', async () => {
+  let calls = 0;
+  let lastArg = null;
+  const fn = debounce((arg) => {
+    calls++;
+    lastArg = arg;
+  }, 20);
+
+  fn('first');
+  fn('second');
+  fn('third');
+
+  assert.equal(calls, 0);
+
+  await new Promise(r => setTimeout(r, 40));
+
+  assert.equal(calls, 1);
+  assert.equal(lastArg, 'third');
+});
+
+test('debounce: cancel stops pending execution', async () => {
+  let calls = 0;
+  const fn = debounce(() => { calls++; }, 20);
+
+  fn();
+  fn.cancel();
+
+  await new Promise(r => setTimeout(r, 40));
+  assert.equal(calls, 0);
 });

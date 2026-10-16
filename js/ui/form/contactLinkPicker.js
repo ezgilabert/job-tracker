@@ -24,51 +24,9 @@
 export const PLATFORM_VALUES = ['linkedin', 'email', 'whatsapp', 'other'];
 export const DEFAULT_PLATFORM = 'linkedin';
 
-// ------------------------------------------------------------
-// Validators per platform. Return `null` if valid, or an i18n
-// error key if not.
-// ------------------------------------------------------------
-const LINK_VALIDATORS = {
-  linkedin(value) {
-    // Accepts with or without protocol, with or without www.
-    const clean = value
-      .trim()
-      .replace(/^https?:\/\//i, '')
-      .replace(/^www\./i, '');
-    if (!/^linkedin\.com\/(in|company|pub|school|showcase)\/[\w\-%.]+\/?$/i.test(clean)) {
-      return 'form.contactLink.error.linkedin';
-    }
-    return null;
-  },
+import { validateContactLink, LINK_VALIDATORS } from '../../app/validators.js';
 
-  email(value) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
-      return 'form.contactLink.error.email';
-    }
-    return null;
-  },
-
-  whatsapp(value) {
-    const trimmed = value.trim();
-    // Only allow digits, spaces, +, hyphens, parentheses and dots.
-    if (!/^[\d\s+\-().]+$/.test(trimmed)) {
-      return 'form.contactLink.error.whatsapp';
-    }
-    const digits = trimmed.replace(/[^\d]/g, '');
-    if (digits.length < 8) {
-      return 'form.contactLink.error.whatsapp';
-    }
-    return null;
-  },
-
-  other(value) {
-    const v = value.trim();
-    if (/^https?:\/\/\S+$/i.test(v)) return null;
-    if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v)) return null;
-    if (/^(mailto|tel):\S+$/i.test(v)) return null;
-    return 'form.contactLink.error.url';
-  },
-};
+export { LINK_VALIDATORS };
 
 export class ContactLinkPicker {
   /**
@@ -150,15 +108,8 @@ export class ContactLinkPicker {
    */
   validate() {
     const link = (this.inputEl?.value || '').trim();
-
-    // Empty = valid (the field is optional).
-    if (!link) return { valid: true, errorKey: null };
-
-    const fn = LINK_VALIDATORS[this.value.platform];
-    if (!fn) return { valid: true, errorKey: null };
-
-    const errorKey = fn(link);
-    return { valid: errorKey === null, errorKey };
+    const res = validateContactLink(this.value.platform, link);
+    return { valid: res.valid, errorKey: res.errorKey || null };
   }
 
   /** Forces error rendering (call from the submit handler). */

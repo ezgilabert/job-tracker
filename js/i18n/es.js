@@ -50,6 +50,8 @@ export const es = {
   'auth.error.registerDisabled': 'El registro está deshabilitado. Pedí acceso al administrador.',
   'auth.error.locked': 'Demasiados intentos fallidos. Probá de nuevo en {min} min.',
   'auth.error.unexpected': 'Error inesperado. Revisá la consola.',
+  'auth.socialStub': 'El inicio con {provider} no está disponible en este modo local.',
+  'auth.forgotNotice': 'En este modo local los datos se guardan en el navegador. Si olvidaste tu contraseña, podés registrar una cuenta nueva o restablecer el almacenamiento.',
 
   // ===== Registration =====
   'auth.register.username': 'Usuario',

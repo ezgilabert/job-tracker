@@ -16,6 +16,18 @@ import { t } from '../i18n/index.js';
 
 let activeUndo = null;
 
+function cloneState(val) {
+  if (val === undefined || val === null) return val;
+  if (typeof structuredClone === 'function') {
+    try {
+      return structuredClone(val);
+    } catch {
+      // Fallback below
+    }
+  }
+  return JSON.parse(JSON.stringify(val));
+}
+
 /**
  * Runs a mutation on one or more stores with a 5-second undo
  * window.
@@ -33,7 +45,7 @@ export function withUndo(stores, message, mutation, icon = 'icon-rotate-ccw') {
   }
 
   const arr = Array.isArray(stores) ? stores : [stores];
-  const snapshots = arr.map(s => s.get());
+  const snapshots = arr.map(s => cloneState(s.get()));
 
   mutation();
 
@@ -41,7 +53,7 @@ export function withUndo(stores, message, mutation, icon = 'icon-rotate-ccw') {
     actionLabel: t('action.undo'),
     duration: 5000,
     onAction: () => {
-      arr.forEach((s, i) => s.update(() => snapshots[i]));
+      arr.forEach((s, i) => s.update(() => cloneState(snapshots[i])));
       activeUndo = null;
       showToast(t('toast.undone'), 'icon-rotate-ccw');
     },
