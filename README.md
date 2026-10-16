@@ -14,24 +14,45 @@ folder over HTTP.
 
 - Create, edit, and delete applications: company, role, date, link, salary,
   work mode, contact, notes.
+- **Collapsible form**: toggle the "New application" section open/closed via
+  the header chevron button.
+- **Form validation & requirements**:
+  - **Company**: required (up to 120 chars).
+  - **Role**: required unless initial status is "Saved" (up to 120 chars).
+    Includes a searchable combo dropdown with role suggestions, category tags,
+    and a quick trigger to add custom roles.
+  - **Date**: required (defaults to today via `todayISO()`, resets to today
+    after submission, cannot be empty).
+  - **Salary**: required in both single-value and range modes, with an
+    auto-formatted mask, ARS/USD currency toggle, and hourly/monthly switch.
+  - **Job link OR contact**: at least one is mandatory — either a valid job
+    posting URL or a complete contact block (contact name + valid contact link).
+  - **Contact platform**: LinkedIn, Email, WhatsApp, or Other, validated
+    strictly against each platform's format rules.
 - **Stage workflow**: Saved → Applied → Contact → HR Interview →
   Technical Challenge → Live Coding → Technical Interview → Client Interview →
   Client Chat → Final Interview → References → Negotiation → Offer.
+- **Offer confirmation**: applications in the "Offer" stage have an offer
+  confirmation toggle (`offerConfirmed`), and closing an application as Offer
+  automatically marks it confirmed.
 - **Close with a reason**: Rejected, Ghosted, Discarded, Offer. Each close
   state comes with preset reason chips (localized) and a free-text field.
-- **Advance with a note**: when moving a stage forward you can leave a reminder
-  for that step (shown as a "PD" on the card).
+- **Advance with a note**: moving a stage forward opens a note modal. The "Save
+  and advance" button remains disabled until at least one non-whitespace
+  character is typed into the note field; "Continue without note" provides an
+  intentional escape hatch to advance without a note. Closing via X, Escape or
+  overlay click cancels the advance. Saved notes appear as a "PD" badge on the card.
 - **Skip a stage**: mark the current step as "Not applicable" and jump to the
   next one.
-- **Go back once**: you can move a stage back a single time per application.
+- **Go back once**: you can move a stage back a single time per application
+  (with confirmation).
 - **Reopen** closed applications.
 - **Drag & drop** to reorder cards.
-- **History modal** with a timeline of every stage change, note, and reason.
+- **History modal** with a timeline of every stage change, note, reason, and
+  backtrack marker.
 - **Filters** by status (configurable order and visibility) + free-text search
   across company, role, contact, notes, and salary.
-- **Salary input** with auto-formatted mask, range/single toggle, ARS/USD
-  currency picker, and hourly/monthly toggle.
-- **Work mode picker**: On-site / Remote / Hybrid (with office days).
+- **Work mode picker**: On-site / Remote / Hybrid (with 1–5 office days).
 - **Contact picker**: LinkedIn / Email / WhatsApp / Other, with per-platform
   validation and one-click actions on the card.
 
@@ -39,15 +60,36 @@ folder over HTTP.
 
 - Create, edit, and delete referrals: name, role, contact, link, relationship,
   status, notes.
+- **Collapsible form**: toggle the "New referral" section open/closed via
+  the header chevron button.
+- **Form validation & requirements**:
+  - **Name**: required (HTML5 required + defensive toast check).
+  - **Role / Company**: required (up to 120 chars).
+  - **Contact OR Link**: required (at least one must be provided).
+  - **Relationship**: required (multi-select chips, at least one chip selected:
+    Friend, Ex-colleague, Recruiter, Family, Mentee, Mentor, Other).
+  - **Status**: required (defaults to "Pending" in the UI).
+  - All five required fields feature a visual red asterisk (`*`) on their labels.
 - **Own workflow**: Pending → Contacted → Referred → In Process → Hired
   (or Not applicable).
+- **Advance with a note**: guarded note modal identical to jobs ("Save and
+  advance" disabled until text is typed, "Continue without note" escape hatch,
+  cancel on close).
 - **Referral → application flow**: when a referral reaches "In Process", a modal
   offers to either create a new application (pre-filled) or link it to an
   existing one. The link is stored internally as `linkedJobId`.
-- **Auto-sync**: when the linked application is closed as "Offer", the referral
-  moves to "Hired" (and vice versa).
+- **Bidirectional auto-sync**:
+  - When the linked application is closed as "Offer", the referral moves to
+    "Hired".
+  - When the referral advances to "Hired" and has a `linkedJobId`, the linked
+    application automatically moves to "Offer" (with offer confirmed).
+- **Go back once**: move back a single step per referral (with confirmation),
+  **locked** if the referral is linked to an application (`linkedJobId`) to
+  prevent state inconsistency.
 - **History modal** with the same timeline treatment as jobs.
 - **Filters by status** + free-text search across name, role, contact, notes.
+- **Mobile workflow strip**: on viewports ≤ 720px, the 5 stages switch to a
+  compact number-only dot strip without overflowing text labels.
 
 ### Dashboards
 
@@ -62,25 +104,33 @@ Six configurable styles, **independently selectable** for jobs and referrals:
 | `circular` | SVG progress rings |
 | `heatmap` | GitHub-style activity calendar |
 
-Each dashboard is wrapped in a header ("Applications" / "Referrals") so the
-two are visually distinguishable.
+- **Aggregations & metrics**: total applications/referrals, active count,
+  highlights (offers / hired), closed count, 7-point weekly trend sparklines,
+  84-day daily activity heatmaps, and top rankings (by company, role, or tag).
+- Each dashboard is wrapped in a header ("Applications" / "Referrals") so the
+  two are visually distinguishable.
 
 ### Configuration modal
 
 Eight tabs, all changes staged as a draft and applied on Save:
 
-- **Roles** — enable/disable role categories, add custom roles, hide/restore.
-- **Initial statuses** — pick which statuses appear in the dropdown and which
-  one is default.
-- **Filters** — reorder and show/hide the filter chips.
-- **Appearance** — logo (2 options) and background (11 options: aurora, mesh,
-  grid, dots, waves, conic, noise, stripes, cosmos, blobs, none).
+- **Roles** — enable/disable 11 role categories, add custom roles with tags,
+  hide/restore defaults.
+- **Initial statuses** — pick which statuses appear in the create-job dropdown
+  and which one is default.
+- **Filters** — reorder and show/hide the filter chips (All, Active, Closed, and
+  workflow steps).
+- **Appearance** — logo (2 options: Target, Briefcase) and background (11 options:
+  aurora, mesh, grid, dots, waves, conic, noise, stripes, cosmos, blobs, none).
 - **Dashboard** — pick a style for jobs and another for referrals.
-- **Language** — ES / EN.
+- **Language** — ES / EN with cascade pulse animation on change.
 - **Profile** — first name, last name, username, email, bio, avatar (stored as
-  dataURL).
-- **Advanced** — export/import JSON backup, plus three danger-zone actions:
-  reset preferences, delete data, reset everything.
+  dataURL). Auto-seeded on registration, real-time session sync.
+- **Advanced** — export/import JSON backup with schema migration, plus three
+  danger-zone actions: reset preferences, delete data, reset everything.
+- **Mobile layout**: on viewports ≤ 720px, navigation tabs transform into a
+  responsive 4×2 grid at the top of the modal, and panels collapse into
+  single-column layouts.
 
 An unsaved-changes badge appears whenever the draft differs from the saved
 state, and closing prompts to discard or save.
@@ -89,6 +139,24 @@ state, and closing prompts to discard or save.
 
 - Light / dark theme with a radial ripple animation on toggle.
 - Eleven animated/static background styles.
+- **Brand logo interactive hover animations** — the brand logo in the header,
+  login screen, and loading splash scales up (1.05x) with a soft violet glow
+  and triggers a smooth gradient sweep text animation (`brandGradientSweep`)
+  across the title.
+- **Hydration / Boot splash screen** — full-screen animated overlay with
+  rotating status indicators ("Loading applications…", "Syncing referrals…",
+  "Preparing your dashboard…") and an animated sliding gradient progress bar
+  during store hydration and session verification.
+- **Responsive mobile & tablet design**:
+  - Global breakpoints: mobile (≤ 640px), tablet (641–720px), desktop (> 720px).
+  - Header keeps brand and user menu on a single row without breaking; titles
+    truncate with ellipsis on narrow screens.
+  - Referral cards on mobile/tablet: full-width card body, floating top-right
+    action buttons, 5-column number-only workflow dots (avoiding cramped text
+    labels), and full-width stacked action buttons.
+  - Application cards & toolbar: search box expands full width above filter
+    chips on mobile.
+  - Config modal: 4×2 grid tab navigation and stacked option cards on mobile.
 - Toast notifications, custom confirm modals, and a progress-ring reset
   animation.
 - **Undo for destructive actions** — delete, advance and close actions show a
@@ -292,7 +360,7 @@ Never leave the plain password in the repo.
 | `validateCredentials(id, pw)` | Looks the user up, checks the hash, updates rate limit |
 | `getLockoutRemainingMs()` | Ms remaining until lockout expires |
 | `getActiveUserId()` | Id of the last user who logged in |
-| `updateSessionProfile({ name, email })` | Patches the session without re-signing |
+| `updateSessionProfile({ name, email, username })` | Patches the session without re-signing |
 | `computeHash(salt, pw)` | Re-exported from `users.js` |
 | `requireSession(redirectTo)` | Guard for protected pages |
 | `redirectIfAuthenticated(redirectTo)` | Guard for `login.html` |
@@ -544,6 +612,7 @@ jsdom needed.
 │   │
 │   └── ui/                       # UI widgets
 │       ├── modal.js              # Shared modal lifecycle + Escape stack
+│       ├── dashboard.js          # Re-export shim for dashboard/index.js
 │       ├── dashboard/            # Six dashboard styles
 │       │   ├── index.js
 │       │   ├── shared.js
@@ -655,8 +724,14 @@ editing:
   needing to know.
 - **UI widgets live under `ui/` by concern:** `ui/form/` for form
   widgets, `ui/feedback/` for overlays, `ui/dashboard/` for the
-  dashboards. `ui/modal.js` (the shared modal lifecycle) is the only
-  cross-cutting primitive sitting at the root of `ui/`.
+  dashboards. `ui/modal.js` (the shared modal lifecycle) and `ui/dashboard.js`
+  (a backward-compatible re-export shim for `ui/dashboard/index.js`) sit at
+  the root of `ui/`.
+- **Note modals guard against accidental empty notes.** Both `noteModal.js`
+  and the referral note modal disable the 'Save and advance' button until
+  non-whitespace text is entered, while 'Continue without note' provides an
+  explicit, intentional escape hatch. Closing via the close button, Escape
+  or clicking the overlay cancels the advance flow.
 - **Events are typed.** Cross-module signals go through
   `js/app/events.js`. Raw `document.dispatchEvent(new CustomEvent(...))`
   calls are not allowed outside that file. Current events:
@@ -714,6 +789,13 @@ editing:
   own styles from scratch instead of resetting the global rule. When
   adding a new input outside a form field, remember it will have no
   padding, border or background until you give it one.
+- **Responsive media queries cascade cleanly.** Global layout queries live
+  in `layout/responsive.css`. However, component-specific mobile rules that
+  would otherwise be overridden by desktop rules due to the `@import` order
+  (such as the 4×2 mobile tab grid in `features/config.css` and mobile card
+  adjustments in `features/referrals.css`) are placed at the bottom of their
+  respective feature stylesheet so they appear after desktop definitions and
+  win cleanly without `!important`.
 
 ### Assets
 
@@ -772,10 +854,6 @@ editing:
   placeholder shows up as literal text. All the templated strings that
   need params (confirm dialogs, etc.) go through `t(key, params)`
   directly instead.
-- **File size**: aim for under ~500 lines per file. When a module grows past
-  that, split by concern rather than by size.
-- **No build step**: everything ships as-is over HTTP. Avoid adding a bundler
-  or TypeScript unless the scope grows significantly.
 
 ---
 
