@@ -19,7 +19,7 @@ import {
 import { WORKFLOW_STEPS, CONFIG_FILTER_META } from '../app/constants.js';
 import { renderJobCard } from '../templates/jobCard.js';
 import {
-  uid, escapeHtml, valueOf, updateById, withHistoryEntry,
+  uid, escapeHtml, valueOf, updateById, withHistoryEntry, todayISO,
 } from '../app/utils.js';
 import { t, tState, tStateShort } from '../i18n/index.js';
 import { scrollToRef, onScrollToJob, onI18nChanged } from '../app/events.js';
@@ -325,6 +325,13 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   contactLinkPicker.translate = t;
 
   // ----------------------------------------------------------
+  // Date default: today.
+  // The user can still change it, but it must never end up
+  // empty on submit. Set on boot and again after each submit.
+  // ----------------------------------------------------------
+  if (datePicker) datePicker.setValue(todayISO());
+
+  // ----------------------------------------------------------
   // Form
   // ----------------------------------------------------------
   const form = document.getElementById('jobForm');
@@ -348,14 +355,18 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     e.preventDefault();
 
     const initialState = statusCombo.getValue();
-    const roleValue = valueOf('role');
+    const roleValue = (valueOf('role') || '').trim();
 
+    // ---- 1. Role (unless "Saved") ----
     if (!roleValue && initialState !== 'Saved') {
       showToast(t('toast.roleRequired'), 'icon-alert-triangle');
       if (roleInput) roleInput.focus();
       return;
     }
 
+    // ---- 2. Contact link format (if filled) ----
+    // Run this before the "link or contact" check so a malformed
+    // contact link surfaces its specific error, not the generic one.
     const contactValidation = contactLinkPicker.validate();
     if (!contactValidation.valid) {
       contactLinkPicker.markTouched();
@@ -364,24 +375,56 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
       return;
     }
 
+    // ---- 3. Date required ----
+    const dateValue = (datePicker?.getValue() || '').trim();
+    if (!dateValue) {
+      showToast(t('toast.dateRequired'), 'icon-alert-triangle');
+      return;
+    }
+
+    // ---- 4. Salary required ----
+    const salaryValue = (salaryInput.getValue() || '').trim();
+    if (!salaryValue) {
+      showToast(t('toast.salaryRequired'), 'icon-alert-triangle');
+      document.getElementById('salary')?.focus();
+      return;
+    }
+
+    // ---- 5. Must have either the job link OR a complete contact ----
+    // "Complete contact" = name + a valid contact link (platform
+    // already has a default). Notes are excluded on purpose.
+    const linkValue = (valueOf('link') || '').trim();
+    const contactNameValue = (valueOf('contact') || '').trim();
+    const contactData = contactLinkPicker.getValue();
+    const contactLinkValue = (contactData.link || '').trim();
+
+    const hasLink = Boolean(linkValue);
+    const hasFullContact = Boolean(contactNameValue) && Boolean(contactLinkValue);
+
+    if (!hasLink && !hasFullContact) {
+      showToast(t('toast.linkOrContactRequired'), 'icon-alert-triangle');
+      document.getElementById('link')?.focus();
+      return;
+    }
+
+    // ---- Build the new job ----
     const mode = workModePicker.getValue();
     const salaryMode = salaryModeChip.getValue();
-    const contactData = contactLinkPicker.getValue();
 
     const newJob = {
       id: uid(),
       company: valueOf('company'),
       role: roleValue,
-      date: datePicker?.getValue() || '',
+      date: dateValue,
       status: initialState,
-      link: valueOf('link'),
-      salary: salaryInput.getValue(),
+      link: linkValue,
+      salary: salaryValue,
       hourlySalary: hourlySalaryCheckbox.checked,
       salaryIsRange: salaryMode === 'range',
       currency: currencyPicker.getValue(),
       workMode: mode.workMode,
       hybridOfficeDays: mode.hybridOfficeDays,
-      contact: valueOf('contact'),
+      contact: contactNameValue,
       contactLink: contactData.link,
       contactPlatform: contactData.platform,
       notes: valueOf('notes'),
@@ -393,7 +436,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     jobsStore.update(jobs => [newJob, ...jobs]);
 
     form.reset();
-    datePicker?.setValue('');
+    datePicker?.setValue(todayISO());   // ← reset to TODAY, not ''
     workModePicker.setValue('');
     currencyPicker.setValue('usd');
     salaryModeChip.setValue('range');
