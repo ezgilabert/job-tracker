@@ -29,6 +29,9 @@ folder over HTTP.
     posting URL or a complete contact block (contact name + valid contact link).
   - **Contact platform**: LinkedIn, Email, WhatsApp, or Other, validated
     strictly against each platform's format rules.
+  - All rules live in `js/app/validators.js` as pure functions
+    (`validateJobPayload`, `validateRefPayload`, `validateContactLink`) so they
+    can be unit-tested without touching the DOM.
 - **Stage workflow**: Saved → Applied → Contact → HR Interview →
   Technical Challenge → Live Coding → Technical Interview → Client Interview →
   Client Chat → Final Interview → References → Negotiation → Offer.
@@ -47,11 +50,15 @@ folder over HTTP.
 - **Go back once**: you can move a stage back a single time per application
   (with confirmation).
 - **Reopen** closed applications.
-- **Drag & drop** to reorder cards.
+- **Drag & drop** to reorder cards. The list handler is extracted to
+  `js/ui/dragDrop.js` — a reusable `mountDragDrop(el, { itemSelector, onReorder })`
+  helper that any list can use.
 - **History modal** with a timeline of every stage change, note, reason, and
   backtrack marker.
 - **Filters** by status (configurable order and visibility) + free-text search
-  across company, role, contact, notes, and salary.
+  across company, role, contact, notes, and salary. Search input is debounced
+  (150 ms) via `debounce()` from `utils.js`. The filter bar itself is rendered
+  by the reusable `mountToolbarFilter()` helper from `js/ui/toolbarFilter.js`.
 - **Work mode picker**: On-site / Remote / Hybrid (with 1–5 office days).
 - **Contact picker**: LinkedIn / Email / WhatsApp / Other, with per-platform
   validation and one-click actions on the card.
@@ -74,7 +81,8 @@ folder over HTTP.
   (or Not applicable).
 - **Advance with a note**: guarded note modal identical to jobs ("Save and
   advance" disabled until text is typed, "Continue without note" escape hatch,
-  cancel on close).
+  cancel on close). Both jobs and referrals share the same lifecycle through
+  `createNoteModalController()` in `js/controllers/modals/noteModalFactory.js`.
 - **Referral → application flow**: when a referral reaches "In Process", a modal
   offers to either create a new application (pre-filled) or link it to an
   existing one. The link is stored internally as `linkedJobId`.
@@ -88,6 +96,8 @@ folder over HTTP.
   prevent state inconsistency.
 - **History modal** with the same timeline treatment as jobs.
 - **Filters by status** + free-text search across name, role, contact, notes.
+  Same `mountToolbarFilter()` helper as jobs — the filter buttons are no
+  longer hardcoded in `index.html`.
 - **Mobile workflow strip**: on viewports ≤ 720px, the 5 stages switch to a
   compact number-only dot strip without overflowing text labels.
 
@@ -162,7 +172,9 @@ state, and closing prompts to discard or save.
 - **Undo for destructive actions** — delete, advance and close actions show a
   5-second toast with an "Undo" button and a countdown bar. Only the most
   recent action stays undoable; starting a new one dismisses the previous
-  toast so the user never restores an intermediate state.
+  toast so the user never restores an intermediate state. Snapshots are deep-
+  cloned with `structuredClone` (with a JSON fallback) so mutating the store
+  after the snapshot can never leak into the undo buffer.
 - **First-run welcome banner** — teaches the keyboard shortcuts, drag-to-
   reorder and where Settings lives. Dismissed once per user.
 - All UI is fully internationalized (Spanish / English). Reason chips, empty
@@ -189,6 +201,24 @@ state, and closing prompts to discard or save.
 - **Shared SVG sprite** — every icon lives once in `assets/icons.svg` and is
   referenced via `<use href="./assets/icons.svg#icon-name"/>`. No duplicated
   path data anywhere in the HTML or templates.
+
+### Accessibility
+
+- **Toasts are announced** — every toast (`showToast` and `showActionToast`)
+  carries `role="status"`, `aria-live="polite"` and `aria-atomic="true"`, so
+  screen readers pick up confirmations like *"Postulación guardada"* or
+  *"Etapa avanzada"* without interrupting the current flow.
+- **Modal focus trap** — the shared `createModal()` lifecycle keeps `Tab`
+  and `Shift+Tab` inside the top-most modal. Escape closes only the top of
+  the stack, and overlay clicks behave consistently with Escape.
+- **Focus restoration** — when a modal closes, focus returns to the element
+  that opened it (typically the trigger button). If that element is no longer
+  in the DOM, focus is left to the browser's default.
+- **Auto-focus on open** — modals focus their first focusable element on
+  open, unless `onOpen` already focused something (e.g. an input).
+- **Reduced motion** — global `@media (prefers-reduced-motion: reduce)`
+  support (see above).
+- **Global focus ring** — `:focus-visible` (see above).
 
 ---
 
@@ -317,6 +347,14 @@ From the login screen's **Create account** tab. Fields:
 On success the new user is automatically signed in and redirected to
 `index.html`. Registration is always available once at least one user
 exists, so multiple accounts can coexist on the same browser profile.
+
+### Login screen stubs
+
+- **Google / GitHub buttons** show an informative toast explaining that
+  social sign-in is a local prototype. No account is created.
+- **"Forgot your password?"** shows a toast explaining that, since this is
+  a local multi-user environment, the password lives only in the current
+  browser and cannot be recovered from the server (there is none).
 
 ### Backup & users
 
@@ -507,9 +545,9 @@ There is no default account. On the first visit, register one from the
 
 ## Tests
 
-The pure modules (selectors, utils, migrations, store, users, icons, i18n)
-have a smoke test suite built on Node's built-in test runner — no
-dependencies to install.
+The pure modules (selectors, utils, migrations, store, users, icons, i18n,
+validators) have a smoke test suite built on Node's built-in test runner —
+no dependencies to install.
 
 ```bash
 npm test
@@ -522,11 +560,12 @@ Expected output: everything green. The suite covers:
 | File | Coverage |
 | --- | --- |
 | `tests/app/selectors.test.js` | Filters, sort, stats, dashboard helpers |
-| `tests/app/utils.test.js` | `escapeHtml`, date helpers, `uid`, array helpers |
+| `tests/app/utils.test.js` | `escapeHtml`, date helpers, `uid`, array helpers, `debounce` |
 | `tests/app/migrations.test.js` | Schema migrations + legacy storage migration |
-| `tests/app/store.test.js` | Persistence, subscribe, versioning, migration |
+| `tests/app/store.test.js` | Persistence, subscribe, versioning, migration, subscriber isolation |
 | `tests/app/constants.test.js` | Sprite names, workflow tables, defaults |
 | `tests/app/icons.test.js` | Sprite reference emitter + name guard |
+| `tests/app/validators.test.js` | Contact link, job payload and referral payload rules |
 | `tests/auth/users.test.js` | User registry: hash, lookups, validation |
 | `tests/auth/session.test.js` | Rate limiting, signing, session helpers |
 | `tests/i18n/index.test.js` | Translations, interpolation, no residual emojis |
@@ -557,9 +596,12 @@ jsdom needed.
 │   │   ├── icons.js              # icon() helper (sprite reference emitter)
 │   │   ├── migrations.js         # Legacy → current + legacy storage → scoped
 │   │   ├── selectors.js          # Pure state selectors
-│   │   ├── store.js              # Reactive localStorage store w/ migrations
-│   │   ├── undo.js               # withUndo() helper
-│   │   └── utils.js              # Shared helpers (+ updateById, withHistoryEntry)
+│   │   ├── store.js              # Reactive localStorage store w/ migrations,
+│   │   │                         #   deep-frozen state, isolated subscribers
+│   │   ├── undo.js               # withUndo() helper (structuredClone snapshots)
+│   │   ├── utils.js              # Shared helpers (+ updateById, withHistoryEntry,
+│   │   │                         #   debounce)
+│   │   └── validators.js         # Pure form/payload validators
 │   │
 │   ├── i18n/                     # Translations
 │   │   ├── index.js              # Public API (t, applyI18n, setLanguage…)
@@ -580,7 +622,7 @@ jsdom needed.
 │   │   └── userMenu.js           # Header dropdown wiring
 │   │
 │   ├── controllers/              # Feature controllers
-│   │   ├── jobsController.js     # List + form + dashboard + drag&drop
+│   │   ├── jobsController.js     # List + form + dashboard
 │   │   ├── refsController.js     # List + form + dashboard
 │   │   ├── createRoleController.js
 │   │   │
@@ -590,7 +632,8 @@ jsdom needed.
 │   │   │   ├── editRefModal.js
 │   │   │   ├── closeJobModal.js
 │   │   │   ├── historyModal.js
-│   │   │   ├── noteModal.js
+│   │   │   ├── noteModal.js      # Jobs — thin wrapper on the factory
+│   │   │   ├── noteModalFactory.js # Shared lifecycle for jobs + refs notes
 │   │   │   └── refToJobModal.js
 │   │   │
 │   │   └── config/               # Per-tab controllers
@@ -611,7 +654,10 @@ jsdom needed.
 │   │   └── steps.js
 │   │
 │   └── ui/                       # UI widgets
-│       ├── modal.js              # Shared modal lifecycle + Escape stack
+│       ├── modal.js              # Shared lifecycle: escape stack,
+│       │                         #   focus trap, focus restoration
+│       ├── dragDrop.js           # mountDragDrop() — reorderable list helper
+│       ├── toolbarFilter.js      # mountToolbarFilter() — filter chip bar
 │       ├── dashboard.js          # Re-export shim for dashboard/index.js
 │       ├── dashboard/            # Six dashboard styles
 │       │   ├── index.js
@@ -636,7 +682,7 @@ jsdom needed.
 │       └── feedback/
 │           ├── confirmModal.js
 │           ├── resetAnimation.js
-│           └── toast.js
+│           └── toast.js          # role="status" + aria-live="polite"
 ├── css/
 │   ├── styles.css                # @imports only — the CSS entry point
 │   ├── base/
@@ -666,7 +712,14 @@ jsdom needed.
 │   │   ├── workflow.css
 │   │   ├── history.css
 │   │   ├── dashboard.css
-│   │   └── config.css
+│   │   └── config.css            # @imports only, pulls from ./config/
+│   │       └── config/
+│   │           ├── base.css      # modal shell, nav, layout, buttons
+│   │           ├── panels.css    # roles, statuses, filters, appearance,
+│   │           │                 #   language
+│   │           ├── profile.css   # profile panel + spacing tweaks
+│   │           ├── advanced.css  # backup, danger zone, unsaved modal
+│   │           └── mobile.css    # 4×2 tab grid + stacked cards
 │   └── pages/
 │       ├── auth.css
 │       └── boot.css
@@ -677,7 +730,8 @@ jsdom needed.
     │   ├── migrations.test.js
     │   ├── selectors.test.js
     │   ├── store.test.js
-    │   └── utils.test.js
+    │   ├── utils.test.js
+    │   └── validators.test.js
     ├── auth/
     │   ├── session.test.js
     │   └── users.test.js
@@ -696,8 +750,9 @@ editing:
 
 - **`app/` is the domain + infra layer.** It contains the constants, the
   store, the selectors, the migrations, the utils, the event bus, the icons
-  helper and the undo helper. Nothing in `app/` imports from `ui/`,
-  `controllers/`, or `boot/` — the dependency direction is one-way.
+  helper, the validators and the undo helper. Nothing in `app/` imports
+  from `ui/`, `controllers/`, or `boot/` — the dependency direction is
+  one-way.
 - **`main.js` orchestrates, `boot/*` does the work.** Adding a new
   cross-cutting concern (shortcuts, a service worker, telemetry) usually
   means a new file in `js/boot/` and one call from `main.js`.
@@ -709,14 +764,23 @@ editing:
   statistics, weekly trends, top-N helpers — anything pure that reads
   from state and returns new data. Controllers call selectors, not the
   other way around.
+- **Validators live in `app/validators.js`.** `validateJobPayload`,
+  `validateRefPayload`, `validateContactLink` and the `LINK_VALIDATORS`
+  table are pure functions that return `{ valid, errorKey?, field? }`.
+  Controllers only orchestrate the side effects (focus, toast, mark
+  touched); they never reimplement the rules.
 - **Dashboard styles are pluggable.** Each style is a function that
   receives a container and a data object and renders into it. Adding a
   style is one new file in `js/ui/dashboard/` plus a switch case in
   `index.js`.
 - **Controllers are split by concern when a file grows past ~300 lines.**
   `modalsController` and `configController` became directories with one
-  file per modal / per tab plus a small facade. `jobsController` and
-  `refsController` stay as single files — they're large but cohesive.
+  file per modal / per tab plus a small facade.
+- **Reusable UI helpers live in `ui/`.** `mountDragDrop()` and
+  `mountToolbarFilter()` are standalone helpers: any list that needs
+  drag-to-reorder or a chip bar can mount them. Controllers pass a
+  selector + an `onReorder` / `onChange` callback and receive a tiny
+  handle with `destroy()` / `render()` / `getFilter()` / `setFilter()`.
 - **Panels never hold a reference to the draft.** In the config split,
   each panel receives a `host` object and calls `host.getDraft()` on
   every read. That way a wholesale draft replacement (from Reset
@@ -724,14 +788,29 @@ editing:
   needing to know.
 - **UI widgets live under `ui/` by concern:** `ui/form/` for form
   widgets, `ui/feedback/` for overlays, `ui/dashboard/` for the
-  dashboards. `ui/modal.js` (the shared modal lifecycle) and `ui/dashboard.js`
-  (a backward-compatible re-export shim for `ui/dashboard/index.js`) sit at
-  the root of `ui/`.
-- **Note modals guard against accidental empty notes.** Both `noteModal.js`
-  and the referral note modal disable the 'Save and advance' button until
-  non-whitespace text is entered, while 'Continue without note' provides an
-  explicit, intentional escape hatch. Closing via the close button, Escape
-  or clicking the overlay cancels the advance flow.
+  dashboards. `ui/modal.js`, `ui/dragDrop.js`, `ui/toolbarFilter.js`
+  and `ui/dashboard.js` (a backward-compatible re-export shim for
+  `ui/dashboard/index.js`) sit at the root of `ui/`.
+- **Note modals share one lifecycle.** Jobs and referrals both use
+  `createNoteModalController()` from
+  `controllers/modals/noteModalFactory.js`. Each caller supplies its own
+  DOM elements, builds its own subtitle HTML and provides the mutation
+  to run on apply. The factory owns the disabled-until-non-whitespace
+  rule, the escape hatch ("Continue without note"), the close X and
+  Escape handling. No duplicated markup or JS between the two note
+  modals.
+- **Modals use a shared lifecycle.** Every overlay goes through
+  `createModal(el, opts)` from `js/ui/modal.js`, which handles:
+  - open / close and overlay-click-to-close,
+  - a module-level Escape stack (only the top-most modal reacts),
+  - **focus trap**: `Tab` / `Shift+Tab` stay inside the top-most modal,
+  - **focus restoration**: the element that opened the modal regains
+    focus on close (when still present in the DOM),
+  - **auto-focus**: the first focusable element is focused on open,
+    unless `onOpen` already focused something.
+  Widgets that consume Escape themselves — the role picker and the
+  status picker — call `e.stopPropagation()` so the parent modal doesn't
+  also close.
 - **Events are typed.** Cross-module signals go through
   `js/app/events.js`. Raw `document.dispatchEvent(new CustomEvent(...))`
   calls are not allowed outside that file. Current events:
@@ -742,18 +821,23 @@ editing:
   two paths in sync automatically.
 - **Undo is single-slot.** `js/app/undo.js` snapshots one or more stores
   before running a mutation and shows an action toast with a 5-second
-  window. Starting a new action dismisses the previous toast so users
+  window. Snapshots use `structuredClone` with a JSON fallback, so
+  mutating the store after the snapshot can never leak into the undo
+  buffer. Starting a new action dismisses the previous toast so users
   never restore an intermediate state.
+- **The store is deep-frozen on every write.** `Store.get()` returns an
+  object graph where every node has been passed through `deepFreeze()`.
+  A mutation like `store.get()[0].status = 'X'` throws in strict mode
+  (ES modules are strict by default) instead of silently breaking
+  persistence and notifications. The cost is negligible for the sizes
+  this app handles (dozens to hundreds of items).
+- **The store isolates subscriber errors.** `#emit()` wraps every
+  subscriber call in `try/catch`, so a bug in one subscriber can't stop
+  the others from running.
 - **Shared mutation helpers.** `updateById(store, id, patchFn)` and
   `withHistoryEntry(item, patch, entry)` (both in `utils.js`) cover the
-  two most common store mutations. Both are used across the controllers
-  instead of hand-rolled `store.update(items => items.map(…))`.
-- **Modals use a shared lifecycle.** Every overlay goes through
-  `createModal(el, opts)` from `js/ui/modal.js`, which handles open /
-  close, overlay-click-to-close and a module-level Escape stack (only
-  the top-most modal reacts). Widgets that consume Escape themselves —
-  the role picker and the status picker — call `e.stopPropagation()`
-  so the parent modal doesn't also close.
+  two most common store mutations. `debounce(fn, ms)` covers input
+  handlers — it returns a function with a `.cancel()` method.
 
 ### CSS
 
@@ -770,6 +854,15 @@ editing:
   - `features/` — domain-specific (jobs, referrals, workflow, dashboard,
     config, history).
   - `pages/` — full-page layouts (login screen, boot overlay).
+- **`config.css` is a barrel file.** It only contains `@import`
+  statements pointing at `./config/{base,panels,profile,advanced,mobile}.css`.
+  The order matters:
+  1. `base` — modal shell, nav, layout, generic buttons.
+  2. `panels` — role, status, filter, appearance and language pickers.
+  3. `profile` — profile panel fields and spacing tweaks.
+  4. `advanced` — backup card, danger zone, unsaved modal.
+  5. `mobile` — responsive overrides. **Must come last** so the media
+     queries win over the desktop rules without `!important`.
 - **CSS custom properties drive everything.** Light/dark themes are a
   swap of variables on `:root` / `[data-theme="dark"]`. Components never
   hard-code colors — they reference variables.
@@ -790,12 +883,10 @@ editing:
   adding a new input outside a form field, remember it will have no
   padding, border or background until you give it one.
 - **Responsive media queries cascade cleanly.** Global layout queries live
-  in `layout/responsive.css`. However, component-specific mobile rules that
-  would otherwise be overridden by desktop rules due to the `@import` order
-  (such as the 4×2 mobile tab grid in `features/config.css` and mobile card
-  adjustments in `features/referrals.css`) are placed at the bottom of their
-  respective feature stylesheet so they appear after desktop definitions and
-  win cleanly without `!important`.
+  in `layout/responsive.css`. Component-specific mobile rules that would
+  otherwise be overridden by desktop rules due to the `@import` order live
+  at the bottom of their own feature file (e.g.
+  `features/config/mobile.css`) so they win cleanly without `!important`.
 
 ### Assets
 
@@ -854,6 +945,14 @@ editing:
   placeholder shows up as literal text. All the templated strings that
   need params (confirm dialogs, etc.) go through `t(key, params)`
   directly instead.
+- **Announce transient UI.** Anything users need to notice without moving
+  focus — toasts, status messages, undo prompts — carries
+  `role="status"` and `aria-live="polite"`. `aria-atomic="true"` ensures
+  the whole message is read, not just the changed part.
+- **Never store a mutable reference to `store.get()`.** The store is
+  deep-frozen; the update path is always
+  `store.update(current => nextValue)`. If you need to keep the current
+  value around, deep-clone it explicitly (`structuredClone`).
 
 ---
 

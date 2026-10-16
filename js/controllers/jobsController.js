@@ -12,6 +12,8 @@ import { SalaryModeChip, DEFAULT_SALARY_MODE } from '../ui/form/salaryModeChip.j
 import { SalaryInput } from '../ui/form/salaryInput.js';
 import { ContactLinkPicker } from '../ui/form/contactLinkPicker.js';
 import { renderDashboard } from '../ui/dashboard.js';
+import { mountDragDrop } from '../ui/dragDrop.js';
+import { mountToolbarFilter } from '../ui/toolbarFilter.js';
 import {
   computeStats, filterJobs, sortJobs, isClosed,
   topByCount, buildWeeklyTrend, buildDailyActivity,
@@ -224,7 +226,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   refsStore.subscribe(renderList);
 
   // ----------------------------------------------------------
-  // Dynamic filters
+  // Dynamic filters (extracted to ui/toolbarFilter.js)
   // ----------------------------------------------------------
   function getFilterLabel(id) {
     const meta = CONFIG_FILTER_META[id];
@@ -234,23 +236,31 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     return id;
   }
 
-  function renderFilters() {
+  const filtersBar = mountToolbarFilter(document.getElementById('filters'), {
+    getItems: () => {
+      const cfg = configStore.get();
+      return (cfg.filters || [])
+        .filter(f => f.visible)
+        .map(f => ({ id: f.id, label: getFilterLabel(f.id) }));
+    },
+    initial: currentFilter,
+    onChange: (id) => {
+      currentFilter = id;
+      renderList();
+    },
+  });
+
+  configStore.subscribe(() => {
     const cfg = configStore.get();
-    const filters = (cfg.filters || []).filter(f => f.visible);
-    const container = document.getElementById('filters');
-
-    if (!filters.some(f => f.id === currentFilter)) {
+    const visible = (cfg.filters || []).filter(f => f.visible).map(f => f.id);
+    if (!visible.includes(currentFilter)) {
       currentFilter = 'all';
+      filtersBar.setFilter('all', { silent: true });
+      renderList();
+    } else {
+      filtersBar.render();
     }
-
-    container.innerHTML = filters.map(f => {
-      const label = getFilterLabel(f.id);
-      const active = f.id === currentFilter ? 'active' : '';
-      return `<button data-filter="${escapeHtml(f.id)}" class="${active}">${escapeHtml(label)}</button>`;
-    }).join('');
-  }
-
-  configStore.subscribe(renderFilters);
+  });
 
   // ----------------------------------------------------------
   // Initial status
@@ -262,7 +272,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
 
   configStore.subscribe(renderInitialStatuses);
 
-  renderFilters();
+  filtersBar.render();
   renderInitialStatuses();
 
   // ----------------------------------------------------------
@@ -328,8 +338,6 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
 
   // ----------------------------------------------------------
   // Date default: today.
-  // The user can still change it, but it must never end up
-  // empty on submit. Set on boot and again after each submit.
   // ----------------------------------------------------------
   if (datePicker) datePicker.setValue(todayISO());
 
@@ -418,7 +426,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
     jobsStore.update(jobs => [newJob, ...jobs]);
 
     form.reset();
-    datePicker?.setValue(todayISO());   // ← reset to TODAY, not ''
+    datePicker?.setValue(todayISO());
     workModePicker.setValue('');
     currencyPicker.setValue('usd');
     salaryModeChip.setValue('range');
@@ -429,20 +437,6 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
 
     expandJobs();
     showToast(t('toast.jobAdded'), 'icon-check');
-  });
-
-  // ----------------------------------------------------------
-  // Filter clicks
-  // ----------------------------------------------------------
-  document.getElementById('filters').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-filter]');
-    if (!btn) return;
-
-    currentFilter = btn.dataset.filter;
-    document.querySelectorAll('#filters button').forEach(b =>
-      b.classList.toggle('active', b === btn)
-    );
-    renderList();
   });
 
   // ----------------------------------------------------------
@@ -514,81 +508,37 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   }
 
   // ----------------------------------------------------------
-  // Drag & drop reordering
+  // Drag & drop reordering (extracted to ui/dragDrop.js)
   // ----------------------------------------------------------
-  list.addEventListener('dragstart', (e) => {
-    const card = e.target.closest('.job');
-    if (!card) return;
-    if (e.target.closest('button, a, input, textarea, select')) {
-      e.preventDefault();
-      return;
-    }
-    card.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', card.dataset.id);
-  });
-
-  list.addEventListener('dragend', (e) => {
-    const card = e.target.closest('.job');
-    if (card) card.classList.remove('dragging');
-    list.querySelectorAll('.job').forEach(c => c.classList.remove('drag-over'));
-  });
-
-  list.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    const dragging = list.querySelector('.job.dragging');
-    if (!dragging) return;
-
-    const after = getDragAfterElement(list, e.clientY);
-    list.querySelectorAll('.job').forEach(c => c.classList.remove('drag-over'));
-
-    if (after == null) list.appendChild(dragging);
-    else {
-      after.classList.add('drag-over');
-      list.insertBefore(dragging, after);
-    }
-  });
-
-  list.addEventListener('dragleave', (e) => {
-    const card = e.target.closest('.job');
-    if (card) card.classList.remove('drag-over');
-  });
-
-  list.addEventListener('drop', (e) => {
-    e.preventDefault();
-    const dragging = list.querySelector('.job.dragging');
-    if (!dragging) return;
-
-    const newOrder = [...list.querySelectorAll('.job')].map(c => Number(c.dataset.id));
-
-    jobsStore.update(jobs => {
-      const ordered = [...jobs].sort((a, b) => {
-        const ia = newOrder.indexOf(a.id);
-        const ib = newOrder.indexOf(b.id);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
-        return ia - ib;
+  mountDragDrop(list, {
+    itemSelector: '.job',
+    onReorder: (newOrder) => {
+      jobsStore.update(jobs => {
+        const ordered = [...jobs].sort((a, b) => {
+          const ia = newOrder.indexOf(a.id);
+          const ib = newOrder.indexOf(b.id);
+          if (ia === -1) return 1;
+          if (ib === -1) return -1;
+          return ia - ib;
+        });
+        return ordered;
       });
-      return ordered;
-    });
-
-    showToast(t('toast.orderUpdated'), 'icon-grip-vertical');
+      showToast(t('toast.orderUpdated'), 'icon-grip-vertical');
+    },
   });
 
   // ----------------------------------------------------------
   // scroll-to-job
   // ----------------------------------------------------------
-  // Fired by other modules (e.g. refsController's "Go to job").
-  // Expands the list, resets the filter if needed, and highlights
-  // the target card.
   onScrollToJob((e) => {
     expandJobs();
 
     const { jobId } = e.detail;
 
     // Reset the filter to "all" so the target is visible.
-    const btn = document.querySelector('#filters button[data-filter="all"]');
-    if (btn && !btn.classList.contains('active')) btn.click();
+    if (filtersBar.getFilter() !== 'all') {
+      filtersBar.setFilter('all');
+    }
 
     const target = list.querySelector(`.job[data-id="${jobId}"]`);
     if (target) {
@@ -604,7 +554,7 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   // i18n
   // ----------------------------------------------------------
   onI18nChanged(() => {
-    renderFilters();
+    filtersBar.render();
     renderInitialStatuses();
     statusCombo.refresh();
     salaryInput.refresh();
@@ -627,16 +577,4 @@ export function mountJobsController(jobsStore, refsStore, modals, datePicker, co
   );
 
   return { renderList, getFilter: () => currentFilter, roleCombo };
-}
-
-function getDragAfterElement(container, y) {
-  const els = [...container.querySelectorAll('.job:not(.dragging)')];
-  return els.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset, element: child };
-    }
-    return closest;
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
 }

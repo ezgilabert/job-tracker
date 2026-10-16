@@ -1,23 +1,32 @@
 // ============================================================
 // Modal: shared lifecycle for every modal overlay.
 //
-// Handles three things that every modal repeats:
-//   - open / close toggle (the `.open` class on the overlay)
+//   - open / close toggle (`.open` on the overlay)
 //   - click-outside-to-close (overlay click)
-//   - Escape-to-close, with correct priority when several
-//     modals are stacked (only the top of the stack responds)
+//   - Escape-to-close, top-of-stack only
+//   - Focus trap: Tab / Shift+Tab stay inside the top-most modal
+//   - Restores focus to the element that opened the modal on close
 //
-// The stack ordering matches the order modals were opened, not
-// their DOM order, so a nested modal (e.g. unsaved on top of
-// config) always wins over its parent.
-//
-// Widgets that handle Escape themselves (the role picker, the
-// status picker) call `e.stopPropagation()` in their own
-// handlers so the modal-level listener doesn't also fire.
+// Widgets that consume Escape themselves (role picker, status
+// picker) call `e.stopPropagation()` so the modal-level listener
+// doesn't also fire.
 // ============================================================
 
-// Modals currently open, oldest first. The last entry is "on top".
 const stack = [];
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
+function getFocusable(root) {
+  const nodes = [...root.querySelectorAll(FOCUSABLE_SELECTOR)];
+  return nodes.filter(n => !n.hasAttribute('hidden') && n.offsetParent !== null);
+}
 
 /**
  * @param {HTMLElement} el   the .modal-overlay element
@@ -38,8 +47,6 @@ export function createModal(el, {
   escapeAction = null,
 } = {}) {
   if (!el) {
-    // Defensive stub so a missing modal in the DOM doesn't crash
-    // the controller.
     return {
       open: () => {},
       close: () => {},
@@ -49,18 +56,71 @@ export function createModal(el, {
   }
 
   const entry = { el, escapeAction: null };
+  let previousActive = null;
+
+  // ------------------------------------------------------------
+  // Focus trap (top-of-stack only)
+  // ------------------------------------------------------------
+  function onKeydown(e) {
+    if (e.key !== 'Tab') return;
+    if (stack[stack.length - 1] !== entry) return;
+
+    const nodes = getFocusable(el);
+    if (nodes.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    const active = document.activeElement;
+
+    if (e.shiftKey) {
+      if (active === first || !el.contains(active)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (active === last || !el.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
 
   function open() {
+    previousActive = document.activeElement;
     el.classList.add('open');
     removeFromStack();
     stack.push(entry);
     if (onOpen) onOpen();
+
+    document.addEventListener('keydown', onKeydown, true);
+
+    // Auto-focus the first focusable element if the caller
+    // hasn't focused one via onOpen.
+    requestAnimationFrame(() => {
+      if (el.contains(document.activeElement)) return;
+      const nodes = getFocusable(el);
+      if (nodes.length > 0) nodes[0].focus();
+    });
   }
 
   function close() {
     el.classList.remove('open');
     removeFromStack();
+    document.removeEventListener('keydown', onKeydown, true);
     if (onClose) onClose();
+
+    // Restore focus to the trigger, if it's still in the DOM.
+    const target = previousActive;
+    previousActive = null;
+    if (
+      target &&
+      document.body.contains(target) &&
+      typeof target.focus === 'function'
+    ) {
+      try { target.focus(); } catch { /* noop */ }
+    }
   }
 
   function isOpen() {
@@ -94,6 +154,7 @@ export function createModal(el, {
     isOpen,
     destroy() {
       removeFromStack();
+      document.removeEventListener('keydown', onKeydown, true);
     },
   };
 }

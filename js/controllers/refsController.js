@@ -14,11 +14,12 @@ import {
   uid, highlightAndScroll, escapeHtml, valueOf, updateById, withHistoryEntry, debounce,
 } from '../app/utils.js';
 import { renderDashboard } from '../ui/dashboard.js';
-import { createModal } from '../ui/modal.js';
+import { mountToolbarFilter } from '../ui/toolbarFilter.js';
 import { t, tRefState, tRefStateShort } from '../i18n/index.js';
 import { scrollToJob, onScrollToRef, onI18nChanged } from '../app/events.js';
 import { withUndo } from '../app/undo.js';
 import { validateRefPayload } from '../app/validators.js';
+import { createNoteModalController } from './modals/noteModalFactory.js';
 
 /**
  * @param {import('../app/store.js').Store} jobsStore
@@ -283,7 +284,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   });
 
   // ----------------------------------------------------------
-  // Search and filters
+  // Search
   // ----------------------------------------------------------
   const onRefSearchInput = debounce((val) => {
     searchTerm = val;
@@ -291,15 +292,26 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   }, 150);
   document.getElementById('refSearch').addEventListener('input', (e) => onRefSearchInput(e.target.value));
 
-  document.getElementById('refFilters').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-filter]');
-    if (!btn) return;
-    currentFilter = btn.dataset.filter;
-    document.querySelectorAll('#refFilters button').forEach(b =>
-      b.classList.toggle('active', b === btn)
-    );
-    renderRefs();
+  // ----------------------------------------------------------
+  // Filters (extracted to ui/toolbarFilter.js)
+  // ----------------------------------------------------------
+  const refFiltersBar = mountToolbarFilter(document.getElementById('refFilters'), {
+    getItems: () => [
+      { id: 'all',            label: t('refFilter.all') },
+      { id: 'Pending',        label: t('refFilter.Pending') },
+      { id: 'Contacted',      label: t('refFilter.Contacted') },
+      { id: 'Referred',       label: t('refFilter.Referred') },
+      { id: 'In Process',     label: t('refFilter.In Process') },
+      { id: 'Hired',          label: t('refFilter.Hired') },
+      { id: 'Not Applicable', label: t('refFilter.Not Applicable') },
+    ],
+    initial: currentFilter,
+    onChange: (id) => {
+      currentFilter = id;
+      renderRefs();
+    },
   });
+  refFiltersBar.render();
 
   // ----------------------------------------------------------
   // #refList delegation
@@ -348,29 +360,16 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   }
 
   // ----------------------------------------------------------
-  // Advance: with note modal
-  //
-  // The "Save and advance" button is disabled until the textarea
-  // has at least one non-whitespace character. "Continue without
-  // note" is always enabled as the escape hatch.
+  // Advance: with note modal (shared factory)
   // ----------------------------------------------------------
-  const refStepNoteInput = document.getElementById('refStepNoteInput');
-  const refNoteSubtitle = document.getElementById('refNoteModalSubtitle');
-  const refSaveNoteBtn = document.getElementById('saveRefNote');
-  let pendingRefAdvance = null;
-
-  const refNoteModal = createModal(document.getElementById('refNoteModal'), {
-    onClose: () => { pendingRefAdvance = null; },
+  const refNoteController = createNoteModalController({
+    modalEl:    document.getElementById('refNoteModal'),
+    inputEl:    document.getElementById('refStepNoteInput'),
+    subtitleEl: document.getElementById('refNoteModalSubtitle'),
+    saveBtn:    document.getElementById('saveRefNote'),
+    skipBtn:    document.getElementById('skipRefNote'),
+    closeBtn:   document.getElementById('closeRefNoteModal'),
   });
-
-  function syncRefSaveButton() {
-    refSaveNoteBtn.disabled = refStepNoteInput.value.trim().length === 0;
-  }
-
-  refStepNoteInput.addEventListener('input', syncRefSaveButton);
-
-  // Initial state: disabled (in case the textarea starts with content).
-  syncRefSaveButton();
 
   function requestMoveNext(id) {
     const r = refsStore.get().find(x => x.id === id);
@@ -383,47 +382,37 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     if (nextIdx >= REF_WORKFLOW_STEPS.length) return;
 
     const step = REF_WORKFLOW_STEPS[nextIdx];
-    pendingRefAdvance = { id, nextStatus: step.id };
-
-    refNoteSubtitle.innerHTML = t('note.subtitle', {
-      step: escapeHtml(tRefStateShort(step.id)),
-      name: escapeHtml(r.name),
-    });
-
-    refStepNoteInput.value = '';
-    syncRefSaveButton();              // ← reset to disabled on open
-    refNoteModal.open();
-    setTimeout(() => refStepNoteInput.focus(), 80);
-  }
-
-  function applyRefAdvance({ note } = {}) {
-    if (!pendingRefAdvance) return;
-    const { id, nextStatus } = pendingRefAdvance;
-
-    const r = refsStore.get().find(x => x.id === id);
-    if (!r) return;
+    const nextStatus = step.id;
     const prevStatus = r.status;
 
-    withUndo(
-      [refsStore, jobsStore],
-      t('toast.advanceTo', { name: r.name, status: tRefState(nextStatus) }),
-      () => {
-        updateById(refsStore, id, x => withHistoryEntry(
-          x,
-          { status: nextStatus },
-          note ? { status: nextStatus, note } : { status: nextStatus }
-        ));
+    refNoteController.open({
+      subtitleHtml: t('note.subtitle', {
+        step: escapeHtml(tRefStateShort(step.id)),
+        name: escapeHtml(r.name),
+      }),
+      onApply: (note) => {
+        withUndo(
+          [refsStore, jobsStore],
+          t('toast.advanceTo', { name: r.name, status: tRefState(nextStatus) }),
+          () => {
+            updateById(refsStore, id, x => withHistoryEntry(
+              x,
+              { status: nextStatus },
+              note ? { status: nextStatus, note } : { status: nextStatus }
+            ));
 
-        if (nextStatus === 'Hired' && r.linkedJobId) {
-          syncLinkedJobToOffer(r.linkedJobId, r.name);
+            if (nextStatus === 'Hired' && r.linkedJobId) {
+              syncLinkedJobToOffer(r.linkedJobId, r.name);
+            }
+          },
+          'icon-arrow-right'
+        );
+
+        if (nextStatus === 'In Process' && prevStatus !== 'In Process') {
+          setTimeout(() => modals.onRefToJob(id), 400);
         }
       },
-      'icon-arrow-right'
-    );
-
-    if (nextStatus === 'In Process' && prevStatus !== 'In Process') {
-      setTimeout(() => modals.onRefToJob(id), 400);
-    }
+    });
   }
 
   function syncLinkedJobToOffer(jobId, refName) {
@@ -437,23 +426,6 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
       );
     }));
   }
-
-  document.getElementById('skipRefNote').addEventListener('click', () => {
-    applyRefAdvance({ note: null });
-    refNoteModal.close();
-  });
-
-  document.getElementById('saveRefNote').addEventListener('click', () => {
-    // Defensive guard: if something re-enables the button without
-    // content (e.g. a future refactor), bail out instead of
-    // saving an empty note.
-    if (refStepNoteInput.value.trim().length === 0) return;
-    applyRefAdvance({ note: refStepNoteInput.value.trim() });
-    refNoteModal.close();
-  });
-
-  // Closing via the X, overlay click, or Escape cancels the advance.
-  document.getElementById('closeRefNoteModal').addEventListener('click', () => refNoteModal.close());
 
   // ----------------------------------------------------------
   // Backtrack: confirm, once per referral
@@ -558,11 +530,9 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
     expandRefsList();
 
     let needsRender = false;
-    if (currentFilter !== 'all') {
+    if (refFiltersBar.getFilter() !== 'all') {
+      refFiltersBar.setFilter('all', { silent: true });
       currentFilter = 'all';
-      document.querySelectorAll('#refFilters button').forEach(b =>
-        b.classList.toggle('active', b.dataset.filter === 'all')
-      );
       needsRender = true;
     }
     if (searchTerm) {
@@ -582,6 +552,7 @@ export function mountRefsController(jobsStore, refsStore, modals, configStore) {
   // ----------------------------------------------------------
   onI18nChanged(() => {
     renderRefsDash();
+    refFiltersBar.render();
     renderRefs();
   });
 

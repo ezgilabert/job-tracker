@@ -11,6 +11,9 @@
 //   - Any string:     '✓'           → renders as text (backwards
 //                                      compatible with older call
 //                                      sites during migration)
+//
+// Accessibility: each toast is announced by screen readers via
+// `role="status"` + `aria-live="polite"` + `aria-atomic="true"`.
 // ============================================================
 
 import { escapeHtml } from '../../app/utils.js';
@@ -53,6 +56,10 @@ export function showToast(message, icon = 'icon-check', opts = {}) {
 
   const toast = document.createElement('div');
   toast.className = 'toast';
+  // Screen-reader announcement.
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.setAttribute('aria-atomic', 'true');
   toast.innerHTML = `
     ${renderIcon(icon)}
     <span class="toast-message">${escapeHtml(message)}</span>
@@ -91,6 +98,10 @@ export function showActionToast(message, icon, opts) {
 
   const toast = document.createElement('div');
   toast.className = 'toast toast-action';
+  // Screen-reader announcement (polite so it doesn't interrupt).
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.setAttribute('aria-atomic', 'true');
   toast.style.setProperty('--toast-duration', `${duration}ms`);
   toast.innerHTML = `
     ${renderIcon(icon)}

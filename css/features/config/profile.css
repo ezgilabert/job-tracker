@@ -1,0 +1,154 @@
+/* ============================================================
+   Config · Profile panel: avatar + fields + spacing tweaks
+   ============================================================ */
+
+.profile-avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid;
+  place-items: center;
+  color: white;
+  box-shadow: 0 8px 24px rgba(124,92,255,0.3);
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--surface);
+}
+
+.profile-avatar svg {
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.8;
+}
+
+.profile-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.profile-avatar-actions button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color     0.15s ease,
+    color            0.15s ease;
+}
+
+.profile-avatar-actions button:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.profile-avatar-actions button.danger:hover {
+  color: var(--danger);
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.profile-avatar-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.input-prefix {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-2);
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    box-shadow   0.2s ease;
+}
+
+[data-theme="dark"] .input-prefix { background: var(--bg-1); }
+
+.input-prefix:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input-prefix .prefix {
+  display: grid;
+  place-items: center;
+  padding: 0 0.75rem;
+  background: var(--surface-soft);
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 0.88rem;
+  border-right: 1px solid var(--border);
+}
+
+.input-prefix input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  flex: 1;
+}
+
+.profile-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* ============================================================
+   Panel: Profile — form field spacing
+   ------------------------------------------------------------
+   Unlike the jobs/refs forms (which lay their .field elements
+   out inside a .v3-grid with its own gap), the profile panel
+   stacks its .field elements directly inside .config-section.
+   Without an explicit gap, each input ends up flush against
+   the next label, which reads as cramped.
+   ============================================================ */
+
+.config-panel[data-panel="profile"] .field {
+  margin-bottom: 1.1rem;
+}
+
+.config-panel[data-panel="profile"] .field:last-child {
+  margin-bottom: 0;
+}
+
+.config-panel[data-panel="profile"] .field label {
+  margin-bottom: 0.55rem;
+}
+
+.config-panel[data-panel="profile"] .profile-avatar-block {
+  margin-bottom: 1.75rem;
+}
+
+.config-panel[data-panel="profile"] .input-prefix .prefix {
+  min-width: 44px;
+  font-size: 0.95rem;
+}

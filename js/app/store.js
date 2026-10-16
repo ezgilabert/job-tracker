@@ -1,6 +1,19 @@
 // ============================================================
 // Reactive store with localStorage persistence and migration.
+//
+// State is deep-frozen on every write, so a mutation like
+// `store.get()[0].status = 'X'` throws in strict mode (ES
+// modules are strict by default) instead of silently breaking
+// persistence and notifications.
 // ============================================================
+
+function deepFreeze(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Object.isFrozen(obj)) return obj;
+  Object.freeze(obj);
+  for (const key of Object.keys(obj)) deepFreeze(obj[key]);
+  return obj;
+}
 
 export class Store {
   /**
@@ -33,7 +46,7 @@ export class Store {
     // Nothing stored yet: seed or use the default.
     if (stored === null) {
       const data = this.seed ? this.seed() : initialValue;
-      const wrapped = { version: this.version, data };
+      const wrapped = { version: this.version, data: deepFreeze(data) };
       this.#persistRaw(wrapped);
       return wrapped;
     }
@@ -50,12 +63,13 @@ export class Store {
         stored.version = this.version;
         this.#persistRaw(stored);
       }
+      stored.data = deepFreeze(stored.data);
       return stored;
     }
 
     // Legacy flat array: run the migration and rewrap.
     const data = this.migrate ? this.migrate(stored, 0, this.version) : stored;
-    const wrapped = { version: this.version, data };
+    const wrapped = { version: this.version, data: deepFreeze(data) };
     this.#persistRaw(wrapped);
     return wrapped;
   }
@@ -69,6 +83,7 @@ export class Store {
   }
 
   get() {
+    // Frozen: safe to share. Any mutation attempt throws in strict mode.
     return this.state.data;
   }
 
@@ -81,7 +96,7 @@ export class Store {
       console.warn('[Store] updater returned undefined; ignored');
       return;
     }
-    this.state.data = next;
+    this.state.data = deepFreeze(next);
     this.#persistRaw(this.state);
     this.#emit();
   }

@@ -1,0 +1,281 @@
+/* ============================================================
+   Config · Base: modal shell, nav, layout, generic buttons
+   ============================================================ */
+
+.config-modal {
+  max-width: 780px;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* The config modal is the only modal large enough to need a
+   scrollbar. Hide it visually (the modal still scrolls) to avoid
+   a stray UI element inside the panel. Other modals use the
+   browser default. */
+.config-modal::-webkit-scrollbar {
+  display: none;
+}
+
+.config-modal h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  padding-right: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.config-modal h2 > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.config-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.unsaved-badge {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.22rem 0.6rem;
+  border-radius: 20px;
+  background: var(--warning-soft);
+  color: var(--warning-2);
+  border: 1px solid var(--warning-border);
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+.unsaved-badge.visible { display: inline-flex; }
+
+.unsaved-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warning);
+  box-shadow: 0 0 6px var(--warning);
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.65; }
+}
+
+.config-layout {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.config-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.4rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+.config-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color 0.18s ease,
+    color            0.18s ease,
+    box-shadow       0.18s ease;
+}
+
+.config-tab:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.config-tab.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+.config-tab-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke-width: 1.8;
+  display: block;
+}
+
+.config-tab-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.config-nav-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 0.35rem 0.5rem;
+  flex-shrink: 0;
+}
+
+.config-body {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.config-panel { display: none; }
+.config-panel.active { display: block; }
+
+.config-section {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.config-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.config-section-head { margin-bottom: 0.85rem; }
+
+.config-section-head h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.config-section-head h3 > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.config-section-head p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.config-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.config-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* SVG icons inside config buttons (backup / danger / save) */
+.config-actions .btn > svg,
+.config-danger-card .btn > svg,
+.config-backup-actions .btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   Config · SVG icon sizing for panel templates
+   ============================================================ */
+
+/* Category tags (Roles tab) */
+.config-tag > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Category chips (New role modal) */
+.create-cat-chip > svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Status checkboxes (Initial statuses tab) */
+.config-check > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Default status buttons */
+.config-default-btn > svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Filter reorder list icons */
+.config-filter-item .drag-info > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Filter action buttons (eye / eye-off) */
+.config-icon-btn > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  display: block;
+}

@@ -1,0 +1,295 @@
+/* ============================================================
+   Config · Advanced: danger zone, backup, unsaved modal
+   ============================================================ */
+
+/* ============================================================
+   Danger zone · 2 cards + full reset
+   ============================================================ */
+
+.config-section-danger {
+  border-bottom: none;
+}
+
+.config-section-danger .config-section-head h3 {
+  color: var(--danger-2);
+}
+
+.config-danger-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.config-danger-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s ease;
+}
+
+.config-danger-card.prefs {
+  border-color: var(--warning-border);
+}
+
+.config-danger-card.data {
+  border-color: var(--danger-border);
+}
+
+.danger-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.danger-card-icon > svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  display: block;
+}
+
+.config-danger-card.prefs .danger-card-icon {
+  background: var(--warning-soft);
+  color: var(--warning-2);
+}
+
+.config-danger-card.data .danger-card-icon {
+  background: var(--danger-soft);
+  color: var(--danger-2);
+}
+
+.config-danger-card h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.config-danger-card p {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  flex: 1;
+  margin: 0;
+}
+
+.config-danger-card .btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.config-danger-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px dashed var(--danger-border);
+  background: transparent;
+  flex-wrap: wrap;
+}
+
+.config-danger-all-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.config-danger-all-info strong {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--danger-2);
+  margin-bottom: 0.15rem;
+}
+
+.config-danger-all-info strong > svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+  vertical-align: -2px;
+  margin-right: 0.3rem;
+  display: inline-block;
+}
+
+.config-danger-all-info span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ============================================================
+   Additional button variants
+   ============================================================ */
+
+.btn-warning-ghost {
+  background: var(--warning-soft);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-2);
+}
+
+.btn-warning-ghost:hover {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: white;
+  box-shadow: 0 6px 16px rgba(245,158,11,0.35);
+}
+
+.btn-danger-solid {
+  background: var(--danger);
+  border: 1px solid var(--danger);
+  color: white;
+}
+
+.btn-danger-solid:hover {
+  background: var(--danger-2);
+  border-color: var(--danger-2);
+  color: white;
+  box-shadow: 0 6px 18px rgba(239,68,68,0.45);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   Data & backup section (Advanced tab)
+   ============================================================ */
+
+.config-backup-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  flex-wrap: wrap;
+  transition: border-color 0.2s ease;
+}
+
+.config-backup-card + .config-backup-card {
+  margin-top: 0.65rem;
+}
+
+.config-backup-card:hover {
+  border-color: var(--border-strong);
+}
+
+.config-backup-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.config-backup-icon > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  display: block;
+}
+
+.config-backup-icon.danger {
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+  color: var(--danger-2);
+}
+
+.config-backup-info {
+  flex: 1;
+  min-width: 220px;
+}
+
+.config-backup-info strong {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.config-backup-info > span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.config-backup-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.config-backup-actions .btn {
+  white-space: nowrap;
+}
+
+.config-backup-stats {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+}
+
+.config-backup-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.config-backup-stat > svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+  flex-shrink: 0;
+  display: block;
+}
+
+.modal-overlay.nested { z-index: 110; }
+
+.unsaved-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-danger-ghost {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-2);
+}
+
+.btn-danger-ghost:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+.unsaved-modal h2 {
+  padding-right: 2.5rem;
+}
